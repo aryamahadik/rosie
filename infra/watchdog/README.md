@@ -33,10 +33,15 @@ Owner: release engineer. Not installed in D-000 until check 3. Nothing here star
 ```
 claude -p "<continue message>" --add-dir "<handover>" \
   --append-system-prompt-file "<handover>/3 Build Plan Prompt for Claude.md" \
+  --settings "<code folder>/.claude/settings.json" \
   --permission-mode acceptEdits --permission-prompts none --output-format stream-json --verbose
 ```
 
 - The continue message is the build prompt's ("How to use", step 4), word for word.
+- `--settings` passes the project's own `.claude/settings.json` explicitly. This workspace is not marked trusted in
+  Claude Code, and a headless run then ignores the file's allow rules ("this workspace has not been trusted"), so
+  every allowed command was refused in check 3's first run. Passed this way, its allow and deny rules and the guard
+  hook apply to the shift and its subagents. A shift does not start if the file is missing (DL-053).
 - Environment: `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` and `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`.
   Removed: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` (never agent teams), `ANTHROPIC_API_KEY` and
   `ANTHROPIC_AUTH_TOKEN`. Without them the shift runs on the signed-in Claude account and cannot bill an
