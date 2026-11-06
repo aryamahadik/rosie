@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git switch *)",
+      "Bash(git worktree *)",
+      "Bash(git rebase *)",
+      "Bash(git revert *)",
+      "Bash(git branch *)",
+      "Bash(git fetch *)",
+      "Bash(git push origin task/*)",
+      "Bash(git push origin train/*)",
+      "Bash(git push -u origin task/*)",
+      "Bash(git push -u origin train/*)",
+      "Bash(git push task/*)",
+      "Bash(git push train/*)",
+      "Bash(git push --force-with-lease origin task/*)",
+      "Bash(git -C ops *)",
+      "Bash(npm ci *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(cp -R * scratch/master-copy/*)",
+      "Bash(cp -r * scratch/master-copy/*)",
+      "Bash(cp * scratch/master-copy/*)",
+      "Bash(chmod -R u+w scratch/master-copy *)",
+      "Bash(node scratch/master-copy/engine/*)",
+      "Bash(docker compose -f infra/docker-compose.yml *)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)",
+      "Bash(gh run watch *)",
+      "Bash(gh workflow run merge-check.yml *)",
+      "Bash(date *)",
+      "Bash(sleep *)"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Edit(**/.env)",
+      "Read(**/.env.*)",
+      "Edit(**/.env.*)",
+      "Read(**/.dev.vars)",
+      "Edit(**/.dev.vars)",
+      "Read(**/.dev.vars.*)",
+      "Edit(**/.dev.vars.*)",
+      "Read(~/.config/rosfield/**)",
+      "Edit(~/.config/rosfield/**)",
+      "Read(~/.ssh/**)",
+      "Edit(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Edit(~/.aws/**)",
+      "Read(**/*.pem)",
+      "Edit(**/*.pem)",
+      "Edit(//Users/aryamahadik/Downloads/Rosfield_Main/Rosfield Main Handover/**)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin HEAD:main:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(npx wrangler deploy:*)",
+      "Bash(wrangler deploy:*)",
+      "Bash(npm run deploy:production:*)",
+      "Agent(fork)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read|Edit|Write|MultiEdit|NotebookEdit|Agent|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}
