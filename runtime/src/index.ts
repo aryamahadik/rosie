@@ -44,7 +44,11 @@ export default {
 
     if (request.method === "GET" && new URL(request.url).pathname === healthPath) {
       console.log(JSON.stringify({ level: "info", msg: "health", trace_id: traceId, environment, version }));
-      return jsonResponse(200, { ok: true, environment, version, trace_id: traceId }, traceId);
+      return jsonResponse(
+        200,
+        { ok: true, service: "rosie", environment, version, trace_id: traceId },
+        traceId,
+      );
     }
     console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
     return jsonResponse(404, { ok: false, error: "not_found", trace_id: traceId }, traceId);

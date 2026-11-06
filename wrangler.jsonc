@@ -39,8 +39,12 @@
       "secrets": {
         "required": [],
       },
-      // Switched on only after the user's OK for staging to take over rosfield.com/test (ops SETUP.md).
-      // "routes": [{ "pattern": "rosfield.com/test*", "zone_name": "rosfield.com" }],
+      // Switched on Nov 6 2026 with the user's OK for staging to take over rosfield.com/test (DL-036).
+      // Two exact patterns, so other site paths that merely start with "test" are not caught.
+      "routes": [
+        { "pattern": "rosfield.com/test", "zone_name": "rosfield.com" },
+        { "pattern": "rosfield.com/test/*", "zone_name": "rosfield.com" },
+      ],
     },
   },
 }
