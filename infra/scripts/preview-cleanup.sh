@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Removes a branch preview's database schema (factory spec 6; build prompt 5.3, "removed after merge"):
-# infra/scripts/preview-cleanup.sh <branch>
+# npm run preview:cleanup -- <branch>  (the lead runs it on the build Mac after a merge or drop; DL-024)
 # Drops preview_<slug> on the staging database, computed exactly as deploy-preview.sh does, and refuses any
 # schema whose name does not start with preview_. Skipped with a notice when STAGING_DATABASE_URL is not set.
 set -euo pipefail

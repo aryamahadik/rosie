@@ -41,6 +41,7 @@
     "migrate": "node infra/scripts/migrate.mjs",
     "cf": "bash infra/scripts/cf.sh",
     "deploy:preview": "bash infra/scripts/deploy-preview.sh",
+    "preview:cleanup": "bash infra/scripts/preview-cleanup.sh",
     "deploy:staging": "bash infra/scripts/deploy-staging.sh",
     "rollback:staging": "bash infra/scripts/rollback-staging.sh",
     "check:staging": "bash infra/scripts/post-deploy-check.sh"

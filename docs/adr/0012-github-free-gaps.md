@@ -1,7 +1,7 @@
 # ADR-012: GitHub Free gaps
 
 - Status: proposed, default in use (D-000)
-- Date: 2026-11-05
+- Date: 2026-11-05; revised the same day for DL-024, before D-000 merged (nothing was built on the earlier text)
 - Owner: architect. Decides: the CTO.
 
 ## Context
@@ -13,13 +13,14 @@
 ## Decision
 
 - **Pushes to `main`** are blocked locally by Claude Code's permission deny rules (`git push origin main`, `HEAD:main`, `--force`, `-f`) and by the PreToolUse hook (any push to `main` or `master`, a force push to a non-task branch, a bare push while on `main`). Only the lead merges, by pull request, after `merge-check.yml` passes (5.1, 6.5).
-- **Production keys are never in GitHub,** and none is in any agent session: no production deploy script, workflow or secret exists (Q-50's default: until the CTO decides, he deploys production by hand). The hook and the deny rules block production deploys; the workflows touch staging only.
+- **Production keys are never in GitHub,** and none is in any agent session: no production deploy script, workflow or secret exists (Q-50's default: until the CTO decides, he deploys production by hand). The hook and the deny rules block production deploys.
+- **GitHub holds no secrets at all** (DL-024): the workflows run checks only and touch no outside service. Previews, staging deploys and the back-only rollback run on the build Mac through the npm scripts and the Rosfield sign-in (ADR-008, ADR-011).
 - **Approvals** count only as build prompt 9.1 allows: the user's answers in this build's chat, speaking for Jay (DL-009, DL-011). No GitHub action counts as Jay's or the CTO's, since one login cannot tell them apart from the build.
 - **CODEOWNERS** (`/.github/` and `/.claude/` to `@aryamahadik`) is informational only.
 
 ## Consequences
 
-- The local rules bind only Claude Code sessions on this Mac. GitHub does not stop a push to `main` made any other way; CI on `main`, the staging check and the back-only rollback job are what catch and undo it.
+- The local rules bind only Claude Code sessions on this Mac. GitHub does not stop a push to `main` made any other way; CI on `main` shows it, and staging changes only when the lead runs `npm run deploy:staging` on the build Mac, whose post-deploy check rolls staging back with no click when it fails (DL-024).
 - Status checks and reviews cannot block a merge; the lead's merge queue (6.5) is the control.
 - With one login, `github.triggering_actor` cannot tell the build from Jay or the CTO, so section 2's gate for plans without Enterprise cannot work as written. Production stays outside GitHub until the CTO decides (Q-50).
 - The hook and the rules are the gate on the agent side, so their tests (`infra/ci/guard.test.mjs`) and D-000 check 2 (each blocked attempt shown) are the evidence that they work (5.9).
@@ -36,6 +37,6 @@
 - Build prompt "How to use" step 1; 2 (the table, and "a hook is never the only control"); 5.1; 5.4; 5.6; 5.9 (check 2); 6.5; 9.1.
 - Architecture: silent on GitHub. Architecture 10, "Every platform area" (Security), keeps runtime secrets in Workers secrets, not in GitHub.
 - MC 8, "GitHub".
-- Q-50; DL-009, DL-011.
+- Q-50; DL-009, DL-011, DL-024.
 - D-000 spec, sections 7 and 9.
 - Checked 2026-11-05: GitHub docs, "Deployments and environments" (required reviewers and environment secrets by plan).

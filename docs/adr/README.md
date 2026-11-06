@@ -27,7 +27,7 @@ A record that work is built on is never rewritten to say something else; it is s
 | [ADR-008](0008-environments.md)                      | Environments                       | Local; a preview per branch with its own schema; staging at `rosfield.com/test`; production later                                    | proposed, default in use (D-000) |
 | [ADR-009](0009-traces.md)                            | Traces                             | One trace id from webhook to delivery receipt; JSON logs; Workers Logs                                                               | proposed, default in use (D-000) |
 | [ADR-010](0010-flags.md)                             | Flags                              | A PostgreSQL table per environment with allow-listed handles; production flags only from the protected release step                  | proposed, default in use (D-000) |
-| [ADR-011](0011-ci-runners.md)                        | CI runners                         | GitHub-hosted Linux runners within GitHub Free's included usage                                                                      | proposed, default in use (D-000) |
+| [ADR-011](0011-ci-runners.md)                        | CI runners                         | GitHub-hosted Linux runners within GitHub Free's included usage; checks only, no secrets (DL-024)                                    | proposed, default in use (D-000) |
 | [ADR-012](0012-github-free-gaps.md)                  | GitHub Free gaps                   | No branch protection, no environments, one login: local permission rules and hooks are the controls; production keys never in GitHub | proposed, default in use (D-000) |
 
 ## Short names used in the records

@@ -1,6 +1,5 @@
 # Every branch: format, lint, type check, tests, the test guard and the migration guard
 # (build prompt 5.2; factory spec sections 3 and 7). Needs no secret, so it goes green without any.
-# A push to task/** then deploys a preview: the `preview` job below calls preview.yml once `checks` passes.
 name: ci
 
 on:
@@ -61,13 +60,3 @@ jobs:
 
       - name: Migration guard (migrations only expand)
         run: npm run guard:migrations
-
-  preview:
-    name: preview
-    needs: checks
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/task/')
-    uses: ./.github/workflows/preview.yml
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}

@@ -16,9 +16,12 @@ coverage/
 # Contract types are generated in CI and never committed (ADR-005)
 /contracts/generated/
 
-# Claude Code: builder worktrees and personal settings
+# Claude Code: builder worktrees, personal settings and the lead session's lock files (the rest of .claude/ is
+# committed by path)
 /.claude/worktrees/
 /.claude/settings.local.json
+/.claude/scheduled_tasks.lock
+/.claude/*.lock
 
 # macOS
 .DS_Store

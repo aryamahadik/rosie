@@ -19,4 +19,4 @@ The Cloudflare Worker: the gateway, the handle actor (safety read on arrival, ba
 ## Running it
 
 - Locally: `npm run cf -- dev --env staging` (wrangler always runs through `infra/scripts/cf.sh`).
-- A branch preview: `npm run deploy:preview -- <branch>`. Staging: `npm run deploy:staging` (CI, from `main`), back only with `npm run rollback:staging`. No production deploy exists in D-000.
+- A branch preview: `npm run deploy:preview -- <branch>`. Staging: `npm run deploy:staging` (run on the build Mac after each merge to `main`, DL-024; it rolls back by itself when its check fails), back only with `npm run rollback:staging`. No production deploy exists in D-000.

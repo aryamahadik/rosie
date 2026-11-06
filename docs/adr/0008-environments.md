@@ -1,7 +1,7 @@
 # ADR-008: Environments
 
 - Status: proposed, default in use (D-000)
-- Date: 2026-11-05
+- Date: 2026-11-05; revised the same day for DL-024, before D-000 merged (nothing was built on the earlier text)
 - Owner: architect. Decides: the CTO.
 
 ## Context
@@ -10,12 +10,13 @@
 - One Cloudflare account on Workers Paid holds staging and, for now, production. Wrangler runs with `XDG_CONFIG_HOME=$HOME/.config/rosfield` and a pinned `account_id` (MC 8, "Cloudflare"). This overrides J-05's separate production account for now (MC section 2, rule 4).
 - The build lives under rosfield.com/test. rosfield.com's DNS is on Cloudflare, and that path serves a page today (DL-014, DL-023).
 - D-000's first check: a trivial change goes from branch to CI to preview to staging, with its trace visible (5.9).
+- DL-024: no Cloudflare API token and no GitHub secrets. Previews, staging deploys and rollbacks run on the build Mac with the Rosfield wrangler sign-in (OAuth); CI runs checks only (ADR-011).
 
 ## Decision
 
 - **Local:** wrangler only through `npm run cf` (`infra/scripts/cf.sh`: the Rosfield sign-in and the account guard), and PostgreSQL in Docker (ADR-006). Keys only in the git-ignored `.dev.vars`; none in a worktree (5.1).
-- **A preview per branch:** `npm run deploy:preview` uploads a version of the staging Worker under a preview alias (`wrangler versions upload --env staging --preview-alias <slug>`), with its own schema `preview_<slug>` in the staging database once that exists. `preview-cleanup.sh` drops the schema when the pull request closes or the branch is deleted.
-- **Staging:** Worker `rosie-staging`, `BASE_PATH` `/test`, on its workers.dev address until the user's OK switches on the route `rosfield.com/test*` (written, commented out). It deploys only from `main`, in the order of 5.4, with doubles and test modes only (Stripe test mode, J-12).
+- **A preview per branch:** once the branch's `ci.yml` run is green, the lead runs `npm run deploy:preview -- <branch>` on the build Mac. It checks out the branch's pushed commit in a temporary worktree and uploads a version of the staging Worker under a preview alias (`wrangler versions upload --env staging --preview-alias <slug>`), with its own schema `preview_<slug>` in the staging database once that exists. After the branch merges or is dropped, the lead runs `npm run preview:cleanup -- <branch>`, which drops the schema. A branch whose own changes touch the wrangler config, `infra/`, `.github/`, a package manifest, the lockfile or `.npmrc` is refused until the lead has reviewed that diff and sets `PREVIEW_ALLOW_INFRA=1`; the preview installs with `npm ci --ignore-scripts` and uploads through the main checkout's `cf.sh`, never the branch's.
+- **Staging:** Worker `rosie-staging`, `BASE_PATH` `/test`, on its workers.dev address until the user's OK switches on the route `rosfield.com/test*` (written, commented out). It deploys only from `main`, in the order of 5.4, with doubles and test modes only (Stripe test mode, J-12): the lead runs `npm run deploy:staging` on the build Mac after each merge, and a failed post-deploy check rolls staging back with no click.
 - **Production:** the Worker name `rosie` is reserved. No production deploy script, workflow or secret exists in D-000; until the CTO decides, he deploys production by hand (Q-50). The hook and the deny rules block every production deploy (D-000 spec, section 9).
 
 ## Consequences
@@ -24,7 +25,8 @@
 - Requests to version URLs do not reach Workers Logs or `wrangler tail`, so a preview's trace id is read from its response. D-000's trace check reads Workers Logs on staging (ADR-009).
 - Version URLs exist only on workers.dev. A preview alias must start with a lowercase letter, and alias plus Worker name must fit in 63 characters; slugs of `task/T-xxx` branches (`task-t-xxx`, at most 40 characters) fit.
 - Until the staging database exists (J-06), previews and staging run without one and skip migrations with a notice.
-- Cloudflare grants Workers permissions per account, and its permissions reference lists no way to limit a token to one Worker. A staging CI token could therefore change any Worker in the account. The controls: only `--env staging` in scripts and workflows; the hook and the deny rules; no production secret in GitHub (ADR-012); and Q-51 (production in its own account before live keys).
+- Cloudflare grants Workers permissions per account, and its permissions reference lists no way to limit a token to one Worker. The Rosfield wrangler sign-in the deploy scripts use (OAuth, DL-024) has the same account-wide reach: anything run with it could change any Worker in the account. The controls: `cf.sh` pins the Rosfield account and refuses a Worker-changing command without `--env staging`; the hook and the deny rules; no secret of any kind in GitHub (ADR-012); and Q-51 (production in its own account before live keys).
+- Previews and staging deploy only while the build Mac is up and signed in (DL-024's trade-off; the Mac stays on).
 - `BASE_PATH` is `/test` on workers.dev too, so URLs keep their shape when the route goes live.
 
 ## Alternatives not chosen
@@ -39,6 +41,6 @@
 - Build prompt "How to use" step 1; 3.7 (J-05, J-06, J-12); 5.1; 5.3; 5.4; 5.9 (check 1); 9.4.
 - Architecture 02 (a Durable Object per handle); architecture 10, "Every platform area" (Deploy; Security: secrets in Workers secrets); architecture 12, "Critical path outside the code" (the Linq webhook moves to staging once staging is up).
 - MC 8, "Cloudflare"; MC section 2, rule 4.
-- DL-014, DL-023; Q-50, Q-51.
+- DL-014, DL-023, DL-024; Q-50, Q-51.
 - D-000 spec, sections 6 and 7.
 - Checked 2026-11-05: Cloudflare docs ("Version URLs"; "Previews"; API token permissions reference); `wrangler versions upload --help` and `wrangler preview --help` (Wrangler 4.158.0).

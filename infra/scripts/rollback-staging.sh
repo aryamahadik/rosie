@@ -69,8 +69,6 @@ fi
 log "rollback: to version $target (uploaded $target_created); migrations stay in place"
 "$CF" rollback "$target" --env staging --message "$reason" --yes
 log "rollback: done, live version is now $target"
-gh_output version_id "$target"
-gh_summary "Staging rolled back to version \`$target\` (uploaded $target_created). Reason: $reason"
 
 [[ -n "${STAGING_BASE_URL:-}" ]] ||
   die "rolled back, but STAGING_BASE_URL is not set, so check:staging could not run"

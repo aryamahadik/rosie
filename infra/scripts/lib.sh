@@ -33,22 +33,20 @@ preview_schema() {
   printf 'preview_%s' "${1//-/_}"
 }
 
-# The commit being deployed: GIT_SHA, else GitHub's GITHUB_SHA, else the checked-out commit.
+# The commit being deployed: GIT_SHA when set, else the checked-out commit.
 git_sha() {
   if [[ -n "${GIT_SHA:-}" ]]; then
     printf '%s' "$GIT_SHA"
-  elif [[ -n "${GITHUB_SHA:-}" ]]; then
-    printf '%s' "$GITHUB_SHA"
   else
     git -C "$ROOT" rev-parse HEAD
   fi
 }
 
-# Local runs only: loads one named key from the git-ignored .dev.vars into the environment, unless it is
-# already set (CI passes its secrets in the environment). The value is never printed.
+# Loads one named key from the git-ignored .dev.vars into the environment, unless it is already set. The value
+# is never printed.
 load_dev_var() {
   local name="$1" file="$ROOT/.dev.vars" line value
-  if [[ -n "${CI:-}" || -n "${!name:-}" || ! -f "$file" ]]; then
+  if [[ -n "${!name:-}" || ! -f "$file" ]]; then
     return 0
   fi
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -75,17 +73,4 @@ wrangler_output() {
     const value = entry === undefined ? undefined : entry[field];
     if (value !== undefined && value !== null) console.log(Array.isArray(value) ? value.join("\n") : String(value));
   ' "$1" "$2" "$3"
-}
-
-# GitHub Actions: a step output and a line in the job summary (no-ops elsewhere).
-gh_output() {
-  if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-    printf '%s=%s\n' "$1" "$2" >>"$GITHUB_OUTPUT"
-  fi
-}
-
-gh_summary() {
-  if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
-    printf '%s\n' "$*" >>"$GITHUB_STEP_SUMMARY"
-  fi
 }
