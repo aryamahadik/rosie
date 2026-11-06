@@ -1,0 +1,2 @@
+# Keys never go in this file: never list .env, .dev.vars or any key file here (build prompt 5.1).
+# Builders use fixtures and test doubles, so keys never enter a worktree.

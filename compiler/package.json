@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/compiler",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Fixture set v1 and the step-graph compiler from the master JSON, trade files and Master Corrections.",
+  "type": "module"
+}

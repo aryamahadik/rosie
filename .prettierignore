@@ -1,0 +1,7 @@
+# Prettier also skips everything .gitignore lists (ops/, scratch/, keys, node_modules, coverage, .wrangler/).
+package-lock.json
+
+# Generated or checksummed files are never reformatted.
+bundles/
+fixtures/
+contracts/generated/

@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Secure pages, booking page, owner and team consoles, and the staging test tools.",
+  "type": "module"
+}

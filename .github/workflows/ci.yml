@@ -1,0 +1,62 @@
+# Every branch: format, lint, type check, tests, the test guard and the migration guard
+# (build prompt 5.2; factory spec sections 3 and 7). Needs no secret, so it goes green without any.
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  # Keep every run on main; on other branches a newer push replaces the running one.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out (full history, so the guards can compare with origin/main)
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node (version from .nvmrc)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install from the lockfile
+        run: npm ci --no-audit --no-fund
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Tests (unit, workers, contract)
+        run: npm test
+
+      - name: CI script tests (the guards and the PreToolUse hook)
+        run: node --test "infra/ci/*.test.mjs"
+
+      - name: Test guard (no fewer tests, no new skip, todo or only)
+        run: npm run guard:tests
+
+      - name: Migration guard (migrations only expand)
+        run: npm run guard:migrations

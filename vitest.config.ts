@@ -1,0 +1,80 @@
+// Vitest projects (factory spec 2, ADR-003). `npm test` runs unit, workers and contract; each project also has its
+// own script (`npm run test:<project>`). A project with no test files passes.
+import { cloudflareTest } from "@cloudflare/vitest-plugin";
+import { defineConfig } from "vitest/config";
+
+const workspaces = [
+  "contracts",
+  "compiler",
+  "db",
+  "runtime",
+  "actions",
+  "ai",
+  "adapters",
+  "web",
+  "evals",
+  "tests",
+];
+
+// The local database of infra/docker-compose.yml, used when DATABASE_URL and CI are both unset.
+const LOCAL_DATABASE_URL = "postgres://rosie:rosie@127.0.0.1:54329/rosie";
+const databaseUrl = process.env.DATABASE_URL ?? (process.env.CI ? undefined : LOCAL_DATABASE_URL);
+
+export default defineConfig({
+  test: {
+    passWithNoTests: true,
+    projects: [
+      {
+        // Unit tests beside the code: each workspace's src/, plus db/repo/ and db/seeds/ (db's layout).
+        test: {
+          name: "unit",
+          include: [
+            ...workspaces.map((workspace) => `${workspace}/src/**/*.test.ts`),
+            "db/repo/**/*.test.ts",
+            "db/seeds/**/*.test.ts",
+          ],
+          exclude: ["**/node_modules/**", "**/*.worker.test.ts", "**/*.int.test.ts"],
+        },
+      },
+      {
+        // Runs inside the Workers runtime with wrangler.jsonc's staging environment.
+        plugins: [
+          cloudflareTest({
+            wrangler: { configPath: "./wrangler.jsonc", environment: "staging" },
+            miniflare: { bindings: { GIT_SHA: "test-sha" } },
+          }),
+        ],
+        test: {
+          name: "workers",
+          include: ["runtime/src/**/*.worker.test.ts"],
+        },
+      },
+      {
+        test: {
+          name: "contract",
+          include: ["tests/contract/**/*.test.ts"],
+        },
+      },
+      {
+        // Needs PostgreSQL: `npm run db:up` locally, a service container in CI.
+        test: {
+          name: "integration",
+          include: ["db/**/*.int.test.ts"],
+          env: databaseUrl === undefined ? {} : { DATABASE_URL: databaseUrl },
+        },
+      },
+      {
+        test: {
+          name: "scenario",
+          include: ["tests/scenarios/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
+          name: "e2e",
+          include: ["tests/e2e/**/*.test.ts"],
+        },
+      },
+    ],
+  },
+});

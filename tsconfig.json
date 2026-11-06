@@ -1,0 +1,25 @@
+{
+  // One program for every workspace (factory spec 2): `npm run typecheck` runs `tsc --noEmit -p .`.
+  // Node types load first, then the Workers types: unit tests run Workers code under Node, and the Worker runs with
+  // nodejs_compat (Cloudflare's TypeScript guidance pairs its runtime types with @types/node). The two packages
+  // declare some of the same globals; skipLibCheck (tsconfig.base.json) keeps that overlap out of the results.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "@cloudflare/workers-types", "@cloudflare/vitest-plugin/types"]
+  },
+  "include": [
+    "contracts",
+    "compiler",
+    "db",
+    "runtime",
+    "actions",
+    "ai",
+    "adapters",
+    "web",
+    "evals",
+    "tests",
+    "infra",
+    "vitest.config.ts"
+  ]
+}

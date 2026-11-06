@@ -1,0 +1,151 @@
+# The merge queue's check (build prompt 5.2 and 6.5; factory spec section 7). Before merging, the lead runs:
+#   gh workflow run merge-check.yml -f branch=task/T-xxx [-f ai_change=true]
+# It rebases the branch onto origin/main inside the runner (a conflict fails the run: the lead hands it back as
+# a rebase step), runs everything ci.yml runs, then applies the migrations to a PostGIS service container and
+# runs the integration, scenario and end-to-end tests. Nothing is pushed. Needs no secret.
+name: merge-check
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to check, for example task/T-041"
+        required: true
+        type: string
+      ai_change:
+        description: "The branch changes what the AI does: also run the eval smoke slice"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merge-check-${{ inputs.branch }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  merge-check:
+    name: merge check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: rosie
+          POSTGRES_PASSWORD: rosie
+          POSTGRES_DB: rosie
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rosie -d rosie"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      BRANCH: ${{ inputs.branch }}
+      # The throwaway CI database (factory spec section 4: rosie/rosie is local only, not a secret).
+      DATABASE_URL: postgres://rosie:rosie@localhost:5432/rosie
+    steps:
+      - name: Check the branch name
+        run: |
+          set -euo pipefail
+          if ! [[ "$BRANCH" =~ ^(task|train)/[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*$ ]] || [[ "$BRANCH" == *..* ]]; then
+            echo "::error title=Bad branch::branch must be a task/... or train/... branch, not \"$BRANCH\"."
+            exit 1
+          fi
+
+      - name: Check out the branch (full history)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Rebase onto origin/main (a conflict fails the run)
+        run: |
+          set -euo pipefail
+          git config user.name "rosie merge-check"
+          git config user.email "merge-check@users.noreply.github.com"
+          before="$(git rev-parse HEAD)"
+          main="$(git rev-parse origin/main)"
+          if ! git rebase origin/main; then
+            git rebase --abort || true
+            echo "::error title=Rebase conflict::$BRANCH does not rebase cleanly onto origin/main ($main). It goes back to its owner as a rebase step."
+            exit 1
+          fi
+          after="$(git rev-parse HEAD)"
+          echo "Rebased $BRANCH ($before) onto origin/main ($main): now $after"
+          {
+            echo "## merge-check: $BRANCH"
+            echo ""
+            echo "- Branch head: \`$before\`"
+            echo "- origin/main: \`$main\`"
+            echo "- Checked (rebased, not pushed): \`$after\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Node (version from .nvmrc)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install from the lockfile
+        run: npm ci --no-audit --no-fund
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Tests (unit, workers, contract)
+        run: npm test
+
+      - name: CI script tests (the guards and the PreToolUse hook)
+        run: node --test "infra/ci/*.test.mjs"
+
+      - name: Test guard (no fewer tests, no new skip, todo or only)
+        run: npm run guard:tests
+
+      - name: Migration guard (migrations only expand)
+        run: npm run guard:migrations
+
+      - name: Apply the migrations to the CI database
+        run: npm run migrate
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      - name: Scenario tests
+        run: npm run test:scenario
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Eval smoke slice (AI changes only)
+        if: inputs.ai_change
+        run: echo "no gold set yet"
+
+      - name: Job summary
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          AI_CHANGE: ${{ inputs.ai_change }}
+        run: |
+          set -euo pipefail
+          {
+            echo "- Result: $JOB_STATUS"
+            if [ "$AI_CHANGE" = "true" ]; then
+              echo "- Eval smoke slice: no gold set yet"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/actions",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tool API and frontier, the gate and limits 1 to 7, the one commit per turn, domain services and the Agent API.",
+  "type": "module"
+}

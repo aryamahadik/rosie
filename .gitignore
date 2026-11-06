@@ -1,0 +1,27 @@
+# The lead's own repository and the scratch space (build prompt 5.7, hard rule 2)
+/ops/
+/scratch/
+
+# Keys never enter git (hard rule 7)
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+
+# Dependencies and tool output
+node_modules/
+coverage/
+.wrangler/
+
+# Contract types are generated in CI and never committed (ADR-005)
+/contracts/generated/
+
+# Claude Code: builder worktrees, personal settings and the lead session's lock files (the rest of .claude/ is
+# committed by path)
+/.claude/worktrees/
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock
+/.claude/*.lock
+
+# macOS
+.DS_Store

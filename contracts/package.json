@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Contracts (JSON Schema with fixtures, per version) and the TypeScript types generated from them.",
+  "type": "module"
+}
