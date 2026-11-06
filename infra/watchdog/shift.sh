@@ -14,6 +14,10 @@ CODE_DIR=${ROSIE_CODE_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}
 OPS_DIR=${ROSIE_OPS_DIR:-$CODE_DIR/ops}
 HANDOVER_DIR=${ROSIE_HANDOVER_DIR:-/Users/aryamahadik/Downloads/Rosfield_Main/Rosfield Main Handover}
 CLAUDE_BIN=${ROSIE_CLAUDE_BIN:-claude}
+# The project settings, passed explicitly (DL-053): this workspace is not marked trusted, and a headless run then
+# ignores the allow rules in .claude/settings.json ("this workspace has not been trusted"). --settings applies the
+# same file (allow and deny rules, and the guard hook) to the shift and its subagents.
+SETTINGS_FILE="$CODE_DIR/.claude/settings.json"
 PROMPT_FILE="$HANDOVER_DIR/3 Build Plan Prompt for Claude.md"
 SHIFTS_DIR="$OPS_DIR/shifts"
 CURRENT_PID="$SHIFTS_DIR/current.pid"
@@ -196,6 +200,7 @@ main() {
   if ! command -v "$CLAUDE_BIN" >/dev/null 2>&1; then die "claude not found ('$CLAUDE_BIN')"; fi
   if [ ! -d "$HANDOVER_DIR" ]; then die "handover folder not found: $HANDOVER_DIR"; fi
   if [ ! -f "$PROMPT_FILE" ]; then die "build prompt not found: $PROMPT_FILE"; fi
+  if [ ! -f "$SETTINGS_FILE" ]; then die "settings not found: $SETTINGS_FILE (a shift never runs without its rules)"; fi
   if [ -f "$CURRENT_PID" ]; then
     cur=$(read_pid_file "$CURRENT_PID")
     if is_claude "$cur"; then die "a shift is already running (pid $cur)"; fi
@@ -215,6 +220,7 @@ main() {
   "$CLAUDE_BIN" -p "$MESSAGE" \
     --add-dir "$HANDOVER_DIR" \
     --append-system-prompt-file "$PROMPT_FILE" \
+    --settings "$SETTINGS_FILE" \
     --permission-mode acceptEdits \
     --permission-prompts none \
     --output-format stream-json \

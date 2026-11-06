@@ -97,6 +97,7 @@ fi
 
 printf '%s\n' -p "$MESSAGE" --add-dir "$T/handover" \
   --append-system-prompt-file "$T/handover/3 Build Plan Prompt for Claude.md" \
+  --settings "$T/code/.claude/settings.json" \
   --permission-mode acceptEdits --permission-prompts none --output-format stream-json --verbose >"$T/expected.args"
 
 # ---- helpers ------------------------------------------------------------------------------------------------
@@ -166,7 +167,8 @@ reset_state() {
   fi
   if ! wait_for 10 all_ended; then echo "warning: a shift from the previous case did not end" >&2; fi
   rm -rf "$T/code" "$T"/call-*
-  mkdir -p "$OPS"
+  mkdir -p "$OPS" "$T/code/.claude"
+  printf '{}\n' >"$T/code/.claude/settings.json"
 }
 
 run_wd() {
