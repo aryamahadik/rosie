@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/adapters",
+  "version": "0.0.0",
+  "private": true,
+  "description": "One adapter per port, each with its test double first.",
+  "type": "module"
+}

@@ -1,0 +1,87 @@
+# Removes a task branch's preview schema once its pull request closes or the branch is deleted
+# (build prompt 5.3; factory spec sections 6 and 7). preview-cleanup.sh drops preview_<slug> only.
+# Both events can fire for one branch; the script is run from main and must not mind a schema already gone.
+# Without STAGING_DATABASE_URL there is no preview schema, so it skips with a notice.
+name: preview-cleanup
+
+on:
+  pull_request:
+    types: [closed]
+  delete:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-cleanup-${{ github.event.pull_request.head.ref || github.event.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cleanup:
+    name: drop preview schema
+    if: >-
+      (github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'task/')) ||
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' && startsWith(github.event.ref, 'task/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BRANCH: ${{ github.event.pull_request.head.ref || github.event.ref }}
+    steps:
+      - name: Check secrets
+        id: secrets
+        env:
+          HAS_STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL != '' }}
+        run: |
+          set -euo pipefail
+          if [ "$HAS_STAGING_DATABASE_URL" = "true" ]; then
+            echo "database=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "database=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Preview cleanup skipped::STAGING_DATABASE_URL is not set, so $BRANCH has no preview schema to drop."
+          fi
+
+      - name: Check out main (the branch may be gone)
+        if: steps.secrets.outputs.database == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
+      - name: Set up Node (no dependency cache in a job that holds secrets)
+        if: steps.secrets.outputs.database == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Install from the lockfile
+        if: steps.secrets.outputs.database == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Drop the preview schema
+        id: cleanup
+        if: steps.secrets.outputs.database == 'true'
+        env:
+          STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: bash infra/scripts/preview-cleanup.sh "$BRANCH"
+
+      - name: Job summary
+        if: always()
+        env:
+          DATABASE_READY: ${{ steps.secrets.outputs.database }}
+          CLEANUP_OUTCOME: ${{ steps.cleanup.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## Preview cleanup: $BRANCH"
+            echo ""
+            if [ "$DATABASE_READY" != "true" ]; then
+              echo "- Skipped: STAGING_DATABASE_URL is not set, so there is no preview schema."
+            else
+              echo "- Dropping the preview schema: ${CLEANUP_OUTCOME:-not run}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

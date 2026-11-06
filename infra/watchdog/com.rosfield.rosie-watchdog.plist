@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Rosie watchdog launchd agent (factory spec section 10). Template with the code folder filled in:
+  /Users/aryamahadik/Downloads/Rosfield_Main/rosie. infra/watchdog/install.sh copies it to ~/Library/LaunchAgents/
+  and loads it in gui/<uid>; it refuses if the code folder has moved. PATH holds the folders of claude, node and
+  npm (~/.local/bin), gh (/opt/homebrew/bin), docker (/usr/local/bin), git and jq (/usr/bin).
+  AbandonProcessGroup: the watchdog exits at once, and the shift it started must keep running.
+-->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.rosfield.rosie-watchdog</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/zsh</string>
+		<string>-lc</string>
+		<string>/Users/aryamahadik/Downloads/Rosfield_Main/rosie/infra/watchdog/rosie-watchdog.sh</string>
+	</array>
+	<key>StartInterval</key>
+	<integer>900</integer>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>WorkingDirectory</key>
+	<string>/Users/aryamahadik/Downloads/Rosfield_Main/rosie</string>
+	<key>StandardOutPath</key>
+	<string>/Users/aryamahadik/Downloads/Rosfield_Main/rosie/ops/watchdog/launchd.out.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/aryamahadik/Downloads/Rosfield_Main/rosie/ops/watchdog/launchd.err.log</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/Users/aryamahadik/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+	<key>AbandonProcessGroup</key>
+	<true/>
+</dict>
+</plist>

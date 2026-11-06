@@ -1,0 +1,4 @@
+# Code owners (build prompt section 2; factory spec section 7).
+# Informational only: GitHub Free cannot enforce code-owner review on a private repository (recorded gap, ADR-012).
+/.github/ @aryamahadik
+/.claude/ @aryamahadik

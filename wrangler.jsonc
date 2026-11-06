@@ -1,0 +1,46 @@
+// Cloudflare Worker config (factory spec 6, ADR-008). Run wrangler only through infra/scripts/cf.sh (npm run cf),
+// which uses the Rosfield sign-in and refuses any other account and any production target.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Top level: the production Worker. Unused in D-000: no production deploy script, workflow or secret exists.
+  "name": "rosie",
+  "account_id": "ecb06e7bc9129fa81104d331e9652362",
+  "main": "runtime/src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Workers Logs: where D-000's traces are read (search a trace id).
+  "observability": {
+    "enabled": true,
+  },
+  "workers_dev": true,
+  // Needed for branch previews (wrangler versions upload --preview-alias).
+  "preview_urls": true,
+  // No KV, R2, Queues, Hyperdrive or Durable Object bindings yet: they come with the tasks that need them.
+  // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
+  "vars": {
+    "ENVIRONMENT": "production",
+    "BASE_PATH": "",
+    "DB_SCHEMA": "",
+  },
+  // The secrets the Worker needs, by name. Only these reach local runs and tests from .dev.vars; none in D-000,
+  // so keys stay out of tests (build prompt 5.1). Not inherited: repeated in each environment.
+  "secrets": {
+    "required": [],
+  },
+  "env": {
+    "staging": {
+      "name": "rosie-staging",
+      // DB_SCHEMA stays empty on staging; each branch preview sets it to preview_<slug> at upload.
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "BASE_PATH": "/test",
+        "DB_SCHEMA": "",
+      },
+      "secrets": {
+        "required": [],
+      },
+      // Switched on only after the user's OK for staging to take over rosfield.com/test (ops SETUP.md).
+      // "routes": [{ "pattern": "rosfield.com/test*", "zone_name": "rosfield.com" }],
+    },
+  },
+}

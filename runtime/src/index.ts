@@ -1,0 +1,52 @@
+// Rosie's Worker. D-000 holds only the health endpoint (factory spec 6): GET {BASE_PATH}/health.
+// Every request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
+// The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
+
+declare global {
+  namespace Cloudflare {
+    interface Env {
+      /** "production" or "staging" (wrangler.jsonc vars). */
+      ENVIRONMENT: string;
+      /** Path prefix the Worker answers under: "/test" on staging, "" otherwise. */
+      BASE_PATH: string;
+      /** PostgreSQL schema: empty on staging, preview_<slug> on a branch preview. */
+      DB_SCHEMA: string;
+      /** The commit a deploy came from (`--var GIT_SHA:<sha>`); missing when run locally. */
+      GIT_SHA?: string;
+    }
+  }
+}
+
+const TRACE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function traceIdOf(request: Request): string {
+  const incoming = request.headers.get("x-trace-id")?.trim();
+  return incoming !== undefined && TRACE_ID.test(incoming) ? incoming.toLowerCase() : crypto.randomUUID();
+}
+
+function jsonResponse(status: number, body: Record<string, unknown>, traceId: string): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store",
+      "x-trace-id": traceId,
+    },
+  });
+}
+
+export default {
+  fetch(request: Request, env: Cloudflare.Env): Response {
+    const traceId = traceIdOf(request);
+    const environment = env.ENVIRONMENT;
+    const version = env.GIT_SHA ?? "unknown";
+    const healthPath = `${env.BASE_PATH.replace(/\/+$/, "")}/health`;
+
+    if (request.method === "GET" && new URL(request.url).pathname === healthPath) {
+      console.log(JSON.stringify({ level: "info", msg: "health", trace_id: traceId, environment, version }));
+      return jsonResponse(200, { ok: true, environment, version, trace_id: traceId }, traceId);
+    }
+    console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
+    return jsonResponse(404, { ok: false, error: "not_found", trace_id: traceId }, traceId);
+  },
+} satisfies ExportedHandler<Cloudflare.Env>;

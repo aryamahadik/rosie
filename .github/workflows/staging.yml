@@ -1,0 +1,262 @@
+# Staging deploy (build prompt 5.3 and 5.4; factory spec sections 6 and 7): on push to main, or by hand.
+# deploy:staging runs, in order: migrate (expand-only, when STAGING_DATABASE_URL is set), wrangler deploy
+# --env staging, then check:staging, logging each step. If the deploy fails after it started, the rollback
+# job goes back with no click: to the version staging ran before this run (or, if that is unknown, the
+# previous deployment); if staging still runs that version, there is nothing to roll back. It only goes back
+# and leaves migrations in place.
+# Without the Cloudflare secrets it skips with a notice, so the run stays green.
+# Optional repository variable STAGING_BASE_URL: where check:staging looks (default: workers.dev URL + /test).
+name: staging
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One staging deploy at a time; a running deploy, and its rollback, is never cancelled by a newer push.
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      started: ${{ steps.start.outputs.started }}
+      previous_version: ${{ steps.before.outputs.version_id }}
+      base_url: ${{ steps.deploy.outputs.base_url }}
+    steps:
+      - name: Deploy only main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error title=Not main::Staging gets only main; this run is on $GITHUB_REF_NAME."
+          exit 1
+
+      - name: Check secrets
+        id: secrets
+        env:
+          HAS_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          HAS_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+          HAS_STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL != '' }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [ "$HAS_CLOUDFLARE_API_TOKEN" = "true" ] || missing+=(CLOUDFLARE_API_TOKEN)
+          [ "$HAS_CLOUDFLARE_ACCOUNT_ID" = "true" ] || missing+=(CLOUDFLARE_ACCOUNT_ID)
+          if [ "${#missing[@]}" -eq 0 ]; then
+            echo "cloudflare=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "cloudflare=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Staging deploy skipped::The repository secret(s) ${missing[*]} are not set, so nothing was deployed."
+          fi
+          if [ "$HAS_STAGING_DATABASE_URL" = "true" ]; then
+            echo "database=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "database=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=No staging database::STAGING_DATABASE_URL is not set, so deploy:staging skips the migrations."
+          fi
+
+      - name: Check out
+        if: steps.secrets.outputs.cloudflare == 'true'
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node (no dependency cache in a job that holds secrets)
+        if: steps.secrets.outputs.cloudflare == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Install from the lockfile
+        if: steps.secrets.outputs.cloudflare == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Record the version staging runs now
+        id: before
+        if: steps.secrets.outputs.cloudflare == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          status="$RUNNER_TEMP/staging-status.json"
+          if ! npm run --silent cf -- deployments status --env staging --json > "$status" 2> "$RUNNER_TEMP/staging-status.err"; then
+            cat "$RUNNER_TEMP/staging-status.err" || true
+          fi
+          id="$(node -e '
+            const fs = require("node:fs");
+            let id = "";
+            try {
+              const text = fs.readFileSync(process.argv[1], "utf8");
+              const status = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+              const top = [...(status.versions ?? [])].sort((a, b) => b.percentage - a.percentage)[0];
+              if (top && /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(top.version_id)) id = top.version_id;
+            } catch {}
+            process.stdout.write(id);
+          ' "$status")"
+          echo "version_id=$id" >> "$GITHUB_OUTPUT"
+          if [ -n "$id" ]; then
+            echo "Staging runs version $id before this deploy."
+          else
+            echo "::warning title=Version before the deploy unknown::A rollback after this deploy would go to the previous deployment."
+          fi
+
+      - name: Mark the deploy as started
+        id: start
+        if: steps.secrets.outputs.cloudflare == 'true'
+        run: echo "started=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to staging (migrate, deploy, check)
+        id: deploy
+        if: steps.secrets.outputs.cloudflare == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STAGING_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          # Optional repository variable (not a secret); empty means the deploy's workers.dev URL plus /test.
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+        run: |
+          set -euo pipefail
+          npm run deploy:staging 2>&1 | tee "$RUNNER_TEMP/deploy-staging.log"
+
+      - name: Job summary
+        if: always()
+        env:
+          ON_MAIN: ${{ github.ref == 'refs/heads/main' }}
+          CLOUDFLARE_READY: ${{ steps.secrets.outputs.cloudflare }}
+          DATABASE_READY: ${{ steps.secrets.outputs.database }}
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          TRACE_FROM_SCRIPT: ${{ steps.deploy.outputs.trace_id }}
+          PREVIOUS_VERSION: ${{ steps.before.outputs.version_id }}
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/deploy-staging.log"
+          trace="$TRACE_FROM_SCRIPT"
+          if [ -z "$trace" ] && [ -f "$log" ]; then
+            trace="$(sed 's/\x1b\[[0-9;]*m//g' "$log" | grep -Eio 'trace[ _-]?id"?[[:space:]]*[:=][[:space:]]*"?[A-Za-z0-9-]{8,}' | tail -n 1 | grep -Eo '[A-Za-z0-9-]{8,}$' || true)"
+          fi
+          {
+            echo "## Staging deploy"
+            echo ""
+            echo "- Commit: \`$GITHUB_SHA\`"
+            if [ "$ON_MAIN" != "true" ]; then
+              echo "- Refused: staging gets only main (this run is on $GITHUB_REF_NAME)."
+            elif [ "$CLOUDFLARE_READY" != "true" ]; then
+              echo "- Skipped: the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets are needed."
+            elif [ "$DEPLOY_OUTCOME" = "success" ]; then
+              echo "- Deployed and checked."
+            elif [ "$DEPLOY_OUTCOME" = "failure" ]; then
+              echo "- Failed: the rollback job takes staging back (no click)."
+            else
+              echo "- Not deployed: an earlier step failed."
+            fi
+            if [ "$ON_MAIN" = "true" ] && [ "$CLOUDFLARE_READY" = "true" ]; then
+              echo "- Trace id from the check: ${trace:-none found in the log} (Workers Logs of rosie-staging)"
+              echo "- Version before this deploy: ${PREVIOUS_VERSION:-unknown}"
+              if [ "$DATABASE_READY" != "true" ]; then
+                echo "- Database: migrations skipped (STAGING_DATABASE_URL is not set)."
+              fi
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  rollback:
+    name: rollback
+    needs: deploy
+    # The "rollback job" of build prompt 5.4: runs when the deploy failed (or timed out, or was cancelled)
+    # after it started; never after a skipped or successful deploy.
+    if: always() && needs.deploy.outputs.started == 'true' && needs.deploy.result != 'success' && needs.deploy.result != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node (no dependency cache in a job that holds secrets)
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Install from the lockfile
+        run: npm ci --no-audit --no-fund
+
+      - name: Roll staging back (back only)
+        id: rollback
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PREVIOUS_VERSION: ${{ needs.deploy.outputs.previous_version }}
+          # For the check after the rollback: this deploy's URL, else the optional repository variable.
+          STAGING_BASE_URL: ${{ needs.deploy.outputs.base_url || vars.STAGING_BASE_URL }}
+          ROLLBACK_REASON: "staging deploy of ${{ github.sha }} failed (run ${{ github.run_id }})"
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/rollback-staging.log"
+          if [ -z "$PREVIOUS_VERSION" ]; then
+            echo "::warning title=Version before the deploy unknown::Rolling back to the previous deployment."
+            npm run rollback:staging 2>&1 | tee "$log"
+            exit 0
+          fi
+          # A deploy that stopped before the code changed (in migrate, say) leaves nothing to roll back.
+          status="$RUNNER_TEMP/staging-status.json"
+          if ! npm run --silent cf -- deployments status --env staging --json > "$status" 2> "$RUNNER_TEMP/staging-status.err"; then
+            cat "$RUNNER_TEMP/staging-status.err" || true
+          fi
+          live="$(node -e '
+            const fs = require("node:fs");
+            let id = "";
+            try {
+              const text = fs.readFileSync(process.argv[1], "utf8");
+              const status = JSON.parse(text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1));
+              const top = [...(status.versions ?? [])].sort((a, b) => b.percentage - a.percentage)[0];
+              if (top && /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(top.version_id)) id = top.version_id;
+            } catch {}
+            process.stdout.write(id);
+          ' "$status")"
+          if [ "$live" = "$PREVIOUS_VERSION" ]; then
+            echo "::notice title=Nothing to roll back::Staging still runs $PREVIOUS_VERSION, the version from before this deploy (it stopped before the code changed). Migrations stay in place."
+            echo "rolled_back=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Taking staging back to $PREVIOUS_VERSION, the version it ran before this deploy."
+          npm run rollback:staging -- "$PREVIOUS_VERSION" 2>&1 | tee "$log"
+
+      - name: Job summary
+        if: always()
+        env:
+          ROLLBACK_OUTCOME: ${{ steps.rollback.outcome }}
+          ROLLED_BACK: ${{ steps.rollback.outputs.rolled_back }}
+          TRACE_FROM_SCRIPT: ${{ steps.rollback.outputs.trace_id }}
+          PREVIOUS_VERSION: ${{ needs.deploy.outputs.previous_version }}
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/rollback-staging.log"
+          trace="$TRACE_FROM_SCRIPT"
+          if [ -z "$trace" ] && [ -f "$log" ]; then
+            trace="$(sed 's/\x1b\[[0-9;]*m//g' "$log" | grep -Eio 'trace[ _-]?id"?[[:space:]]*[:=][[:space:]]*"?[A-Za-z0-9-]{8,}' | tail -n 1 | grep -Eo '[A-Za-z0-9-]{8,}$' || true)"
+          fi
+          {
+            echo "## Staging rollback (no click)"
+            echo ""
+            echo "- Failed deploy: \`$GITHUB_SHA\`"
+            if [ "$ROLLED_BACK" = "false" ]; then
+              echo "- Nothing to roll back: staging still runs $PREVIOUS_VERSION, the version from before this deploy."
+            else
+              echo "- Back to: ${PREVIOUS_VERSION:-the previous deployment}"
+              echo "- Rollback: ${ROLLBACK_OUTCOME:-not run}; migrations stay in place"
+              echo "- Trace id from the check after the rollback: ${trace:-none found in the log}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

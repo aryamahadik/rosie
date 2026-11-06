@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/runtime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Cloudflare Worker: gateway, handle actor, guard, clocks, queues and outbox. D-000 holds only the health endpoint.",
+  "type": "module"
+}

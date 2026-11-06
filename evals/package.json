@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/evals",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Gold set, accuracy report and replay.",
+  "type": "module"
+}

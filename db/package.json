@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PostgreSQL schema, expand-only migrations, seeds from fixture set v1 and the data-access calls.",
+  "type": "module"
+}

@@ -1,0 +1,28 @@
+# Local PostgreSQL 17 with PostGIS (factory spec 4, ADR-006). Start: npm run db:up. Stop: npm run db:down.
+# Shell: npm run db:psql. DATABASE_URL=postgres://rosie:rosie@127.0.0.1:54329/rosie (local only, not a secret).
+name: rosie
+
+services:
+  rosie-pg:
+    image: postgis/postgis:17-3.5
+    # The image is published for amd64 only; Docker Desktop runs it under emulation on Apple silicon.
+    platform: linux/amd64
+    container_name: rosie-pg
+    environment:
+      POSTGRES_DB: rosie
+      POSTGRES_USER: rosie
+      POSTGRES_PASSWORD: rosie
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - rosie-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      # TCP, so it passes only after first-start setup is done (setup runs on the Unix socket alone).
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U rosie -d rosie"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 10s
+
+volumes:
+  rosie-pg-data:

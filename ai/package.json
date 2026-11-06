@@ -1,0 +1,7 @@
+{
+  "name": "@rosie/ai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Safety read, decide, re-read, planner, composer and the AI gateway with prompt caching.",
+  "type": "module"
+}
