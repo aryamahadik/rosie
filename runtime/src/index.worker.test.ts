@@ -36,6 +36,7 @@ describe("GET {BASE_PATH}/health", () => {
     expect(response.headers.get("x-trace-id")).toBe(TRACE_ID);
     expect(await response.json()).toEqual({
       ok: true,
+      service: "rosie",
       environment: "staging",
       version: "test-sha",
       trace_id: TRACE_ID,
