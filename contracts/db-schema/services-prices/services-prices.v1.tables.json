@@ -1,0 +1,928 @@
+{
+  "part": "services-prices",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "services",
+      "description": "The business's services, one row per line of its list (S1-12 gives services): the name, the price kind, the time it takes, the order, whether it is offered, and what the profession file says about it. The kind of work each line was matched to is named. Where a service happens and how it is paid there are service_money's rows; every price is a price rule (price_rules), since every price carries effective dates (arch 09 line 488). A service is never deleted or re-keyed: one no longer offered is set inactive, so its id stays stable for K-26's rules for some services (QUESTIONS.md CQ-51), K-30's booking lines and K-32's packs and memberships.",
+      "source": "02-contracts section 7 row K-25 ('Services (name, price kind, price, length, places, order, active, extras)'); FS line 724 (service); FS rows V01 to V04; S1-12 (gives services); arch 09 line 457 ('Service: length · price kind'); 02-contracts section 8 (services: K-25 service rows); QUESTIONS.md CQ-51",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service's id: an opaque string code makes and never parses (CQ-09). Stable: never reused, and the row is never deleted (README rule 6), so other parts can name it.",
+          "source": "CQ-09 (other ids are opaque strings); QUESTIONS.md CQ-51 (K-26's service-scoped rules need K-25's service ids); FS line 730 (booking_service.service_id); FS lines 737, 738 (membership and pack service_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose service it is (businesses.id).",
+          "source": "FS line 724 (business_id); arch 10 line 546"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind of work the line was matched to (K-24 kinds.id), such as barber or electrician: search's trade filter, the money paths the plug-in offers for it (K-24 kind_flows.combos) and K-26's kind-scoped rules read it. That the business has the kind (K-23 company_kinds) spans rows, so code checks it.",
+          "source": "S1-12 ('Each line is matched to Rosie's known kinds of work'); arch 05 line 237 ('the kind picked is search's trade filter'); S1-13 ('Only the choices the plug-in's money rules allow are offered'); K-24 v1 kinds.id"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The service's name as the owner's list gives it (V01; the form's 'Service'), such as Haircut.",
+          "source": "FS row V01; FS line 724 (name); S1-12 ('On the secure page: Service, Price kind, Price, Time it takes'); 02-contracts K-02 v1.1 (photo reading: the field names K-25's service rows use)"
+        },
+        {
+          "name": "price_kind",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "What the price counts (the form's 'Price kind'): one_price, per_hour, per_unit, or by_answers (set by the customer's answers). When the price is known (from the list, from photos first or at the visit) is the way's price part, in service_money.path.",
+          "source": "S1-12 ('Each service gets a price kind: one price, per hour, per unit, or set by the customer's answers. It can also be priced from the customer's photos, at the visit, or a free estimate'); FS rows V02, V03; FS line 724 (price_kind); 02-contracts K-02 v1.1"
+        },
+        {
+          "name": "unit",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "For a per_unit price, what one unit is, as the list words it, such as night for a boarding stay; null for any other price kind.",
+          "source": "S1-12 ('per unit'); FS row V03 ('per unit'); fixtures/v1/test-kit/shops/boarding.json ('per night, from the owner's list')"
+        },
+        {
+          "name": "length",
+          "type": "interval",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The time it takes (V04; the form's 'Time it takes'), which a booking holds: for one price, the whole service; per hour, the shortest booking, such as event hours' 1-hour minimum; per unit or by the customer's answers, the time one unit takes, such as about 35 minutes a person, so a booking of several holds that many.",
+          "source": "FS row V04 ('Length | minutes | R'); FS line 724 (length); S1-12; A4-14 ('They fit everything asked before: the length'); fixtures/v1/forms/barber.json services_listed_in_profession_file (lengths)"
+        },
+        {
+          "name": "position",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "Its place in the business's list, from 1 (FS service.order): the money card, the booking page and Settings show the services in this order. Customers see the order, never the number.",
+          "source": "FS line 724 (order); S1-13 ('One card lists each service as read')"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "null": false,
+          "default": "true",
+          "audience": ["owner"],
+          "description": "Whether it is offered for new bookings (FS service.active). One no longer offered is set false, never deleted; bookings already made keep it.",
+          "source": "FS line 724 (active); S11-53 ('Bookings already made keep their terms'); RULES 3.7"
+        },
+        {
+          "name": "extras",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "What the profession file says about this one service (FS Service.extras): its pf.services entry (name, price, kind, length, where, before, after, notes) and its pf.questions, stored whole as JSON text; null: the file says nothing about it. The AI reads it and the Settings page shows it; no code and no screen reads a sub-key by name, and its words reach a customer only through the composer's checked messages. Code never takes a price or a length from it: those are typed columns.",
+          "source": "FS lines 724, 747 ('Service.extras holds what the profession file says about that one service'), 748 ('No screen reads a sub-key by name'); MC R3; K-24 v1 picked_kind_texts.block; BP rule 4"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "services_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "services_kind_fk",
+          "columns": ["kind_id"],
+          "references": {
+            "table": "kinds",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "services_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "arch 10 line 546 (a service's ways, prices and spaces carry its business, for row-level security)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "services_name_given",
+          "expression": "length(btrim(name)) > 0",
+          "source": "FS row V01 (R)"
+        },
+        {
+          "name": "services_price_kind_known",
+          "expression": "price_kind in ('one_price', 'per_hour', 'per_unit', 'by_answers')",
+          "source": "S1-12; FS row V03"
+        },
+        {
+          "name": "services_unit_with_per_unit",
+          "expression": "(price_kind = 'per_unit') = (unit is not null) and (unit is null or length(btrim(unit)) > 0)",
+          "source": "S1-12 ('per unit'); FS row V03"
+        },
+        {
+          "name": "services_length_positive",
+          "expression": "length > interval '0'",
+          "source": "FS row V04 (R)"
+        },
+        {
+          "name": "services_position_from_one",
+          "expression": "position >= 1",
+          "source": "FS line 724 (order)"
+        },
+        {
+          "name": "services_extras_json",
+          "expression": "extras is null or extras is json object",
+          "source": "FS line 747 (one JSON field per service); K-24 v1 README rule 6 (JSON text checked with is json)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "services_business_idx",
+          "columns": ["business_id", "position"],
+          "why": "A business's services in order: the money card (S1-13), Settings (S11-54), the booking page and the context bundle."
+        },
+        {
+          "name": "services_kind_idx",
+          "columns": ["kind_id", "business_id"],
+          "where": "active",
+          "why": "Search's trade filter: the active services of one kind of work across businesses (arch 05 lines 237, 239)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "service_money",
+      "description": "Where each service happens and how it is paid there (FS service_money; S1-13 gives ways): one row per service and place, since 'a service in two places has two prices and two money rows'. Each row holds the place (L01, as S1-43 allows), its flow, its money path (one of the master's 28 for that flow), the deposit and the late-cancel and no-show fee, and this way's own free-cancel time and tip line where the owner set one (else the business's: K-23 flow_defaults, K-26's tip_line rule). The price is a price rule (price_rules), whose place condition names this row; the rest and the amount paid in full are worked out by code, never stored. A change applies to new bookings at once: each booking copies its way in (K-30, written once).",
+      "source": "02-contracts section 7 row K-25 ('service money per flow, place and path with its amounts, cutoff and tips (FS service and service_money rows)'); FS line 725 (service_money); FS rows L01, V05 to V08, V11; FS section 4; S1-13 (gives ways); S1-43; S11-56; 02-contracts section 8 (ways: K-25 service money per path)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The way's id: an opaque string code makes and never parses (CQ-09). Stable: the row is never deleted (README rule 6), so a price rule can name it as its place.",
+          "source": "CQ-09 (other ids are opaque strings); arch 05 line 253 (a price rule's place)"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service (services.id).",
+          "source": "FS line 725 (service_id)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service's business, copied from services and held to it by service_money_service_fk, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "A, the customer comes to the business (a shop or office, a meeting spot, or video or phone); B, the business goes to the customer. Held to the place by service_money_flow_matches_place.",
+          "source": "FS line 725 ('flow (A or B)'); FS row L01; K-04 v1 bookings.flow; master-A.json intro ('Video and phone sessions count here too')"
+        },
+        {
+          "name": "place",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Where the service happens on this row (L01): business, at one of the business's shops or offices; customer, at the customer's place; meeting_spot, a listed meeting spot; video, by video or phone. 'Both' is two rows, and the customer picks the place and sees both prices first.",
+          "source": "FS row L01 ('at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)'); FS line 725 (place); S1-13 ('Where: at the business, at the customer's place, both, a listed meeting spot or video, as S1-43 allows'; 'For a haircut, the customer picks the place and sees both prices first'); S1-43"
+        },
+        {
+          "name": "location_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The location (K-23 locations.id): for business, the shop or office; for meeting_spot, the spot, which says where the visit ends; for customer, the shop or office whose travel area (L02) the customer's address is checked against (B4-77). Null only for video.",
+          "source": "FS line 722 (location); FS rows L01, L02, L04; S1-13 ('A meeting spot says where it ends'); B4-77; K-23 v1 locations"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The money path on this row, written price|before|after, one of the master's 28 for its flow (one way per service and place): price from the list, from photos first or at the visit; before none, card, deposit or full; after none, counter (flow A), bill, card or own (flow B). The booking page and the confirmation show its words before the yes.",
+          "source": "FS line 725 ('path (one of the 28: price|before|after)'); FS section 4 (28 paths per flow); master-A.json and master-B.json money.combos; SPEC-master D66 amendment; S1-13 ('Before, one way per service'); fixtures/v1/forms/barber.json suggested_services_note ('picks ONE path per service and place'); A4-14"
+        },
+        {
+          "name": "deposit_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "On a deposit path, a deposit of a set amount in whole cents, taken at booking and counted toward the price (V06); null otherwise, or when deposit_percent gives it. Never more than the price known then, which code checks against the price rule.",
+          "source": "FS row V06; FS line 725 (amounts: deposit); S1-13 ('A deposit is never more than the price known then'; 'A deposit is taken at booking'); A4-13; CQ-09; K-33 v1 rule 5 (whole cents)"
+        },
+        {
+          "name": "deposit_percent",
+          "type": "integer",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "On a deposit path, a deposit as a share of the price, in whole percent from 1 to 99, such as 25 for work quoted first; null otherwise, or when deposit_cents gives it. The rest (V06) is the price less the deposit, worked out by code, never stored.",
+          "source": "fixtures/v1/test-kit/shops/barber.json (wedding party grooming: 'a 25% deposit when booked'), plumber.json and electrician.json ('25% deposit'); SPEC-master 6 ('25% deposit $160 now'); FS row V06"
+        },
+        {
+          "name": "fee_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The late-cancel and no-show fee for this service here, in whole cents (V08). A booking with several services uses the largest, never more than what was paid now. Null: no fee of its own (with a deposit, the deposit is the fee). Never on a path that takes nothing before: 'no fee possible'.",
+          "source": "FS row V08 ('one amount per service; a booking uses the largest'); FS line 725 (amounts: fee); FS section 4 (Fee column); S13-55 ('A deposit service with no fee of its own: its deposit is the fee'); S1-13; RULES 3.3, 3.5; K-26 v1 README (K-25 owns each service's fee); CQ-09"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The currency code of deposit_cents and fee_cents, such as USD; set exactly when one of them is.",
+          "source": "CQ-09 ('money in integer cents with a currency code'); contracts/common/formats.v1.schema.json (currency); K-33 v1 rule 5"
+        },
+        {
+          "name": "cutoff_before",
+          "type": "interval",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "This way's own free-cancel time, counted back from the visit's start, such as 2 hours; null: cutoff_day_before_at gives it, or, with both null, the business's default for the flow (K-23 flow_defaults, H06).",
+          "source": "FS line 725 (cutoff); FS row H06; FS section 2b (an item's service: 'fee, cutoff'); K-23 v1 flow_defaults.cutoff_before; fixtures/master/engine/work/prof/barber.json pf.money.cancel ('many barbershops pick 2 hours for a cut')"
+        },
+        {
+          "name": "cutoff_day_before_at",
+          "type": "time",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "This way's own free-cancel time as a clock time on the day before the visit, in the business's zone, such as 6pm the day before; null: as cutoff_before says.",
+          "source": "FS line 725 (cutoff); FS row H06; K-23 v1 flow_defaults.cutoff_day_before_at"
+        },
+        {
+          "name": "tip_line",
+          "type": "boolean",
+          "null": true,
+          "audience": ["owner"],
+          "description": "This way's own tip line on the bill Rosie sends (V11): true on, false off; null: the business's tip-line rule decides (K-26 rules of kind tip_line; off when unset). Only on a path whose bill Rosie sends (after bill).",
+          "source": "FS line 725 ('tip on or off'); FS row V11 ('Tip line on the bills Rosie sends'); S11-56 ('The tip line on the bills Rosie texts is turned on or off here too'); K-26 v1 rule kind tip_line; K-26 v1 README (K-25 owns a service path's tip setting)"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "null": false,
+          "default": "true",
+          "audience": ["owner"],
+          "description": "Whether the service is offered here for new bookings. A place no longer offered is set false, never deleted, so a price rule naming it keeps its place.",
+          "source": "FS line 724 (active); S11-53 ('Bookings already made keep their terms')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "service_money_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "service_money_location_fk",
+          "columns": ["location_id"],
+          "references": {
+            "table": "locations",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "service_money_id_service_key",
+          "columns": ["id", "service_id"],
+          "source": "arch 05 line 253 (a price rule's place is a way of its own service: price_rules_place_fk)"
+        },
+        {
+          "name": "service_money_one_per_place",
+          "columns": ["service_id", "place", "location_id"],
+          "where": "location_id is not null",
+          "source": "S1-13 ('A service in two places has two prices and two money rows'); fixtures/v1/forms/barber.json ('picks ONE path per service and place')"
+        },
+        {
+          "name": "service_money_one_video",
+          "columns": ["service_id"],
+          "where": "place = 'video'",
+          "source": "S1-13 (one way per service and place); FS row L01 (video or phone)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "service_money_flow_known",
+          "expression": "flow in ('A', 'B')",
+          "source": "FS line 725 (flow (A or B)); K-04 v1 bookings_flow_known"
+        },
+        {
+          "name": "service_money_place_known",
+          "expression": "place in ('business', 'customer', 'meeting_spot', 'video')",
+          "source": "FS row L01"
+        },
+        {
+          "name": "service_money_flow_matches_place",
+          "expression": "(place = 'customer') = (flow = 'B')",
+          "source": "master-A.json intro ('The customer comes to the business ... Video and phone sessions count here too'); master-B.json (the business goes to the customer); FS row L01"
+        },
+        {
+          "name": "service_money_location_by_place",
+          "expression": "(place = 'video') = (location_id is null)",
+          "source": "FS rows L01, L02 ('R for any service at the customer's place'), L04; FS line 722"
+        },
+        {
+          "name": "service_money_path_known",
+          "expression": "(flow = 'A' and path in ('list|none|none', 'list|none|counter', 'list|none|bill', 'list|card|counter', 'list|card|bill', 'list|card|card', 'list|deposit|counter', 'list|deposit|bill', 'list|deposit|card', 'list|full|none', 'photos|none|none', 'photos|none|counter', 'photos|none|bill', 'photos|card|counter', 'photos|card|bill', 'photos|card|card', 'photos|deposit|counter', 'photos|deposit|bill', 'photos|deposit|card', 'photos|full|none', 'visit|none|counter', 'visit|none|bill', 'visit|card|counter', 'visit|card|bill', 'visit|card|card', 'visit|deposit|counter', 'visit|deposit|bill', 'visit|deposit|card')) or (flow = 'B' and path in ('list|none|none', 'list|none|bill', 'list|none|own', 'list|card|bill', 'list|card|card', 'list|card|own', 'list|deposit|bill', 'list|deposit|card', 'list|deposit|own', 'list|full|none', 'photos|none|none', 'photos|none|bill', 'photos|none|own', 'photos|card|bill', 'photos|card|card', 'photos|card|own', 'photos|deposit|bill', 'photos|deposit|card', 'photos|deposit|own', 'photos|full|none', 'visit|none|bill', 'visit|none|own', 'visit|card|bill', 'visit|card|card', 'visit|card|own', 'visit|deposit|bill', 'visit|deposit|card', 'visit|deposit|own'))",
+          "source": "master-A.json money.combos (flow A's 28); master-B.json money.combos (flow B's 28); FS section 4; SPEC-master D66 amendment ('only its 28 paths')"
+        },
+        {
+          "name": "service_money_deposit_with_deposit_path",
+          "expression": "(split_part(path, '|', 2) = 'deposit') = (num_nonnulls(deposit_cents, deposit_percent) = 1)",
+          "source": "FS row V06 ('R when V05 is a deposit'); FS section 4"
+        },
+        {
+          "name": "service_money_deposit_in_range",
+          "expression": "(deposit_cents is null or deposit_cents > 0) and (deposit_percent is null or deposit_percent between 1 and 99)",
+          "source": "FS row V06 ('never more than the price known then'); S1-13; CQ-09"
+        },
+        {
+          "name": "service_money_fee_needs_money_before",
+          "expression": "fee_cents is null or (fee_cents > 0 and split_part(path, '|', 2) <> 'none')",
+          "source": "FS section 4 (a nothing-taken path: 'no fee possible'); FS row V08; RULES 3.3"
+        },
+        {
+          "name": "service_money_currency_with_amount",
+          "expression": "(currency is null) = (deposit_cents is null and fee_cents is null) and (currency is null or currency ~ '^[A-Z]{3}$')",
+          "source": "CQ-09; contracts/common/formats.v1.schema.json (currency)"
+        },
+        {
+          "name": "service_money_one_cutoff",
+          "expression": "num_nonnulls(cutoff_before, cutoff_day_before_at) <= 1 and (cutoff_before is null or cutoff_before > interval '0')",
+          "source": "FS row H06; K-23 v1 flow_defaults_one_cutoff, flow_defaults_cutoff_before_positive"
+        },
+        {
+          "name": "service_money_tip_line_on_bills",
+          "expression": "tip_line is null or split_part(path, '|', 3) = 'bill'",
+          "source": "FS row V11 ('Tip line on the bills Rosie sends'); FS section 4 (after bill: 'Rosie texts the bill after DONE')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "service_money_service_idx",
+          "columns": ["service_id"],
+          "why": "A service's places and ways: the money card and its read-back (S1-13), the place pick and the booking page (A4-01, B4-01), Settings (S11-56)."
+        },
+        {
+          "name": "service_money_business_idx",
+          "columns": ["business_id"],
+          "why": "A business's ways, for the one-page summary (S1-79) and the money read-back."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "item_services",
+      "description": "Which services each space or thing takes (S1-81: 'Which services use it'): one row per space or thing and service, the FS section 2b item_service link. Customers then pick a space and its size, never a person (A4-62). The space or thing itself, its size and count are K-23's places_or_things. The fields FS section 2b lets an owner change per item (price, money combo, deposit, fee, cutoff) come with the Items tab, a minor version (Q-46's default).",
+      "source": "02-contracts section 7 row K-25 ('item services (FS section 2b; Q-46)'); S1-81 ('which services use it'; 'the services that use a space aren't bookable until it's listed'); FS row K04 ('which services use it'); FS line 741 (place_or_thing services); FS section 2b (item_service); K-23 v1 README (a place's services are K-25's); Q-46",
+      "columns": [
+        {
+          "name": "place_or_thing_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The space or thing (K-23 places_or_things.id), such as a boarding inn's suite.",
+          "source": "FS line 741 (place_or_thing); FS section 2b ('item id'); S1-81"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "A service it takes (services.id).",
+          "source": "FS section 2b ('service id'); S1-81 ('Which services use it')"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service's business, held to it by item_services_service_fk, so row-level security can scope the row. That the space or thing is the same business's spans K-23's table, so code checks it.",
+          "source": "arch 10 line 546"
+        }
+      ],
+      "primaryKey": ["place_or_thing_id", "service_id"],
+      "foreignKeys": [
+        {
+          "name": "item_services_place_or_thing_fk",
+          "columns": ["place_or_thing_id"],
+          "references": {
+            "table": "places_or_things",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "item_services_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "item_services_service_idx",
+          "columns": ["service_id"],
+          "why": "The spaces and things a service books, for the space pick (A4-62) and a stay (A4-68)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "price_rules",
+      "description": "Every price (arch 09 line 457: 'Price rule: worker · place · time'): one row per price of a service, with the conditions it holds under (the place, the worker, the time; none set: the service's own price) and effective dates (arch 09 line 488). The rule with the most conditions set wins; a possible tie, two rules with as many conditions that can both apply, is caught when the owner saves the second, and the read-back asks which wins (price_rule_ties); until answered, the lower price applies (arch 05 line 253; S13-25 rule 19). A change closes one row and opens the next: a rule prices visits that start inside its dates, read when the booking is made, and the booking line copies the winner (K-30), so a booking keeps the price it was made with. Code fills every price from the owner's words read back; the model never writes one (BP rule 4).",
+      "source": "02-contracts section 7 row K-25 ('price rules by worker, place and time with effective dates, where the most specific wins and a possible tie is caught at the second save'); arch 05 line 253; arch 09 lines 457, 478, 488; S11-54; S2-15; FS rows V03, T06; FS line 725 (amounts: price); 02-contracts section 8 (team: K-25 staff prices); RULES 3.7; BP rule 4",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The rule's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service's business, held to it by price_rules_service_fk, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service it prices (services.id).",
+          "source": "FS line 724 (service price); arch 09 line 457"
+        },
+        {
+          "name": "service_money_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The place condition: the way of this service it prices (service_money.id), such as the haircut at the customer's home; null: every place of the service.",
+          "source": "arch 05 line 253 ('worker, place, time'); arch 09 line 457 ('Price rule: worker · place · time'); S1-13 ('A service in two places has two prices'); FS row L01 ('and a price per place')"
+        },
+        {
+          "name": "worker_resource_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The worker condition: the person giving the work, as their worker resource (K-04 resources, kind worker, with its person), such as Andre for event hours; null: the same price whoever goes.",
+          "source": "FS row T06 ('Price by person (default: the same price whoever goes)'); S2-15 ('Prices by person: the same, whoever goes, unless Sam says. Customers see the price of whoever comes before they say yes'); arch 05 line 253; K-04 v1 resources; 02-contracts section 8 (team: K-25 staff prices (FS T06))"
+        },
+        {
+          "name": "worker_resource_kind",
+          "type": "text",
+          "null": false,
+          "default": "'worker'",
+          "audience": "never",
+          "description": "Always worker: it holds worker_resource_id to a worker resource (price_rules_worker_fk).",
+          "source": "K-04 v1 resources_id_kind_key; FS line 743 (a worker is a person)"
+        },
+        {
+          "name": "weekdays",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The time condition's days, as ISO weekday digits in order (1 Monday to 7 Sunday), such as 6 for Saturdays or 67 for weekends; null: every day.",
+          "source": "arch 05 line 253 (time); arch 09 lines 457, 478 ('Rows for price rules ... A new combination is a new row')"
+        },
+        {
+          "name": "from_time",
+          "type": "time",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The time condition's start, a clock time in the business's zone, such as 17:00 for 'after 5pm'; null: from the day's start.",
+          "source": "arch 05 line 253 (time); fixtures/v1/test-kit/shops/movers.json ('Evening vault visit: $40, after 5pm')"
+        },
+        {
+          "name": "until_time",
+          "type": "time",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The time condition's end, not included, a clock time in the business's zone; null: to the day's end.",
+          "source": "arch 05 line 253 (time)"
+        },
+        {
+          "name": "price_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The price in whole cents, counted as the service's price kind says (one price, per hour, per unit). On a path priced from the list, the set price (free is 0); on a path priced at the visit, the visit's own price that is promised, such as the $89 service call. A path priced from photos takes the quote made for the booking (K-30), never a rule.",
+          "source": "FS rows V02 ('free = a list price of $0'), V03; FS line 725 (amounts: price); A4-06 ('The price is on the shop's board'); A4-13; A4-94 ('Only the visit's own price is promised, if it has one, from Sam's settings'); A4-08 (a photo quote is priced per customer); CQ-09; K-33 v1 rule 5"
+        },
+        {
+          "name": "from_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "On a path priced at the visit, the starting price, shown only as 'from' and never as a set price, in whole cents; a deposit is never more than it. Null: none.",
+          "source": "FS row V03 ('for at the visit: the visit fee and any from price'); A4-05 ('Never: show a from price as a set price, or guess one'); A4-06; A4-13 ('A deposit is never more than the starting price'); master-A.json money.examples (visit|deposit|counter: 'Color correction from $110')"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The currency code of price_cents and from_cents, such as USD.",
+          "source": "CQ-09; contracts/common/formats.v1.schema.json (currency); K-33 v1 rule 5"
+        },
+        {
+          "name": "set_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who set it (persons.id): the owner, or an admin the owner lets set prices; never a helper or Rosie.",
+          "source": "S2-15 ('Only the account owner, or an admin for what the owner lets them'); S11-54; S13-45 row 8; BP rule 4"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When it starts: it prices visits that start from then, such as the haircut's $40 for visits from Mon Nov 2. AI assistants show it for those dates at once.",
+          "source": "arch 09 line 488 ('Effective dates on every price and rule'); S11-54 ('Sam raises the haircut to $40 for visits from Mon Nov 2. AI assistants show the new price for those dates at once')"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When it stops: the change that closed it opened the next row at the same instant. Null: in effect. A booking made before keeps its price, even for a visit after.",
+          "source": "arch 09 line 488 ('A change closes one row and opens the next. A booking keeps the price it was made with, even for a visit after the change'); S11-54 ('Haircuts already booked keep $35, even after Nov 2'); RULES 3.7"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "price_rules_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rules_place_fk",
+          "columns": ["service_money_id", "service_id"],
+          "references": {
+            "table": "service_money",
+            "columns": ["id", "service_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rules_worker_fk",
+          "columns": ["worker_resource_id", "worker_resource_kind"],
+          "references": {
+            "table": "resources",
+            "columns": ["id", "kind"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rules_set_by_fk",
+          "columns": ["set_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "price_rules_id_service_key",
+          "columns": ["id", "service_id"],
+          "source": "arch 05 line 253 (a tie is between two rules of one service: price_rule_ties)"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "price_rules_one_in_effect",
+          "using": "gist",
+          "elements": [
+            {
+              "column": "service_id",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(service_money_id, '')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(worker_resource_id, '')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(weekdays, '')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(from_time, time '00:00')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(until_time, time '24:00')",
+              "operator": "="
+            },
+            {
+              "expression": "tstzrange(effective_from, effective_to, '[)')",
+              "operator": "&&"
+            }
+          ],
+          "source": "arch 09 line 488 ('A change closes one row and opens the next'): one price in effect per service and set of conditions at a time"
+        }
+      ],
+      "checks": [
+        {
+          "name": "price_rules_worker_kind",
+          "expression": "worker_resource_kind = 'worker'",
+          "source": "FS row T06 (price by person); K-04 v1 resources_kind_known"
+        },
+        {
+          "name": "price_rules_weekdays_form",
+          "expression": "weekdays is null or (weekdays ~ '^1?2?3?4?5?6?7?$' and length(weekdays) between 1 and 6)",
+          "source": "arch 05 line 253 (time); one form per condition, so price_rules_one_in_effect compares like with like (every day is no day condition)"
+        },
+        {
+          "name": "price_rules_times_form",
+          "expression": "(from_time is null or from_time > time '00:00') and (until_time is null or until_time < time '24:00') and (from_time is null or until_time is null or from_time < until_time)",
+          "source": "arch 05 line 253 (time); one form per condition (a day's start or end is no clock condition)"
+        },
+        {
+          "name": "price_rules_money",
+          "expression": "price_cents >= 0 and (from_cents is null or from_cents > 0) and currency ~ '^[A-Z]{3}$'",
+          "source": "FS rows V02 ('free = a list price of $0'), V03; CQ-09"
+        },
+        {
+          "name": "price_rules_dates_in_order",
+          "expression": "effective_to is null or effective_to > effective_from",
+          "source": "arch 09 line 488"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "price_rules_service_idx",
+          "columns": ["service_id", "effective_from"],
+          "why": "A service's rules in effect at a visit's start: the price resolver (arch 05 line 253; C-131), search's five rows with exact prices (arch 05 line 239), the times card (A4-14) and the read-back at a save (S11-54)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": true,
+      "effectiveColumns": ["effective_from", "effective_to"]
+    },
+    {
+      "name": "price_rule_ties",
+      "description": "A possible tie between two price rules of one service (arch 05 line 253): rules with as many conditions set that can both apply to one booking, caught when the owner saves the second. The read-back asks which wins; the owner's answer is kept here. Until it is answered, the lower price applies (S13-25 rule 19). One row per pair caught.",
+      "source": "arch 05 line 253 ('A possible tie is caught when the owner saves the second rule: the read-back asks which wins (DD). Until answered, the lower price applies (S13-25 rule 19)'); 02-contracts section 7 row K-25 ('a possible tie is caught at the second save'); S13-25 rule 19 ('The safer one wins until settled: ... less money')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The tie's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service's business, held to it by price_rule_ties_service_fk, so row-level security can scope the row.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "service_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The service both rules price (services.id).",
+          "source": "arch 05 line 253"
+        },
+        {
+          "name": "first_rule_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The rule saved first (price_rules.id).",
+          "source": "arch 05 line 253 ('when the owner saves the second rule')"
+        },
+        {
+          "name": "second_rule_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The rule whose save caught the tie (price_rules.id).",
+          "source": "arch 05 line 253"
+        },
+        {
+          "name": "asked_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the read-back of the second save asked which wins.",
+          "source": "arch 05 line 253 ('the read-back asks which wins')"
+        },
+        {
+          "name": "winner_rule_id",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The rule the owner said wins where both apply: first_rule_id or second_rule_id. Null until answered, and meanwhile the lower price applies.",
+          "source": "arch 05 line 253 ('Until answered, the lower price applies'); S13-25 rule 19"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner answered; null until then.",
+          "source": "arch 05 line 253"
+        },
+        {
+          "name": "answered_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who answered (persons.id): the owner, or an admin the owner lets set prices; null until answered.",
+          "source": "S2-15; S13-45 row 8"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "price_rule_ties_service_fk",
+          "columns": ["service_id", "business_id"],
+          "references": {
+            "table": "services",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rule_ties_first_fk",
+          "columns": ["first_rule_id", "service_id"],
+          "references": {
+            "table": "price_rules",
+            "columns": ["id", "service_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rule_ties_second_fk",
+          "columns": ["second_rule_id", "service_id"],
+          "references": {
+            "table": "price_rules",
+            "columns": ["id", "service_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_rule_ties_answered_by_fk",
+          "columns": ["answered_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "price_rule_ties_pair_key",
+          "columns": ["first_rule_id", "second_rule_id"],
+          "source": "arch 05 line 253 (one question per tie caught)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "price_rule_ties_two_rules",
+          "expression": "first_rule_id <> second_rule_id",
+          "source": "arch 05 line 253 ('the second rule')"
+        },
+        {
+          "name": "price_rule_ties_winner_of_pair",
+          "expression": "winner_rule_id is null or winner_rule_id in (first_rule_id, second_rule_id)",
+          "source": "arch 05 line 253 ('the read-back asks which wins')"
+        },
+        {
+          "name": "price_rule_ties_answer_together",
+          "expression": "(winner_rule_id is null) = (answered_at is null) and (answered_at is null) = (answered_by_person_id is null) and (answered_at is null or answered_at >= asked_at)",
+          "source": "arch 05 line 253 ('Until answered')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "price_rule_ties_service_idx",
+          "columns": ["service_id"],
+          "why": "A service's ties and their answers, read with its rules by the price resolver (arch 05 line 253)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

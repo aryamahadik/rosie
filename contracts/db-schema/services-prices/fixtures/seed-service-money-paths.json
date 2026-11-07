@@ -1,0 +1,277 @@
+{
+  "after": [
+    "seed-services-price-list.json",
+    "../../business-setup/fixtures/seed-location-travel-centre.json",
+    "../../business-setup/fixtures/seed-location-flow-b.json"
+  ],
+  "rows": [
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-haircut-shop",
+        "service_id": "svc-lees-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-haircut-home",
+        "service_id": "svc-lees-haircut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lees-barbershop-second-shop",
+        "path": "list|full|none",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-skin-fade-shop",
+        "service_id": "svc-lees-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": "2 hours",
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-beard-trim-shop",
+        "service_id": "svc-lees-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-kids-cut-shop",
+        "service_id": "svc-lees-kids-cut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-signature-cut-shop",
+        "service_id": "svc-lees-signature-cut",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|full|none",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-grooms-package-shop",
+        "service_id": "svc-lees-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|deposit|counter",
+        "deposit_cents": 4000,
+        "deposit_percent": null,
+        "fee_cents": 4000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-style-consult-shop",
+        "service_id": "svc-lees-style-consult",
+        "business_id": "biz-lees-barbershop",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-lees-barbershop-shop",
+        "path": "list|none|none",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": null,
+        "currency": null,
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-home-grooming-home",
+        "service_id": "svc-lees-home-grooming",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lees-barbershop-second-shop",
+        "path": "list|card|bill",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 8900,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": true,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-wedding-party-home",
+        "service_id": "svc-lees-wedding-party",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lees-barbershop-second-shop",
+        "path": "photos|deposit|bill",
+        "deposit_cents": null,
+        "deposit_percent": 25,
+        "fee_cents": null,
+        "currency": null,
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lees-event-hours-home",
+        "service_id": "svc-lees-event-hours",
+        "business_id": "biz-lees-barbershop",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lees-barbershop-second-shop",
+        "path": "list|none|bill",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": null,
+        "currency": null,
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-lee-electric-wiring-repair",
+        "business_id": "biz-lee-home-services",
+        "kind_id": "electrician",
+        "name": "Wiring repair (flickering lights, a dead circuit)",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "90 minutes",
+        "position": 1,
+        "active": true,
+        "extras": "{\"pf.services\":{\"service\":\"Wiring repair (flickering lights, a dead circuit)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-lee-electric-wiring-repair-home",
+        "service_id": "svc-lee-electric-wiring-repair",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "place": "customer",
+        "location_id": "loc-lee-home-services-office",
+        "path": "visit|card|bill",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 8900,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "after": [
+    "../../kinds-of-work/fixtures/seed-kinds-sample.json",
+    "../../business-setup/fixtures/seed-place-or-thing.json"
+  ],
+  "rows": [
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-pet-boarding-inn",
+        "business_id": "biz-pet-boarding",
+        "kind": "shop",
+        "name": null,
+        "address": "123 Demo St, Anytown",
+        "map_point": null,
+        "end_address": null,
+        "travel_miles": null,
+        "travel_centre": null,
+        "travel_centre_address": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-boarding-standard-run-stay",
+        "business_id": "biz-pet-boarding",
+        "kind_id": "boarding",
+        "name": "Stay in a standard run (dog)",
+        "price_kind": "per_unit",
+        "unit": "night",
+        "length": "1 day",
+        "position": 1,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Stay in a standard run (dog)\",\"price\":\"per night, from the owner's list (the example inn: $48; the example resort: $55)\",\"length\":\"a start date and an end date, in drop-off and pick-up hours\",\"place\":\"at the business; with van rides at the customer's place, where the business has a van\",\"before\":\"a card saved for the late-cancel or no-show fee\",\"after\":\"at the counter at pick-up; with van rides, the saved card charged when the pet is home\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-boarding-suite-stay",
+        "business_id": "biz-pet-boarding",
+        "kind_id": "boarding",
+        "name": "Stay in a suite",
+        "price_kind": "per_unit",
+        "unit": "night",
+        "length": "1 day",
+        "position": 2,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Stay in a suite\",\"price\":\"per night (the examples: $70 and $80)\",\"place\":\"the same\",\"before\":\"a deposit (the examples: $40)\",\"after\":\"the rest at pick-up, or charged when the pet is home\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-boarding-cat-condo",
+        "business_id": "biz-pet-boarding",
+        "kind_id": "boarding",
+        "name": "Cat condo",
+        "price_kind": "per_unit",
+        "unit": "night",
+        "length": "1 day",
+        "position": 3,
+        "active": true,
+        "extras": "{\"pf.services\":{\"name\":\"Cat condo\",\"price\":\"per night (the example inn: $25)\",\"place\":\"at the business\"}}",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-boarding-standard-run-stay-inn",
+        "service_id": "svc-boarding-standard-run-stay",
+        "business_id": "biz-pet-boarding",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-pet-boarding-inn",
+        "path": "list|card|counter",
+        "fee_cents": 2000,
+        "currency": "USD",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-boarding-suite-stay-inn",
+        "service_id": "svc-boarding-suite-stay",
+        "business_id": "biz-pet-boarding",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-pet-boarding-inn",
+        "path": "list|deposit|counter",
+        "deposit_cents": 4000,
+        "fee_cents": 4000,
+        "currency": "USD",
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-boarding-cat-condo-inn",
+        "service_id": "svc-boarding-cat-condo",
+        "business_id": "biz-pet-boarding",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-pet-boarding-inn",
+        "path": "list|card|counter",
+        "fee_cents": 2000,
+        "currency": "USD",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-boarding-standard-run-stay",
+        "business_id": "biz-pet-boarding",
+        "service_id": "svc-boarding-standard-run-stay",
+        "price_cents": 4800,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-boarding-suite-stay",
+        "business_id": "biz-pet-boarding",
+        "service_id": "svc-boarding-suite-stay",
+        "price_cents": 7000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-boarding-cat-condo",
+        "business_id": "biz-pet-boarding",
+        "service_id": "svc-boarding-cat-condo",
+        "price_cents": 2500,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "item_services",
+      "values": {
+        "place_or_thing_id": "place-pet-boarding-standard-run",
+        "service_id": "svc-boarding-standard-run-stay",
+        "business_id": "biz-pet-boarding"
+      }
+    },
+    {
+      "table": "item_services",
+      "values": {
+        "place_or_thing_id": "place-pet-boarding-suite",
+        "service_id": "svc-boarding-suite-stay",
+        "business_id": "biz-pet-boarding"
+      }
+    },
+    {
+      "table": "item_services",
+      "values": {
+        "place_or_thing_id": "place-pet-boarding-cat-condo",
+        "service_id": "svc-boarding-cat-condo",
+        "business_id": "biz-pet-boarding"
+      }
+    }
+  ]
+}

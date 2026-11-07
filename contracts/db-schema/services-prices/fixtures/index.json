@@ -1,0 +1,68 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-services-price-list.json",
+      "version": "v1",
+      "table": "services",
+      "expect": "accept",
+      "shows": "Lee's Barbershop's list as S1-12 reads it from Sam's photo, matched to the barber kind: the price board (Haircut 30 minutes, Skin fade, Beard trim, Kids cut (12 and under), Signature cut and hot towel shave 60 minutes, Groom's package 2 hours 30 minutes), the free Style consult, and the house calls (Home grooming visit, Wedding party grooming set by the party's details at about 35 minutes a person, Event hours per hour with a 1-hour minimum), in order, each with what the barber file says about it as JSON text. The prices are price rules (seed-price-rule-dates), since every price carries effective dates",
+      "source": "S1-12 (gives services; 'Service, Price kind, Price, Time it takes'); SPEC-master 6 (the price board, its lengths); master-A.json money.examples ('A free 15-minute style consult'); fixtures/master/engine/work/prof/barber.json pf.services and pf.questions (lengths, kinds, the house-call lines); fixtures/v1/forms/barber.json; FS lines 724, 747; 02-contracts K-02 v1.1"
+    },
+    {
+      "file": "seed-service-money-paths.json",
+      "version": "v1",
+      "table": "service_money",
+      "expect": "accept",
+      "shows": "S1-13's money card as Sam confirmed it ('F $40 deposit. E paid when they book. A at their home too, 75, paid when they book'): every shop service a card saved for the $20 fee and paid at the chair, the Groom's package a $40 deposit with its $40 fee, the signature cut paid in full, the free consult nothing before and nothing after, and the haircut in a second place, at the customer's home, paid in full; the skin fade with its own free-cancel time of 2 hours; the house calls from the second shop's travel area: a home grooming visit with a card saved for the $89 fee and a tip line on the bill, a wedding party quoted first with a 25% deposit that is its fee, and event hours billed after; and Lee Home Services' wiring repair, priced at the visit with a card saved for the $89 service-call fee",
+      "source": "S1-13 (gives ways; its card and the owner's reply in its before:deposit+after:counter vary; 'A service in two places has two prices and two money rows'); SPEC-master 6 ('The shop's no-show and late-cancel fee: $20 ($40 for the Groom's package)'); FS line 725; FS section 4; FS rows L01, V05 to V08, V11; fixtures/master/engine/work/prof/barber.json pf.money (fees, tips, cancel); fixtures/v1/test-kit/shops/barber.json (flow B), electrician.json (wiring repair)"
+    },
+    {
+      "file": "seed-price-rule-dates.json",
+      "version": "v1",
+      "table": "price_rules",
+      "expect": "accept",
+      "shows": "Every price as a rule with effective dates: the board's prices from Sam's yes at S1-13 (2:11pm Mon Oct 19), with the haircut's $35 closed at the start of Mon Nov 2 and $40 opened at that instant (S11-54); the haircut at the customer's home $75 (a place condition); event hours $120 an hour, and $140 with Andre (a worker condition, set at S2-15); the wiring repair's $89 service call promised at the visit; and the movers' vault visit at the warehouse, $35, and $40 after 5pm (a time condition)",
+      "source": "arch 09 lines 457, 478, 488; arch 05 line 253; S11-54 ('Sam raises the haircut to $40 for visits from Mon Nov 2'; 'Haircuts already booked keep $35, even after Nov 2'); S1-13 ('A at their home too, 75'); S2-15 ('Prices by person: the same, whoever goes, unless Sam says'); FS row T06; fixtures/master/engine/work/prof/barber.json ('$120 an hour, 1-hour minimum ($140 with Andre)'); fixtures/v1/test-kit/shops/barber.json (flow B staff Andre), electrician.json ('only the $89 service call is promised'), movers.json ('Vault visit: $35, 30 minutes'; 'Evening vault visit: $40, after 5pm')"
+    },
+    {
+      "file": "seed-item-services.json",
+      "version": "v1",
+      "table": "item_services",
+      "expect": "accept",
+      "shows": "The pet boarding demo shop's stays, priced per night ($48 in a standard run, $70 in a suite with a $40 deposit, $25 in a cat condo), and which stays each space takes (S1-81: 'Which services use it'): the standard run, the suite and the cat condo of K-23's seed each take their own stay",
+      "source": "S1-81 ('The owner lists each space or thing: its name, how many it fits, which services use it'); FS row K04; FS line 741; FS section 2b (item_service); Q-46; fixtures/v1/test-kit/shops/boarding.json (services_shape: per-night prices, the suite's $40 deposit, the inn's $20 fee)"
+    },
+    {
+      "file": "invalid/refuse-overlapping-effective-dates.json",
+      "version": "v1",
+      "table": "price_rules",
+      "expect": "refuse",
+      "shows": "S11-54's raise saved without closing the row in effect: the haircut's $40 from Mon Nov 2 while its $35 row is still open is refused (EXCLUDE price_rules_one_in_effect, SQLSTATE 23P01); once the $35 row is closed at that instant, the same row passes: a change closes one row and opens the next",
+      "source": "arch 09 line 488 ('Effective dates on every price and rule. A change closes one row and opens the next'); S11-54; 02-contracts section 7 row K-25 (refused refuse-overlapping-effective-dates.json)"
+    },
+    {
+      "file": "invalid/refuse-fee-on-nothing-taken.json",
+      "version": "v1",
+      "table": "service_money",
+      "expect": "refuse",
+      "shows": "The haircut at the shop changed to nothing taken before while it keeps its $20 fee is refused (CHECK service_money_fee_needs_money_before, SQLSTATE 23514): with nothing taken, no fee is possible; the same change that also clears the fee passes, as S1-13's 'A nothing before' read-back shows",
+      "source": "FS section 4 (list|none|counter: 'no fee possible'); S1-13 (its before:none+after:counter vary: 'Haircut at the shop · $35 · Nothing taken · At the chair'); RULES 3.3; fixtures/v1/test-kit/shops/plumber.json (lists a fee on a nothing-taken path)"
+    },
+    {
+      "file": "invalid/refuse-place-of-another-service.json",
+      "version": "v1",
+      "table": "price_rules",
+      "expect": "refuse",
+      "shows": "A price for the skin fade whose place is the haircut's home visit is refused (foreign key price_rules_place_fk, SQLSTATE 23503): a price rule's place is a way of its own service; the same row naming the skin fade's own way at the shop passes",
+      "source": "arch 05 line 253 ('worker, place, time'); S1-13 ('A service in two places has two prices and two money rows')"
+    },
+    {
+      "file": "invalid/refuse-cross-business-price-read.json",
+      "version": "v1",
+      "table": "price_rules",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to the yoga studio reads none of the barbershop's haircut prices (row-level security, 0 rows); in the barbershop's own scope the same read gives its 3 rows",
+      "source": "arch 10 line 546 (row-level security per business on every Tool API call); K-04 v1 rule 4"
+    }
+  ]
+}

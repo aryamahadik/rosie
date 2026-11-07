@@ -1,0 +1,23 @@
+{
+  "after": ["seed-service-money-paths.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "service_money",
+    "set": {
+      "path": "list|none|counter",
+      "version": 2
+    },
+    "where": {
+      "id": "way-lees-haircut-shop"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["service_money_fee_needs_money_before"]
+    }
+  }
+}

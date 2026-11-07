@@ -1,0 +1,321 @@
+{
+  "after": ["seed-service-money-paths.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-andre",
+        "name": "Andre",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-andre-barber",
+        "person_id": "person-andre",
+        "business_id": "biz-lees-barbershop",
+        "role": "staff",
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-andre",
+        "business_id": "biz-lees-barbershop",
+        "kind": "worker",
+        "name": "Andre",
+        "person_id": "person-andre",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-haircut-35",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-haircut",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 3500,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": "2026-11-02T05:00:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-haircut-40",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-haircut",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 4000,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-11-02T05:00:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-haircut-home",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-haircut",
+        "service_money_id": "way-lees-haircut-home",
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 7500,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-skin-fade",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-skin-fade",
+        "price_cents": 4000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-beard-trim",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-beard-trim",
+        "price_cents": 2000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-kids-cut",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-kids-cut",
+        "price_cents": 2500,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-signature-cut",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-signature-cut",
+        "price_cents": 5500,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-grooms-package",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-grooms-package",
+        "price_cents": 14000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-style-consult",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-style-consult",
+        "price_cents": 0,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-home-grooming",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-home-grooming",
+        "price_cents": 17900,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-event-hours",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-event-hours",
+        "price_cents": 12000,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lees-event-hours-andre",
+        "business_id": "biz-lees-barbershop",
+        "service_id": "svc-lees-event-hours",
+        "service_money_id": null,
+        "worker_resource_id": "res-andre",
+        "weekdays": null,
+        "from_time": null,
+        "until_time": null,
+        "price_cents": 14000,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T19:00:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-lee-electric-wiring-repair",
+        "business_id": "biz-lee-home-services",
+        "service_id": "svc-lee-electric-wiring-repair",
+        "price_cents": 8900,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-movers-warehouse",
+        "business_id": "biz-movers",
+        "kind": "shop",
+        "name": null,
+        "address": "123 Demo St, Anytown",
+        "map_point": null,
+        "end_address": null,
+        "travel_miles": null,
+        "travel_centre": null,
+        "travel_centre_address": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "services",
+      "values": {
+        "id": "svc-movers-vault-visit",
+        "business_id": "biz-movers",
+        "kind_id": "movers",
+        "name": "Vault visit",
+        "price_kind": "one_price",
+        "unit": null,
+        "length": "30 minutes",
+        "position": 1,
+        "active": true,
+        "extras": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "service_money",
+      "values": {
+        "id": "way-movers-vault-visit-warehouse",
+        "service_id": "svc-movers-vault-visit",
+        "business_id": "biz-movers",
+        "flow": "A",
+        "place": "business",
+        "location_id": "loc-movers-warehouse",
+        "path": "list|card|counter",
+        "deposit_cents": null,
+        "deposit_percent": null,
+        "fee_cents": 2000,
+        "currency": "USD",
+        "cutoff_before": null,
+        "cutoff_day_before_at": null,
+        "tip_line": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-movers-vault-visit",
+        "business_id": "biz-movers",
+        "service_id": "svc-movers-vault-visit",
+        "price_cents": 3500,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "price_rules",
+      "values": {
+        "id": "price-movers-vault-visit-evening",
+        "business_id": "biz-movers",
+        "service_id": "svc-movers-vault-visit",
+        "service_money_id": null,
+        "worker_resource_id": null,
+        "weekdays": null,
+        "from_time": "17:00",
+        "until_time": null,
+        "price_cents": 4000,
+        "from_cents": null,
+        "currency": "USD",
+        "set_by_person_id": "person-sam",
+        "effective_from": "2026-10-19T18:11:00Z",
+        "effective_to": null,
+        "version": 1
+      }
+    }
+  ]
+}
