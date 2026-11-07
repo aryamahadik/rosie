@@ -1,0 +1,19 @@
+{
+  "call": "freeBusy",
+  "given": {
+    "now": "2026-11-07T15:06:29Z",
+    "note": "The fresh read before Alex's booking is written is rate-limited by Google with Retry-After 30 seconds. Nothing is known about Riley's calendar, so A6-10's safe default holds: 'the booking isn't written until the time is still free'; the read goes again after 30 seconds, while the saved time still holds (arch 10 line 540).",
+    "calendar": []
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "purpose": "bookingWrite",
+    "from": "2026-11-14T16:00:00Z",
+    "to": "2026-11-14T16:30:00Z"
+  },
+  "outcome": {
+    "error": "rateLimited",
+    "retryAfterSeconds": 30
+  }
+}

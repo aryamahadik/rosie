@@ -1,0 +1,91 @@
+{
+  "call": "readChanges",
+  "given": {
+    "now": "2026-11-12T21:15:03Z",
+    "note": "After Riley's push (notification-google.json), the handler reads what changed since the cursor. Five events changed on the double's calendar: Riley's personal event over Alex's haircut on Sat Nov 14 (busy: a clash, which goes to Sam at once, S12-33), an invite Riley declined (not busy), a tentative event (busy, tentative ones too), an event marked free (not busy), and Rosie's own event for Alex's haircut (never back in as busy). The answer holds no title (arch 05 lines 261, 265, 267).",
+    "calendar": [
+      {
+        "key": "gcal-ev-riley-personal-01",
+        "start": "2026-11-14T15:30:00Z",
+        "end": "2026-11-14T17:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-invite-02",
+        "start": "2026-11-17T18:00:00Z",
+        "end": "2026-11-17T19:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "declined",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-tentative-03",
+        "start": "2026-11-19T14:00:00Z",
+        "end": "2026-11-19T15:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "tentative",
+        "invite": "tentative",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-free-04",
+        "start": "2026-11-20T13:00:00Z",
+        "end": "2026-11-20T14:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "free",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-event-demo-0001",
+        "start": "2026-11-14T16:00:00Z",
+        "end": "2026-11-14T16:30:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": true,
+        "deleted": false
+      }
+    ]
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "trigger": "push",
+    "cursor": "gcal-sync-riley-0007",
+    "window": { "from": "2026-11-12T21:15:03Z", "to": "2027-02-10T21:15:03Z" }
+  },
+  "outcome": {
+    "result": "changes",
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "full": false,
+    "busy": [
+      {
+        "key": "gcal-ev-riley-personal-01",
+        "start": "2026-11-14T15:30:00Z",
+        "end": "2026-11-14T17:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "google", "calendarLinkId": "callink-riley-google" }
+      },
+      {
+        "key": "gcal-ev-riley-tentative-03",
+        "start": "2026-11-19T14:00:00Z",
+        "end": "2026-11-19T15:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "google", "calendarLinkId": "callink-riley-google" }
+      }
+    ],
+    "removed": ["gcal-ev-riley-invite-02", "gcal-ev-riley-free-04"],
+    "cursor": "gcal-sync-riley-0008",
+    "readAt": "2026-11-12T21:15:04Z"
+  }
+}

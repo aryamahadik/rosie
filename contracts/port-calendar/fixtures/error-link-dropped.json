@@ -1,0 +1,19 @@
+{
+  "call": "readChanges",
+  "given": {
+    "now": "2026-11-15T13:30:00Z",
+    "note": "Riley removed Rosie's access in the Google account. At the 30-minute poll the refresh answers invalid_grant, so the read answers linkDropped with why tokenRevoked; the caller tells the Tool API calendarLinkDropped (K-09 v1) and S12-13 follows: Sam is texted at once, Riley's open times come off, booked visits stay (arch 11 line 580).",
+    "calendar": []
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "trigger": "poll",
+    "cursor": "gcal-sync-riley-0009",
+    "window": { "from": "2026-11-15T13:30:00Z", "to": "2027-02-13T13:30:00Z" }
+  },
+  "outcome": {
+    "error": "linkDropped",
+    "why": "tokenRevoked"
+  }
+}

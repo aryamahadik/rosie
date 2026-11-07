@@ -1,0 +1,21 @@
+{
+  "call": "connectStart",
+  "given": {
+    "now": "2026-11-02T15:00:00Z",
+    "note": "connect-start-google.json with one fault: it asks for Google's whole-calendar scope. Refused: v1 asks for calendar.events.owned only, the narrowest scope that covers K-16 (T-1123 findings: calendar.events and calendar are 'broader than needed')."
+  },
+  "request": {
+    "provider": "google",
+    "personId": "person-riley",
+    "calendarLinkId": "callink-riley-google",
+    "startedOn": "staffPage"
+  },
+  "outcome": {
+    "result": "started",
+    "provider": "google",
+    "authorizeUrl": "https://calendar-double.example.com/consent?provider=google&state=state-riley-google-0001",
+    "state": "state-riley-google-0001",
+    "scopes": ["https://www.googleapis.com/auth/calendar"],
+    "expiresAt": "2026-11-02T15:15:00Z"
+  }
+}

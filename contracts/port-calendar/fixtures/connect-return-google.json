@@ -1,0 +1,23 @@
+{
+  "call": "connectReturn",
+  "given": {
+    "now": "2026-11-02T15:01:10Z",
+    "note": "Google sends Riley back with the state and a code. The adapter exchanges the code once, checks that every scope asked was granted, and seals the access and refresh tokens under Riley's key with the link (arch 05 line 271). The answer names where the tokens are and holds none; the code is a placeholder, never a real one."
+  },
+  "request": {
+    "provider": "google",
+    "state": "state-riley-google-0001",
+    "code": "placeholder-auth-code-riley-google",
+    "error": null,
+    "receivedAt": "2026-11-02T15:01:10Z"
+  },
+  "outcome": {
+    "result": "linked",
+    "provider": "google",
+    "personId": "person-riley",
+    "calendarLinkId": "callink-riley-google",
+    "scopesGranted": ["https://www.googleapis.com/auth/calendar.events.owned"],
+    "tokens": "sealedUnderPersonKey",
+    "linkedAt": "2026-11-02T15:01:11Z"
+  }
+}

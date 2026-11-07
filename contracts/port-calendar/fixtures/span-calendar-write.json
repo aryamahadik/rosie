@@ -1,0 +1,26 @@
+{
+  "trace_id": "trace-alex-0012",
+  "span_id": "span-alex-0012-19",
+  "seq": 19,
+  "hop": "effectRun",
+  "at": "2026-11-07T15:06:33.000Z",
+  "ms": 380,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-alex-book-1",
+  "job_id": null,
+  "handle_ref": "handle-alex",
+  "business_id": "biz-lees-barbershop",
+  "provider": "google_calendar",
+  "call": "calendarWrite",
+  "attempt": 1,
+  "got": {
+    "effect": "eff-cal-riley-alex-nov14-write",
+    "booking": "booking-alex-riley-nov14",
+    "visit": "visit-alex-riley-nov14",
+    "link": "callink-riley-google",
+    "idempotencyKey": "eff-cal-riley-alex-nov14-write"
+  },
+  "decided": { "result": "written", "eventWritten": true, "alreadyDone": false, "outageRow": false },
+  "outcome": "ok",
+  "error_code": null
+}

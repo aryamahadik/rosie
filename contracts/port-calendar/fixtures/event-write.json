@@ -1,0 +1,30 @@
+{
+  "call": "calendarWrite",
+  "given": {
+    "now": "2026-11-07T15:06:33Z",
+    "note": "After the commit of Alex's yes, the calendar_write effect (K-07 effect-calendar-write, whose portRequest is this request) writes one event for the visit on Riley's Google calendar, keyed by booking, visit and person. It shows the business's display name, the service and the first name of the person served, Alex, and nothing else (arch 05 line 267; A6-10 'It shows on Riley's phone calendar too')."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov14",
+      "visitId": "visit-alex-riley-nov14",
+      "personId": "person-riley"
+    },
+    "start": "2026-11-14T16:00:00Z",
+    "end": "2026-11-14T16:30:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "providerEventId": "gcal-event-demo-0001",
+    "alreadyWritten": false
+  }
+}

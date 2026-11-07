@@ -1,0 +1,19 @@
+{
+  "call": "watch",
+  "given": {
+    "now": "2026-11-02T21:22:00Z",
+    "note": "Sam's Outlook link gets its Graph subscription to his events (created, updated, deleted), with lifecycle notifications, for 10,079 minutes, a minute under Graph's 10,080 for events. Graph checks the gateway's address first (notification-microsoft-validation.json). renewAt is halfway (arch 05 line 271)."
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft"
+  },
+  "outcome": {
+    "result": "watching",
+    "calendarLinkId": "callink-sam-microsoft",
+    "watchId": "graph-sub-sam-01",
+    "startedAt": "2026-11-02T21:22:00Z",
+    "expiresAt": "2026-11-09T21:21:00Z",
+    "renewAt": "2026-11-06T09:21:30Z"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "call": "verifyNotification",
+  "given": {
+    "now": "2026-11-12T21:15:00Z",
+    "note": "Riley adds a personal event to the phone calendar over Alex's haircut on Sat Nov 14 (S12-33). Google pushes on Riley's channel with no body, state exists. Its channel token was made for this channel from the test push secret, so the gateway stores the push once as a provider event and answers 200 in under 1 s; the handler then reads the changes (changes-to-busy-blocks.json).",
+    "verifier": "valid"
+  },
+  "request": {
+    "provider": "google",
+    "kind": "push",
+    "channelId": "gcal-channel-riley-03",
+    "channelToken": "made-at-test-time",
+    "resourceId": "gcal-resource-riley-primary",
+    "resourceState": "exists",
+    "messageNumber": "7",
+    "channelExpiration": "Mon, 16 Nov 2026 15:02:00 GMT",
+    "receivedAt": "2026-11-12T21:15:00Z",
+    "traceId": "trace-gcal-0001"
+  },
+  "outcome": {
+    "result": "accepted",
+    "httpStatus": 200,
+    "events": [
+      {
+        "provider": "google_calendar",
+        "providerEventId": "gcal-channel-riley-03:7",
+        "eventType": "exists",
+        "occurredAt": null,
+        "receivedAt": "2026-11-12T21:15:00Z",
+        "businessId": null,
+        "effectId": null,
+        "payload": {
+          "calendarLinkId": "callink-riley-google",
+          "watchId": "gcal-channel-riley-03",
+          "notice": "changed"
+        },
+        "traceId": "trace-gcal-0001"
+      }
+    ],
+    "unknownWatches": 0
+  }
+}

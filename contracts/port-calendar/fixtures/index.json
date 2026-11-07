@@ -1,0 +1,324 @@
+{
+  "fixtures": [
+    {
+      "file": "connect-start-google.json",
+      "version": "v1",
+      "def": "connectStart.exchange",
+      "expect": "accept",
+      "shows": "Riley links a Google calendar on the staff page, a page already open: the start answers the consent page's address, the state, calendar.events.owned alone and when the start stops being accepted",
+      "source": "02-contracts K-16 Fixtures and Defines ('Connect: an OAuth start link for Google or Microsoft ... started on a page the person already has open'); S1-24 ('Each person can link their own calendar when they join'); S2-06; Q-10; T-1123 FINDINGS.md (calendar.events.owned)"
+    },
+    {
+      "file": "connect-start-microsoft.json",
+      "version": "v1",
+      "def": "connectStart.exchange",
+      "expect": "accept",
+      "shows": "Sam links his Outlook calendar on registration screen 16 at sign-up: the start asks for offline_access, Calendars.Read and Calendars.ReadWrite, nothing wider",
+      "source": "02-contracts K-16 Fixtures; S1-24 in master-A.json ('Connect your calendar or booking system'); FS screen 16, row H03; Q-10; T-1123 FINDINGS.md [M2], [M3]; README spike row 14 (Calendars.Read for the subscription)"
+    },
+    {
+      "file": "connect-return-google.json",
+      "version": "v1",
+      "def": "connectReturn.exchange",
+      "expect": "accept",
+      "shows": "Google sends Riley back with the state and a placeholder code: linked, every scope granted, and the tokens sealed under Riley's key with the link; the answer names where they are and holds none",
+      "source": "02-contracts K-16 ('its return, with the tokens sealed under the person's key'); arch 05 line 271 ('Links keep their tokens sealed under the person's key'); rule 7; README spike row 7"
+    },
+    {
+      "file": "connect-return-microsoft.json",
+      "version": "v1",
+      "def": "connectReturn.exchange",
+      "expect": "accept",
+      "shows": "Microsoft sends Sam back with a placeholder code: linked, the three Microsoft scopes granted, the tokens sealed under Sam's key",
+      "source": "02-contracts K-16; arch 05 line 271; S1-24 ('Connected. The jobs already on it now block those times'); README spike row 16"
+    },
+    {
+      "file": "connect-return-declined.json",
+      "version": "v1",
+      "def": "connectReturn.exchange",
+      "expect": "accept",
+      "shows": "Iris says no on Google's consent page: access_denied comes back with no code, the answer is declined, and S1-24's safe default holds (nothing blocked yet, with one reminder)",
+      "source": "S1-24 in master-A.json (safe default 'nothing blocked yet, with one reminder'); fixture set v1 test-kit/shops/therapist.json (Lee Associates; 'Maya and Iris (therapists)'); README spike rows 7, 16 (access_denied)"
+    },
+    {
+      "file": "connect-return-scopes-missing.json",
+      "version": "v1",
+      "def": "connectReturn.exchange",
+      "expect": "accept",
+      "shows": "Riley unticks the calendar box on Google's consent page: nothing is linked, the answer names the missing scope, and the page asks again",
+      "source": "README spike row 7 (Google's granular consent: 'users may not grant your app access to all of them'); T-1123 FINDINGS.md; S1-24 safe default"
+    },
+    {
+      "file": "watch-google.json",
+      "version": "v1",
+      "def": "watch.exchange",
+      "expect": "accept",
+      "shows": "Riley's Google link gets its channel for 7 days, Google's default life, with renewAt halfway",
+      "source": "02-contracts K-16 ('Watch and renew'); arch 05 lines 261, 271 ('renewed when half its life is left'); README spike row 1 (params.ttl default 604800 s)"
+    },
+    {
+      "file": "watch-microsoft.json",
+      "version": "v1",
+      "def": "watch.exchange",
+      "expect": "accept",
+      "shows": "Sam's Outlook link gets its Graph subscription for 10,079 minutes, a minute under Graph's maximum for events, with renewAt halfway",
+      "source": "02-contracts K-16; arch 05 lines 261, 271; README spike row 8 (Outlook event: 10,080 minutes, under seven days)"
+    },
+    {
+      "file": "renew-google.json",
+      "version": "v1",
+      "def": "renew.exchange",
+      "expect": "accept",
+      "shows": "Half of the life of Riley's channel is left: a new channel replaces the old one, which is stopped after it",
+      "source": "arch 05 line 271; README spike row 1 ('there's no automatic way to renew a notification channel'; a new id, an overlap)"
+    },
+    {
+      "file": "renew-microsoft.json",
+      "version": "v1",
+      "def": "renew.exchange",
+      "expect": "accept",
+      "shows": "Half of the life of Sam's Graph subscription is left: the same subscription gets a new expiry, which also reauthorizes it",
+      "source": "arch 05 line 271; README spike rows 8, 11 (PATCH expirationDateTime; 'renewing your subscription also reauthorizes your endpoint')"
+    },
+    {
+      "file": "renewal-failed-dropped-link.json",
+      "version": "v1",
+      "def": "renewal.life",
+      "expect": "accept",
+      "shows": "Sam's renewal fails five times within 10 minutes, so at 4:30pm the link is dropped with why renewalFailed, the Tool API's calendarLinkDropped, and S12-13's text to Sam follows",
+      "source": "02-contracts K-16 Fixtures ('a renewal still failing after arch 10's effect retries is a dropped link'); arch 05 line 271; arch 10 line 542; arch 11 line 580; S12-13, S12-14 in master-A.json (Mon Nov 9, 4:30pm); K-09 v1 calendarLinkDropped"
+    },
+    {
+      "file": "notification-google.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "Google pushes on Riley's channel after Riley adds a personal event; the channel token checks out, the push is stored once as a provider event with eventType exists and notice changed, and the gateway answers 200",
+      "source": "02-contracts K-16 Fixtures; arch 02 line 109 ('Stripe and calendar events go to PostgreSQL'); K-07 v1 providerEvent; S12-33; README spike row 2"
+    },
+    {
+      "file": "notification-microsoft.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "Graph posts one basic change notification for Sam's subscription; its clientState checks out and it is stored once with Graph's notification id",
+      "source": "02-contracts K-16 Fixtures; arch 02 line 109; K-07 v1 providerEvent; README spike row 10"
+    },
+    {
+      "file": "notification-microsoft-validation.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "Graph's validation handshake when Sam's subscription is made: the gateway answers 200, text/plain, the token itself, within 10 seconds, and stores nothing",
+      "source": "02-contracts K-16 Spike ('Graph's validation handshake'); README spike row 9"
+    },
+    {
+      "file": "notification-microsoft-lifecycle.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "Graph posts reauthorizationRequired and missed for Sam's subscription in one POST: two provider events, notices reauthorizationRequired (renew now) and missed (read changes now)",
+      "source": "README spike rows 10, 11 (lifecycle notifications; several per POST); arch 05 line 271"
+    },
+    {
+      "file": "notification-google-sync.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "Google's sync message after Riley's channel starts says only that the channel was made: 200, ignored, nothing stored",
+      "source": "README spike row 2 (sync: the channel was created; message number 1)"
+    },
+    {
+      "file": "notification-rejected.json",
+      "version": "v1",
+      "def": "verifyNotification.exchange",
+      "expect": "accept",
+      "shows": "A post naming Riley's channel with a channel token that was not made for it: 401, dropped, nothing stored",
+      "source": "arch 02 line 109 ('Bad signature: 401, dropped'); README spike row 2 (the token verifies that each message is for a channel the app made)"
+    },
+    {
+      "file": "changes-to-busy-blocks.json",
+      "version": "v1",
+      "def": "readChanges.exchange",
+      "expect": "accept",
+      "shows": "Riley's changes read into busy blocks with no titles: the personal event over Alex's haircut and a tentative event are busy; a declined invite and an event marked free are removed; Rosie's own event never comes back in",
+      "source": "02-contracts K-16 Fixtures ('changes-to-busy-blocks.json (no titles; a declined invite skipped)'); arch 05 lines 261, 265, 267; S12-33; S1-24"
+    },
+    {
+      "file": "changes-full-read.json",
+      "version": "v1",
+      "def": "readChanges.exchange",
+      "expect": "accept",
+      "shows": "The first read after Sam links: a full read over the 90 days ahead, two occurrences of a repeating event and an all-day day off busy, an event marked free and a declined invite left out",
+      "source": "arch 05 line 265 ('Rosie reads 90 days ahead, expanding repeating events'); S1-24 ('jobs already booked block those times'); README spike row 12"
+    },
+    {
+      "file": "free-busy-fresh.json",
+      "version": "v1",
+      "def": "freeBusy.exchange",
+      "expect": "accept",
+      "shows": "The fresh read of Riley's calendar over Alex's haircut before the booking is written: nothing busy, so the time is still free",
+      "source": "02-contracts K-16 Fixtures ('free-busy-fresh.json'); arch 05 line 259; A6-10 in master-A.json ('Rosie checks the calendars once more, then saves the booking'); K-05 v1.1 commit-writes-effect"
+    },
+    {
+      "file": "free-busy-clash-check.json",
+      "version": "v1",
+      "def": "freeBusy.exchange",
+      "expect": "accept",
+      "shows": "Sam reconnects within 24 hours: the clash check's fresh read finds his personal event over Ben T.'s visit on Sat Nov 21, without Rosie's own event for that visit, so the clash goes to the owner first",
+      "source": "S12-13 ('Yes: checks for clashes'), S12-14 ('any clash goes to Sam first'); arch 11 line 580; K-09 v1 calendarLinkBack ('a fresh free/busy read through K-16')"
+    },
+    {
+      "file": "error-link-dropped.json",
+      "version": "v1",
+      "def": "readChanges.exchange",
+      "expect": "accept",
+      "shows": "Riley revoked Rosie's access: the 30-minute poll's read answers linkDropped with why tokenRevoked, which the Tool API records as a dropped link",
+      "source": "arch 11 lines 578, 580; S12-13; K-09 v1 calendarLinkDropped (why tokenRevoked); README spike row 7 (invalid_grant)"
+    },
+    {
+      "file": "error-rate-limited.json",
+      "version": "v1",
+      "def": "freeBusy.exchange",
+      "expect": "accept",
+      "shows": "The fresh read before Alex's booking is rate-limited with Retry-After 30 seconds; A6-10's safe default holds until a read shows the time free",
+      "source": "arch 10 line 540 ('a rate limit with any Retry-After'); A6-10 safe default ('the booking isn't written until the time is still free')"
+    },
+    {
+      "file": "event-write.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "After Alex's booking, one event for the visit on Riley's calendar, keyed by booking, visit and person, showing Lee's Barbershop, Haircut and Alex and nothing else",
+      "source": "02-contracts K-16 Fixtures ('event-write.json'); arch 05 line 267; A6-10 ('It shows on Riley's phone calendar too'); K-07 v1 effect-calendar-write"
+    },
+    {
+      "file": "event-move.json",
+      "version": "v1",
+      "def": "calendarUpdate.exchange",
+      "expect": "accept",
+      "shows": "Alex moves the haircut to 11:30am: the same event on Riley's calendar is updated",
+      "source": "02-contracts K-16 Fixtures ('event-move.json'); arch 05 line 267 ('a move updates that visit's event'); B8-37; K-07 v1 effect-calendar-move"
+    },
+    {
+      "file": "event-delete.json",
+      "version": "v1",
+      "def": "calendarDelete.exchange",
+      "expect": "accept",
+      "shows": "Alex calls the visit off: its event is deleted from Riley's calendar",
+      "source": "02-contracts K-16 Fixtures ('event-delete.json'); arch 05 line 267 ('a call-off or a change of person deletes it'); K-07 v1 effect-calendar-delete"
+    },
+    {
+      "file": "event-sensitive.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "accept",
+      "shows": "Lee Associates has the sensitive switch on: Alex's first session goes on Maya's calendar as 'Visit' and the initials A.M. only",
+      "source": "02-contracts K-16 Fixtures ('event-sensitive.json'); arch 05 line 267 ('with the sensitive switch on, only Visit and initials'); RULES 4.6; S13-22; fixture set v1 test-kit/shops/therapist.json (sensitive; Alex's first session with Maya, Sat Oct 24 at 11:00am)"
+    },
+    {
+      "file": "event-move-gone.json",
+      "version": "v1",
+      "def": "calendarUpdate.exchange",
+      "expect": "accept",
+      "shows": "Riley deleted Rosie's event before Alex's move: the update answers gone, nothing is updated or written again, and the booking stands",
+      "source": "arch 05 line 267; README default 12 and open gap (an event the person deleted)"
+    },
+    {
+      "file": "effect-row-calendar-write.json",
+      "version": "v1",
+      "def": "calendarEffect.row",
+      "expect": "accept",
+      "shows": "K-07 v1's effect row for Alex's calendar write, with this port's calendarWrite request as its portRequest",
+      "source": "K-07 v1 effectRow ('the request in the port's terms ... whose shape K-14, K-16 and K-11 give') and effect-calendar-write; lead note for T-025 ('Calendar effects run as K-07 v1 effect rows')"
+    },
+    {
+      "file": "span-free-busy.json",
+      "version": "v1",
+      "def": "calendar.span",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of A6-10's fresh read: provider google_calendar, call freeBusy, attempt 1, with the step, link and purpose it got and the result and count it decided",
+      "source": "K-08 v1 README ('a fresh calendar free/busy read when a booking is written'; provider, call, attempt); lead note for T-025; A6-10; K-01 bundle v0's id"
+    },
+    {
+      "file": "span-calendar-write.json",
+      "version": "v1",
+      "def": "calendar.span",
+      "expect": "accept",
+      "shows": "The K-08 effectRun span of Alex's calendar write: call calendarWrite, attempt 1, the effect, booking, visit, link and key it got, written with no outage row",
+      "source": "K-08 v1 README (effectRun; 'a K-07 effect kind such as charge or calendarWrite'); K-07 v1 effect-calendar-write; K-08 v1 span-effect-run-retry"
+    },
+    {
+      "file": "span-notification.json",
+      "version": "v1",
+      "def": "calendar.span",
+      "expect": "accept",
+      "shows": "The K-08 providerWebhook span of Riley's push: call verifyNotification, the watch and link it got, one provider event stored",
+      "source": "K-08 v1 README (providerWebhook: 'A Stripe or calendar event received and stored once'); arch 02 line 109; notification-google.json"
+    },
+    {
+      "file": "invalid/refuse-busy-block-with-title.json",
+      "version": "v1",
+      "def": "readChanges.exchange",
+      "expect": "refuse",
+      "shows": "changes-to-busy-blocks.json with the personal event's title on its busy block: refused, since a busy block never carries a title (without it, it is changes-to-busy-blocks.json)",
+      "source": "02-contracts K-16 Fixtures ('refuse-busy-block-with-title.json'); arch 05 line 261 ('never its title'); S12-33"
+    },
+    {
+      "file": "invalid/refuse-icloud.json",
+      "version": "v1",
+      "def": "connectStart.exchange",
+      "expect": "refuse",
+      "shows": "connect-start-google.json asking for an Apple iCloud calendar: refused, since iCloud is not linked (with google it is connect-start-google.json)",
+      "source": "02-contracts K-16 Fixtures ('refuse-icloud.json (Q-11)'); Q-11 default ('Not linked'); MC 8 'Calendars'"
+    },
+    {
+      "file": "invalid/refuse-texted-connect.json",
+      "version": "v1",
+      "def": "connectStart.exchange",
+      "expect": "refuse",
+      "shows": "connect-start-microsoft.json started from a texted link: refused, since no link is texted for it (with registration it is connect-start-microsoft.json)",
+      "source": "MC 8 'Calendars' ('no secure link is sent for this for now'); Q-10 default ('No text is sent just to give a calendar link')"
+    },
+    {
+      "file": "invalid/refuse-scope-widened.json",
+      "version": "v1",
+      "def": "connectStart.exchange",
+      "expect": "refuse",
+      "shows": "connect-start-google.json asking for Google's whole-calendar scope: refused, since v1 asks for calendar.events.owned only (with it, it is connect-start-google.json)",
+      "source": "Card T-025 ('K-16 v1 freezes the narrowest scopes'); T-1123 FINDINGS.md (calendar.events and calendar 'broader than needed')"
+    },
+    {
+      "file": "invalid/refuse-token-in-answer.json",
+      "version": "v1",
+      "def": "connectReturn.exchange",
+      "expect": "refuse",
+      "shows": "connect-return-google.json with a refresh token (a placeholder) in the answer: refused, since tokens never cross the port (without it, it is connect-return-google.json)",
+      "source": "arch 05 line 271; rule 7; contracts README convention 9; lead note for T-025 ('The contract names where a token is kept and how it is referred to, never a token value')"
+    },
+    {
+      "file": "invalid/refuse-sensitive-with-service.json",
+      "version": "v1",
+      "def": "calendarWrite.exchange",
+      "expect": "refuse",
+      "shows": "event-sensitive.json that also names the service: refused, since a sensitive event shows only Visit and initials (without the service it is event-sensitive.json)",
+      "source": "RULES 4.6 ('Never the service or the reason'); arch 05 line 267; S13-22"
+    },
+    {
+      "file": "invalid/refuse-title-in-span.json",
+      "version": "v1",
+      "def": "calendar.span",
+      "expect": "refuse",
+      "shows": "span-free-busy.json with an event title in what it got: refused by the span's closed list (K-08 alone would take the one word as a label), so no title enters a span (without it, it is span-free-busy.json)",
+      "source": "K-08 v1 ('never the raw number or words'); arch 02 diagram line 105; S12-33 ('The event's title is never shown to Sam or anyone')"
+    },
+    {
+      "file": "invalid/refuse-dropped-before-five-tries.json",
+      "version": "v1",
+      "def": "renewal.life",
+      "expect": "refuse",
+      "shows": "renewal-failed-dropped-link.json dropped after three failed tries: refused, since a renewal drops the link only after the effect retries, five tries (with tries 4 and 5 it is renewal-failed-dropped-link.json)",
+      "source": "arch 05 line 271 ('a renewal still failing after section 10's Effects retries is a dropped link'); arch 10 line 542 ('5 times in 10 minutes')"
+    }
+  ]
+}

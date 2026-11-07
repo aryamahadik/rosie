@@ -1,0 +1,20 @@
+{
+  "call": "connectReturn",
+  "given": {
+    "now": "2026-10-19T14:05:00Z",
+    "note": "Iris, a therapist at Lee Associates, opens Google's consent page from the staff page and says no. Google returns access_denied with the state; nothing is linked, no code is exchanged, and S1-24's safe default holds: nothing blocked yet, with one reminder."
+  },
+  "request": {
+    "provider": "google",
+    "state": "state-iris-google-0001",
+    "code": null,
+    "error": "access_denied",
+    "receivedAt": "2026-10-19T14:05:00Z"
+  },
+  "outcome": {
+    "result": "declined",
+    "provider": "google",
+    "personId": "person-iris",
+    "calendarLinkId": "callink-iris-google"
+  }
+}

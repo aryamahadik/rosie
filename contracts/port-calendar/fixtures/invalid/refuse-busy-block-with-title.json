@@ -1,0 +1,92 @@
+{
+  "call": "readChanges",
+  "given": {
+    "now": "2026-11-12T21:15:03Z",
+    "note": "changes-to-busy-blocks.json with one fault: Riley's personal event comes back with its title. Refused: a busy block keeps start, end and source, never the title (arch 05 line 261; S12-33: 'The event's title is never shown to Sam or anyone').",
+    "calendar": [
+      {
+        "key": "gcal-ev-riley-personal-01",
+        "start": "2026-11-14T15:30:00Z",
+        "end": "2026-11-14T17:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-invite-02",
+        "start": "2026-11-17T18:00:00Z",
+        "end": "2026-11-17T19:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "declined",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-tentative-03",
+        "start": "2026-11-19T14:00:00Z",
+        "end": "2026-11-19T15:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "tentative",
+        "invite": "tentative",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-ev-riley-free-04",
+        "start": "2026-11-20T13:00:00Z",
+        "end": "2026-11-20T14:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "free",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "gcal-event-demo-0001",
+        "start": "2026-11-14T16:00:00Z",
+        "end": "2026-11-14T16:30:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": true,
+        "deleted": false
+      }
+    ]
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "trigger": "push",
+    "cursor": "gcal-sync-riley-0007",
+    "window": { "from": "2026-11-12T21:15:03Z", "to": "2027-02-10T21:15:03Z" }
+  },
+  "outcome": {
+    "result": "changes",
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "full": false,
+    "busy": [
+      {
+        "key": "gcal-ev-riley-personal-01",
+        "start": "2026-11-14T15:30:00Z",
+        "end": "2026-11-14T17:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "google", "calendarLinkId": "callink-riley-google" },
+        "title": "Dentist"
+      },
+      {
+        "key": "gcal-ev-riley-tentative-03",
+        "start": "2026-11-19T14:00:00Z",
+        "end": "2026-11-19T15:00:00Z",
+        "zone": "America/New_York",
+        "source": { "provider": "google", "calendarLinkId": "callink-riley-google" }
+      }
+    ],
+    "removed": ["gcal-ev-riley-invite-02", "gcal-ev-riley-free-04"],
+    "cursor": "gcal-sync-riley-0008",
+    "readAt": "2026-11-12T21:15:04Z"
+  }
+}

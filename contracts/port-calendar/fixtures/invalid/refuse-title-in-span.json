@@ -1,0 +1,20 @@
+{
+  "trace_id": "trace-alex-0012",
+  "span_id": "span-alex-0012-12",
+  "seq": 12,
+  "hop": "portCall",
+  "at": "2026-11-07T15:06:29.100Z",
+  "ms": 240,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-alex-book-1",
+  "job_id": null,
+  "handle_ref": "handle-alex",
+  "business_id": "biz-lees-barbershop",
+  "provider": "google_calendar",
+  "call": "freeBusy",
+  "attempt": 1,
+  "got": { "step": "A6-10", "link": "callink-riley-google", "purpose": "bookingWrite", "title": "Dentist" },
+  "decided": { "result": "read", "busy": 0 },
+  "outcome": "ok",
+  "error_code": null
+}

@@ -1,0 +1,46 @@
+{
+  "call": "verifyNotification",
+  "given": {
+    "now": "2026-11-08T16:00:00Z",
+    "note": "Sam changes an event in his Outlook calendar. Graph posts one basic change notification for his subscription, with no event data in it. Its clientState matches the one made for the subscription, so the gateway stores it once and answers 200; the handler reads the changes with Sam's delta cursor.",
+    "verifier": "valid"
+  },
+  "request": {
+    "provider": "microsoft",
+    "kind": "notifications",
+    "notifications": [
+      {
+        "notificationId": "graph-notif-demo-0001",
+        "subscriptionId": "graph-sub-sam-01",
+        "clientState": "made-at-test-time",
+        "changeType": "updated",
+        "lifecycleEvent": null,
+        "subscriptionExpirationDateTime": "2026-11-13T09:20:30Z"
+      }
+    ],
+    "receivedAt": "2026-11-08T16:00:00Z",
+    "traceId": "trace-graph-0001"
+  },
+  "outcome": {
+    "result": "accepted",
+    "httpStatus": 200,
+    "events": [
+      {
+        "provider": "microsoft_calendar",
+        "providerEventId": "graph-notif-demo-0001",
+        "eventType": "updated",
+        "occurredAt": null,
+        "receivedAt": "2026-11-08T16:00:00Z",
+        "businessId": null,
+        "effectId": null,
+        "payload": {
+          "calendarLinkId": "callink-sam-microsoft",
+          "watchId": "graph-sub-sam-01",
+          "notice": "changed"
+        },
+        "traceId": "trace-graph-0001"
+      }
+    ],
+    "unknownWatches": 0
+  }
+}

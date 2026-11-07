@@ -1,0 +1,69 @@
+{
+  "call": "verifyNotification",
+  "given": {
+    "now": "2026-11-09T20:00:00Z",
+    "note": "Graph posts two lifecycle notifications for Sam's subscription in one POST: reauthorizationRequired (renew now) and missed (some notifications were lost: read changes now). Each is stored once, under its subscription, event and subscription expiry, so a repeat of the same challenge is dropped and one after a renewal is new.",
+    "verifier": "valid"
+  },
+  "request": {
+    "provider": "microsoft",
+    "kind": "notifications",
+    "notifications": [
+      {
+        "notificationId": null,
+        "subscriptionId": "graph-sub-sam-01",
+        "clientState": "made-at-test-time",
+        "changeType": null,
+        "lifecycleEvent": "reauthorizationRequired",
+        "subscriptionExpirationDateTime": "2026-11-13T09:20:30Z"
+      },
+      {
+        "notificationId": null,
+        "subscriptionId": "graph-sub-sam-01",
+        "clientState": "made-at-test-time",
+        "changeType": null,
+        "lifecycleEvent": "missed",
+        "subscriptionExpirationDateTime": "2026-11-13T09:20:30Z"
+      }
+    ],
+    "receivedAt": "2026-11-09T20:00:00Z",
+    "traceId": "trace-graph-0002"
+  },
+  "outcome": {
+    "result": "accepted",
+    "httpStatus": 200,
+    "events": [
+      {
+        "provider": "microsoft_calendar",
+        "providerEventId": "graph-sub-sam-01:reauthorizationRequired:2026-11-13T09:20:30Z",
+        "eventType": "reauthorizationRequired",
+        "occurredAt": null,
+        "receivedAt": "2026-11-09T20:00:00Z",
+        "businessId": null,
+        "effectId": null,
+        "payload": {
+          "calendarLinkId": "callink-sam-microsoft",
+          "watchId": "graph-sub-sam-01",
+          "notice": "reauthorizationRequired"
+        },
+        "traceId": "trace-graph-0002"
+      },
+      {
+        "provider": "microsoft_calendar",
+        "providerEventId": "graph-sub-sam-01:missed:2026-11-13T09:20:30Z",
+        "eventType": "missed",
+        "occurredAt": null,
+        "receivedAt": "2026-11-09T20:00:00Z",
+        "businessId": null,
+        "effectId": null,
+        "payload": {
+          "calendarLinkId": "callink-sam-microsoft",
+          "watchId": "graph-sub-sam-01",
+          "notice": "missed"
+        },
+        "traceId": "trace-graph-0002"
+      }
+    ],
+    "unknownWatches": 0
+  }
+}

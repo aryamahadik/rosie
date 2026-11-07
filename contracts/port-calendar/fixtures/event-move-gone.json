@@ -1,0 +1,30 @@
+{
+  "call": "calendarUpdate",
+  "given": {
+    "now": "2026-11-08T14:00:02Z",
+    "note": "Riley deleted Rosie's event for Alex's haircut from the phone calendar the evening before; then Alex moves the visit. The provider no longer has the event, so the answer is gone: nothing is updated and the event is not written again (README default 12; open gap). The booking itself stands and still blocks the time in Rosie."
+  },
+  "request": {
+    "calendarLinkId": "callink-riley-google",
+    "provider": "google",
+    "eventKey": {
+      "bookingId": "booking-alex-riley-nov14",
+      "visitId": "visit-alex-riley-nov14",
+      "personId": "person-riley"
+    },
+    "providerEventId": "gcal-event-demo-0001",
+    "start": "2026-11-14T16:30:00Z",
+    "end": "2026-11-14T17:00:00Z",
+    "zone": "America/New_York",
+    "content": {
+      "sensitive": false,
+      "businessName": "Lee's Barbershop",
+      "service": "Haircut",
+      "firstName": "Alex"
+    }
+  },
+  "outcome": {
+    "result": "gone",
+    "providerEventId": "gcal-event-demo-0001"
+  }
+}

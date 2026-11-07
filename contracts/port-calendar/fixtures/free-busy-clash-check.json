@@ -1,0 +1,45 @@
+{
+  "call": "freeBusy",
+  "given": {
+    "now": "2026-11-10T14:00:00Z",
+    "note": "Sam reconnects within 24 hours of the drop (S12-13 'Reconnected within 24 hours? Yes: checks for clashes'; K-09 calendarLinkBack). Before his times are offered again, a fresh read over the time ahead finds a personal event he added while the link was down, over Ben T.'s visit on Sat Nov 21 at 2:00pm; Rosie's own event for that visit is not among the busy times. The clash goes to the owner first (S12-14; arch 11 line 580).",
+    "calendar": [
+      {
+        "key": "graph-ev-sam-personal-05",
+        "start": "2026-11-21T19:00:00Z",
+        "end": "2026-11-21T20:00:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": false,
+        "deleted": false
+      },
+      {
+        "key": "graph-event-demo-0002",
+        "start": "2026-11-21T19:00:00Z",
+        "end": "2026-11-21T19:30:00Z",
+        "zone": "America/New_York",
+        "shownAs": "busy",
+        "invite": "none",
+        "own": true,
+        "deleted": false
+      }
+    ]
+  },
+  "request": {
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "purpose": "clashCheck",
+    "from": "2026-11-10T14:00:00Z",
+    "to": "2027-02-08T14:00:00Z"
+  },
+  "outcome": {
+    "result": "read",
+    "calendarLinkId": "callink-sam-microsoft",
+    "provider": "microsoft",
+    "from": "2026-11-10T14:00:00Z",
+    "to": "2027-02-08T14:00:00Z",
+    "busy": [{ "start": "2026-11-21T19:00:00Z", "end": "2026-11-21T20:00:00Z" }],
+    "readAt": "2026-11-10T14:00:01Z"
+  }
+}

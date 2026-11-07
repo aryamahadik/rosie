@@ -1,0 +1,17 @@
+{
+  "record": "renewal",
+  "note": "Sam's Outlook subscription is due for renewal on Mon Nov 9 at 4:21pm. Five tries within 10 minutes all fail (Graph unavailable, rate-limited for 120 s, then unavailable), so at the fifth, 4:30pm, the link is dropped: the Tool API's calendarLinkDropped with why renewalFailed (K-09 v1). S12-13 follows: 'Your calendar link stopped working at 4:30pm. Until you reconnect, your open times aren't offered. Booked visits stay, and the rest of the team is still offered', and one reminder after 24 hours (S12-14).",
+  "calendarLinkId": "callink-sam-microsoft",
+  "personId": "person-sam",
+  "provider": "microsoft",
+  "watchId": "graph-sub-sam-01",
+  "dueAt": "2026-11-09T21:21:00Z",
+  "tries": [
+    { "attempt": 1, "at": "2026-11-09T21:21:00Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } },
+    { "attempt": 2, "at": "2026-11-09T21:23:00Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } },
+    { "attempt": 3, "at": "2026-11-09T21:25:00Z", "outcome": { "error": "rateLimited", "retryAfterSeconds": 120 } },
+    { "attempt": 4, "at": "2026-11-09T21:27:30Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } },
+    { "attempt": 5, "at": "2026-11-09T21:30:00Z", "outcome": { "error": "unavailable", "retryAfterSeconds": null } }
+  ],
+  "end": { "result": "dropped", "why": "renewalFailed", "droppedAt": "2026-11-09T21:30:00Z" }
+}

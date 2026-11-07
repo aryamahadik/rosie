@@ -1,0 +1,20 @@
+{
+  "call": "verifyNotification",
+  "given": {
+    "now": "2026-11-02T21:21:58Z",
+    "note": "Rosie asks Graph for Sam's subscription (watch-microsoft.json). Before Graph answers, it posts to the gateway's address with a validation token; the gateway answers within 10 seconds with 200, text/plain and the token itself, and stores nothing. Without that answer Graph makes no subscription."
+  },
+  "request": {
+    "provider": "microsoft",
+    "kind": "validation",
+    "validationToken": "graph-validation-demo-0001",
+    "receivedAt": "2026-11-02T21:21:58Z",
+    "traceId": "trace-graph-0000"
+  },
+  "outcome": {
+    "result": "validation",
+    "httpStatus": 200,
+    "contentType": "text/plain",
+    "body": "graph-validation-demo-0001"
+  }
+}
