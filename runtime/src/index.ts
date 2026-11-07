@@ -1,6 +1,9 @@
-// Rosie's Worker. D-000 holds only the health endpoint (factory spec 6): GET {BASE_PATH}/health.
+// Rosie's Worker. Routes (factory spec 6; T-241): GET {BASE_PATH}/health and POST {BASE_PATH}/webhooks/linq (the gateway).
 // Every request carries one trace id: the incoming x-trace-id when it is a valid id (a UUID), else a new one.
 // The id is returned in the x-trace-id header and the JSON body, and written in one JSON log line (Workers Logs).
+// The Linq webhook opens its own id at receipt (runtime/src/gateway).
+
+import { handleLinqWebhook, LINQ_WEBHOOK_PATH, unconfiguredGateway, type GatewayDeps } from "./gateway";
 
 declare global {
   namespace Cloudflare {
@@ -35,14 +38,32 @@ function jsonResponse(status: number, body: Record<string, unknown>, traceId: st
   });
 }
 
-export default {
-  fetch(request: Request, env: Cloudflare.Env): Response {
+/**
+ * The health and 404 answers are synchronous (the health tests read them without waiting); the Linq webhook answers
+ * later. The Workers runtime always passes the execution context, so its call is the second form.
+ */
+export interface RosieWorker {
+  fetch(request: Request, env: Cloudflare.Env): Response;
+  fetch(request: Request, env: Cloudflare.Env, context: ExecutionContext): Response | Promise<Response>;
+}
+
+/** The Worker with the gateway's doors (the Linq adapter, the handle actor) supplied by `gatewayDeps`. */
+export function createWorker(gatewayDeps: (env: Cloudflare.Env) => GatewayDeps): RosieWorker {
+  const fetch = (request: Request, env: Cloudflare.Env): Response | Promise<Response> => {
     const traceId = traceIdOf(request);
     const environment = env.ENVIRONMENT;
     const version = env.GIT_SHA ?? "unknown";
-    const healthPath = `${env.BASE_PATH.replace(/\/+$/, "")}/health`;
+    const basePath = env.BASE_PATH.replace(/\/+$/, "");
+    const pathname = new URL(request.url).pathname;
 
-    if (request.method === "GET" && new URL(request.url).pathname === healthPath) {
+    if (pathname === `${basePath}${LINQ_WEBHOOK_PATH}`) {
+      if (request.method !== "POST") {
+        return jsonResponse(405, { ok: false, error: "method_not_allowed", trace_id: traceId }, traceId);
+      }
+      return handleLinqWebhook(request, gatewayDeps(env), { environment, version });
+    }
+
+    if (request.method === "GET" && pathname === `${basePath}/health`) {
       console.log(JSON.stringify({ level: "info", msg: "health", trace_id: traceId, environment, version }));
       return jsonResponse(
         200,
@@ -52,5 +73,10 @@ export default {
     }
     console.log(JSON.stringify({ level: "info", msg: "not_found", trace_id: traceId, environment, version }));
     return jsonResponse(404, { ok: false, error: "not_found", trace_id: traceId }, traceId);
-  },
-} satisfies ExportedHandler<Cloudflare.Env>;
+  };
+  // The cast states the arity rule of RosieWorker: the runtime's three-argument call may get a Promise (the webhook).
+  return { fetch: fetch as RosieWorker["fetch"] };
+}
+
+// Until the Linq adapter (T-413) and the handle actor (T-243) exist, the gateway's doors fail and the route answers 503.
+export default createWorker(() => unconfiguredGateway());
