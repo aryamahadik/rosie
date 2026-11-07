@@ -1,0 +1,18 @@
+{
+  "fixtures": [
+    {
+      "file": "note.ok.json",
+      "version": "v1",
+      "expect": "accept",
+      "shows": "A note with an id, an amount in whole cents with a currency code, and a kind from the closed list",
+      "source": "CQ-09 (money in integer cents)"
+    },
+    {
+      "file": "invalid/note.decimal-cents.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "An amount written with a decimal is refused: money is whole cents",
+      "source": "CQ-09 (money in integer cents)"
+    }
+  ]
+}

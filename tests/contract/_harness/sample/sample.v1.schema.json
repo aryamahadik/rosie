@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/harness-sample/sample.v1.schema.json",
+  "title": "Harness sample v1",
+  "description": "Not a contract: the sample the contract-test harness is proven on (T-003). A made-up note that uses the shared formats. The $id sits beside the real contracts' so a relative $ref to common/ resolves the way it does there; contracts:check never scans this folder.",
+  "type": "object",
+  "properties": {
+    "note": {
+      "description": "The note's id (common formats: id).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "amount": {
+      "description": "An amount in whole cents (common formats: money).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/money"
+    },
+    "kind": {
+      "description": "A closed list is an enum (02-contracts section 2 item 2).",
+      "enum": ["visit", "class"]
+    }
+  },
+  "required": ["note", "amount", "kind"],
+  "additionalProperties": false
+}

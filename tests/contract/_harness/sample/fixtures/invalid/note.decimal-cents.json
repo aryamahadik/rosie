@@ -1,0 +1,5 @@
+{
+  "note": "n-0002",
+  "amount": { "cents": 45.5, "currency": "USD" },
+  "kind": "visit"
+}
