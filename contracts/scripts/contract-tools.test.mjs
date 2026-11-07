@@ -190,7 +190,7 @@ describe("frozen.json", () => {
     assert.match(text, /widget\/frozen\.json: freezes v2, but no schema or tables file of v2/);
     assert.match(
       text,
-      /scripts\/test-sample\/frozen\.json: the frozen-contract guard reads frozen\.json only at contracts\/<name>\/frozen\.json/,
+      /scripts\/test-sample\/frozen\.json: a frozen\.json sits only at contracts\/<name>\/frozen\.json or contracts\/db-schema\/<part>\/frozen\.json/,
     );
     assert.match(text, /common\/fixtures\/frozen\.json/);
   });
@@ -200,7 +200,66 @@ describe("frozen.json", () => {
     writeWidget(copy, { frozen: { frozen: "v1" } });
     assert.match(copy.check().errors.join("\n"), /widget\/frozen\.json: \/frozen must be array/);
   });
+
+  // T-1062: the guard takes a file's nearest frozen.json (T-1061), so a database part freezes on its own.
+  it("accepts a database part's own frozen.json at contracts/db-schema/<part>/frozen.json", (t) => {
+    const copy = copyContracts(t);
+    writePart(copy, "core", "v1");
+    copy.write("db-schema/core/frozen.json", { frozen: ["v1"] });
+    writeWidget(copy, { frozen: { frozen: ["v1"] } });
+    const { errors, counts } = copy.check();
+    assert.deepEqual(errors, []);
+    assert.equal(counts.frozen, 2);
+    assert.equal(counts.tableLists, 2);
+  });
+
+  it("refuses a frozen.json in a fixtures/ folder, one folder below a part, or in db-schema/fixtures/", (t) => {
+    const copy = copyContracts(t);
+    writePart(copy, "core", "v1");
+    writeWidget(copy);
+    const misplaced = [
+      "db-schema/core/fixtures/frozen.json",
+      "db-schema/core/old/frozen.json",
+      "db-schema/fixtures/frozen.json",
+      "widget/fixtures/frozen.json",
+    ];
+    for (const file of misplaced) copy.write(file, { frozen: ["v1"] });
+    const { errors, counts } = copy.check();
+    const text = errors.join("\n");
+    for (const file of misplaced) {
+      assert.ok(
+        errors.some((line) =>
+          line.startsWith(
+            `${file}: a frozen.json sits only at contracts/<name>/frozen.json or contracts/db-schema/<part>/frozen.json`,
+          ),
+        ),
+        `${file} is not refused:\n${text}`,
+      );
+    }
+    assert.equal(counts.frozen, 0);
+  });
+
+  it("refuses a part's frozen version with no table list of that version in the part's own folder", (t) => {
+    const copy = copyContracts(t);
+    writePart(copy, "core", "v1");
+    writePart(copy, "billing", "v2"); // a v2 table list of another part does not count for core
+    copy.write("db-schema/core/frozen.json", { frozen: ["v1", "v2"] });
+    const { errors } = copy.check();
+    assert.equal(errors.length, 1, errors.join("\n"));
+    assert.equal(
+      errors[0],
+      "db-schema/core/frozen.json: freezes v2, but no table list of v2 is in db-schema/core/",
+    );
+  });
 });
+
+/** A database part's table list, contracts/db-schema/<part>/<part>.<version>.tables.json, made from the sample. */
+function writePart(copy, part, version) {
+  const list = readJson(path.join(CONTRACTS_DIR, TABLES));
+  list.part = part;
+  list.version = version;
+  copy.write(`db-schema/${part}/${part}.${version}.tables.json`, list);
+}
 
 describe("db-schema table list meta-schema", () => {
   const meta = readJson(path.join(CONTRACTS_DIR, "db-schema/tables.meta.schema.json"));
