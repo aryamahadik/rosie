@@ -12,4 +12,5 @@ export {
   type RowOutcome,
   type RowReport,
 } from "./dispatcher";
+export { decideLimit8, type Limit8Decision, type Limit8Input } from "./limit8";
 export type * from "./types";

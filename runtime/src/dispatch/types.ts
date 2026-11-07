@@ -28,7 +28,16 @@ export interface FinalParts {
   row: string;
   channel: string;
   sends: readonly PlannedSend[];
+  /** The K-01 fixed line ids code added (a stop reply carries `stopReply`: limit 8 lets it go to a stopped phone). */
+  fixedLines: readonly string[];
   threadReplyTo: string | null;
+}
+
+/** K-05 `rowRef`: a row and the version it was read at. */
+export interface VersionRef {
+  table: string;
+  rowId: string;
+  version: number;
 }
 
 /** K-05 v1 `claimedPart`. */
@@ -62,6 +71,8 @@ export interface ClaimedRow {
   openQuestionId: string | null;
   channel: string;
   sendClass: string;
+  /** The rows the plan rested on, at the versions read: limit 8 checks them unchanged at send. */
+  versionsRead: readonly VersionRef[];
   finalParts: FinalParts;
   parts: readonly ClaimedPart[];
   traceId: string;
@@ -164,11 +175,38 @@ export interface MarkPartResponse {
   row?: { state: string; version: number };
 }
 
+/** K-05 v1.1 `markRow.request`: limit 8's outcome for a claimed row (compare-and-set on the row's version). */
+export interface MarkRowRequest {
+  outboxRowId: string;
+  expectVersion: number;
+  outcome: "held" | "droppedStopped" | "stale" | "withdrawn" | "waitingChat";
+  /** For held, until when; null otherwise. */
+  heldUntil: Utc | null;
+  at: Utc;
+}
+
+export interface MarkRowResponse {
+  result: "marked";
+  outboxRowId: string;
+  version: number;
+  outcome: MarkRowRequest["outcome"];
+}
+
+/** K-05 `versionChangedError` (the row's own version moved since it was claimed). */
+export interface VersionChangedError {
+  error: "versionChanged";
+  changed: readonly { table: string; rowId: string; readVersion: number; currentVersion: number }[];
+}
+
 /**
  * The K-05 calls the dispatcher makes (the database engineer's C-152 builds them; a fake answers here). Every call is
  * one transaction on the primary, uncached.
  */
 export interface OutboxStore {
+  /** K-05 v1 item 4, with v1.1's `waitingChat` (item 16): limit 8's outcome. */
+  markRow(
+    request: MarkRowRequest,
+  ): Promise<MarkRowResponse | VersionChangedError | WrongStateError | NotFoundError | TransientError>;
   /** K-05 v1.1 item 13. */
   claimOutbox(request: ClaimOutboxRequest): Promise<ClaimOutboxResponse | TransientError>;
   /** K-05 v1.1 item 14. */
@@ -245,6 +283,38 @@ export interface ChatTarget {
 /** Reads a recipient's chat (NQ-RT-2: K-05 v1.2's recipient send state; a fake until then). Null: no chat known. */
 export interface RecipientDirectory {
   chatFor(recipientHandleId: string): Promise<ChatTarget | null>;
+}
+
+/**
+ * What limit 8 reads about a claimed row's recipient just before a send (NQ-RT-2's default: K-05 v1.2's "recipient send
+ * state", one primary, uncached read; T-072 builds it, T-220 serves it, joined at D-017; a fake answers until then).
+ * Its fields are NQ-RT-2's list (stopped, chat open, zone, text hours, the current versions of the rows the row read)
+ * and what CQ-05 and RULES 4.3 need from them: who the recipient is (8am for owner and team) and the test-phone override.
+ */
+export interface SendState {
+  /** K-04 phones: the stopped flag. */
+  stopped: boolean;
+  /** K-04 phones: whether the mobile has an open chat (it has texted Rosie). */
+  chatOpen: boolean;
+  /** Who the recipient is: a customer's text hours start at 9am, the owner's and team's at 8am (RULES 4.3). */
+  audience: "customer" | "owner" | "team";
+  /** The zone of the visit the row is about, when it is about one (CQ-05: the visit's zone first). */
+  visitZone: string | null;
+  /** The business's own zone (K-04 businesses.time_zone), the fallback. */
+  businessZone: string;
+  /** K-04 businesses text hours (H04), "HH:MM" each. */
+  textHours: { start: string; end: string };
+  /** The staging test phone's text-hours override (BP 9.4): honoured on staging only, by the caller's environment. */
+  textHoursOverride: boolean;
+  /** Each row of the row's `versionsRead` as it stands now; a row missing here counts as changed. */
+  currentVersions: readonly VersionRef[];
+  /** Whether the row's booking or question has closed since (a stale row then is withdrawn, not composed again). */
+  closed: { booking: boolean; question: boolean };
+}
+
+/** Reads the send state of a claimed row's recipient. A transient answer sends nothing (limit 8 fails closed). */
+export interface SendStateReader {
+  sendStateFor(row: ClaimedRow): Promise<SendState | TransientError>;
 }
 
 /** Builds a calendar file from a booking, by code (arch 07 line 383; K-03 `calendarFile`). Null: none can be built. */

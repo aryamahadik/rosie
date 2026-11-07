@@ -10,6 +10,7 @@ import {
   FakeLinq,
   FakeOutboxStore,
   FakeRecipients,
+  FakeSendState,
   traceCollector,
   words,
   type SeedRow,
@@ -44,6 +45,7 @@ interface Setup {
   linq: FakeLinq;
   recipients: FakeRecipients;
   arming: FakeClockArming;
+  sendState: FakeSendState;
   spans: Span[];
   deps: (claimer: string) => DispatchDeps;
 }
@@ -58,6 +60,7 @@ function setup(
   const linq = new FakeLinq(clock.now);
   const recipients = new FakeRecipients(chats);
   const arming = new FakeClockArming();
+  const sendState = new FakeSendState();
   const spans: Span[] = [];
   const traceFor = traceCollector(spans);
   return {
@@ -66,8 +69,19 @@ function setup(
     linq,
     recipients,
     arming,
+    sendState,
     spans,
-    deps: (claimer) => ({ store, linq, recipients, traceFor, now: clock.now, claimer }),
+    deps: (claimer) => ({
+      store,
+      linq,
+      recipients,
+      // T-259: limit 8's read, answering "open chat, customer, 10am in New York, not stopped" for these tests.
+      sendState,
+      environment: "production",
+      traceFor,
+      now: clock.now,
+      claimer,
+    }),
   };
 }
 
@@ -231,6 +245,8 @@ describe("a held row lets the next pass (claim-held-lets-later-pass.json)", () =
 
   it("sends Sam's quick reply, leaves the held row for the morning and then sends it", async () => {
     const t = setup(seeds, { "handle-alex": ALEX, "handle-sam": SAM }, evening);
+    // Sam is the owner: the morning claim at 8:01am in New York is inside the owner's hours (RULES 4.3).
+    t.sendState.forHandle("handle-sam", { audience: "owner" });
 
     const night = await runDispatch(t.deps("dispatcher-1"), { recipientHandleId: "handle-sam" });
 

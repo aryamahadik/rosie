@@ -43,6 +43,12 @@ import type {
   Utc,
   WrongStateError,
   ClaimLostError,
+  MarkRowRequest,
+  MarkRowResponse,
+  SendState,
+  SendStateReader,
+  VersionChangedError,
+  VersionRef,
 } from "./types";
 
 const CLAIM_MS = 60_000;
@@ -76,6 +82,10 @@ export interface SeedRow {
   openQuestionId?: string | null;
   /** A Retry-After an earlier failure left on the row's claim (K-07 rule 6); kept at the first claim here. */
   nextTryNotBefore?: Utc;
+  channel?: string;
+  bookingId?: string | null;
+  versionsRead?: readonly VersionRef[];
+  fixedLines?: readonly string[];
 }
 
 type PartState = "pending" | "sent" | "failed" | "delivered";
@@ -88,9 +98,22 @@ interface FakePart {
   messageId: string | null;
   deliveredAt: Utc | null;
 }
-type RowState = "checked" | "held" | "sending" | "sent" | "delivered" | "failed";
+type RowState =
+  | "checked"
+  | "held"
+  | "sending"
+  | "sent"
+  | "delivered"
+  | "failed"
+  | "dropped_stopped"
+  | "stale"
+  | "withdrawn"
+  | "waiting_chat";
 interface FakeRow {
   seed: SeedRow;
+  /** The words as they stand: the seed's, or the new ones after a recomposition. */
+  sends: readonly PlannedSend[];
+  versionsRead: readonly VersionRef[];
   state: RowState;
   version: number;
   heldUntil: Utc | null;
@@ -113,6 +136,8 @@ export class FakeOutboxStore implements OutboxStore {
     for (const seed of seeds) {
       this.rows.set(seed.id, {
         seed,
+        sends: seed.sends,
+        versionsRead: seed.versionsRead ?? [],
         state: seed.heldUntil === undefined ? "checked" : "held",
         version: 3,
         heldUntil: seed.heldUntil ?? null,
@@ -136,8 +161,11 @@ export class FakeOutboxStore implements OutboxStore {
     }
     const claimed: ClaimedRow[] = [];
     const passedHeld: { outboxRowId: string; heldUntil: Utc }[] = [];
+    // Finished rows are skipped, a waiting_chat row is passed (K-05 v1.1 item 13), and a stale row (no final parts)
+    // stops its recipient's walk as a row with a live claim does.
     const open = [...this.rows.values()].filter(
-      (row) => !["sent", "delivered", "failed"].includes(row.state),
+      (row) =>
+        !["sent", "delivered", "failed", "dropped_stopped", "withdrawn", "waiting_chat"].includes(row.state),
     );
     const recipients = [...new Set(open.map((row) => row.seed.recipient))]
       .filter(
@@ -163,6 +191,7 @@ export class FakeOutboxStore implements OutboxStore {
             passedHeld.push({ outboxRowId: row.seed.id, heldUntil: row.heldUntil });
             continue;
           }
+          if (row.state === "stale") break;
           if (row.state === "sending" && row.claim !== null && after(row.claim.lapsesAt, request.now)) break;
           claimed.push(this.take(row, request));
         }
@@ -188,7 +217,7 @@ export class FakeOutboxStore implements OutboxStore {
     row.heldUntil = null;
     row.version += 1;
     if (row.parts.length === 0) {
-      row.parts = row.seed.sends.map((_, index) => {
+      row.parts = row.sends.map((_, index) => {
         const partNo = (index + 1) as 1 | 2;
         return {
           partNo,
@@ -210,11 +239,18 @@ export class FakeOutboxStore implements OutboxStore {
       recipientHandleId: row.seed.recipient,
       recipientPersonId: null,
       businessId: null,
-      bookingId: null,
+      bookingId: row.seed.bookingId ?? null,
       openQuestionId: row.seed.openQuestionId ?? null,
-      channel: "imessage",
+      channel: row.seed.channel ?? "imessage",
       sendClass: row.seed.sendClass ?? "routine",
-      finalParts: { row: row.seed.id, channel: "imessage", sends: row.seed.sends, threadReplyTo: null },
+      versionsRead: row.versionsRead,
+      finalParts: {
+        row: row.seed.id,
+        channel: row.seed.channel ?? "imessage",
+        sends: row.sends,
+        fixedLines: row.seed.fixedLines ?? [],
+        threadReplyTo: null,
+      },
       parts: row.parts.map((part) => ({
         partNo: part.partNo,
         tryNo: part.tryNo,
@@ -226,6 +262,79 @@ export class FakeOutboxStore implements OutboxStore {
       claim: row.claim,
       claimedFrom,
     };
+  }
+
+  /** Every markRow request and its answer's kind, in the order made. */
+  readonly rowMarks: { request: MarkRowRequest; answer: string }[] = [];
+
+  /**
+   * markRow as mark-held-for-text-hours.json and mark-waiting-chat.json state, and as K-07's moves allow: only a
+   * `sending` row moves (mark-row-wrong-state.json), compare-and-set on the version (a repeat gets versionChanged), the
+   * version rises by one. held keeps the claim and sets held_until; waitingChat clears both and deletes the claim;
+   * stale clears the plan (the parts keep their keys); droppedStopped and withdrawn close the row.
+   */
+  async markRow(
+    request: MarkRowRequest,
+  ): Promise<MarkRowResponse | VersionChangedError | WrongStateError | NotFoundError | TransientError> {
+    await yieldToOthers(1);
+    const answer = this.moveRow(request);
+    this.rowMarks.push({ request, answer: "error" in answer ? answer.error : answer.outcome });
+    return answer;
+  }
+
+  private moveRow(
+    request: MarkRowRequest,
+  ): MarkRowResponse | VersionChangedError | WrongStateError | NotFoundError {
+    const row = this.rows.get(request.outboxRowId);
+    if (row === undefined) return { error: "notFound", table: "outbox_rows", rowId: request.outboxRowId };
+    if (row.state !== "sending") {
+      return { error: "wrongState", table: "outbox_rows", rowId: row.seed.id, state: row.state };
+    }
+    if (row.version !== request.expectVersion) {
+      return {
+        error: "versionChanged",
+        changed: [
+          {
+            table: "outbox_rows",
+            rowId: row.seed.id,
+            readVersion: request.expectVersion,
+            currentVersion: row.version,
+          },
+        ],
+      };
+    }
+    switch (request.outcome) {
+      case "held":
+        row.state = "held";
+        row.heldUntil = request.heldUntil;
+        break;
+      case "waitingChat":
+        row.state = "waiting_chat";
+        row.heldUntil = null;
+        row.claim = null;
+        break;
+      case "stale":
+        row.state = "stale";
+        break;
+      case "droppedStopped":
+        row.state = "dropped_stopped";
+        break;
+      case "withdrawn":
+        row.state = "withdrawn";
+        break;
+    }
+    row.version += 1;
+    return { result: "marked", outboxRowId: row.seed.id, version: row.version, outcome: request.outcome };
+  }
+
+  /** The row composed again from today's record (K-05 writePlan: stale to checked), with its new words and versions. */
+  recompose(id: string, sends: readonly PlannedSend[], versionsRead: readonly VersionRef[]): void {
+    const row = this.row(id);
+    if (row.state !== "stale") throw new Error(`row ${id} is ${row.state}, not stale`);
+    row.sends = sends;
+    row.versionsRead = versionsRead;
+    row.state = "checked";
+    row.version += 1;
   }
 
   async renewClaim(
@@ -398,6 +507,52 @@ export class FakeRecipients implements RecipientDirectory {
     await yieldToOthers(1);
     if (this.beforeAnswer !== null) await this.beforeAnswer(recipientHandleId);
     return this.chats[recipientHandleId] ?? null;
+  }
+}
+
+/**
+ * A send-state read that answers as K-04's and K-07's fixtures state (NQ-RT-2's default until K-05 v1.2): an open chat,
+ * a customer, a business in New York with text hours 08:00 to 20:00 (seed-business-head.json), not stopped, no override,
+ * and the versions the row read still current. A test sets what differs, for a recipient (handle id) or for one row.
+ */
+export class FakeSendState implements SendStateReader {
+  private readonly byHandle = new Map<string, Partial<SendState>>();
+  private readonly byRow = new Map<string, Partial<SendState>>();
+  /** How many of the next reads answer transient instead (a lost connection). */
+  failReads = 0;
+  /** Every row id a read was made for, in order. */
+  readonly reads: string[] = [];
+
+  forHandle(handle: string, patch: Partial<SendState>): this {
+    this.byHandle.set(handle, { ...this.byHandle.get(handle), ...patch });
+    return this;
+  }
+
+  forRow(rowId: string, patch: Partial<SendState>): this {
+    this.byRow.set(rowId, { ...this.byRow.get(rowId), ...patch });
+    return this;
+  }
+
+  async sendStateFor(row: ClaimedRow): Promise<SendState | TransientError> {
+    await yieldToOthers(1);
+    this.reads.push(row.outboxRowId);
+    if (this.failReads > 0) {
+      this.failReads -= 1;
+      return { error: "transient", sqlstate: "08006" };
+    }
+    return {
+      stopped: false,
+      chatOpen: true,
+      audience: "customer",
+      visitZone: null,
+      businessZone: "America/New_York",
+      textHours: { start: "08:00", end: "20:00" },
+      textHoursOverride: false,
+      currentVersions: row.versionsRead,
+      closed: { booking: false, question: false },
+      ...this.byHandle.get(row.recipientHandleId),
+      ...this.byRow.get(row.outboxRowId),
+    };
   }
 }
 

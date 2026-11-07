@@ -16,12 +16,17 @@
 //      (`<row>/<part>/<try>`), and Linq answers a repeated key with the first message (K-11 'Repeating it'), so the
 //      person gets one message. `markPart` sent for a part already sent says `repeated` and changes nothing.
 //
-// Not here: limit 8 (T-259), retry keys and the Linq error kinds (T-258: a reported failure is only recorded, with
+// Limit 8 (T-259, limit8/limit8.ts) runs before each send, ahead of the claim's renewal: a row it holds, drops, makes
+// stale or withdraws, or parks for a chat, is marked through K-05 `markRow` and nothing is sent; one it cannot read or
+// mark sends nothing and keeps its claim. A held row, a waiting row and a finished one let the recipient's later rows go.
+//
+// Not here: retry keys and the Linq error kinds (T-258: a reported failure is only recorded, with
 // `retry` false, and its row's recipient stops), the second part waiting for the first's receipt (T-262), email (T-264).
 //
 // No words, number or key is logged: spans carry ids, counts and labels only (runtime/src/trace; K-08 v1).
 
-import type { Outcome, TraceContext } from "../trace";
+import { decideLimit8 } from "./limit8";
+import type { Outcome, SpanFields, TraceContext } from "../trace";
 import type {
   CalendarFileBuilder,
   ChatTarget,
@@ -36,9 +41,12 @@ import type {
   OutboxStore,
   PlannedSend,
   RecipientDirectory,
+  SendStateReader,
   TransientError,
   Utc,
 } from "./types";
+
+type LimitResult = NonNullable<SpanFields["limits"]>[number];
 
 /** How many times a transient store answer is repeated before the run leaves the row to its claim's lapse. */
 const TRANSIENT_TRIES = 3;
@@ -49,6 +57,13 @@ export interface DispatchDeps {
   store: OutboxStore;
   linq: LinqPort;
   recipients: RecipientDirectory;
+  /** Limit 8's read of the recipient's send state, made before each send (NQ-RT-2; K-05 v1.2 later). */
+  sendState: SendStateReader;
+  /**
+   * The Worker's `ENVIRONMENT` var (wrangler.jsonc sets it: "staging" under env.staging, "production" elsewhere). The
+   * staging test phone's text-hours override (BP 9.4) is honoured when it is exactly "staging", ignored otherwise.
+   */
+  environment: string;
   /** Builds a booking's calendar file; without it a words part that names a file goes without one (open question). */
   calendar?: CalendarFileBuilder;
   /** The trace of a claimed row: the row's `traceId` (one id from the webhook to the receipt) and the bundle in force. */
@@ -82,7 +97,41 @@ export type RowOutcome =
   /** The row's parts do not match its final parts: nothing was sent for the part. */
   | "badRow"
   /** An earlier row of the same recipient did not finish, so this one waits (commit order). */
-  | "notReached";
+  | "notReached"
+  /** Limit 8 held the row for text hours (markRow held): later rows pass it. */
+  | "held"
+  /** Limit 8 dropped the row, its phone being stopped (its question takes the never-delivered path, T-255). */
+  | "droppedStopped"
+  /** Limit 8 found the row's read versions changed: its plan is cleared and it is composed again. */
+  | "stale"
+  /** Limit 8 found it stale and its booking or question closed: it is never sent. */
+  | "withdrawn"
+  /** Limit 8 found a customer mobile with no open chat: no text, no clock, the row waits. */
+  | "waitingChat"
+  /** An SMS channel: refused, nothing sent (DL-012). */
+  | "refusedSms"
+  /** Limit 8 could not read the send state or its zone and hours: nothing was sent. */
+  | "unreadable";
+
+/** The outcomes after which the recipient's later rows still go: the row is held, waiting or finished. */
+const LETS_LATER_PASS: ReadonlySet<RowOutcome> = new Set<RowOutcome>([
+  "sent",
+  "held",
+  "waitingChat",
+  "droppedStopped",
+  "withdrawn",
+]);
+
+/** How a limit-8 outcome shows in the dispatch span (K-08 v1 outcomes). */
+const LIMIT8_SPAN_OUTCOME: Partial<Record<RowOutcome, Outcome>> = {
+  held: "held",
+  waitingChat: "held",
+  droppedStopped: "dropped",
+  withdrawn: "dropped",
+  stale: "refused",
+  refusedSms: "refused",
+  unreadable: "refused",
+};
 
 export interface RowReport {
   outboxRowId: string;
@@ -138,7 +187,7 @@ async function sendRecipient(deps: DispatchDeps, rows: readonly ClaimedRow[]): P
     }
     const done = await sendRow(deps, row);
     reports.push(done);
-    stopped = done.outcome !== "sent";
+    stopped = !LETS_LATER_PASS.has(done.outcome);
   }
   return reports;
 }
@@ -169,6 +218,9 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
   let attempted: ClaimedPart | null = null;
   let partsSent = 0;
   let errorCode: string | null = null;
+  /** The row's version as the store last said it (markPart answers raise it); a markRow compares it. */
+  let version = row.version;
+  let limit8: LimitResult | null = null;
 
   const end = (outcome: RowOutcome): RowReport => {
     const spanOutcome: Outcome =
@@ -176,11 +228,10 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
         ? "ok"
         : attempted !== null
           ? "failed"
-          : outcome === "retryAfter"
-            ? "held"
-            : "refused";
+          : (LIMIT8_SPAN_OUTCOME[outcome] ?? (outcome === "retryAfter" ? "held" : "refused"));
     timer.finish({
       outcome: spanOutcome,
+      ...(limit8 === null ? {} : { limits: [limit8] }),
       ...(attempted === null
         ? {}
         : { provider: "linq" as const, call: "sendPart", attempt: attempted.tryNo }),
@@ -198,6 +249,20 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
     if (part.sent) continue;
     const send = row.finalParts.sends[part.partNo - 1];
     if (send === undefined) return end("badRow");
+
+    // Limit 8, before each send and before the claim is renewed (a held row must not start the 15 minutes of tries).
+    const gate = await checkLimit8(
+      deps,
+      row,
+      version,
+      parts.some((candidate) => candidate.sent) || partsSent > 0,
+    );
+    limit8 = gate.limit;
+    if (!gate.go) {
+      errorCode = gate.errorCode;
+      return end(gate.outcome);
+    }
+    const { overrideOptout } = gate;
 
     chat ??= await deps.recipients.chatFor(row.recipientHandleId);
     if (chat === null) return end("noChat");
@@ -227,7 +292,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
     }
 
     attempted = part;
-    const request = await buildRequest(deps, row, part, send, chat);
+    const request = await buildRequest(deps, row, part, send, chat, overrideOptout);
     const outcome = await deps.linq.sendPart(request);
 
     if (outcome.result === "failed") {
@@ -257,6 +322,7 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
     }
     if ("error" in marked) return end("storeError");
 
+    version = marked.row?.version ?? version;
     partsSent += 1;
     trace.record({
       hop: "providerAccepted",
@@ -268,6 +334,71 @@ async function sendRow(deps: DispatchDeps, row: ClaimedRow): Promise<RowReport> 
     });
   }
   return end("sent");
+}
+
+type Limit8Gate =
+  | { go: true; overrideOptout: boolean; limit: LimitResult }
+  | { go: false; outcome: RowOutcome; errorCode: string | null; limit: LimitResult | null };
+
+const limit8Failed = (outcome: string): LimitResult => ({ limit: 8, result: "fail", outcome });
+
+/**
+ * Limit 8 for one send (T-259): reads the recipient's send state, decides (limit8/limit8.ts) and carries a mark out.
+ * Anything it cannot read or mark sends nothing: the row keeps its claim and the claim's lapse hands it on.
+ */
+async function checkLimit8(
+  deps: DispatchDeps,
+  row: ClaimedRow,
+  version: number,
+  partOut: boolean,
+): Promise<Limit8Gate> {
+  // No SMS provider exists (DL-012): refused before anything is read, with no K-05 move to record it (open question).
+  if (row.channel === "sms") {
+    return { go: false, outcome: "refusedSms", errorCode: "smsRefused", limit: limit8Failed("refusedSms") };
+  }
+  const state = await untilNotTransient(() => deps.sendState.sendStateFor(row));
+  if ("error" in state) {
+    return { go: false, outcome: "storeError", errorCode: "sendStateUnavailable", limit: null };
+  }
+
+  const decision = decideLimit8({
+    row,
+    state,
+    now: deps.now(),
+    honourOverride: deps.environment === "staging",
+    partOut,
+  });
+  switch (decision.action) {
+    case "send":
+      return {
+        go: true,
+        overrideOptout: decision.overrideOptout,
+        limit: { limit: 8, result: "pass", outcome: null },
+      };
+    case "refuseSms":
+      return { go: false, outcome: "refusedSms", errorCode: "smsRefused", limit: limit8Failed("refusedSms") };
+    case "unreadable":
+      return {
+        go: false,
+        outcome: "unreadable",
+        errorCode: "sendStateInvalid",
+        limit: limit8Failed("unreadable"),
+      };
+    case "mark": {
+      const marked = await untilNotTransient(() =>
+        deps.store.markRow({
+          outboxRowId: row.outboxRowId,
+          expectVersion: version,
+          outcome: decision.outcome,
+          heldUntil: decision.heldUntil,
+          at: deps.now(),
+        }),
+      );
+      const limit = limit8Failed(decision.outcome);
+      if ("error" in marked) return { go: false, outcome: "storeError", errorCode: marked.error, limit };
+      return { go: false, outcome: decision.outcome, errorCode: null, limit };
+    }
+  }
 }
 
 /** What Linq's failure is recorded as: its code, else its kind (K-04 `outbox_parts.error_code`, a label). */
@@ -301,6 +432,7 @@ async function buildRequest(
   part: ClaimedPart,
   send: PlannedSend,
   chat: ChatTarget,
+  overrideOptout: boolean,
 ): Promise<LinqSendRequest> {
   // A file and a thread reach iMessage only: a chat Linq reports as SMS or RCS gets words alone (DL-031; arch 07 line 383).
   const iMessage = chat.service === "imessage";
@@ -323,7 +455,7 @@ async function buildRequest(
     tapback: null,
     threadedReplyTo: send.kind === "words" && iMessage && thread !== null ? { messageId: thread } : null,
     typing: null,
-    overrideOptout: false,
+    overrideOptout,
   };
 }
 
