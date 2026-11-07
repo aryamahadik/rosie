@@ -22,7 +22,8 @@
   "dangerWords": [
     {
       "words": "gas leak",
-      "list": "general"
+      "list": "general",
+      "kind": "other"
     }
   ],
   "outcomes": [

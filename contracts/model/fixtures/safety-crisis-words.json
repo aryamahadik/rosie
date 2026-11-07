@@ -22,7 +22,8 @@
   "dangerWords": [
     {
       "words": "don't want to be alive",
-      "list": "general"
+      "list": "general",
+      "kind": "selfHarm"
     }
   ],
   "outcomes": [

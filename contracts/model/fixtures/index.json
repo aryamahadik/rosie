@@ -93,8 +93,16 @@
       "version": "v1",
       "def": "decideResult",
       "expect": "accept",
-      "shows": "Alex asks for Sam: hand_off with the reason.",
+      "shows": "Alex asks for Sam: hand_off with the reason, about other, so it goes to the owner in text hours.",
       "source": "arch 03 line 183; arch 06 line 329; A3-51 ('Asks for a person')"
+    },
+    {
+      "file": "decide-hand-off-owner-or-staff.json",
+      "version": "v1",
+      "def": "decideResult",
+      "expect": "accept",
+      "shows": "Alex reports that Riley, a barber, grabbed their arm: hand_off about ownerOrStaff, so it goes to Rosie's team that day, never to the person named.",
+      "source": "arch 06 line 329 ('a report about the owner or staff: Rosie's team that day, never the person named'); S13-29 rule 58; S13-27 rule 36; fixture set v1 test-kit/shops/barber.json (Riley and Avery)"
     },
     {
       "file": "decide-redact.json",
@@ -189,8 +197,16 @@
       "version": "v1",
       "def": "safetyResult",
       "expect": "accept",
-      "shows": "No verdict in 4 s from Haiku or Sonnet, and the barbershop's danger words match: the timeout marker, no read, and Unsure.",
+      "shows": "No verdict in 4 s from Haiku or Sonnet, and the barbershop's danger words match: the timeout marker, no read, and Unsure; the words are kind other, so the safety line gives 911.",
       "source": "arch 02 line 111; arch 06 line 283; fixture set v1 test-kit/shops/barber.json safety_stop"
+    },
+    {
+      "file": "safety-timeout-self-harm-word.json",
+      "version": "v1",
+      "def": "safetyResult",
+      "expect": "accept",
+      "shows": "No verdict in 4 s, and the general check's self-harm words match: the timeout marker, no read, and Unsure; the words are kind selfHarm, so the safety line gives 988 and 911.",
+      "source": "arch 02 line 111 ('988 and 911 for self-harm words, else 911'); A3-22 (the general check: self-harm); A3-25"
     },
     {
       "file": "planner-answer.json",
@@ -207,6 +223,14 @@
       "expect": "accept",
       "shows": "Nothing stored answers it: the planner logs a gap case.",
       "source": "arch 06 line 291; arch 01 line 95; arch 03 line 189"
+    },
+    {
+      "file": "planner-hand-off.json",
+      "version": "v1",
+      "def": "plannerOutput",
+      "expect": "accept",
+      "shows": "Alex reports that Avery, a barber, hurt them: the planner hands it to a person, about ownerOrStaff, so Rosie's team gets it that day, never the person named.",
+      "source": "arch 06 lines 291 and 329; S13-29 rule 58; fixture set v1 test-kit/shops/barber.json (Riley and Avery)"
     },
     {
       "file": "invalid/refuse-unknown-verb.json",

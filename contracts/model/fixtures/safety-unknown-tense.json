@@ -22,7 +22,8 @@
   "dangerWords": [
     {
       "words": "fire",
-      "list": "general"
+      "list": "general",
+      "kind": "other"
     }
   ],
   "outcomes": [

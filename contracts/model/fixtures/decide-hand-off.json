@@ -19,7 +19,8 @@
           {
             "verb": "hand_off",
             "quote": "can I talk to Sam directly please",
-            "reason": "Alex asks for a person."
+            "reason": "Alex asks for a person.",
+            "about": "other"
           }
         ]
       }
@@ -33,7 +34,8 @@
           {
             "verb": "hand_off",
             "quote": "can I talk to Sam directly please",
-            "reason": "Alex asks for a person."
+            "reason": "Alex asks for a person.",
+            "about": "other"
           }
         ]
       }
@@ -47,7 +49,8 @@
       "part": {
         "verb": "hand_off",
         "quote": "can I talk to Sam directly please",
-        "reason": "Alex asks for a person."
+        "reason": "Alex asks for a person.",
+        "about": "other"
       },
       "outcome": "go"
     }

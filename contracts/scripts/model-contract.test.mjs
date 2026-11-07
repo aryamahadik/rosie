@@ -207,6 +207,28 @@ describe("K-02 refused fixtures are refused for the one reason they show", () =>
     disagree.reads.pop();
     assert.equal(reread(disagree), false, "a re-read is the third read");
   });
+
+  it("a matched danger word names its kind, and a hand-off whom it is about, from closed lists", () => {
+    const safety = validatorFor("safetyResult");
+    const timeout = fixture("safety-timeout-self-harm-word.json");
+    assert.ok(safety(timeout), JSON.stringify(safety.errors));
+    delete timeout.dangerWords[0].kind;
+    assert.equal(safety(timeout), false, "kind is required");
+    timeout.dangerWords[0].kind = "crisis";
+    assert.equal(safety(timeout), false, "kind is selfHarm or other");
+
+    const planner = validatorFor("plannerOutput");
+    const handOff = fixture("planner-hand-off.json");
+    assert.ok(planner(handOff), JSON.stringify(planner.errors));
+    delete handOff.action.about;
+    assert.equal(planner(handOff), false, "about is required");
+
+    const decideRead = validatorFor("decideRead");
+    const read = fixture("decide-hand-off-owner-or-staff.json").reads[0].output;
+    assert.ok(decideRead(read), JSON.stringify(decideRead.errors));
+    read.parts[0].about = "Riley";
+    assert.equal(decideRead(read), false, "about is ownerOrStaff or other");
+  });
 });
 
 /** A copy of what the fixture check reads, with a contract "widget" that has one named rule. */

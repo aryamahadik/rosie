@@ -16,7 +16,8 @@
   "dangerWords": [
     {
       "words": "cut won't stop bleeding",
-      "list": "plugin"
+      "list": "plugin",
+      "kind": "other"
     }
   ],
   "outcomes": [

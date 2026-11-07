@@ -1157,9 +1157,15 @@
       "required": ["verb", "quote", "words"],
       "additionalProperties": false
     },
+    "handOffAbout": {
+      "title": "HandOffAbout",
+      "description": "Whom a hand-off is about, so the hand-off code (C-104) routes it without reading the reason: ownerOrStaff, a report about the owner or staff, which goes to Rosie's team that day, never the person named (arch 06 line 329: 'a report about the owner or staff: Rosie's team that day, never the person named'; S13-29 rule 58: 'A report that the owner or staff harmed someone goes to Rosie's team that day, never only to the one named'; S13-27 rule 36's note: 'If it's about the owner or staff, or is sent to Rosie itself, only Rosie's team gets it'); other, any other hand-off, which goes to the owner in text hours, then Rosie's team after 2 days unanswered (arch 06 line 329; S11-19). A closed enum of scalars, inside the structured-outputs subset (02-contracts section 2 item 7). Model-facing.",
+      "type": "string",
+      "enum": ["ownerOrStaff", "other"]
+    },
     "handOff": {
       "title": "HandOff",
-      "description": "hand_off(reason): the part goes to a person (arch 03 line 183; arch 06 line 329: any other hand-off goes to the owner in text hours, then Rosie's team). Model-facing.",
+      "description": "hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.",
       "type": "object",
       "properties": {
         "verb": {
@@ -1172,9 +1178,12 @@
         "reason": {
           "description": "Why it goes to a person (arch 03 line 183).",
           "type": "string"
+        },
+        "about": {
+          "$ref": "#/$defs/handOffAbout"
         }
       },
-      "required": ["verb", "quote", "reason"],
+      "required": ["verb", "quote", "reason", "about"],
       "additionalProperties": false
     },
     "redact": {
@@ -1550,9 +1559,14 @@
                 "description": "general: the general danger check (A3-22); plugin: the trade's own danger words (arch 06 line 283; A3-22).",
                 "type": "string",
                 "enum": ["general", "plugin"]
+              },
+              "kind": {
+                "description": "Which safety line the match gets on a timeout, when no read gives a Crisis words label (arch 02 line 111: 'a danger-word match counts as Unsure and gets the safety line (988 and 911 for self-harm words, else 911)'): selfHarm, words about suicide, self-harm or a mental health crisis (A3-25: 'Words about suicide, self-harm or a mental health crisis get the 988 line at once'; A3-22's general check names self-harm, and 'Crisis words' means suicide, self-harm or a mental health crisis), which get 988 and 911; other, every other danger word (danger to life, fire, gas, a medical emergency: A3-22; a trade's own words: arch 06 line 283), which get 911. Code sets it from the list entry the words matched; no source lists the words themselves (README open gaps: 'Self-harm words').",
+                "type": "string",
+                "enum": ["selfHarm", "other"]
               }
             },
-            "required": ["words", "list"],
+            "required": ["words", "list", "kind"],
             "additionalProperties": false
           }
         },
@@ -1670,7 +1684,7 @@
     },
     "plannerHandOff": {
       "title": "PlannerHandOff",
-      "description": "Hand to a person: the owner, then the team (arch 06 lines 279 and 291). Model-facing.",
+      "description": "Hand to a person: the owner, then the team (arch 06 lines 279 and 291); a report about the owner or staff goes to Rosie's team that day, never the person named, so about says which (arch 06 line 329; S13-29 rule 58). Model-facing.",
       "type": "object",
       "properties": {
         "verb": {
@@ -1680,9 +1694,12 @@
         "reason": {
           "description": "Why (arch 06 line 291).",
           "type": "string"
+        },
+        "about": {
+          "$ref": "#/$defs/handOffAbout"
         }
       },
-      "required": ["verb", "reason"],
+      "required": ["verb", "reason", "about"],
       "additionalProperties": false
     },
     "plannerLogGap": {

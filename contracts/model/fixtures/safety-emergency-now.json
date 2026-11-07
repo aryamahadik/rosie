@@ -22,7 +22,8 @@
   "dangerWords": [
     {
       "words": "lips are swelling",
-      "list": "plugin"
+      "list": "plugin",
+      "kind": "other"
     }
   ],
   "outcomes": [
