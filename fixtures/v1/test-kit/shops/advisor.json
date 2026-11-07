@@ -1,0 +1,99 @@
+{
+ "id": "advisor",
+ "name": "Financial Advisor",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "mortgage",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Financial Advisor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Financial Advisor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Intro call",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 30-minute intro call by phone with Maya. Nothing is taken, a YES books it, and nothing is paid through Rosie. If Alex becomes a client later, the firm's fees are billed in its own tools or from Alex's accounts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Financial Advisor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 60-minute meeting about retiring, at Alex's home, with Marcus. Nothing is taken, and Rosie sends no bill. Any plan or advisory fees are the firm's own, outside Rosie.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a free intro call with a named adviser who is registered for the client's state. Flow A: by phone, by video, or a meeting at the office. Flow B: at the client's home, or on set days at a host's place, like a retirement workshop at a library.\",\"at the business (the example firm's own list)\":[{\"name\":\"Intro call\",\"length\":\"30 minutes\",\"price\":\"free\",\"where\":\"by phone or video, or at the office\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\"},{\"name\":\"Second-opinion call\",\"length\":\"30 minutes\",\"price\":\"free\",\"before\":\"nothing taken\",\"after\":\"nothing to pay\"},{\"name\":\"Joint intro call\",\"length\":\"45 minutes\",\"price\":\"free\",\"note\":\"for a couple; both say yes to texts on the secure page\"},{\"name\":\"Follow-up call\",\"length\":\"15 minutes\",\"price\":\"free\",\"note\":\"booked by the customer, or by the adviser with the customer's yes\"},{\"name\":\"Office meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"rule\":\"the adviser's or Sam's OK first\"},{\"name\":\"Planning session\",\"length\":\"2 hours\",\"price\":\"free first session\",\"rule\":\"the adviser's or Sam's OK first\"},{\"name\":\"Social Security questions, added to a call\",\"length\":\"15 more minutes\",\"price\":\"free\",\"rule\":\"only if the customer says yes\"}],\"at the customer's place (the example firm's own list)\":[{\"name\":\"Home meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"the client's home\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\",\"rule\":\"a set start time, never a window\"},{\"name\":\"Plan update meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"the client's home\",\"note\":\"for clients already working with the firm\"},{\"name\":\"Retirement workshop seat\",\"length\":\"2 hours\",\"price\":\"free\",\"where\":\"a host's place, like a library or a community center, on set days, with the host's OK\"}],\"the advice itself\":\"Never booked, priced or paid in Rosie. The client agreement, the disclosures it needs, account details, statements, planning, account opening, transfers and trading all happen in the firm's own tools, after the call. A flat-fee plan, an hourly fee or a fee on assets managed is the firm's own, billed by the firm or taken from the client's accounts by the custodian, outside Rosie.\",\"travel area\":\"The business's setting (the example: 25 miles).\",\"capacity\":\"One adviser per booking. A spouse or partner may join the same call.\",\"online\":\"Phone and video calls count as at the business. The adviser must be registered for the client's state, wherever the client is that day.\",\"booking window\":\"Up to 60 days ahead, with at least 2 hours' notice (the business's settings).\",\"blocked times\":\"Client meetings and other work block times, from the adviser's calendar or a BLOCK text.\"}",
+ "questions_before_times": [
+  "What would you like help with? Retirement, investments, a plan, or something else.",
+  "Which state do you live in? The state only.",
+  "By phone, by video or at the office? Or at your home?",
+  "An adviser by name, or the soonest one? Rosie never ranks or suggests one."
+ ],
+ "safety_stop": [
+  "someone is in danger right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "Always. Each adviser who gives advice: their own registration as an investment adviser representative where the client's state requires it. The firm: its own registration as an investment adviser, with the national regulator or the state, as its size and the state's rules say.",
+ "staff_skills": "Retirement planning, investments, Social Security questions, workshops, Spanish.",
+ "messages_never": "[\"account numbers, balances, savings amounts or income\",\"Social Security, tax ID or bank numbers\",\"statements or documents of any kind\",\"health or family details\",\"advice: what to buy, sell or hold, or what to expect to earn\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/financial+advisor",
+  "pexels": "https://www.pexels.com/search/financial%20advisor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

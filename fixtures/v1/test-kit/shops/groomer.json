@@ -1,0 +1,177 @@
+{
+ "id": "groomer",
+ "name": "Pet groomer",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet groomer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet groomer",
+   "staff": "Jamal and Mei (groomers)",
+   "customer": null,
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Bath and brush",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 bath and brush for Biscuit, priced by his size and coat. A card is saved for the salon's $20 fee and the late pick-up fee. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Bath and brush",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 bath and brush for a pet the salon knows. Nothing is taken: a YES books it. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Matted coat groom",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A matted coat, priced at drop-off once Jamal sees it: a $110 shave-down and a $15 tidy. Only the $25 coat check is promised. A card is saved for the $20 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet groomer",
+   "staff": "Nico and Hana (van groomers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Full groom in the van",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 full groom in the van for Maple. A card is saved for the $89 fee, and charged $179 when Nico texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Full groom in the van",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 van groom. A card is saved for the $89 fee. Rosie texts the bill after, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Matted coat groom in the van",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A matted coat, priced at the van door: a $165 shave-down and an $80 skin-soothing bath. Only the $89 van visit is promised. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the pet is left at the salon and picked up after the READY text; or the van grooms it outside the owner's home\",\"priced_by\":\"the pet's size and coat: the plug-in's answers (dog or cat, breed, weight, coat, mats) pick the service and its price before any times\",\"list\":[{\"name\":\"Bath and brush, by size (small, medium, large)\",\"price\":\"one price per size, from the salon's board (the example: small $35, medium $40)\",\"length\":\"about 2 hours at the salon, ready by text\",\"place\":\"at the salon, or in the van\",\"before\":\"a card saved for the fees\",\"after\":\"at the counter at pick-up; in the van, the saved card at DONE\"},{\"name\":\"Full groom (bath, haircut, nails), by size and coat\",\"price\":\"one price per size; doodle and poodle coats cost more (the example: small $55, large doodle $140; in the van, $179)\",\"length\":\"2 to 3 hours of table time; the ready time is set from it\",\"place\":\"at the salon, or in the van\",\"before\":\"a card saved for the fees\",\"after\":\"at the counter; in the van, the saved card at DONE\"},{\"name\":\"De-shed bath, for double coats\",\"price\":\"one price (the example: $40)\",\"length\":\"about 2 hours\",\"place\":\"at the salon, or added to a van groom\"},{\"name\":\"Cat groom\",\"price\":\"one price (the example: $139 in the van)\",\"length\":\"about 1½ hours, in the quiet cat room or the van\",\"place\":\"at the salon, or in the van\",\"staff\":\"only a groomer cleared for cats\"},{\"name\":\"Nail trim\",\"price\":\"one price (the example: $20)\",\"length\":\"15 minutes; the owner can wait\",\"place\":\"at the salon, or added to a van groom\",\"before\":\"a card saved, or nothing for a walk-in\",\"after\":\"at the counter\"},{\"name\":\"Puppy's first groom (under 6 months)\",\"price\":\"one price (the example: $25)\",\"length\":\"about 1 hour, gently\",\"place\":\"at the salon\"},{\"name\":\"Dematting\",\"price\":\"a set price per 15 minutes, agreed at drop-off before any brushing (the example: $20 for 15 minutes), up to the cap the owner sets\",\"place\":\"added to a groom\"},{\"name\":\"Matted coat: shave-down or dematting\",\"price\":\"quoted at the visit: the groomer checks the coat with the owner at drop-off or at the van door, then prices it; only the coat check is promised (the example: $25 at the salon, the $89 van visit)\",\"place\":\"at the salon, or in the van\",\"before\":\"a card saved for the fees\",\"after\":\"at the counter; in the van, the saved card at DONE\"},{\"name\":\"Flea bath\",\"price\":\"one price, only if fleas are found and the owner says yes (the example: $20)\",\"place\":\"added to a groom\"},{\"name\":\"Teeth brushing\",\"price\":\"one price (the example: $10); a cleaning under the gums is vet work, never offered\",\"place\":\"added to a groom\"}],\"not_offered\":\"sedation or calming drugs, cleanings under the gums, and overnight stays: Rosie points the owner to their vet or a licensed boarding kennel\",\"repeat\":\"a repeat groom every few weeks (the example: every 6 weeks), by the owner's own yes, same day, time and groomer\",\"capacity\":\"one groomer per pet; table time set by size and coat, plus 30 minutes for a pet with a bite history; the big tub and the cat room are saved like equipment\",\"drop_off_window\":\"drop-off times with each groomer through the day (the example salon: 9am to 3pm), ready by text\",\"touch_up\":\"a free touch-up within the days the owner sets (the example: 3 days), the business's own policy\",\"van\":\"one groomer per van; the van parks at the home and the pet is groomed inside it; arrival in a 2-hour window\",\"nobody_home\":\"no: an adult on the booking hands the pet over and takes it back\",\"online\":\"no\",\"example_prices\":\"every price, fee and window in the example flows is the example business's own: the $25 coat check, the $89 van visit, the $20 fee ($40 for the large doodle groom), the late pick-up window and fee (30 minutes, then $10 for each 15 minutes, up to $40), the 3-day free touch-up, and every groom price\"}",
+ "questions_before_times": [
+  "Dog or cat, the breed, and about how much the pet weighs",
+  "The coat: when it was last groomed, and any mats (a few spots, or tight to the skin)",
+  "Has the pet ever bitten or snapped at a groomer?",
+  "For the van: the town or ZIP, and a place to park a 24-foot van"
+ ],
+ "safety_stop": [
+  "a person hurt, or a fire",
+  "a pet that's bleeding, can't breathe, collapsed or had a seizure"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "dropoff",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "plans",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "if: where the state licenses grooming businesses (some do, vans and trailers too); none where the state has no grooming license",
+ "staff_skills": "[\"bath and brush\",\"full grooms and breed cuts\",\"doodle and poodle coats\",\"cats\",\"dematting and shave-downs\",\"nervous or biting pets\",\"van grooming\",\"dog walking\"]",
+ "messages_never": "[\"The pet's health notes\",\"An injury or a nick: the owner calls\",\"The emergency contact's number\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+groomer",
+  "pexels": "https://www.pexels.com/search/pet%20groomer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

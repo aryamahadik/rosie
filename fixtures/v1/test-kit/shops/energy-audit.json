@@ -1,0 +1,196 @@
+{
+ "id": "energy-audit",
+ "name": "Home energy auditor",
+ "booking_type": "Service",
+ "pattern": "service",
+ "built_from": "inspector",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Home energy auditor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Home energy auditor",
+   "staff": "Maya and Nora (energy advisors at the office)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Report walk-through",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 report walk-through. A card is saved for the office's $20 fee. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Report walk-through",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 report walk-through. Nothing is taken: a YES books it. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Second opinion on an audit",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A second opinion on another company's audit, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Report walk-through",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 report walk-through on a Saturday morning, when Maya works alone with no front desk: the saved card is charged when she texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Home energy auditor",
+   "staff": "Owen and Felix (energy auditors)",
+   "customer": "Alex M. (homeowner) · other customers",
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home energy audit",
+     "price": "$349",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $349 home energy audit. A card is saved and charged $349 when Owen texts DONE. The report follows Fri.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home energy audit",
+     "price": "$349",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $349 home energy audit. Nothing is taken. Rosie texts the bill after, and the report goes out once it's paid.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Test-out after upgrades",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 test-out after upgrades, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "4-unit building audit",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 4-unit building, priced from the listing and bills at $640. Sam OKs it. A $160 deposit now, the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: one audit visit at the home, priced by the home's size, with a written report later.\",\"list\":[{\"name\":\"Home energy audit\",\"price_kind\":\"set by the customer's answers (square feet, house or condo, year built)\",\"example\":\"house up to 2,500 sq ft: $349; 2,501 to 4,000 sq ft: $449; condo or townhouse: $249 (the example business's own prices)\",\"length\":\"about 3 hours on site: a blower door test, an infrared scan, a duct check and a combustion safety test, then a results walk-through; the report follows in about 3 business days\",\"where\":\"at the home; an adult stays for the whole visit\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Condo or townhouse audit\",\"price_kind\":\"one price\",\"example\":\"$249, about 2 hours\",\"where\":\"at the home\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"New-home energy rating (the second kind of work)\",\"price_kind\":\"quoted from the plans first\",\"example\":\"a certified rater tests the house at framing and at the end\",\"where\":\"at the home\"},{\"name\":\"Large property evaluation\",\"price_kind\":\"set by the auditor at the visit from the size; only the $89 trip fee is promised before\",\"example\":\"a large home with an addition: priced on site; the fee never depends on what is found\",\"where\":\"at the home\"},{\"name\":\"Multi-unit or very large home\",\"price_kind\":\"quoted from the listing, the bills and photos first\",\"example\":\"a 4-unit building: $640, with a deposit; Sam OKs any quote over $500\",\"where\":\"at the home\"},{\"name\":\"Test-out after upgrades\",\"price_kind\":\"one price\",\"example\":\"$150, about 1 hour: a blower door retest after air sealing or insulation\",\"where\":\"at the home\",\"money\":\"booked like the first audit; paid in full when booking (the example business's setting)\"},{\"name\":\"Duct leakage test\",\"price_kind\":\"one price, an add-on\",\"example\":\"$199 (about 45 minutes); $249 when Sam goes himself\",\"where\":\"at the home\"},{\"name\":\"Crawl space moisture check\",\"price_kind\":\"one price, an add-on at the visit\",\"example\":\"$160, only if the client says yes first\",\"where\":\"at the home\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or no way in that Sam confirms, or a return visit when part of the home could not be tested\",\"where\":\"never booked alone\"},{\"name\":\"Report walk-through, bill review and upgrade plans (at Lee Energy Office)\",\"price_kind\":\"one price each\",\"example\":\"30-minute report walk-through $35; bill review $20; upgrade priority list $40; second opinion on another audit $55; whole-house upgrade plan, about 2½ hours, $140; at the home $75 (the example office's own prices)\",\"where\":\"at the office, by video, or at the home\",\"money\":\"card saved for the $20 fee; paid at the office after\"}],\"start_times\":\"Set starts, like 8:00am and 1:00pm. The results walk-through comes at the end of the visit.\",\"notice\":\"2 days' notice by default. A sooner time only if Sam says yes.\",\"capacity\":\"One auditor per audit. A rating only with a certified rater.\",\"nobody_home\":\"No: an adult (18 or older) stays for the whole visit, because the tests run in every room and the heating system is used.\",\"online\":\"Report walk-throughs and upgrade plans can be done by video.\",\"not_offered\":\"Installing upgrades, filing rebate or incentive paperwork, home inspections, and any promise of savings.\",\"partner_work\":\"None. Rosie never names or refers an installer.\"}",
+ "questions_before_times": [
+  "The town or ZIP, and the kind of home: a house, a condo or townhouse, or several units",
+  "About how many square feet, and the year built",
+  "What bothers you: drafts, hot or cold rooms, high bills, a damp attic or crawl space",
+  "How it is heated and cooled: gas, oil, electric or a heat pump, if you know",
+  "Add-ons: a duct leakage test",
+  "Do you own the home or rent it?"
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "sparks or smoke",
+  "a carbon monoxide alarm",
+  "live wires hanging down",
+  "flooding up to the outlets"
+ ],
+ "first_steps": [],
+ "facts": [
+  "results",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "6pm the day before"
+ },
+ "license": "Where the state, a utility program or the business's own rules require it, each auditor holds a current energy auditor or building performance credential (a building analyst or rater certification), and the company holds its own registration or contractor license. Some states license nobody: then registration only. Combustion safety testing needs an auditor trained for it.",
+ "staff_skills": "[\"Home energy audits\",\"Condo and townhouse audits\",\"Multi-unit buildings\",\"Duct leakage tests\",\"Test-outs after upgrades\",\"New-home energy ratings (certified rater)\",\"Report walk-throughs and upgrade plans at the office\"]",
+ "messages_never": "[\"Door and alarm codes\",\"The street address in a first text to someone new\",\"The utility account number and the bills: only the secure link\",\"Findings, photos and the report: only the secure link\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/home+energy+auditor",
+  "pexels": "https://www.pexels.com/search/home%20energy%20auditor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

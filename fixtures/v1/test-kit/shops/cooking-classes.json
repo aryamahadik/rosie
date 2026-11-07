@@ -1,0 +1,133 @@
+{
+ "id": "cooking-classes",
+ "name": "Cooking classes",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "dance",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Cooking classes",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Cooking classes",
+   "staff": "Ines (cook and teacher) and the front desk",
+   "customer": "Alex M. (a parent, for Alex's son Mia, 9) · other parents and cooks",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial class",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$35",
+     "fee": "$20",
+     "story": "The main story: Mia's $35 trial class in Ines's Pasta 1, Sat Oct 24 at 11:00am (12 seats, 2 trial seats), paid in full when booking. A private cooking lesson at the kitchen ($55), an adult dinner club ($20) and the 4-week term ($140) are paid this way too.",
+     "due_now_at_booking": 35,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trial class",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 trial at a kitchen that takes nothing online: a YES books Mia's seat, and Alex pays at the front desk. Adult dinner clubs can work this way too.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Cooking classes",
+   "staff": "Tomas (a cook who travels)",
+   "customer": "Alex M. (an adult cook) · other customers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Private lesson at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $150 private cooking lesson (90 minutes) at Alex's home with Tomas. A card is saved for the $40 fee, and the $150 is charged when Tomas texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The same $150 lesson, paid in full when booking, as some cooks ask. A $150 group class at a host's place is paid in full this way too.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a seat in a set class time by cooking, age group and level, with a set number of seats, a few trial seats and a waitlist; each learner booked is checked in on their own. Private lessons book one teacher, at the school, at a home, or by video. A class at a host's place (a school, a company office, a library) books a teacher's time for a group",
+ "questions_before_times": [
+  "who is learning: the adult themselves, or the parent's child (the age sets the class)",
+  "which cooking, and the level: never studied, some before, or a fluent speaker who wants a refresher",
+  "the goal: travel, school, work, or fun",
+  "at the school, by video, or at home",
+  "for a class at a host's place: how many learners, their ages, and the place"
+ ],
+ "safety_stop": [
+  "someone hurt right now: a deep cut, a bad burn or scald, fainting, a child choking, chest pain, trouble breathing"
+ ],
+ "first_steps": [
+  "Waiver and the child's details",
+  "The pick-up list and the photo yes or no",
+  "Placement for a learner who knows some of the cooking"
+ ],
+ "facts": [
+  "classes",
+  "children",
+  "waitlist",
+  "groups",
+  "forms"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "none for a cooking school or a cook in most places; where the state's form names a license or registration, the owner adds it as an optional item. Rosie checks no license, certificate, insurance or background check",
+ "staff_skills": "knife skills, pasta, bread, Thai and baking; menu planning; children's classes only for cooks the owner OKs for children",
+ "messages_never": "a child's last name, age, allergies, food restrictions or health notes, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the class, and link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/cooking+classes",
+  "pexels": "https://www.pexels.com/search/cooking%20classes/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

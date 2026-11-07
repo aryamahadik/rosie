@@ -1,0 +1,943 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "snow",
+  "name": "Snow removal",
+  "type": "service",
+  "started_from": "cleaner"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "T12",
+   "field": "On call: who takes jobs sent now (open hours, nights, weekends)",
+   "type": "schedule",
+   "need": "R when any service is sent now",
+   "shows": "team page",
+   "source": "S2-30, S2-27, S1-21",
+   "google": "no",
+   "turned_on_by": "fact sentnow"
+  },
+  {
+   "id": "V10",
+   "field": "Extras: after-hours price, materials at cost, tax rate",
+   "type": "amounts",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "S1-12, B4-91",
+   "google": "no",
+   "turned_on_by": "fact sentnow"
+  },
+  {
+   "id": "V16",
+   "field": "Stage payments (each stage billed as it is done)",
+   "type": "stage plan",
+   "need": "P",
+   "shows": "bill",
+   "source": "fact stages, A9-16",
+   "google": "no",
+   "turned_on_by": "fact stages"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "plans",
+  "stages",
+  "documents",
+  "sentnow",
+  "extrawork"
+ ],
+ "switches": [
+  "cancelright"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter",
+    "list|full|none",
+    "visit|none|counter",
+    "photos|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Rock salt, a quarter-yard",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a quarter-yard of rock salt, $35, loaded into Alex's pickup. Nothing is taken: a YES books the load-out. Alex pays at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Salt-sand mix, a half-yard",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$0",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A half-yard of salt-sand mix, $55, paid in full when booking, so it's set aside on a storm-rush day."
+  },
+  {
+   "flow": "A",
+   "path": "visit|none|counter",
+   "name": "Salt by weight",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Salt by weight: a trailer load weighed at the scale, priced at the counter. Only the $25 minimum is promised; paid at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "photos|none|counter",
+   "name": "Trailer fill",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A trailer fill, priced at $90 from photos of the trailer. Sam OKs it; nothing taken; paid at the counter."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Per-push plan: driveway and front walk",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$70",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$30",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a per-push plan. $55 a push for the driveway and front walk, plus $15 ice melt: $70, charged to the saved card when Rory texts DONE. No snow, no charge."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Per-push plan: driveway and front walk",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$70",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$30",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The same per-push plan, with nothing taken. Rosie texts the $70 bill after each push."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Seasonal contract, Oct 15 to Apr 30",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$540",
+   "deposit": null,
+   "rest": null,
+   "paid": "$540",
+   "fee": "$30",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A seasonal contract, Oct 15 to Apr 30: $540 paid in full when booking. Every push at 2 inches or more is covered."
+  },
+  {
+   "flow": "B",
+   "path": "photos|full|none",
+   "name": "Gravel lane season (600 ft)",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": null,
+   "rest": null,
+   "paid": "$640",
+   "fee": "$30",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A 600-ft gravel lane with a turnaround, priced from Alex's photos at $640 for the season. Sam OKs it, both sign the contract, and it's paid in full."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Trailer fill",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$90"
+  },
+  {
+   "flow": "A",
+   "name": "Rock salt, a quarter-yard",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$35"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Per-push plan (driveway and front walk)",
+   "price": null,
+   "kind": "set by the customer's answers: the driveway's length, and walks and steps",
+   "length": "about 20 to 30 minutes a stop",
+   "where": "at the customer's place; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Walk and steps only",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "at the customer's place; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Ice melt on the walk and steps",
+   "price": null,
+   "kind": "one price, added only when the customer asks",
+   "length": null,
+   "where": "with a push",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "One-time push",
+   "price": null,
+   "kind": "set by the customer's answers",
+   "length": null,
+   "where": "at the customer's place; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Seasonal contract (Oct 15 to Apr 30)",
+   "price": null,
+   "kind": "one price for the season, set by the customer's answers",
+   "length": null,
+   "where": "at the customer's place; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Long private lanes and business lots, by the season",
+   "price": null,
+   "kind": "quoted from the customer's photos or a map first; the owner OKs it over his limit",
+   "length": null,
+   "where": "at the customer's place; a stop on a route",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Loader work",
+   "price": null,
+   "kind": "per hour",
+   "length": null,
+   "where": "at the customer's place, at a set time",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "City plow berm",
+   "price": null,
+   "kind": "free",
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Trip charge",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "not booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Lawn mowing (the second kind of work)",
+   "price": null,
+   "kind": "from the list, by lawn size",
+   "length": null,
+   "where": "at the customer's place; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Salt and ice melt at the yard (a second company)",
+   "price": null,
+   "kind": "one price by amount",
+   "length": null,
+   "where": "loaded into the customer's truck at the yard at a booked load-out time; a quarter-yard can also be delivered ($75)",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "The driveway's length and width, and is it sloped?",
+   "Which walks and steps to clear",
+   "Ice melt on the walk and steps, and does it need to be pet-safe?",
+   "A per-push plan, one storm only, or the season",
+   "For a business lot: photos or a map, and the hours it must be clear by",
+   "At the yard: how much salt, and what truck it goes in"
+  ],
+  "after_time": [
+   "Anything a plow could hit along the edges, with a photo: sprinkler heads, lights, curbs, a low wall",
+   "Where to pile the snow: left, right or the end of the driveway",
+   "Do cars stay in the driveway overnight?",
+   "Pets in the yard",
+   "A gate, and how the crew gets through it"
+  ],
+  "secure_page_only": [
+   "A gate code",
+   "A photo of the driveway with the stake spots marked"
+  ],
+  "who_may_book": "An adult who lives or works at the place, or the owner, a landlord or a property manager they name."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "someone trapped, hurt or stuck in the cold",
+   "no heat in freezing weather",
+   "a fallen power line in the snow",
+   "a car stuck with someone inside, or its tailpipe buried",
+   "roof snow or ice dams",
+   "ice hanging from the roof edge over a walk or door"
+  ],
+  "go_on": "Yes, for roof snow or hanging ice: the driveway and walk can still be booked. No, for anyone in danger, no heat or a power line.",
+  "stop_action": [
+   "Someone trapped, hurt or without heat in the cold: call 911 now. A snow crew can't answer an emergency. No booking.",
+   "A fallen power line: stay far away from it, and call 911 and the power company. No booking until it's safe.",
+   "A car stuck with someone inside: clear the tailpipe or open a window, and call 911 if anyone feels sick.",
+   "Roof snow or ice dams: that's roofing work, so the AI can look for a roofer. Stay out from under the roof edge where ice hangs. The driveway and walk can still be booked.",
+   "Ice hanging over a walk or door: use another door until it's down. The crew skips that part of the walk and tells the customer in writing."
+  ],
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Move cars off the driveway by 5am",
+   "Leave the stakes in all winter",
+   "Keep pets in while the plow runs",
+   "Leave the gate unlocked, or keep its code on the secure page"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": false,
+  "documents_fact": true
+ },
+ "staff": {
+  "skills": [
+   "Plow truck driving (residential driveways)",
+   "Business lots with a loader or skid steer",
+   "Shoveling and ice melt",
+   "Setting stakes",
+   "Loader work at the salt yard",
+   "Lawn mowing"
+  ],
+  "licenses_or_certificates": "None per person unless the state's form says so. A driver's license that fits the truck.",
+  "who_oks": "The owner OKs new addresses joining a route, and quotes over the limit. The office manager may too; the owner's answer wins.",
+  "crews": "One route lead per route, who texts OMW and DONE, sometimes with a shoveler riding along."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult who lives or works at the place, or the owner, a landlord or a property manager they name.",
+  "minors_texts": "Nobody under 18 books."
+ },
+ "visit": {
+  "check_in": "Nobody needs to be home: no check-in code. The route lead texts OMW about 10 minutes out, then DONE with a photo. At the yard: the code at the counter.",
+  "done": "DONE with a photo of the cleared driveway and walk, from the street.",
+  "changes_at_visit": "Extra walks or a buried mailbox only when the customer says yes by text, priced first."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "No statewide snow-removal license is known so far. Where a state's or city's rules require a license or a business registration, the form asks for it.",
+  "who": "The business. Plow drivers and shovelers need no license of their own unless the state's form says so. A driver's license fits the truck they drive.",
+  "ask": "The company's business registration, or a city business license where the city asks for one.",
+  "insurance": "General liability and commercial auto insurance are asked for. They are shown as given by the business, not checked by Rosie.",
+  "background": "Only where the state's rules require them, or as the business's own word."
+ },
+ "never_in_a_text": [
+  "Gate codes",
+  "Where a key or a garage remote is kept"
+ ],
+ "languages": "English and Spanish. The crew's language shows on the job.",
+ "unmapped_keys": {
+  "pf.first_steps": [
+   "stakes",
+   "storm_alert"
+  ],
+  "pf.staff": [
+   "backup"
+  ],
+  "pf.license": [
+   "not_this_work"
+  ],
+  "pf.messages": [
+   "storm_day"
+  ],
+  "pf.visit": [
+   "storm_call",
+   "how_it_is_done",
+   "cars",
+   "price_at_visit",
+   "breakage",
+   "berm"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

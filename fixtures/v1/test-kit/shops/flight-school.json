@@ -1,0 +1,186 @@
+{
+ "id": "flight-school",
+ "name": "Flight school",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "driving-school",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Flight school",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Flight school",
+   "staff": "Owen and Mia (instructors at the school's airport)",
+   "customer": "Alex M. (student) · other students",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "2-hour dual lesson",
+     "price": "$470",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The main story: a 2-hour dual lesson in the 4-seat trainer, $470 for the block. A card is saved for the $75 fee; the block is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "1-hour ground lesson",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "A 1-hour ground lesson, $90. A card is saved for the $75 fee, and Alex pays at the front desk after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "discovery flight",
+     "price": "$149",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$149",
+     "fee": "$75",
+     "story": "A $149 discovery flight, paid in full when booking.",
+     "due_now_at_booking": 149,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "ground school course (10 evenings)",
+     "price": "$399",
+     "deposit": "$100",
+     "rest": "$299",
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The $399 private pilot ground school course: a $100 deposit now, and the $299 rest paid at the front desk at the first evening.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Flight school",
+   "staff": "Ravi and Ines (instructors who fly to the customer's airport)",
+   "customer": "Alex M. (pilot, owner of the aircraft) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "flight review in your own aircraft",
+     "price": "$255",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The main story: a 3-hour flight review in Alex's own aircraft at Alex's home airport, $255. The saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "ground school seat",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$45",
+     "fee": "$40",
+     "story": "A $45 seat at a ground school class at a host's place, paid in full.",
+     "due_now_at_booking": 45,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "transition training (estimate)",
+     "price": "$1200",
+     "deposit": "$300",
+     "rest": "$900",
+     "paid_now": null,
+     "fee": "$75",
+     "story": "Transition training in a newly bought aircraft: a $300 deposit on the $1,200 estimate, and the $900 rest on the bill after the last visit.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a person's time (an instructor) plus an aircraft or the simulator for lessons; an aircraft or the simulator alone for a student's supervised solo, with an instructor on duty; seats on a timetable for the ground school course; flow B: an instructor at the customer's own aircraft and airport, and a ground school class at a host's place",
+ "questions_before_times": [
+  "new to flying, a student pilot, or a licensed pilot (sets the service: a discovery flight, the next lesson, a solo, a flight review or checkout)",
+  "what the lesson is for, and the next stage of training if the student knows it",
+  "which aircraft type, if the pilot is checked out in one",
+  "for a discovery flight: how many people fly, and whether a guest under 18 is coming",
+  "for a flight in the customer's own aircraft (flow B): the airport and the aircraft type"
+ ],
+ "safety_stop": [
+  "an aircraft crash or fire happening now, someone hurt at the airport, an aircraft overdue or missing"
+ ],
+ "first_steps": [
+  "Waiver and training agreement",
+  "Proof of citizenship, or the federal security approval",
+  "Weight for the flight",
+  "Medical and student pilot certificate",
+  "Instructor's solo endorsement",
+  "The owner's aircraft papers (flow B)"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "children",
+  "classes",
+  "video",
+  "spaces",
+  "multiday"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: a flight school needs no state license in most places; where the state licenses flight schools as private or vocational schools, the business says so (a switch from the state form). Each instructor's federal flight instructor certificate is the business's own word",
+ "staff_skills": "discovery flights, primary training, instrument, multi-engine, tailwheel, checkout flights, flight reviews, simulator, ground school, stage checks (the chief instructor or a second instructor)",
+ "messages_never": "weight, date of birth, medical certificate details, health answers, citizenship papers and certificate numbers never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/flight+school",
+  "pexels": "https://www.pexels.com/search/flight%20school/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

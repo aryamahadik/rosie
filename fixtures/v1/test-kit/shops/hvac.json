@@ -1,0 +1,287 @@
+{
+ "id": "hvac",
+ "name": "HVAC technician",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] HVAC technician",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "HVAC technician",
+   "staff": "Luis and Kara (techs at the parts counter)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Part test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 part test at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Part test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 part test. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Dehumidifier repair",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 dehumidifier repair. A $40 deposit now, and $100 at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Window AC cleaning",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "free",
+     "story": "The $55 window AC cleaning, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Control board repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A control board repair, priced from Alex's photos at $90. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Blower motor repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A blower motor repair, priced at the counter. Only the $25 bench test is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "HVAC technician",
+   "staff": "Andre and Nina (HVAC techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "No-heat repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: no heat. A no-heat repair, priced at the visit. Only the $89 diagnostic visit is promised, and a card is saved for the $89 fee. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "No-heat repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same no-heat repair. Nothing is taken before. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Furnace tune-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 furnace tune-up. A card is saved for the $89 fee. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Furnace tune-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 furnace tune-up. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Furnace tune-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 furnace tune-up. A card is saved and charged $179 when Andre texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Mini-split cleaning",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "free",
+     "story": "A $150 mini-split cleaning, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Humidifier install",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A humidifier put in, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Ridgeway Heat & Air's own list)\":[{\"service\":\"Diagnostic visit (finds why there's no heat or no cooling)\",\"price kind\":\"one price\",\"price\":\"$89, credited to the repair\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the repairs below. Alex sees it, and that it's owed even if he says no to the repair, before booking.\"},{\"service\":\"No-heat or no-cooling repair (furnace, boiler, AC, heat pump)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 diagnostic visit is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 diagnostic visit\",\"after\":\"Rosie texts the bill\",\"note\":\"Nothing is fixed until the customer OKs the quote.\"},{\"service\":\"Furnace tune-up\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee, or a card saved when the card is charged at DONE\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"service\":\"AC or heat pump tune-up\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee, or a card saved when the card is charged at DONE\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\",\"note\":\"Only a tech with the refrigerant card. An outdoor unit may be done with nobody home.\"},{\"service\":\"Mini-split cleaning\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Comfort Plan (yearly upkeep)\",\"price kind\":\"one price\",\"price\":\"$189 a year: a fall furnace tune-up and a spring AC tune-up\",\"length\":\"two 60-minute visits a year\",\"place\":\"at the customer's place\",\"before\":\"the full price, after the plan's own yes\",\"after\":\"nothing more\",\"note\":\"Renews each year, told before each renewal. Each season's visit starts with a text to pick a time.\"},{\"service\":\"Humidifier or air cleaner put in\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\"},{\"service\":\"System replacement (furnace, boiler, AC or heat pump)\",\"price kind\":\"free estimate visit first\",\"price\":\"the signed contract's price\",\"length\":\"one or two days\",\"place\":\"at the customer's place\",\"before\":\"a deposit under the signed contract, within the state form's cap\",\"after\":\"the rest on the bill\",\"note\":\"Sam does the estimates (the example's own choice). The license holder pulls the permit, where the local rules require one.\"},{\"service\":\"Duct camera inspection\",\"price kind\":\"by person\",\"price\":\"tech $199, master $249\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 diagnostic visit\",\"after\":\"Rosie texts the bill\",\"note\":\"The report link comes later\"},{\"service\":\"Gas line or venting work\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 diagnostic visit is promised\",\"length\":\"set by the owner\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 diagnostic visit\",\"after\":\"Rosie texts the bill\",\"note\":\"The owner OKs each booking first. Only techs with the gas license, where the state issues one.\"},{\"service\":\"After-hours no-heat or no-cooling call\",\"price kind\":\"one price\",\"price\":\"$149, credited to the repair; flat-price jobs $60 more\",\"length\":\"sent now: an arrival estimate, not a window\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $149 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Sent now to the tech on call, then the backup. Free to cancel until he texts OMW.\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted jobs; not booked alone\"}],\"at the business (the example: Ridgeway Supply's counter list)\":[{\"service\":\"Part test (bring the old part: an igniter, a flame sensor, a capacitor or a motor)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"A new part found to match is sold at the shop's own price, once Alex says yes.\"},{\"service\":\"Thermostat setup (bring the thermostat)\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Custom filter (cut to size)\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Flame sensor cleaning\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Window AC cleaning\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Dehumidifier repair\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the shop\",\"before\":\"a card saved for the $40 fee (over 2 hours), or a $40 deposit\",\"after\":\"paid at the counter\"},{\"service\":\"Control board repair\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The owner OKs each quote. Only Luis does board repairs.\"},{\"service\":\"Blower motor repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 bench test is promised\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a thermostat or a unit\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it\"}],\"capacity\":\"One tech per booking. A replacement can need a crew of two. The counter's bench repairs need its one test bench.\",\"skills each needs\":\"AC and heat pump work needs the refrigerant card. Gas furnaces and boilers need the gas license, and oil burners the oil license, where the state issues one. Board repairs at the counter need the board skill.\",\"nobody home\":\"An outdoor AC or heat pump tune-up, with the customer's OK: nobody needs to be home. DONE comes with a photo. Anything inside: an adult is home.\",\"online\":\"A video check only, where the owner offers it. No repair is done by video.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at cost or at list, the owner's pick. An after-hours price the owner sets. No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "What heats or cools the home: a gas furnace, a boiler, a heat pump, oil, central AC or a mini-split",
+  "What's happening: no heat, no cooling, a noise, water around the unit, or it keeps turning on and off",
+  "Is a carbon monoxide alarm going off, or is there a gas smell? A yes means get out first",
+  "No heat in freezing weather, or no cooling in great heat, with an older person, a baby or someone with a medical need at home: a yes or no only",
+  "For a tune-up or the plan: which system, and when it was last serviced",
+  "At the counter: which part, and the unit's brand and model from its label"
+ ],
+ "safety_stop": [
+  "A carbon monoxide alarm going off, or a gas smell",
+  "Someone feels sick, dizzy, or too cold or hot; smoke or a burning smell from the equipment"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "dropoff",
+  "extrawork",
+  "photos",
+  "plans",
+  "sentnow"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Heating and cooling work in a home needs a license where the state or city licenses it. Gas or oil burner work can need its own license, where the state issues one apart.",
+ "staff_skills": "[\"Gas furnaces and boilers\",\"Oil burners\",\"AC and heat pumps\",\"Mini-splits\",\"Tune-ups\",\"Ductwork and duct camera\",\"Humidifiers and air cleaners\",\"Counter part tests and board repairs\"]",
+ "messages_never": "Any medical need at home (only 'urgent' is passed on), gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/hvac+technician",
+  "pexels": "https://www.pexels.com/search/hvac%20technician/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

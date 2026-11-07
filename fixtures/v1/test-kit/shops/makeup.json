@@ -1,0 +1,208 @@
+{
+ "id": "makeup",
+ "name": "Makeup artist",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "photographer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Makeup artist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Makeup artist",
+   "staff": "Talia and Priya (studio makeup artists)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Makeup lesson (2 hours)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 makeup lesson (2 hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Express makeup",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 express makeup. A card is saved for the studio's $20 no-show fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Express makeup",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 express makeup for a returning customer. Nothing is taken: a YES books it, and Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Event makeup with lashes",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 event makeup with lashes, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Makeup artist",
+   "staff": "Marco and Amara (makeup artists)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Wedding party makeup (4 faces)",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a wedding party of four, all ready by 10am. Planned and quoted at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit holds the date, and the $480 rest is charged to the saved card when the faces are done.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Wedding party makeup (4 faces)",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The same wedding party, with the $160 deposit now and the $480 rest on the bill after the faces, with a tip line.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Event makeup for two",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Event makeup for two at home, $150 from the list. A $40 deposit now, and the $110 rest charged to the saved card when the faces are done.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Event makeup for two",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The $150 event makeup for two, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Bridal Beauty's own list)\":[{\"service\":\"Wedding party makeup\",\"price kind\":\"planned and quoted first: a price per face from the list, plus travel and any early start, checked by the lead artist and OK'd by the owner\",\"price\":\"the quote (the example: $640 for four faces: the bride $200, three party faces at $120, travel $80)\",\"length\":\"about 45 to 60 minutes a face, the bride about 70 minutes and last, all done by the ready-by time\",\"place\":\"at a home, hotel or venue where the party gets ready\",\"before\":\"a signed contract, then a 25% retainer that holds the date\",\"after\":\"the rest charged to the saved card when the faces are done, or on the bill after the faces\"},{\"service\":\"Bridal makeup (with strip lashes)\",\"price kind\":\"one price, in the wedding quote\",\"price\":\"$200\",\"length\":\"70 min\",\"place\":\"where the party gets ready\",\"before\":\"with the wedding\",\"after\":\"with the wedding\"},{\"service\":\"Party makeup (bridesmaids, mothers, guests; strip lashes included)\",\"price kind\":\"per face, in the wedding quote\",\"price\":\"$120 a face\",\"length\":\"45 to 60 min a face\",\"place\":\"where the party gets ready\",\"before\":\"with the wedding\",\"after\":\"with the wedding\"},{\"service\":\"Junior makeup (under 18: a parent says yes and stays)\",\"price kind\":\"per face\",\"price\":\"$45\",\"length\":\"20 min\",\"place\":\"where the party gets ready\",\"before\":\"with the wedding\",\"after\":\"with the wedding\",\"note\":\"Light makeup only. A parent's yes on a page the booker forwards\"},{\"service\":\"Event makeup for two (prom, a gala or photos)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"90 min\",\"place\":\"at the customer's home\",\"before\":\"a $40 deposit, or the full price (the owner picks)\",\"after\":\"the rest charged to the saved card when the faces are done, or nothing more\"},{\"service\":\"Event makeup for one at your place\",\"price kind\":\"one price\",\"price\":\"$179, travel within 10 miles included\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"a $40 deposit\",\"after\":\"the rest charged to the saved card when the faces are done\"},{\"service\":\"Touch-ups on site after the faces (photo shoot or reception)\",\"price kind\":\"per hour\",\"price\":\"$120 an hour for one artist, $160 an hour for two (the example)\",\"length\":\"by the hour\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking, or one pay link if added on the day\",\"note\":\"Added on the day only with the payer's written yes\"},{\"service\":\"Travel\",\"price kind\":\"travel fee, per artist\",\"price\":\"free within 10 miles; $40 an artist from 10 to 25 miles; farther, quoted first\",\"place\":\"at the customer's place\",\"before\":\"in the quote or the list price\",\"after\":\"with the rest\"},{\"service\":\"Early start (artists arrive before 7:00am)\",\"price kind\":\"a set fee, per artist\",\"price\":\"$40 an artist (the example)\",\"place\":\"at the customer's place\",\"before\":\"in the quote\",\"after\":\"with the rest\"},{\"service\":\"Bridal hair (Lee Bridal Hair, the second kind of work)\",\"price kind\":\"one price, or per person in a wedding quote\",\"price\":\"bridal hairstyle $189, party hairstyle $149 (the example)\",\"length\":\"45 to 75 min\",\"place\":\"where the party gets ready\",\"before\":\"with the wedding\",\"after\":\"with the wedding\",\"note\":\"Only stylists whose cosmetology license is on file as given\"}],\"at the business (the example: Lee Makeup Studio's own list)\":[{\"service\":\"Makeup lesson (one to one, with a face chart to keep)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2 hours\",\"place\":\"at the studio\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\"},{\"service\":\"Express makeup (lips, lashes, a fresh base)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the studio's $20 no-show fee, or nothing for a returning customer\",\"after\":\"paid at the studio\"},{\"service\":\"Event makeup with strip lashes\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Natural makeup\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"45 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the studio\"},{\"service\":\"Strip lashes (add-on)\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"10 min\",\"place\":\"at the studio\",\"before\":\"with the main booking\",\"after\":\"paid at the studio\"},{\"service\":\"Kids' recital makeup (12 and under)\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"20 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\",\"note\":\"A parent books and stays\"},{\"service\":\"Bridal trial\",\"price kind\":\"one price\",\"price\":\"$125 (the example)\",\"length\":\"90 min\",\"place\":\"at the studio\",\"before\":\"nothing: no fee for a missed trial\",\"after\":\"paid at the trial\",\"note\":\"The first step before a wedding, booked as its own visit\"},{\"service\":\"Stage or costume look\",\"price kind\":\"quoted from photos first\",\"price\":\"the quote (the example: $90)\",\"length\":\"about 60 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\"},{\"service\":\"Cover-up makeup (a tattoo or birthmark)\",\"price kind\":\"quoted at the studio\",\"price\":\"from $110; only the $25 consult is promised\",\"length\":\"30 to 60 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\"},{\"service\":\"Express makeup at home\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"45 min\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same studio work, booked in flow B\"}],\"planning a party\":\"Start times are worked back from the ready-by time: about 45 to 60 minutes a face, the bride last (about 70 minutes), after 30 minutes of setup, with touch-ups until the ready-by time. One artist for up to 3 faces in 2 hours; a second artist when the party is bigger or the morning is short (the owner's setting).\",\"capacity\":\"One booking per artist at a time. A wedding books every artist it needs together.\",\"nobody needs to be home\":\"Never: someone always sits in the chair.\",\"online\":\"A video lesson or a planning call can be online; makeup itself is in person.\"}",
+ "questions_before_times": [
+  "What it's for: a wedding, an event, photos, a lesson or a trial",
+  "The date and the ready-by time (when everyone must be done)",
+  "Where everyone gets ready: a home, a hotel or a venue, and the town only (for the travel fee)",
+  "How many faces, and each person's role (the bride, bridesmaids, mothers, anyone under 18)",
+  "Who wants strip lashes, and any bridal hair",
+  "Whether they want a trial before the day"
+ ],
+ "safety_stop": [
+  "A reaction now: the face, lips or throat swelling, or trouble breathing",
+  "Makeup or lash glue in the eye with pain or a change in sight"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "forms",
+  "photos",
+  "groups",
+  "documents",
+  "tips",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "A switch from the state form. Where the state's rules license makeup work, it falls under a cosmetology or esthetics license (or a makeup license where the state issues one); some states exempt makeup-only work, sometimes after a short course. Hair styling is licensed nearly everywhere.",
+ "staff_skills": "[\"Bridal (leads only)\",\"Party and event makeup\",\"Lessons\",\"Stage and costume looks\",\"Cover-up makeup\",\"Bridal hair\"]",
+ "messages_never": "Allergies, skin conditions, past reactions, patch-test results and medical notes stay on the secure page and the artist's job link, never in a text to the customer, the owner or the staff, and never through the AI. A text says only 'a note is on the page'.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/makeup+artist",
+  "pexels": "https://www.pexels.com/search/makeup%20artist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,964 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "camp",
+  "name": "Summer camp",
+  "type": "class",
+  "started_from": "swim"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K01",
+   "field": "Class timetable: day, time, teacher, room (sent as a photo or typed)",
+   "type": "schedule",
+   "need": "R for class work",
+   "shows": "booking page (sessions with seats left)",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K02",
+   "field": "Seats Rosie can book per session, the fewest to run, the cutoff",
+   "type": "numbers",
+   "need": "R for class work",
+   "shows": "seats left; owner decides at the cutoff",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K03",
+   "field": "Trial seats per class (one trial each)",
+   "type": "number",
+   "need": "P",
+   "shows": "booking page",
+   "source": "A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K06",
+   "field": "Stays: a start and an end date, a price per night or day, drop-off and pick-up times",
+   "type": "dates",
+   "need": "R when the work has stays",
+   "shows": "booking page, confirmation",
+   "source": "A4-68, B4-85",
+   "google": "no",
+   "turned_on_by": "fact multiday"
+  },
+  {
+   "id": "K08",
+   "field": "Groups: size limits and a chaperone count",
+   "type": "numbers",
+   "need": "P",
+   "shows": "booking",
+   "source": "A4-32, fact groups",
+   "google": "no",
+   "turned_on_by": "fact groups"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children; fact incare"
+  },
+  {
+   "id": "V14",
+   "field": "Waitlist",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "times card",
+   "source": "S1-21, A4-60, fact waitlist",
+   "google": "no",
+   "turned_on_by": "fact waitlist"
+  }
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "children",
+  "incare",
+  "forms",
+  "multiday",
+  "waitlist"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|deposit|card",
+   "paths": [
+    "list|deposit|card",
+    "list|full|none",
+    "list|none|none"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|deposit|card",
+   "paths": [
+    "list|deposit|card",
+    "list|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|deposit|card",
+   "name": "Overnight Week 2",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$1,150",
+   "deposit": "$250",
+   "rest": "$900",
+   "paid": null,
+   "fee": "$250",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: Ava's Overnight Week 2, Sat Oct 24 to Fri Oct 30 (fall break), $1,150. A $250 deposit is paid on the secure page when registering, and the $900 rest is charged to the saved card when the week is done (Rosie never charges the rest on a date by itself). Day camp weeks ($325, $75 deposit) and the two-week session ($2,150, $400 deposit) are paid this way too. The camp's dated refund schedule is its own signed terms, shown before paying."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Overnight Week 2",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$1,150",
+   "deposit": "$250",
+   "rest": "$900",
+   "paid": "$1,150",
+   "fee": "$250",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "The same Overnight Week 2, paid in full when registering: $1,150. The same signed refund schedule applies."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|none",
+   "name": "Camp tour (45 min)",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "free",
+   "deposit": "$0",
+   "rest": "$0",
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A free 45-minute camp tour with Sam, the director, Sat Oct 24 at 11:00am, for Alex and Ava. Nothing is taken and no card is saved: a YES books it, and nothing is owed after."
+  },
+  {
+   "flow": "B",
+   "path": "list|deposit|card",
+   "name": "Backyard camp week",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$900",
+   "deposit": "$225",
+   "rest": "$675",
+   "paid": null,
+   "fee": "$225",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a backyard camp at Alex's home, four mornings from Thu Oct 22, 8:00am to noon, for up to 6 children: $900. A $225 deposit when booking, and the $675 rest charged to the saved card when the week is done. The refund schedule is the company's own signed terms, shown before paying."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Backyard camp week",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$900",
+   "deposit": "$225",
+   "rest": "$675",
+   "paid": "$900",
+   "fee": "$225",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "The same backyard camp week, paid in full when booking: $900. A backyard camp day ($250) and a camp-style birthday party ($250) are paid this way too."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Extended day (after-care)",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$75",
+   "fee": "$75"
+  },
+  {
+   "flow": "A",
+   "name": "School-holiday day camp",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$65",
+   "paid": "$65",
+   "fee": "$65"
+  },
+  {
+   "flow": "A",
+   "name": "Overnight Week 2 (a camp credit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Backyard camp day",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$250",
+   "paid": "$250",
+   "fee": "$250"
+  },
+  {
+   "flow": "B",
+   "name": "Camp-style birthday party",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$250",
+   "paid": "$250",
+   "fee": "$250"
+  },
+  {
+   "flow": "B",
+   "name": "Backyard camp week (a camp credit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Overnight week (Sun 2:00pm to Sat noon), ages 9 to 14",
+   "price": "$1,150",
+   "kind": "one price",
+   "length": "7 days",
+   "where": "at the camp",
+   "before": "a $250 deposit when registering, with the $900 rest charged to the saved card when the session is done",
+   "after": "nothing more"
+  },
+  {
+   "name": "Two-week overnight session, ages 11 to 15",
+   "price": "$2,150",
+   "kind": "one price",
+   "length": "14 days",
+   "where": "at the camp",
+   "before": "a $400 deposit when registering, with the rest charged to the saved card when the session is done",
+   "after": "nothing more"
+  },
+  {
+   "name": "Day camp week (Mon to Fri, 9:00am to 3:30pm), ages 5 to 8",
+   "price": "$325",
+   "kind": "one price",
+   "length": "5 days",
+   "where": "at the camp",
+   "before": "a $75 deposit when registering, with the $250 rest charged to the saved card when the session is done",
+   "after": "nothing more"
+  },
+  {
+   "name": "Extended day (3:30 to 5:30pm), with a day camp week",
+   "price": "$60 a week",
+   "kind": "an add-on",
+   "length": "5 afternoons",
+   "where": "at the camp",
+   "before": "paid with the day camp week",
+   "after": "nothing more"
+  },
+  {
+   "name": "School-holiday day camp (one day), ages 5 to 10",
+   "price": "$65",
+   "kind": "one price",
+   "length": "9:00am to 3:30pm",
+   "where": "at the camp",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Camp tour with the director",
+   "price": "free",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the camp",
+   "before": "nothing taken",
+   "after": "nothing owed"
+  },
+  {
+   "name": "Backyard camp week (Lee Backyard Camps), ages 5 to 10",
+   "price": "$900 for up to 6 children",
+   "kind": "one price",
+   "length": "Mon to Thu, 9:00am to noon",
+   "where": "at the host family's home",
+   "before": "a $225 deposit when booking, with the $675 rest charged to the saved card when the week is done",
+   "after": "nothing more"
+  },
+  {
+   "name": "Backyard camp day",
+   "price": "$250 for up to 6 children",
+   "kind": "one price",
+   "length": "3 hours",
+   "where": "at the host family's home",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "An extra morning, added to a backyard camp week",
+   "price": "$225",
+   "kind": "an add-on",
+   "length": "3 hours",
+   "where": "at the host family's home",
+   "before": "paid in full when added, by one pay link",
+   "after": "nothing more"
+  },
+  {
+   "name": "Camp-style birthday party (Lee Backyard Camps' second kind of work)",
+   "price": "$250",
+   "kind": "one price",
+   "length": "2 hours, up to 15 children",
+   "where": "at the customer's place",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "each camper's age on the first day of the session, and the grade they finish in June (they set the session and the cabin group)",
+   "day camp or overnight, and which week",
+   "for an overnight week: girls' or boys' cabins",
+   "for a backyard camp: the home's town (the travel area; the street address goes on the secure page), and how many children and their ages",
+   "for a camp tour: who is coming, and the child's age"
+  ],
+  "after_time": [
+   "one cabin-mate request, kept where it fits",
+   "for day camp: who drops off and picks up most days",
+   "anything the counselors should know that isn't health, like a first time away from home",
+   "for a backyard camp: a shaded part of the yard, and a bathroom inside the children can use"
+  ],
+  "secure_page_only": [
+   "the parent or guardian's yes that they may register the child, and the camp's agreement and risk notice, signed for the child",
+   "the camper's full name and birth date, the home address and two emergency contacts",
+   "the health form, the shot record (or the papers the state's rules accept instead), and a medicine form for each medicine, signed where the camp asks",
+   "allergies, health needs and any custody order, for the camp nurse and the director only",
+   "the pick-up list: the adults who may take the child home, and anyone who may not, with a copy of any court order",
+   "a yes or no for photos of the child",
+   "the card for the deposit or the full price"
+  ],
+  "who_may_book": "a parent or legal guardian, 18 or older, registers a camper, signs and pays; a teen gets a link to send to a parent; for a backyard camp, the host parent books the week and each child's own parent fills that child's forms"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "a child hurt, very sick or in danger right now; a child who is missing",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   },
+   {
+    "words": "a report of abuse or neglect at a camp",
+    "say": "If a child is in danger now, call 911. You can also call your state's child abuse hotline. A person on Rosie's team will follow up.",
+    "booking": "no booking in that chat; a person on Rosie's team follows up"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "an allergy, asthma, a medicine or a health need",
+    "what": "the booking goes on; the details go on the secure page for the camp nurse; Rosie gives no health advice"
+   },
+   {
+    "words": "a food allergy that needs an epinephrine pen",
+    "what": "the booking goes on; the nurse reads the form before camp, and the pen comes to check-in in its labeled box"
+   },
+   {
+    "words": "a custody order, or a person who may not pick up",
+    "what": "the booking goes on; the order goes on the secure page for Sam and the check-in staff, never in a text"
+   },
+   {
+    "words": "a first time away from home, or homesick worries",
+    "what": "the booking goes on; the note goes to the head counselor on the secure page"
+   }
+  ],
+  "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "The camp's agreement and risk notice",
+    "when": "signed on the secure page while registering",
+    "who": "a parent or guardian signs for the child",
+    "result": "signed: the booking goes on; not signed in 10 minutes: nothing is booked"
+   },
+   {
+    "name": "The pick-up list and the photo yes or no",
+    "when": "on the secure page while registering; the parent can change them until pick-up",
+    "result": "only adults on the list take the child home; no answer to photos counts as no"
+   },
+   {
+    "name": "Health form, shot record and medicine forms",
+    "when": "open when registering; due May 15 (the camp's setting; the state's rules can set more)",
+    "who": "the parent fills them; the camp nurse reads each one",
+    "result": "still missing: one reminder a week, then Sam calls; no camper checks in without them"
+   },
+   {
+    "name": "Backyard camp: each child's forms and the yard check",
+    "when": "each child's own parent fills that child's forms by 7 days before the first day; the host fills the yard check while booking",
+    "result": "the yard has a fence or a clear edge, shade, water and a bathroom inside; a pool is gated and locked; pets stay inside; a child with no forms doesn't join"
+   },
+   {
+    "name": "Camp tour",
+    "when": "optional, before registering",
+    "result": "nothing to sign; no forms"
+   }
+  ],
+  "prep": "for the check-in note: the check-in window and the closing-day pick-up time; medicines in their original labeled boxes for the nurse; the camp's own packing list; photo ID for anyone picking up; for a backyard camp: the yard and the bathroom ready, pets inside, and each child's snack and water bottle",
+  "forms_fact": true,
+  "first_steps_fact": false,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "head counselor (a cabin group or a day camp group), counselor, camp nurse, waterfront staff, backyard camp counselor, party leader",
+  "licenses_or_certificates": "first aid and CPR for every counselor; a water safety certificate for anyone guarding the lake or pool; switches from the state's form, on by default",
+  "supervision": "two adults with any group of children; counselors under 18 never count toward the ratio",
+  "who_oks": "Sam OKs waitlist offers, moves after May 1, refunds and exceptions; Pat may OK waitlist offers and moves too, and Sam's answer wins; Hannah, the camp nurse, answers health questions",
+  "ratio": "8 campers and 2 counselors a cabin; 10 campers and 2 counselors a day camp group; 6 children and 2 counselors at a backyard camp (the example camps' settings; a ratio from the state's form wins)"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": true,
+  "animals_fact": false,
+  "who_may_book": "a parent or legal guardian, 18 or older, registers a camper, signs and pays; a teen gets a link to send to a parent; for a backyard camp, the host parent books the week and each child's own parent fills that child's forms",
+  "minors_texts": "a teen gets a link to send to a parent; Rosie never texts a child"
+ },
+ "visit": {
+  "check_in": "overnight: on check-in day, the parent gives the camper's check-in code at the check-in table, the nurse takes any medicines and checks the forms, and the head counselor walks the camper to the cabin; day camp: each day the adult dropping off signs the camper in with the code, and signs out at pick-up; backyard camp: the code at the host's door on the first day, then each child signed in and out by their own adult each day; a camp tour: the code at the camp office",
+  "done": "the check-in code on the first day, the sign-out at closing-day pick-up, and the head counselor's DONE once every camper has gone home",
+  "changes_at_visit": "a cabin or counselor change inside the camp is the camp's own; a change of session or dates is texted to the parent with a yes first"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "from the state form: a youth camp license or permit for the camp's own grounds where the state's rules require one (a switch), renewed on the state's schedule; health inspections of the grounds, kitchen, water, cabins and swim area where the state's or county's rules require them (a switch); a backyard camp at a family's home may need none, or the host site's own OK (a switch)",
+  "who": "the business, for the camp license, its inspections and its registration; the camp nurse, for a nursing license; each counselor, for first aid and CPR certificates; waterfront staff, for their own water safety certificates",
+  "ask": "the camp license number and its end date where the state's form asks (shown in an obviously made-up example as EX-1042); the date of the last health inspection; the business registration; the camp nurse's license number; each person's first aid and CPR certificates; any accreditation the camp holds, only as the camp gives it",
+  "insurance": "liability insurance where the state's form asks for it, or where a host site (a school, a park, a community center) asks for proof",
+  "background": "a background check for every staff member and regular volunteer before they start, and again on the state's schedule, where the state's rules require it (a switch from the state's form, on by default for anyone who works with children): who ran it and when, kept on file, shown to families only as the camp's own dated statement"
+ },
+ "never_in_a_text": "a child's last name, birth date, allergies, medicines, health needs, custody orders, the pick-up list (and who may not pick up) and photos never go in a text; texts to the parent may use the child's first name; texts to Sam or the staff carry none of it: they name the parent and the session, and link to the secure page",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "weather",
+   "children"
+  ],
+  "pf.staff": [
+   "nurse",
+   "checks"
+  ],
+  "pf.license": [
+   "accreditation"
+  ],
+  "pf.messages": [
+   "to",
+   "duringCamp",
+   "pickUp"
+  ],
+  "pf.visit": [
+   "children",
+   "lateEntry",
+   "note"
+  ]
+ },
+ "duplicate_spellings_dropped": [
+  "pf.staff.license"
+ ]
+}

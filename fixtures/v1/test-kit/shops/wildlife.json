@@ -1,0 +1,232 @@
+{
+ "id": "wildlife",
+ "name": "Wildlife and animal removal",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "pest",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Wildlife and animal removal",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Wildlife and animal removal",
+   "staff": "Pilar and Jonas (desk techs at the wildlife desk)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Animal ID",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 animal ID from photos. Nothing is taken: a YES books the visit. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Animal ID",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 animal ID from photos. A card is saved for the desk's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Exclusion plan",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "An exclusion plan, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Attic damage check",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An attic damage check, priced from Alex's photos at $90. Booked once it's OK'd; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Complex case review",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A complex case, priced at the counter. Only the $25 look is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Wildlife and animal removal",
+   "staff": "Dmitri and Alma (wildlife technicians)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Trapping and removal",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: trapping and removal of one animal, $179 with up to 3 trap checks. A card is saved for the $89 inspection fee and charged $179 when Dmitri texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Trapping and removal",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 trapping and removal. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Attic cleanup and insulation",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An attic cleanup and insulation, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest is charged to the card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Attic exclusion and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An attic exclusion and repair, priced at the inspection before any work. A card is saved for the $89 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a fixed service at the customer's place, priced by the answers, with trap checks on following days.\",\"list\":[{\"name\":\"Inspection (find the animal and the entry points)\",\"price_kind\":\"one price\",\"example\":\"$89, credited to the work if the customer books it\",\"length\":\"about 1 hour\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking for the fee; charged at DONE if booked alone\"},{\"name\":\"Trapping and removal (one animal)\",\"price_kind\":\"set by the customer's answers (the animal, how many, where)\",\"example\":\"$179 with up to 3 trap checks (the example business's own price); each extra check $45\",\"length\":\"about 1 hour to set up, then short trap checks on following days\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking for the fee; the saved card is charged when the job is finished (DONE)\"},{\"name\":\"Entry point sealing\",\"price_kind\":\"set by the customer's answers (how many entry points)\",\"example\":\"$150 for one entry point\",\"length\":\"about 2 hours\",\"where\":\"at the customer's place\",\"money\":\"nothing taken, or the full price when booking, Sam's choice (the sign-up example pays it in full)\"},{\"name\":\"Dead animal removal\",\"price_kind\":\"from the list\",\"example\":\"$199, with the entry point checked\",\"length\":\"about 1 hour\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Attic cleanup and insulation\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for a small attic (droppings removed, insulation replaced)\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"money\":\"a 25% deposit once the quote is OK'd, where the state's caps allow ($160 in the example); the rest charged at DONE\"},{\"name\":\"Attic exclusion and repair\",\"price_kind\":\"quoted at the inspection, before any work\",\"example\":\"only the $89 inspection is promised\",\"length\":\"1 to 2 days\",\"where\":\"at the customer's place\",\"money\":\"card saved; a deposit where the state's caps allow; the rest charged at DONE\",\"note\":\"A signed service agreement with the exclusion guarantee (the example: 1 year on each sealed entry point).\"},{\"name\":\"Animal ID from a photo\",\"price_kind\":\"free\",\"example\":\"send a photo or a recording; a technician names the animal and says what the visit would be\",\"where\":\"by text, or at the desk\",\"money\":\"nothing taken, nothing after\"},{\"name\":\"By the hour\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour, 1-hour minimum\",\"where\":\"at the customer's place\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, added only when the customer asks\",\"example\":\"sealing a second entry point $160; a chimney cap $180; droppings cleanup of one room $120\"},{\"name\":\"Inspection fee\",\"price_kind\":\"one price\",\"example\":\"$89: the late-cancel and nobody-home fee when the owner confirms it, and owed when a quoted job isn't booked\",\"where\":\"not booked alone as a fee\"},{\"name\":\"Photo and plan services at the desk (Lee Wildlife Desk)\",\"price_kind\":\"one price by service, from photos, or at the counter\",\"example\":\"animal ID from photos $35, entry point photo check $40, deterrent advice $20, nest and den check $25, exclusion plan $55, wildlife-proofing plan $140, attic damage check from photos $90, a complex case priced at the counter after a $25 look\",\"where\":\"at the desk; no animal, alive or dead, is ever brought in\",\"money\":\"nothing taken; paid at the counter\"}],\"capacity\":\"One technician for trapping, ID and checks. Two for exclusion and cleanup. The desk needs one person at the counter.\",\"nobody_home\":\"The first visit needs an adult at home. A trap check outside or on the roof, with no need to enter the home, can be done with nobody home, and DONE comes with a photo.\",\"online\":\"No removal by video or phone. A photo or recording ID is free by text.\",\"not_offered\":\"Pest control, poison baits, bears, deer, big cats, coyotes, venomous snakes, stray or lost pets, and any animal that is sick or hurt (animal control).\",\"season\":\"Spring and summer: young animals may be in the nest. Bats: no exclusion while young can't fly, where the state sets a season. Nesting birds: no removal of an active nest.\"}",
+ "questions_before_times": [
+  "What you saw or heard: scratching, droppings, a smell, or the animal itself",
+  "Where: the attic, a wall, the chimney, a crawl space, the garage, a vent or the yard",
+  "Since when, and whether it is day or night",
+  "Whether young animals might be there (spring and summer)",
+  "Any holes you can see, and the roof's height",
+  "Own or rent: the landlord's OK for exclusion and repairs",
+  "At the desk: which photos or recordings you have"
+ ],
+ "safety_stop": [
+  "someone bitten or scratched by a wild animal",
+  "a bat in a room where someone slept, or near a child or pet",
+  "an animal that is sick, hurt or acting aggressive",
+  "a bear, a coyote, a big cat or another dangerous animal",
+  "a venomous snake",
+  "a gas smell",
+  "smoke or fire",
+  "a roof or attic floor that isn't safe"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "photos",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Yes, where the state's form says so (nearly every state): a nuisance wildlife control license or permit for the company and for each technician who traps or removes animals. Extra permits can apply to protected species (bats, nesting birds), to moving or releasing animals, and to animals that carry rabies. Exclusion work that repairs a building can need a contractor registration where the state requires one. The desk (reading photos) needs a business registration only.",
+ "staff_skills": "[\"Trapping and removal (a licensed wildlife control technician)\",\"Exclusion and sealing, with roof and ladder work (a crew of two)\",\"Attic cleanup and insulation\",\"Bat work, outside the protected season only\",\"Desk work: naming animals from photos and recordings\"]",
+ "messages_never": "[\"Gate or lock codes, and where a key is kept\",\"Card details\",\"Photos from inside the home. The report and photos open on the secure page.\",\"A bite, a scratch or an exposure, and any health reason. Those go on the secure page only.\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/wildlife+and+animal+removal",
+  "pexels": "https://www.pexels.com/search/wildlife%20and%20animal%20removal/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

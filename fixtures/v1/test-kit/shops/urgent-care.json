@@ -1,0 +1,129 @@
+{
+ "id": "urgent-care",
+ "name": "Urgent care clinic",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Urgent care clinic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Urgent Care",
+   "staff": "Marcus (physician assistant) and Nadia (nurse practitioner), with the front desk",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Urgent care visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a time this morning, about 11:00am; sicker patients may go first. Nothing is taken. The desk checks Alex's plan by hand, and Alex pays the $35 copay at the front desk (self-pay: $150). A test added in the room is paid there too, and a balance after the plan pays is billed by the clinic its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Care",
+   "staff": "Ravi (nurse practitioner, on call) and Luis (physician assistant, the backup), who drive out with a kit",
+   "customer": "Alex M. (patient, at home) · other patients",
+   "arrive": "window",
+   "cutoff": null,
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a house call sent now, Ravi on call. Nothing is taken. The office bills Alex's plan its own way, then Alex for any share.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same house call, paid by Alex: $179 on the price list. Nothing is taken, and Rosie texts the bill when Ravi texts DONE. A hotel visit for a traveler runs the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a saved spot in today's line at the clinic: an estimated time, not an appointment, and sicker patients are seen first; walk-ins join the same line; tests or treatment are added in the room from the price list, with the patient's yes first; a house call or hotel visit is sent now with an arrival estimate, or booked in an arrival window; a video visit",
+ "questions_before_times": [
+  "for you, your child, or someone you help",
+  "new or returning patient",
+  "which visit: the clinic's own visit types only (illness or injury, a test, a physical, a video visit), never a symptom typed into the AI",
+  "a health plan (its name only) or paying yourself",
+  "for a house call: the address, inside the travel area"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, stroke signs (a drooping face, a weak arm, trouble speaking, a sudden severe headache), heavy bleeding, fainting or a seizure, or someone who can't wake up",
+  "swallowed something poisonous, or too much of a medicine",
+  "thoughts of harming themselves"
+ ],
+ "first_steps": [
+  "Health forms and consent",
+  "The plan check",
+  "A written price estimate for self-pay patients"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "sentnow",
+  "results",
+  "extrawork",
+  "children",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  }
+ },
+ "license": "always: each clinician (physician, physician assistant, nurse practitioner, nurse) holds their own active license from the state's board",
+ "staff_skills": "every clinician on shift sees illness and injury visits; stitches and X-ray reads by the clinicians trained for them; only clinicians cleared for house calls go out with the mobile kit",
+ "messages_never": "texts to the patient carry only the clinic's name, the date, the estimated time, the address and a secure link: never the visit type, the plan, symptoms, medicines, the reason, results or children's details; the mobile clinician's first name stays in house-call texts, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/urgent+care+clinic",
+  "pexels": "https://www.pexels.com/search/urgent%20care%20clinic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

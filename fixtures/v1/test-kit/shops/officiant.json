@@ -1,0 +1,210 @@
+{
+ "id": "officiant",
+ "name": "Wedding officiant",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "planner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Wedding officiant",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Wedding officiant",
+   "staff": "Ines and Ben (officiants at the studio)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Ceremony at the studio (15 minutes)",
+     "price": "$250",
+     "deposit": "$50",
+     "rest": "$200",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: a 15-minute ceremony in the studio room, $250. A $50 deposit now, and the $200 rest paid at the studio.",
+     "due_now_at_booking": 50,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Ceremony meeting (1 hour)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A $150 ceremony meeting (1 hour). A card is saved for the studio's $25 late-cancel fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free first call (20 minutes)",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The free first call (20 minutes) with the officiant: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Vow-writing session (1 hour)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$25",
+     "story": "A $150 vow-writing session (1 hour), paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Custom ceremony (quoted first)",
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A custom ceremony quoted after the free first call: $600, with a $150 deposit now and the $450 rest on the bill after the ceremony.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Wedding officiant",
+   "staff": "Ruth and Omar (officiants on the day)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Wedding ceremony at a venue (30 minutes)",
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a 30-minute wedding ceremony at Cedar Hill Farm, $450. A $150 deposit holds the date, and the $300 rest is charged to the saved card when the ceremony is done.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Elopement ceremony (20 minutes)",
+     "price": "$300",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$300",
+     "fee": "$50",
+     "story": "An elopement ceremony (20 minutes) at a park, $300, paid in full when booking.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Rehearsal (45 minutes at the venue)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A rehearsal at the venue (45 minutes), $150. Nothing is taken to book; the bill comes after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Custom ceremony (quoted first)",
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A custom ceremony with two places, quoted after the free first call: $600, with a $150 deposit now and the $450 bill after the ceremony.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Ceremonies' own list)\":[{\"service\":\"Wedding ceremony at a venue (30 minutes, one officiant)\",\"price kind\":\"one price\",\"price\":\"$450, travel within 25 miles included\",\"length\":\"30 minutes, plus 30 minutes to set up\",\"place\":\"at a venue, a home or outdoors\",\"before\":\"a $150 deposit that holds the date\",\"after\":\"the $300 rest charged to the saved card when the officiant texts DONE\",\"note\":\"The ceremony agreement is signed first. The marriage license comes from the county, where the state requires one.\"},{\"service\":\"Rehearsal (45 minutes, at the venue)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"45 minutes\",\"place\":\"at the venue\",\"before\":\"nothing taken to book\",\"after\":\"the bill texted after the rehearsal\",\"note\":\"Booked with the wedding or on its own.\"},{\"service\":\"Elopement ceremony (20 minutes, a small group, at a park or a home)\",\"price kind\":\"one price\",\"price\":\"$300\",\"length\":\"20 minutes\",\"place\":\"at a park or a home\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\",\"note\":\"Outdoors, the weather rule applies.\"},{\"service\":\"Custom ceremony (more than one part, a faith or cultural order, or two places), quoted first\",\"price kind\":\"quoted after a free call\",\"price\":\"the quote (the example: $600 for a longer ceremony with two readings)\",\"length\":\"the ceremony's length, plus set-up\",\"place\":\"as booked\",\"before\":\"a signed agreement, then a $150 deposit that holds the date\",\"after\":\"the $450 rest on the bill after the ceremony, texted by Rosie\",\"note\":\"Over $500, the owner OKs the quote first.\"},{\"service\":\"Extra hour on the day (one more hour, added at the ceremony)\",\"price kind\":\"one price, per hour\",\"price\":\"$150 (the example)\",\"length\":\"one hour\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"paid at the visit or on the bill (D91)\",\"note\":\"Added on the day only with both partners' written yes, at the rate shown before booking.\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 25 miles; $40 from 25 to 50 miles; farther, quoted first\",\"place\":\"at the customer's place\",\"before\":\"in the quote or the list price\",\"after\":\"with the rest\"}],\"at the business (the example: Lee Vow Studio's own list)\":[{\"service\":\"Ceremony at the studio room (15 minutes, for a couple and up to 10 guests)\",\"price kind\":\"one price\",\"price\":\"$250\",\"length\":\"15 minutes\",\"place\":\"at the studio\",\"before\":\"a $50 deposit\",\"after\":\"the $200 rest paid at the studio\"},{\"service\":\"Ceremony meeting (1 hour, at the studio or on video)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"1 hour\",\"place\":\"at the studio or by video\",\"before\":\"a card saved for the studio's $25 late-cancel fee\",\"after\":\"paid at the studio\"},{\"service\":\"Vow-writing session (1 hour, one to one)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"1 hour\",\"place\":\"at the studio or by video\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Free first call (20 minutes, phone or video)\",\"price kind\":\"free\",\"price\":\"free\",\"length\":\"20 minutes\",\"place\":\"by phone or video\",\"before\":\"nothing taken\",\"after\":\"nothing\"},{\"service\":\"Custom ceremony (quoted after the free first call)\",\"price kind\":\"quoted after a free call\",\"price\":\"the quote (the example: $600)\",\"length\":\"about 60 min\",\"place\":\"at the studio or a venue\",\"before\":\"a $150 deposit\",\"after\":\"the $450 rest on the bill after the ceremony\"}]}",
+ "questions_before_times": [
+  "What it's for: a wedding, a small or elopement ceremony, a vow renewal, or a custom ceremony",
+  "The date and the start time, and how long the ceremony should run",
+  "Where: a venue, a home, a park or the studio, and the town only (for the travel fee)",
+  "How many guests, and indoors, outdoors, or both (an outdoor ceremony has a weather rule)",
+  "Whether they want a rehearsal, extra time, or a custom ceremony"
+ ],
+ "safety_stop": [
+  "Someone says they are being made to marry, or is scared to say no",
+  "Someone under the state's age to marry is named as one of the couple",
+  "Someone can't say what they want, or says they didn't agree"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "firststeps",
+  "forms",
+  "extrawork",
+  "video",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "No state license to perform a wedding in most places. Many states ask an officiant to hold a credential: an ordination, a registration with the county, or a state officiant's card. The state's form says which applies; the business says what it holds.",
+ "staff_skills": "[\"Wedding ceremonies\",\"Elopements\",\"Custom ceremonies\",\"Vow writing\",\"Rehearsals\"]",
+ "messages_never": "Health, access and family notes, the venue's codes, any minor's name, and anything about a ceremony that could hurt someone stay on the secure page and the officiant's job link, never in a text to the couple, the owner or the staff. A text says only 'a note is on the page'.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/wedding+officiant",
+  "pexels": "https://www.pexels.com/search/wedding%20officiant/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

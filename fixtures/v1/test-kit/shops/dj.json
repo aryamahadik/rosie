@@ -1,0 +1,202 @@
+{
+ "id": "dj",
+ "name": "DJ",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "photographer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] DJ",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "DJ",
+   "staff": "Mira and Jalen (DJ instructors)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "DJ starter session",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 DJ starter session (2½ hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Mixing lesson",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 mixing lesson. A card is saved for the studio's $20 fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Mixing lesson",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 mixing lesson for a returning student. Nothing is taken: a YES books it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 private lesson (60 minutes), paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom mix",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom mix for a dance routine, priced from the song list at $90. Booked once Sam OKs it, and paid at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "DJ",
+   "staff": "Kayla and Marcus (DJs)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Birthday party DJ",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a 2-hour birthday party, quoted from Alex's plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit holds the date, and the $480 rest goes on the saved card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Birthday party DJ",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A company party, quoted from the plan at $640 (over $500, so Sam OKs it). Both sign the contract, a $160 deposit holds the date, and the rest, with any overtime, goes on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Kids' party",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 kids' party (2 hours). A $40 deposit now, and the $110 rest on the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Kids' party",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The $150 kids' party, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Sound & Light's own list)\":[{\"service\":\"Party DJ (DJ and MC, sound, dance lights, a wireless mic)\",\"price kind\":\"quoted from the plan first (the date, hours, venue, guests and rooms)\",\"price\":\"the quote (the example: $640 for a 2-hour party with a patio speaker)\",\"length\":\"the party's hours, plus 90 minutes to set up\",\"place\":\"at the venue or a home\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"Only lead DJs play a party with an MC.\"},{\"service\":\"Wedding DJ (ceremony, cocktail hour and reception, 6 hours)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"6 hours, plus setup\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 30% retainer\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"The owner OKs every wedding. One wedding a day per lead DJ, booked up to 18 months ahead.\"},{\"service\":\"Company party\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"the event's hours\",\"place\":\"at the venue or the office\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"Rosie texts the bill after, with any overtime on it\"},{\"service\":\"Kids' party DJ (2 hours, clean music and games)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"2 hours\",\"place\":\"at a home or a hall\",\"before\":\"the full price, or a $40 deposit\",\"after\":\"nothing more, or the $110 rest on the saved card at DONE\",\"note\":\"A parent books. Clean edits only. A late cancel or no-show keeps at most $40 (the deposit, or a $40 fee from the full price), only if the owner confirms; the rest is refunded.\"},{\"service\":\"Ceremony sound (mics and a speaker for vows or speeches)\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"1 hour, plus setup (2 hours held)\",\"place\":\"at the venue\",\"before\":\"booked alone: a $40 deposit; with a wedding: in the wedding's quote\",\"after\":\"booked alone: the rest on the saved card at DONE; with a wedding: with the wedding\",\"note\":\"Booked alone for a small ceremony, or added to a wedding\"},{\"service\":\"Second-room DJ (add-on)\",\"price kind\":\"by person\",\"price\":\"$199 with Marcus, $249 with Sam\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\"},{\"service\":\"Uplighting and dance lights (Lee Lighting)\",\"price kind\":\"one price, or per hour\",\"price\":\"8 uplights $149; dance floor lights $189; a lighting tech $120 an hour\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\",\"note\":\"Set up on the circuits the venue names\"},{\"service\":\"Overtime on the night\",\"price kind\":\"per hour, by the half hour\",\"price\":\"$160 an hour with Kayla, $120 with anyone else (the example)\",\"length\":\"30 or 60 minutes\",\"place\":\"at the event\",\"before\":\"nothing: asked on the night\",\"after\":\"one pay link after, or on the bill\",\"note\":\"Only with the customer's written yes, at the rate shown before booking, and never past the venue's music curfew\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 15 miles; $89 from 15 to 25 miles (the travel area)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"added to the quote or the deposit\",\"after\":\"with the rest\"},{\"service\":\"Bar night (a regular DJ night at a bar or restaurant)\",\"price kind\":\"one price, on a plan\",\"price\":\"$179 a night (the example)\",\"length\":\"3 hours\",\"place\":\"at the bar\",\"before\":\"a card saved\",\"after\":\"on a plan: one bill a month, or the saved card billed on the 1st, with notice the day before\",\"note\":\"Skip, pause or end by text; a price change gets 30 days' notice\"}],\"at the business (the example: Lee DJ Studio's own list)\":[{\"service\":\"DJ starter session (one to one, on the decks, gear provided)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours\",\"place\":\"at the studio\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\"},{\"service\":\"Mixing lesson\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the studio\"},{\"service\":\"Private lesson\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Party speaker rental (a speaker, a mic and a stand, one night)\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"a 30-minute pick-up with a how-to; back by noon the next day\",\"place\":\"picked up at the studio\",\"before\":\"a card saved, and the rental agreement signed\",\"after\":\"paid at pick-up\",\"note\":\"A card is also saved for a $100 damage fee, charged only with the owner's yes after the speaker is checked back in\"},{\"service\":\"Kids' DJ lesson (12 and under)\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\",\"note\":\"A parent books and stays\"},{\"service\":\"Song edit (a first dance or an entrance song cut to length)\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"15 min\",\"place\":\"at the studio\",\"before\":\"nothing\",\"after\":\"paid at the studio\"},{\"service\":\"Custom mix (for a dance routine or a wedding entrance)\",\"price kind\":\"quoted from the song list first\",\"price\":\"the quote (the example: $90)\",\"length\":\"a 30-minute listen at the studio\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\"},{\"service\":\"Home lesson (the instructor brings a controller)\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same lesson, booked in flow B\"},{\"service\":\"4-lesson course (mixing basics, four 60-minute lessons with one instructor)\",\"price kind\":\"one price\",\"price\":\"$200\",\"length\":\"four 60-minute lessons, the times picked together\",\"place\":\"at the studio\",\"before\":\"the full price, or a signed proposal after a starter session\",\"after\":\"nothing more; each lesson uses one from the course\",\"note\":\"A cancel period applies only where the state form says so\"}],\"capacity\":\"One booking per DJ at a time. A wedding books the lead DJ, any second DJ and the lighting tech together. The studio's practice booth holds one lesson at a time.\",\"nobody needs to be home\":\"Never: someone from the event is there. Gear is set up early only with the venue's OK and a venue contact there.\",\"online\":\"A planning call can be a video call. Lessons are in person.\",\"plans\":[\"Mixing lesson every 4 weeks (the studio): the same day and time, $35 a visit, a card saved for the $20 fee, paid at the studio after each visit\",\"Yearly kids' party (DJ work): $150 a visit, each booked and paid like a single one\",\"Bar night (DJ work): one bill a month, or the saved card billed on the 1st\",\"Every plan: skip, pause or end by text; a price change gets 30 days' notice\"]}",
+ "questions_before_times": [
+  "The kind of event: a party, a wedding, a company or school event",
+  "The date, and the start and end time",
+  "The venue's name and town (for the travel fee), and indoors, outdoors or both",
+  "About how many guests (it sets the sound system)",
+  "Add-ons: uplighting, a second room, ceremony sound",
+  "At the studio: the lesson and the level, or the rental night"
+ ],
+ "safety_stop": [
+  "Someone hurt, a fire, or a fight at the venue right now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "None for DJ work in most places. A local business license where the city or county asks for one: from the state form.",
+ "staff_skills": "[\"Weddings and MC work (leads only)\",\"Parties and company events\",\"Kids' parties\",\"Lighting\",\"Lessons\",\"Rentals\"]",
+ "messages_never": "Gate codes, access notes, a child's details and family notes stay on the secure page. The do-not-play list and the timeline stay on the music form. Texts to the DJ carry none of them either.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dj",
+  "pexels": "https://www.pexels.com/search/dj/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,182 @@
+{
+ "id": "limo",
+ "name": "Limo, chauffeur and party bus",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "rentals",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Limo, chauffeur and party bus",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Limo, chauffeur and party bus",
+   "staff": "Hugo and Lina (desk)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Brewery tour seat (21+)",
+     "price": "$69",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$69",
+     "fee": "$20",
+     "story": "The main story: a brewery tour seat from the garage lot, $69, paid in full when booking.",
+     "due_now_at_booking": 69,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Free vehicle viewing",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free vehicle viewing at the garage: nothing taken, nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Limo, chauffeur and party bus",
+   "staff": "Marco and Dev (chauffeurs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Wedding stretch limo, 4 hours",
+     "price": "$720",
+     "deposit": "$180",
+     "rest": "$540",
+     "paid_now": null,
+     "fee": "$180",
+     "story": "The main story: a wedding stretch limo, 4 hours: $720 with the 20% gratuity. A 25% deposit ($180) with the contract; the $540 rest is charged to the saved card when Marco texts DONE.",
+     "due_now_at_booking": 180,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Airport transfer, flat",
+     "price": "$125",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "An airport transfer, $125 flat: a card saved for a $60 late-cancel fee; the $125 charged when the chauffeur texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Prom package",
+     "price": "$850",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$850",
+     "fee": "$150",
+     "story": "A prom package, $850, paid in full when the parent signs and books.",
+     "due_now_at_booking": 850,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Custom party bus night",
+     "price": "$1200",
+     "deposit": "$300",
+     "rest": "$900",
+     "paid_now": null,
+     "fee": "$300",
+     "story": "A custom party bus night, quoted from the route at $1,200: a $300 deposit with the contract, the $900 rest charged to the saved card at DONE.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "event: a vehicle and a chauffeur for a date and a span of hours, along a route of a pickup, stops and a drop-off; hourly with a minimum, or a flat transfer; the vehicle is the capacity, with a chauffeur licensed for it. Flow A: tour seats from the company's own lot, and a free vehicle viewing",
+ "questions_before_times": [
+  "the date, the pickup time, and how many hours (or one way)",
+  "the kind of trip: a wedding, a prom, a birthday, an airport ride, a night out, a funeral",
+  "how many passengers (it sets the vehicle)",
+  "the pickup town and kind of place, the stops, and the last drop-off",
+  "whether any passenger is under 21 (no alcohol on the trip) or under 18 (the prom rules, car seats)",
+  "for an airport pickup: the flight number"
+ ],
+ "safety_stop": [
+  "someone hurt or in danger right now"
+ ],
+ "first_steps": [
+  "Signed contract",
+  "Prom agreement",
+  "Final passenger count and itinerary",
+  "Flight number",
+  "Vehicle viewing"
+ ],
+ "facts": [
+  "documents",
+  "photos",
+  "extrawork",
+  "forms",
+  "groups",
+  "children"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7 days before"
+  }
+ },
+ "license": "where the state's or the local for-hire authority's rules require it: a for-hire passenger carrier permit for the business (a livery, limousine or charter-party permit), each vehicle registered and inspected for for-hire use; a business registration everywhere",
+ "staff_skills": "sedan and SUV, stretch limo, party bus, airport meet and greet, weddings, proms (two years with the company, its own rule), funerals",
+ "messages_never": "a prom passenger list, ages, a child's details, a passenger's health or accessibility needs and any money details never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/limo+chauffeur+and+party+bus",
+  "pexels": "https://www.pexels.com/search/limo%2C%20chauffeur%20and%20party%20bus/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

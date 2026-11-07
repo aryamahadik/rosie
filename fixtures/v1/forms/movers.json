@@ -1,0 +1,1048 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "movers",
+  "name": "Movers",
+  "type": "project",
+  "started_from": "contractor"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "firststeps",
+  "documents",
+  "extrawork",
+  "photos",
+  "video"
+ ],
+ "switches": [
+  "cancelright"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|counter",
+   "paths": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "visit|none|bill",
+   "paths": [
+    "visit|none|bill",
+    "visit|none|own",
+    "photos|deposit|bill",
+    "list|card|card",
+    "list|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Vault visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Vault visit, $35 at the warehouse; a card saved for the $20 missed-visit fee; paid at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Vault visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Vault visit, $35; nothing taken; a YES books it; paid at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Vault load-in",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "Vault load-in, $55, paid in full when booking."
+  },
+  {
+   "flow": "A",
+   "path": "list|deposit|counter",
+   "name": "Pack-out help",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": "$40",
+   "rest": "$100",
+   "paid": null,
+   "fee": "$40",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Pack-out help, $140 (up to 2½ hours); a $40 deposit now; the $100 rest at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "photos|card|counter",
+   "name": "Custom crate",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A custom crate priced from Alex's photos at $90, OK'd by Sam; a card saved for the $20 fee; paid at the counter."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|bill",
+   "name": "Household move",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "free",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "Household move: the in-home survey is free, nothing taken; Tomás's written estimate of $3,390; signed, with a $200 deposit; the $3,190 balance on the bill Rosie texts at delivery, before unloading."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|own",
+   "name": "Household move",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "free",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The same move, but Sam takes the deposit and the balance his own way, like a certified check at the door; Rosie sends nothing about money."
+  },
+  {
+   "flow": "B",
+   "path": "photos|deposit|bill",
+   "name": "Piano move",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": "$160",
+   "rest": "$480",
+   "paid": null,
+   "fee": "$160",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "An upright piano move priced from photos at $640 (over $500, so Sam OKs it); a signed estimate; a 25% deposit of $160; the $480 rest on the bill at delivery."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Loading help",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "Loading help, 2 movers for up to 2 hours, $179 from the list; a card saved for the $89 late-cancel fee; $179 charged when Tomás texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Single-item move",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": null,
+   "rest": null,
+   "paid": "$150",
+   "fee": "$89",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A single-item move in town, $150, paid in full when booking (Lee Storage's $75 delivery from a vault is paid the same way)."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "In-home survey",
+   "price": "free",
+   "kind": null,
+   "length": "about 45 minutes",
+   "where": "at the customer's home (or by live video, which counts as at the business)",
+   "before": "nothing taken",
+   "after": "nothing billed"
+  },
+  {
+   "name": "Household move",
+   "price": "quoted after the survey: a written estimate (the example's kind: not-to-exceed, so the customer pays the estimate or less if the load weighs less)",
+   "kind": null,
+   "length": "one day for the example's 90 miles; long-distance moves run several days, with a delivery window",
+   "where": "from one address to another",
+   "before": "nothing at booking the survey; a deposit when the estimate is signed (the example: $200, credited to the move)",
+   "after": "the balance at delivery, before unloading, on the bill Rosie texts (pay link, the crew chief's phone, or a certified check)"
+  },
+  {
+   "name": "Piano move",
+   "price": "priced from photos (example: $640); over $500, Sam OKs it",
+   "kind": null,
+   "length": null,
+   "where": "from one address to another",
+   "before": "a signed estimate, then a 25% deposit",
+   "after": "the rest on the bill at delivery"
+  },
+  {
+   "name": "Loading help",
+   "price": "$179 from the list: 2 movers for up to 2 hours, loading or unloading the customer's own truck or container (the example's own price)",
+   "kind": null,
+   "length": null,
+   "where": "at the customer's place",
+   "before": "a card saved for the $89 late-cancel fee",
+   "after": "charged to the saved card when the crew chief texts DONE"
+  },
+  {
+   "name": "Single-item move",
+   "price": "$150 from the list (the example's own price)",
+   "kind": null,
+   "length": null,
+   "where": "in town",
+   "before": "paid in full when booked",
+   "after": "nothing more"
+  },
+  {
+   "name": "Photo inventory",
+   "price": "$199: every item photographed and listed before the move, for the customer's own insurance; the report is ready 2 days later",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Stairs",
+   "price": "$90 a flight, at either end, in the estimate",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Packing",
+   "price": "optional, priced per box in the estimate",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Taking apart and rebuilding, wrapping, crating",
+   "price": "priced per item in the estimate; a crate is built at the warehouse",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Full value protection",
+   "price": "priced in the estimate (the example: $9 for each $1,000 declared); the basic coverage the rules allow instead only with the customer's signed choice",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Junk hauling (Lee Hauling)",
+   "price": "its own plug-in: a curbside haul-away needs nobody home",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Vault visit",
+   "price": "$35, 30 minutes: a dock hand brings the customer's storage vault down to the dock",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse; or a delivery from the vault to the customer's home for $75, paid in full when booked",
+   "before": "a card saved for the $20 missed-visit fee",
+   "after": "paid at the warehouse counter"
+  },
+  {
+   "name": "Evening vault visit",
+   "price": "$40, after 5pm",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": "a card saved",
+   "after": "at the counter"
+  },
+  {
+   "name": "Photo list",
+   "price": "$20, an add-on: every item in the vault photographed and listed",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Corner guards",
+   "price": "$15, an add-on at a crate pickup",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Box drop-in",
+   "price": "$25: up to 5 boxes added to the vault at the dock",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Vault load-in",
+   "price": "$55, 60 minutes: the crew unloads the customer's car or van into a vault",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": "paid in full when booked",
+   "after": "nothing more"
+  },
+  {
+   "name": "Pack-out help",
+   "price": "$140, up to 2½ hours: the crew loads the customer's truck from the vault",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": "the $40 fee held (over 2 hours), or a $40 deposit",
+   "after": "at the counter"
+  },
+  {
+   "name": "Custom crate",
+   "price": "priced from photos (example: $90); Sam OKs each one",
+   "kind": null,
+   "length": null,
+   "where": "built at the warehouse",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Odd-size crate",
+   "price": "priced at the dock after a $25 look",
+   "kind": null,
+   "length": null,
+   "where": "at the warehouse",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "From and to: the town at each end",
+   "Home size: bedrooms, plus any storage, basement or garage",
+   "Floors at each end: stairs, an elevator, a loading dock",
+   "Heavy or special items: a piano, a safe, gym gear, art",
+   "Packing: you, us, or some of each",
+   "The move date, and how flexible it is"
+  ],
+  "after_time": [
+   "How far the truck can park from each door",
+   "Building rules at each end: insurance proof, elevator booking, move hours",
+   "Anything that must come apart, like a bed or a desk",
+   "Anyone else who will be there to sign"
+  ],
+  "secure_page_only": [
+   "Both street addresses",
+   "Door, gate or building codes",
+   "Declared value for full value protection",
+   "A private booking: the reason is never asked"
+  ],
+  "who_may_book": "An adult moving their own things, or someone they name. The home's owner isn't asked: a move takes the customer's own things."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "someone in danger right now, a fire, a gas smell",
+    "says": "Get to safety and call 911.",
+    "booking": "no booking in that chat"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "unsafe at home, leaving a partner, afraid someone will find out about the move",
+    "says": "If you're in danger now, call 911. For private help any time, call the National Domestic Violence Hotline: 1-800-799-7233.",
+    "booking": "goes on, marked private: texts only to the customer's own mobile, both addresses shown only to the crew and Sam, nobody else on the booking told without the customer's yes"
+   }
+  ],
+  "business_line": "Questions about what coverage to pick, or what a claim is worth, go to the business's own line: Rosie never explains coverage itself",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Survey: open closets, storage, the basement and the garage, so nothing is missed",
+   "Move day: pack and tape boxes, empty drawers, defrost the fridge",
+   "Save a parking spot for the truck, as close to the door as you can",
+   "Keep valuables, papers and medicine with you"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "licenses_or_certificates": "No trade license per person. A driver whose truck's weight needs one gives a commercial driver's license, checked like a license.",
+  "who_oks": "Sam OKs estimates and revised estimates over $500; Pat may OK them too, and Sam's answer wins. Fees and refunds are Sam's alone.",
+  "roles": "Crew chiefs (Tomás, Andre): surveys, estimates and running a move, each with a crew of 3. Dock hands (Nico, Wes) at the warehouse.",
+  "crews": "A move books a crew chief, a crew of a set size and a truck together. A crew chief out sick: Sam swaps in the other crew, and the customer is told."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult moving their own things, or someone they name. The home's owner isn't asked: a move takes the customer's own things.",
+  "minors_texts": "Never booked by a minor; an adult signs at each end"
+ },
+ "visit": {
+  "check_in": "Survey: the check-in code at the door. Move day: that day's own code at the pickup door. Warehouse: the code at the desk, with a photo ID.",
+  "done": "DONE when the truck is at the new door with the weigh tickets, so the balance bill goes out; the delivery receipt closes the move",
+  "changes_at_visit": "More goods or services than the estimate: a revised estimate, signed before loading, or the extra stays behind. After loading, no new estimate."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "always for household moves: the company's carrier authority. Moves across state lines need the federal household goods authority (a USDOT number, plus the federal mover number); moves inside one state need that state's mover permit, where its form has one",
+  "who": "The business. Crew members hold no trade license; a driver gives a commercial driver's license only where the truck's weight requires one.",
+  "ask": [
+   "The company's USDOT number, and its federal mover number for moves across state lines",
+   "The state's mover permit or household goods number, where the state's form asks for one",
+   "Cargo and liability insurance, as the state's form asks",
+   "Junk hauling: the hauler's permit, where the city's or state's form asks for one"
+  ],
+  "background": "Background checks for crew who enter homes: the owner's choice, or where the state's form asks"
+ },
+ "never_in_a_text": [
+  "Street addresses: they stay on the secure page and the crew's day list",
+  "Door, gate and building codes",
+  "Declared values and the coverage picked",
+  "Why a booking is private"
+ ],
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.questions": [
+   "storage"
+  ],
+  "pf.first_steps": [
+   "before_estimate",
+   "after_signing",
+   "storage_prep"
+  ],
+  "pf.staff": [
+   "claims"
+  ],
+  "pf.license": [
+   "status_any_day",
+   "storage"
+  ],
+  "pf.messages": [
+   "show"
+  ],
+  "pf.visit": [
+   "at_the_survey",
+   "estimate",
+   "before_loading",
+   "inventory",
+   "weighing",
+   "delivery",
+   "warehouse_done"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

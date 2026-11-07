@@ -1,0 +1,156 @@
+{
+ "id": "laundry",
+ "name": "Laundry, dry cleaning and wash-and-fold pickup",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "tailor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Laundry, dry cleaning and wash-and-fold pickup",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Laundry, dry cleaning and wash-and-fold pickup",
+   "staff": "Dolores and Hiro (counter and pressing)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Wash and fold",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: 20 pounds of wash and fold, $35. Nothing is taken: a YES books the drop-off. Dolores weighs and tags it, texts READY, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Special-care items",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A silk dress and a suede jacket, priced at the counter before any cleaning. Nothing is taken. Alex says yes to the price, and pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Wedding gown cleaning",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A wedding gown cleaning, $140. A $40 deposit books the slot, and the $100 rest is paid at the counter at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Laundry, dry cleaning and wash-and-fold pickup",
+   "staff": "Mateo and Bao (drivers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Wash and fold pickup",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a pickup of 20 pounds of wash and fold, $35. A card is saved, with no fee. Mateo picks up the bags at the door, and the card is charged the ticket total when the order is delivered.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Wash and fold pickup",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A salon's towels, picked up and delivered on account. Nothing is taken when it books, and Rosie texts the bill after the delivery.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: clothes left at the counter, or picked up at the door, then counted, tagged and cleaned, and READY to pick up or delivered back; pickups can repeat on one chosen day\",\"examples\":\"the example shop's own prices, not a standard\",\"list\":[{\"name\":\"Wash and fold\",\"price\":\"$1.75 a pound, 10-pound minimum ($17.50); the example order of 20 pounds is $35\",\"kind\":\"one price from the list, per pound, weighed in front of the customer at the counter, or at the plant for a pickup\",\"length\":\"ready next business day by 5pm when dropped by noon; same day for +$10 when dropped by 9am (the rush is in the price shown before the yes)\",\"place\":\"at the counter, or by pickup and delivery\",\"before\":\"nothing taken at the counter; a card saved for a pickup\",\"after\":\"paid at the counter at pick-up; for a pickup, the saved card is charged when the order is delivered\"},{\"name\":\"Dry cleaning, per item\",\"price\":\"shirt laundered and pressed $3.50, pants or skirt $8, jacket $9, 2-piece suit $17, dress from $14 (the example shop's own prices); a winter coat $25\",\"kind\":\"one price from the list, per item\",\"length\":\"ready in 2 business days\",\"place\":\"at the counter, or by pickup and delivery\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Comforters and blankets\",\"price\":\"king comforter $40, queen comforter $30, blanket $20, bedding bundle (comforter, sheets and two pillowcases) $55\",\"length\":\"ready in 3 days\",\"place\":\"at the counter, or by pickup and delivery\"},{\"name\":\"Special-care items (silk, leather, suede, beading, drapes)\",\"price\":\"quoted at the counter, item by item, before any cleaning; leather and suede can be priced from photos first\",\"kind\":\"quoted at the visit\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Wedding gown cleaning\",\"price\":\"$140 for a standard gown; heavy beading, a long train or a preservation box is quoted at the counter first\",\"length\":\"4 to 6 weeks\",\"before\":\"a $40 deposit books the slot\",\"after\":\"the $100 rest at pick-up\"},{\"name\":\"Stain check\",\"price\":\"free, at the counter\",\"length\":\"while you wait\",\"before\":\"nothing taken\",\"after\":\"nothing\"},{\"name\":\"Pickup and delivery\",\"price\":\"free over $30; $5.99 under $30, inside the order total shown before the yes\",\"place\":\"at the customer's door, in a 2-hour window; bags left out; returned within 48 hours\",\"before\":\"a card saved, no fee\",\"after\":\"the saved card charged for the ticket total when the order is delivered\",\"note\":\"one time, or every week or 2 weeks on one chosen day (a repeat plan; each pickup is booked and paid like a single one)\"}],\"stains\":\"stain treatment is included and not guaranteed; stains are noted at intake\",\"turnaround\":\"wash and fold next business day; dry cleaning 2 business days; comforters 3 days; gowns 4 to 6 weeks; a pickup order is back within 48 hours\",\"included\":\"a free re-clean or re-press within 7 days, the item returned unworn\",\"capacity\":\"pounds a day at the plant (2,000 at the example shop) and stops per pickup window\",\"nobody_home\":\"yes for pickup and delivery: bags are left at the door or with a doorman, and the driver takes a photo\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "Drop-off at the counter, or pickup at the door",
+  "Wash and fold, dry cleaning, comforters or blankets, or a mix",
+  "About how many pounds or items",
+  "The date it's needed back, like an event (it sets which turnaround fits)",
+  "For a pickup: the town and the kind of place, a house or an apartment with a doorman",
+  "Any item soaked in gasoline, oil or thinner, with blood, or holding needles or sharp things: those stay out of the bag"
+ ],
+ "safety_stop": [],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "plans"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "7am the day of",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "none for laundry, wash and fold or dry cleaning in most places; the business registration, where the state asks for one; a dry cleaner that uses cleaning solvents holds the environmental registration or permit the state's rules require (solvent use and waste)",
+ "staff_skills": "[\"counter\",\"wash and fold\",\"spotting (stain work)\",\"pressing\",\"driving\"]",
+ "messages_never": "[\"A card number\",\"A building or door code\",\"A skin or allergy reason for fragrance-free\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/laundry+dry+cleaning+and+wash+and+fold+pickup",
+  "pexels": "https://www.pexels.com/search/laundry%2C%20dry%20cleaning%20and%20wash-and-fold%20pickup/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

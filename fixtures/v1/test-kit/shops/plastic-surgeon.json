@@ -1,0 +1,192 @@
+{
+ "id": "plastic-surgeon",
+ "name": "Plastic and cosmetic surgeon",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dermatologist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Plastic and cosmetic surgeon",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Plastics",
+   "staff": "Nadia (plastic surgeon) and Lucy (nurse practitioner)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "2 days before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient consult",
+     "price": "$250",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $250 new patient consult with Nadia. Nothing is taken at booking, and Alex pays at the front desk after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Post-op check",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free post-op check within 90 days of surgery. Nothing is taken, and there's nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Wound visit",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $140 wound visit. A card is saved for the $20 missed-visit fee, which the owner confirms before any charge, and Alex pays the visit at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Rhinoplasty (surgery day)",
+     "price": "$4800",
+     "deposit": "$1000",
+     "rest": "$3800",
+     "paid_now": null,
+     "fee": "$1000",
+     "story": "A surgery day quoted at $4,800. A $1,000 deposit now counts toward it, and the $3,800 rest is paid at the surgery center's front desk.",
+     "due_now_at_booking": 1000,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Recovery",
+   "staff": "Omar (registered nurse) and Theo (nurse practitioner), who see patients at home under Nadia's orders",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "2 days before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Post-op check at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $150 post-op check at Alex's home. A card is saved for the $89 missed-visit fee, and the card is charged when Omar texts DONE, after Alex says yes to the price.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Post-op check at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same visit billed to Alex's plan: nothing is taken, and the office bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types with set lengths, each with a surgeon or nurse practitioner by name; consults and post-op checks are billed to the plan or paid by the patient; cosmetic procedures are self-pay; a surgery day is quoted in writing first, with a deposit toward it; anything added at the visit needs the patient's yes first",
+ "questions_before_times": [
+  "new or returning patient",
+  "surgical or cosmetic",
+  "which visit: the office's own visit types only, never a body part or a symptom typed into the AI",
+  "a health plan (its name only) or paying yourself",
+  "for a video visit: the state the patient will be in",
+  "join the list for a sooner time"
+ ],
+ "safety_stop": [
+  "swelling of the face, lips, tongue or throat, or trouble breathing (for example after a new medicine, or after an anesthetic)",
+  "a leg that is swollen, painful and warm, or sudden chest pain or short breath after surgery",
+  "bleeding that won't stop after 20 minutes of firm pressure",
+  "a swallowed medicine, or too much of one"
+ ],
+ "first_steps": [
+  "Consent and health history",
+  "The plan check",
+  "A referral from the primary care doctor",
+  "A written quote for surgery and self-pay work",
+  "A consult before surgery"
+ ],
+ "facts": [
+  "planbill",
+  "firststeps",
+  "forms",
+  "results",
+  "video",
+  "aftercare",
+  "children",
+  "extrawork",
+  "waitlist",
+  "plans"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "2 days before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "the owner's word: each surgeon, nurse practitioner and physician assistant holds their own license, and the practice its registration, where the state's form asks; Rosie never looks a license up",
+ "staff_skills": "Nadia (plastic surgeon): consults, surgery days, cosmetic injections; Lucy (nurse practitioner): post-op checks, wound visits, and cosmetic injections where the state allows and the office lists them; Omar (registered nurse) and Theo (nurse practitioner): post-op home visits under Nadia's orders; the front desk: no clinical OKs",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the procedure, the plan, a referral, the reason, a body part, photos or results; flow A's texts drop the surgeon's name; at a home visit the clinician's name stays, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/plastic+and+cosmetic+surgeon",
+  "pexels": "https://www.pexels.com/search/plastic%20and%20cosmetic%20surgeon/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

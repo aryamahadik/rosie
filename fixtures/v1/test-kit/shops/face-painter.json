@@ -1,0 +1,224 @@
+{
+ "id": "face-painter",
+ "name": "Face painter",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "makeup",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Face painter",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Face painter",
+   "staff": "Kit and Bo (face painters at the studio)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Face-painting lesson (2 hours)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 face-painting lesson (2 hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Quick face design",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 quick face design. A card is saved for the studio's $20 no-show fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Quick face design",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 quick face design for a returning customer. Nothing is taken: a YES books it, and Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Full face design with glitter",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 full face design with glitter, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|full|none",
+     "price_kind": "Quoted from photos first",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Custom design from a photo",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$90",
+     "fee": "$20",
+     "story": "A custom design from a photo, quoted on the secure page at $90 and paid in full when booking. A late cancel keeps the $20 fee.",
+     "due_now_at_booking": 90,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Face painter",
+   "staff": "Nia and Bo (face painters at the party)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Party face painting (quoted, two painters)",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a birthday party for about 30 kids, two painters, quoted at $640 (over $500, so Sam OKs it). Both sign the agreement. A $160 deposit holds the date, and the $480 rest is charged to the saved card when the faces are done.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Party face painting (quoted, two painters)",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The same party, with the $160 deposit now and the $480 rest on the bill after the faces, with a tip line.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "One-painter visit (1 hour)",
+     "price": "$120",
+     "deposit": "$40",
+     "rest": "$80",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A one-painter visit at home, $120 from the list (one hour). A $40 deposit now, and the $80 rest charged to the saved card when the faces are done.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Kids' party face painting (2 hours)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "A kids' party face painting for two hours, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Face Painting's own list)\":[{\"service\":\"Kids' party face painting (2 hours, one painter, up to 20 faces)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"2 hours\",\"place\":\"at a home, a park or a hall\",\"before\":\"the full price, paid when booking\",\"after\":\"nothing more\",\"note\":\"A parent or another adult stays in the room the whole time. A late cancel or no-show keeps at most $40, only as the owner confirms; the rest is refunded.\"},{\"service\":\"Party face painting, quoted from the plan (two or three painters: the date, hours, guests and their ages)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote (the example: $640 for about 30 kids, two painters, two hours)\",\"length\":\"the party's hours, plus 30 minutes to set up\",\"place\":\"at a home, a park, a school or a venue\",\"before\":\"a signed agreement, then a 25% deposit that holds the date\",\"after\":\"the rest ($480 in the example) charged to the saved card when the painter texts DONE, or on the bill after the party\",\"note\":\"Over $500, the owner OKs the quote first.\"},{\"service\":\"School or company event (quoted, billed after)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote, with the same deposit rule\",\"length\":\"by the hour\",\"place\":\"at the venue\",\"before\":\"a signed agreement and a 25% deposit\",\"after\":\"the bill after the event, texted by Rosie\"},{\"service\":\"One-painter visit (1 hour, a small party)\",\"price kind\":\"one price\",\"price\":\"$120, travel within 10 miles included\",\"length\":\"1 hour\",\"place\":\"at a home or a park\",\"before\":\"a $40 deposit\",\"after\":\"the $80 rest charged to the saved card when the painter texts DONE\"},{\"service\":\"Second painter (added to a booking)\",\"price kind\":\"one price, per painter\",\"price\":\"$120\",\"length\":\"the same hours as the booking\",\"place\":\"at the same place\",\"before\":\"a card saved for the $40 fee\",\"after\":\"on the bill after the party\"},{\"service\":\"Glitter tattoos (the second kind of work: Lee Party Glitter)\",\"price kind\":\"one price, for a set number of guests\",\"price\":\"$60 for up to 10 guests (the example)\",\"length\":\"by the hour\",\"place\":\"where the party is\",\"before\":\"with the main booking\",\"after\":\"with the main booking\",\"note\":\"Only water-based glitter and a patch test for any guest with a known allergy, 24 hours before.\"},{\"service\":\"Extra painting time on the day (one painter, by the half hour)\",\"price kind\":\"per hour, for one painter\",\"price\":\"$60 an hour for one painter, $100 an hour for two (the example)\",\"length\":\"by the half hour\",\"place\":\"at the party\",\"before\":\"with the main booking\",\"after\":\"paid at the visit or on the bill (D91)\",\"note\":\"Added on the day only with the payer's written yes, and only if a painter is free before the end time.\"},{\"service\":\"Travel\",\"price kind\":\"travel fee, per painter\",\"price\":\"free within 10 miles; $40 a painter from 10 to 25 miles; farther, quoted first\",\"place\":\"at the customer's place\",\"before\":\"in the quote or the list price\",\"after\":\"with the rest\"}],\"at the business (the example: Lee Face Studio's own list)\":[{\"service\":\"Face-painting lesson (one to one, with a design card to keep)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2 hours\",\"place\":\"at the studio\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\"},{\"service\":\"Quick face design (one design, 20 minutes)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"20 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the studio's $20 no-show fee, or nothing for a returning customer\",\"after\":\"paid at the studio\"},{\"service\":\"Full face design with glitter (60 minutes)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Half-face design (about 30 minutes)\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the studio\"},{\"service\":\"Glitter add-on (with the main booking)\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"10 min\",\"place\":\"at the studio\",\"before\":\"with the main booking\",\"after\":\"paid at the studio\"},{\"service\":\"Kids' design at the studio (under 12: a parent books and stays)\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"20 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\",\"note\":\"A parent books and stays. No photo of a child without a parent's yes.\"},{\"service\":\"Custom design from a photo\",\"price kind\":\"quoted from the photo first\",\"price\":\"the quote (the example: $90)\",\"length\":\"about 60 min\",\"place\":\"at the studio\",\"before\":\"the full price, paid when booking\",\"after\":\"nothing more\"}]}",
+ "questions_before_times": [
+  "What it's for: a birthday, a school or shop event, a fair or festival, or a lesson",
+  "The date and the start and end time (the painting time is the party's hours)",
+  "Where: a home, a park, a school, a hall or another venue, and the town only (for the travel fee)",
+  "How many guests, and roughly their ages (it sets how many painters and how long)",
+  "Indoors, outdoors, or both (an outdoor party has a weather rule)",
+  "Add-ons: a second painter, glitter tattoos, extra time"
+ ],
+ "safety_stop": [
+  "A reaction now: swelling of the face, lips or throat, hives all over, or trouble breathing",
+  "Paint or glitter in the eye with pain or a change in sight"
+ ],
+ "first_steps": [],
+ "facts": [
+  "children",
+  "firststeps",
+  "forms",
+  "groups",
+  "documents",
+  "tips",
+  "extrawork",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "None for face painting in most places. A local business license where the city or county asks for one, and a permit for a public or outdoor event where the state's form or the venue asks for one.",
+ "staff_skills": "[\"Kids' parties\",\"School and event face painting\",\"Lessons\",\"Glitter tattoos\",\"Theme designs\"]",
+ "messages_never": "Allergies, skin conditions, past reactions, patch-test results and medical notes, and any child's name, age or notes, stay on the secure page and the painter's job link, never in a text to the host, the owner or the staff. A text says only 'a note is on the page'.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/face+painter",
+  "pexels": "https://www.pexels.com/search/face%20painter/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

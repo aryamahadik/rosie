@@ -1,0 +1,245 @@
+{
+ "id": "interior",
+ "name": "Interior designer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Interior designer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Interior designer",
+   "staff": "Mira and Cora (studio designers)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Sample review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Sample review, $35 at the studio on a Saturday morning; a card saved for the $20 missed-review fee; charged to the saved card when Mira texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Sample review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same sample review on a weekday: a card saved for the $20 fee; paid at the studio desk (a full-room studio session, $140, saves a card for its $40 fee the same way).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video design consultation",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$20",
+     "story": "Video design consultation, $150, paid in full when booking (e-design, $600, is paid the same way).",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Window treatment design",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Window treatment design priced from Alex's photos at $90, OK'd by Sam; a card saved; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom furniture design",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Custom furniture design, from $110, priced at the studio after a $25 consult; a card saved; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Interior designer",
+   "staff": "Nadia and Leo (designers)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "In-home design consultation",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$175",
+     "story": "Living room and kitchen design: the $175 in-home consultation, a card saved for the late-cancel fee; Nadia's written proposal; the agreement, a $2,400 retainer, a $1,200 change order; the last $3,600 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "In-home design consultation",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$175",
+     "story": "The same project, but Sam bills the retainer and the last payment the business's own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Color consultation",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$175",
+     "story": "Color consultation at home, $179 from the list; a card saved; Rosie texts the bill after (the lighting plan, $199, works the same way).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Furniture layout plan",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$75",
+     "story": "Furniture layout plan, $150, paid in full when booking (and the studio's $75 sample review at home).",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Room refresh",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A guest room refresh priced from photos at $640 (over $500, so Sam OKs it); a signed agreement; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "In-home design consultation",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$175",
+     "story": "The same project, but the saved card is charged at DONE, as the old example charged its consultation: only the $175 if Alex doesn't sign, or the last $3,600 at the walk-through.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consultation, then project: a design project is booked only after a written proposal and a signed design agreement\",\"B\":[{\"name\":\"In-home design consultation\",\"price\":\"$175 (the example business's own price), counted toward the design fee if Alex signs; a free first consultation is a starting option\",\"length\":\"about 2 hours\",\"where\":\"at the customer's home or office\",\"before\":\"a card saved, for the late-cancel or no-show fee\",\"after\":\"billed only if no design agreement follows; the owner may have the saved card charged at DONE instead (the old example charged its consultation fee to the saved card after the visit)\"},{\"name\":\"Design project (one or more rooms)\",\"price\":\"quoted after the consultation: a written proposal within 3 business days, good for 30 days (the example: a $4,800 flat design fee for a living room and kitchen)\",\"length\":\"about 12 to 16 weeks: measuring, a site meeting with the client's contractor, the design presentation, install day and the final walk-through\",\"where\":\"at the customer's place, with the presentation at the office\",\"before\":\"nothing more at booking; half the design fee as a retainer once the agreement is signed\",\"after\":\"the rest at the final walk-through, on the bill Rosie texts (or the business's own way)\"},{\"name\":\"Office design project\",\"price\":\"quoted the same way, after a $175 office consultation\",\"where\":\"at the client's office\",\"before\":\"the same as a home project\",\"after\":\"the same\",\"who\":\"only a designer whose license is on file as given, where the state's form requires one for business spaces\"},{\"name\":\"Sample review at home (Lee Sample Studio)\",\"price\":\"$75, paid in full when booked\",\"where\":\"at the customer's home: the studio designer brings the samples\",\"after\":\"nothing more\"},{\"name\":\"Color consultation\",\"price\":\"$179, from the list\",\"length\":\"90 minutes\",\"where\":\"at the customer's place\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill; the customer pays by link or with the saved card\"},{\"name\":\"Room refresh, one room\",\"price\":\"priced from the customer's photos and sizes (the example: $640); over $500, Sam OKs it\",\"length\":\"one styling day\",\"where\":\"at the customer's place\",\"before\":\"a signed agreement, then a 25% deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Furniture layout plan\",\"price\":\"$150, from the list\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Lighting plan\",\"price\":\"$199, with a written plan in 3 business days\",\"where\":\"at the customer's place\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Extra design time\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a project for work beyond the agreement, never booked alone\"},{\"name\":\"Change order\",\"price\":\"an added room or more design work: priced, written and signed before the work; added to the final bill\"},{\"name\":\"Furniture, fabric and decor\",\"price\":\"ordered through the designer's own trade accounts and billed outside Rosie; Rosie never takes product money or sees markups\"}],\"A\":[{\"name\":\"Sample review\",\"price\":\"$35, 30 minutes\",\"where\":\"at the studio; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-review fee\",\"after\":\"paid at the studio desk; on Saturday mornings, with nobody at the desk, the saved card is charged when the designer texts DONE\"},{\"name\":\"Fabric review\",\"price\":\"$40, 30 minutes\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Sample board\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Kids' room review\",\"price\":\"$25\",\"where\":\"at the studio\",\"who\":\"booked by the parent; the child is never the one served\"},{\"name\":\"Video design consultation\",\"price\":\"$150, 60 minutes, by video (counts as at the studio)\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"E-design, one room\",\"price\":\"$600 flat: a video kickoff, then a design board and a shopping list in about 2 weeks\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Full-room studio session (layout, finishes, lighting)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the studio\",\"before\":\"a card saved for its $40 fee\",\"after\":\"at the studio desk\"},{\"name\":\"Window treatment design\",\"price\":\"priced from the customer's photos and sizes (the example: $90); Sam OKs each one\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Custom furniture design\",\"price\":\"priced at the studio after a $25 consult (the example: from $110)\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Intro call\",\"price\":\"15 minutes, free, by phone: offered as a call with the designer before booking; nothing taken and nothing owed\"}],\"capacity\":\"One designer per booking; the studio's sample table is saved with each studio booking\",\"skills\":\"Consultations and projects: designers. Business spaces: designers whose license is on file as given where the state's form requires it. Measuring and install help: a designer or the design assistant.\",\"nobody_home\":\"Install days with a lockbox: nobody needs to be home if Alex OKs it, with start and end photos. A consultation always needs Alex there.\",\"online\":\"A consultation can be a video call (counts as at the studio); e-design is online\",\"smallest_job\":\"A switch the owner sets: the smallest project taken. Smaller requests are offered a color consultation, a room refresh or e-design instead.\"}",
+ "questions_before_times": [
+  "Which rooms, and what would you like to change?",
+  "A home, or a business space like an office or a shop?",
+  "Roughly how big are the rooms?",
+  "When would you like it done?"
+ ],
+ "safety_stop": [
+  "a gas smell, sparking or smoking wires, a carbon monoxide alarm",
+  "a ceiling sagging, or a wall cracking and moving"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "video",
+  "stages",
+  "banktransfer"
+ ],
+ "switches": {},
+ "settings": {
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "if: most states license no interior design for homes. Some protect the title 'registered interior designer', and a few require a registered or licensed designer for business spaces (offices, shops). All of it comes from the state's form.",
+ "staff_skills": "",
+ "messages_never": "[\"Door or lockbox codes\",\"The budget\",\"Agreements, change orders and floor plans (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/interior+designer",
+  "pexels": "https://www.pexels.com/search/interior%20designer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

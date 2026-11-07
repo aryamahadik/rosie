@@ -1,0 +1,932 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "energy-audit",
+  "name": "Home energy auditor",
+  "type": "service",
+  "started_from": "inspector"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact results"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  }
+ ],
+ "facts": [
+  "results",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main_path": "list|card|counter",
+   "paths": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|card|card"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|none|bill",
+    "list|full|none",
+    "photos|deposit|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Report walk-through",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a $35 report walk-through. A card is saved for the office's $20 fee. Alex pays at the office after."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Report walk-through",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $35 report walk-through. Nothing is taken: a YES books it. Alex pays at the office after."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Second opinion on an audit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A second opinion on another company's audit, $55, paid in full when booking."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|card",
+   "name": "Report walk-through",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "A $35 report walk-through on a Saturday morning, when Maya works alone with no front desk: the saved card is charged when she texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Home energy audit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$349",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a $349 home energy audit. A card is saved and charged $349 when Owen texts DONE. The report follows Fri."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Home energy audit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$349",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A $349 home energy audit. Nothing is taken. Rosie texts the bill after, and the report goes out once it's paid."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Test-out after upgrades",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": null,
+   "rest": null,
+   "paid": "$150",
+   "fee": "$89",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A $150 test-out after upgrades, paid in full when booking."
+  },
+  {
+   "flow": "B",
+   "path": "photos|deposit|bill",
+   "name": "4-unit building audit",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": "$160",
+   "rest": "$480",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A 4-unit building, priced from the listing and bills at $640. Sam OKs it. A $160 deposit now, the $480 rest on the bill after."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Bill review",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$20",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Second opinion on an audit",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$55",
+   "paid": "$55",
+   "fee": "$20"
+  },
+  {
+   "flow": "B",
+   "name": "Duct leakage test",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "bill",
+   "price": "$199",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Test-out after upgrades",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$150",
+   "paid": "$150",
+   "fee": "$89"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Home energy audit",
+   "price": null,
+   "kind": "set by the customer's answers (square feet, house or condo, year built)",
+   "length": "about 3 hours on site: a blower door test, an infrared scan, a duct check and a combustion safety test, then a results walk-through; the report follows in about 3 business days",
+   "where": "at the home; an adult stays for the whole visit",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Condo or townhouse audit",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "New-home energy rating (the second kind of work)",
+   "price": null,
+   "kind": "quoted from the plans first",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Large property evaluation",
+   "price": null,
+   "kind": "set by the auditor at the visit from the size; only the $89 trip fee is promised before",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Multi-unit or very large home",
+   "price": null,
+   "kind": "quoted from the listing, the bills and photos first",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Test-out after upgrades",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Duct leakage test",
+   "price": null,
+   "kind": "one price, an add-on",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Crawl space moisture check",
+   "price": null,
+   "kind": "one price, an add-on at the visit",
+   "length": null,
+   "where": "at the home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Trip fee",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "never booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Report walk-through, bill review and upgrade plans (at Lee Energy Office)",
+   "price": null,
+   "kind": "one price each",
+   "length": null,
+   "where": "at the office, by video, or at the home",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "The town or ZIP, and the kind of home: a house, a condo or townhouse, or several units",
+   "About how many square feet, and the year built",
+   "What bothers you: drafts, hot or cold rooms, high bills, a damp attic or crawl space",
+   "How it is heated and cooled: gas, oil, electric or a heat pump, if you know",
+   "Add-ons: a duct leakage test",
+   "Do you own the home or rent it?"
+  ],
+  "after_time": [
+   "Pets at the home, and where they'll be",
+   "Can an adult stay for the whole visit, about 3 hours?",
+   "Is there a wood stove, a fireplace or a gas appliance we should know about?",
+   "Will you come for the results walk-through at the end?"
+  ],
+  "secure_page_only": [
+   "The street address",
+   "The utility account number and the last 12 months of bills",
+   "Photos of the furnace, water heater and attic hatch"
+  ],
+  "who_may_book": "An adult 18 or older who owns the home, or a tenant. A tenant gives the landlord's yes for any area the tenant cannot enter, like a shared attic or a boiler room; those areas are left out and listed as not tested. An adult must stay for the whole visit."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "a gas smell",
+   "sparks or smoke",
+   "a carbon monoxide alarm",
+   "live wires hanging down",
+   "flooding up to the outlets"
+  ],
+  "go_on": "No, for gas, sparks, smoke or a carbon monoxide alarm. Yes, with the unsafe area left out, for live wires or flooding.",
+  "stop_action": [
+   "A gas smell, sparks, smoke or a carbon monoxide alarm: whoever is there gets out first, then calls 911 and the gas company from outside. No booking until the home is safe.",
+   "Live wires hanging down or flooding up to the outlets: stay away from that area, and call 911 if anyone is in danger. The audit can be booked for the rest of the home; the auditor will not enter that area.",
+   "At the visit, a combustion safety test that shows dangerous carbon monoxide or backdrafting stops the test: the auditor tells the household to open windows and leave if needed, and gives 911 and the gas company. The audit goes on only when it is safe."
+  ],
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Last 12 months of energy bills on the secure page",
+   "Clear the way to the attic hatch, crawl space or basement, furnace, water heater and electrical panel",
+   "No fire in a fireplace or wood stove for 24 hours before, and the ashes cleaned out",
+   "Pets put away, and windows and doors closed",
+   "Leave the thermostat where you normally keep it"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": false,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": [
+   "Home energy audits",
+   "Condo and townhouse audits",
+   "Multi-unit buildings",
+   "Duct leakage tests",
+   "Test-outs after upgrades",
+   "New-home energy ratings (certified rater)",
+   "Report walk-throughs and upgrade plans at the office"
+  ],
+  "licenses_or_certificates": "Each auditor's own credential, where the state, a program or the business requires it. Ratings only by a certified rater.",
+  "supervision": "A trainee audits only with a credentialed auditor on the job, where the rules allow trainees.",
+  "who_oks": "Sam OKs quotes over $500 and every fee. Pat, the office manager, may too; Sam's answer wins.",
+  "stand_in": "Another auditor with the same credential and skills may stand in, with the client's OK first."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult 18 or older who owns the home, or a tenant. A tenant gives the landlord's yes for any area the tenant cannot enter, like a shared attic or a boiler room; those areas are left out and listed as not tested. An adult must stay for the whole visit.",
+  "minors_texts": "Nobody under 18 books, and an adult 18 or older must be home for the visit."
+ },
+ "visit": {
+  "check_in": "The adult at home gives the check-in code to the auditor at the door. The code and DONE confirm the visit.",
+  "done": "The check-in code at the start and DONE from the auditor's phone, with photos. The report follows by the date promised.",
+  "changes_at_visit": "An add-on (a duct leakage test, a crawl space moisture check) only if the client says yes first, priced before it is done. The fee never depends on the upgrades the client buys."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "Where the state, a utility program or the business's own rules require it, each auditor holds a current energy auditor or building performance credential (a building analyst or rater certification), and the company holds its own registration or contractor license. Some states license nobody: then registration only. Combustion safety testing needs an auditor trained for it.",
+  "who": "Each auditor holds their own credential. The company holds its own registration where the state asks. A new-home energy rating is done only by a certified rater.",
+  "ask": "Each auditor's credential name and number. The company's registration or license number, where the state's form asks for one.",
+  "insurance": "General liability insurance where the state's form requires it. Shown as given by the business, not checked by Rosie.",
+  "background": "Only where the state's rules require them, or as the business's own word. The auditor spends hours inside the home."
+ },
+ "never_in_a_text": [
+  "Door and alarm codes",
+  "The street address in a first text to someone new",
+  "The utility account number and the bills: only the secure link",
+  "Findings, photos and the report: only the secure link"
+ ],
+ "languages": "English and Spanish.",
+ "unmapped_keys": {
+  "pf.first_steps": [
+   "access"
+  ],
+  "pf.license": [
+   "shown_to_customers",
+   "not_this_work"
+  ],
+  "pf.messages": [
+   "who_gets_texts"
+  ],
+  "pf.visit": [
+   "entry_codes",
+   "what_is_checked",
+   "not_tested",
+   "walk_through",
+   "report",
+   "report_release"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,120 @@
+{
+ "id": "pmu",
+ "name": "Permanent makeup / microblading",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Permanent makeup / microblading",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Permanent makeup / microblading",
+   "staff": "Hannah and Grace (PMU artists)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Microblading",
+     "price": "$550",
+     "deposit": "$100",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: $550 microblading with Hannah, a free consult and patch test first. A $100 deposit now, $450 at the desk.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Included touch-up",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The touch-up included with Alex's August microblading, 8 weeks later. $0: nothing taken, and nothing to pay at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Permanent makeup / microblading",
+   "staff": "Paige and Leah (PMU artists on guest days)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Microblading",
+     "price": "$550",
+     "deposit": "$100",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: $550 microblading on a guest day at Aster Salon. A $100 deposit now, and Rosie texts the $450 bill after.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services with a chosen artist; a first session includes one touch-up 6 to 8 weeks later",
+ "questions_before_times": [
+  "is it for you, and are you 18 or older (asked first)",
+  "which area: brows, lips or eyeliner",
+  "new or returning, and any permanent makeup on that area before",
+  "for a touch-up: the date of the first session, so it falls 6 to 8 weeks after"
+ ],
+ "safety_stop": [
+  "a reaction happening now: face, lips or throat swelling, or trouble breathing",
+  "signs of infection after a session: spreading redness, pus or a fever"
+ ],
+ "first_steps": [
+  "Consult and patch test (a small dab of the pigment on the skin, watched 48 hours for a reaction)",
+  "Consent form, with aftercare advice and a note that a new tattoo can delay giving blood",
+  "The shape drawn and agreed"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "tips",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always: permanent makeup is tattooing on the face, licensed where the state's rules require it (a tattoo, body art or permanent cosmetics license, as the state names it)",
+ "staff_skills": "microblading, powder and combo brows, lip blush, eyeliner; only Hannah does lips and eyeliner at the studio",
+ "messages_never": "health answers, test-spot reports, face photos and healing questions never go in a text or through the AI: only the secure page and the client's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/permanent+makeup+microblading",
+  "pexels": "https://www.pexels.com/search/permanent%20makeup%20%2F%20microblading/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

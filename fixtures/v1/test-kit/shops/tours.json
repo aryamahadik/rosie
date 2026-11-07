@@ -1,0 +1,183 @@
+{
+ "id": "tours",
+ "name": "Tour guide and tour operator",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "gym",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tour guide and tour operator",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tour guide and tour operator",
+   "staff": "Mara and Tomas (guides) and the meeting-point desk",
+   "customer": "Alex M. (a visitor) · other guests · a school's teacher",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Old Town walking tour",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$35",
+     "fee": "$35",
+     "story": "The main story: two adult seats on Saturday's 10am Old Town walking tour, $35 each, paid in full when booking. A tour the guest cancels in time gets a full refund; the price may be kept only with Sam's yes.",
+     "due_now_at_booking": 35,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Private walking tour",
+     "price": "$240",
+     "deposit": "$60",
+     "rest": "$180",
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A private walking tour for a group: a 25% deposit when booking, and the rest is charged to the saved card when the guide texts DONE at the end.",
+     "due_now_at_booking": 60,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Free walking tour",
+     "price": "free",
+     "deposit": "$0",
+     "rest": "$0",
+     "paid_now": null,
+     "fee": null,
+     "story": "The free walking tour: nothing taken, and guests tip the guide in cash if they wish.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "School group walking tour (20 students)",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A school group: nothing before, and one bill to the school after the tour.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tour guide and tour operator",
+   "staff": "Mara and Hugo (guides who meet at hotels and piers) and Lena (licensed driver)",
+   "customer": "Alex M. (books for the group) · guests",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Private van tour with hotel pick-up",
+     "price": "$560",
+     "deposit": "$140",
+     "rest": "$420",
+     "paid_now": null,
+     "fee": "$140",
+     "story": "The main story: a private van tour for a family of 5 with hotel pick-up, $560 for up to 6 people, a 25% deposit when booking, and the rest charged to the saved card when the guide texts DONE.",
+     "due_now_at_booking": 140,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private shore excursion",
+     "price": "$620",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$620",
+     "fee": "$620",
+     "story": "A private shore excursion from the cruise pier, $620 for up to 6 people, paid in full when booking.",
+     "due_now_at_booking": 620,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Custom multi-day itinerary",
+     "price": "$1,500",
+     "deposit": "$450",
+     "rest": "$1,050",
+     "paid_now": null,
+     "fee": "$450",
+     "story": "A custom multi-day itinerary quoted first from the group's answers, signed, then a 30% deposit, and the rest charged to the saved card at the end.",
+     "due_now_at_booking": 450,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: seats on a tour departure at a set time from a meeting point, with a set number of seats and a smallest group to run; a private tour books a guide's time for one group, at a meeting point or picked up at the group's hotel, home or cruise pier (flow B)",
+ "questions_before_times": [
+  "which tour, and the date",
+  "how many adults and children, and the children's ages (sets the price and the seats)",
+  "for a private tour: the group's size, and for a pick-up the kind of place (a hotel, a home or the cruise pier) and the area",
+  "for a shore excursion: the ship's name, the day in port and the all-aboard time",
+  "for the brewery walk: that everyone is 21 or older",
+  "for a school group: the number of students, their grade, and the number of chaperones"
+ ],
+ "safety_stop": [
+  "someone unwell right now: chest pain, fainting, trouble breathing, signs of heat stroke"
+ ],
+ "first_steps": [
+  "Park tour: the park permit",
+  "Entry tickets to sites on the route",
+  "School group: the chaperone list",
+  "Custom itinerary: the signed itinerary"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "children",
+  "multiday",
+  "firststeps"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "if: no state licenses tour guiding itself; where the local rules license sightseeing guides, each guide holds that license; driven tours need the vehicle rules (a commercial driver's license with a passenger endorsement for larger vans, and the company's passenger-carrier authority, federal for trips that cross state lines); tours inside a park or on protected land need the land manager's permit",
+ "staff_skills": "tour languages, the areas and parks each guide may lead, who may drive which van, food tours, brewery walks, school groups",
+ "messages_never": "guests' health, mobility or allergy details, children's names and ages, ID or passport numbers: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tour+guide+and+tour+operator",
+  "pexels": "https://www.pexels.com/search/tour%20guide%20and%20tour%20operator/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,195 @@
+{
+ "id": "addiction",
+ "name": "Addiction counselor and outpatient treatment",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Addiction counselor and outpatient treatment",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Health Group",
+   "staff": "Maya and Iris (counselors)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Assessment",
+     "price": "$200",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: an assessment, then weekly visits. Nothing taken when booking; the plan is billed, and any share is paid at the front desk. The free screening call also runs here, with nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Assessment",
+     "price": "$200",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A sliding-fee visit, or a share billed after the plan pays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Individual visit",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A self-pay visit: a card is saved, nothing is taken, and the visit is charged to the saved card when the counselor marks it DONE. A late-cancel fee applies only if it was agreed at booking and the owner confirms.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Court-ordered class series",
+     "price": "$250",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$250",
+     "fee": "$50",
+     "story": "A court-ordered education class series, $250, paid in full when booking. Nothing more is charged after it.",
+     "due_now_at_booking": 250,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Health",
+   "staff": "David (counselor) and Elena (associate counselor under supervision)",
+   "customer": "Alex M. (client, who can't travel for now) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home-based visit",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: a home-based visit with David, Thu Oct 22 at 8:00am. Nothing is taken; the plan is billed, and any share is texted as a bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home-based visit",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The same visit for a publicly funded client: nothing is taken and no card is saved; the program bills the public funder its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home-based visit",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A self-pay home visit: a card is saved, and the visit is charged to it at DONE. A late-cancel fee applies only if agreed at booking and the owner confirms.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "clinic: a client books one counselor's time for an assessment and individual visits, and a seat in group visits on a timetable (intensive outpatient is a set group several days a week for weeks); care runs as a plan of many weeks; some clients come because a court, an employer or a licensing board requires it",
+ "questions_before_times": [
+  "new or current client",
+  "what it's for: a screening call, an assessment, a session, a group or intensive outpatient, a family session, a medication visit, or a court-ordered assessment or class",
+  "a health plan, self-pay (the sliding fee), or public funding (only the name here)",
+  "whether a court, a probation officer, an employer or a licensing board requires it (sets the kind of assessment; who it is and the papers go on the secure page)",
+  "for a group: which days work",
+  "the client's age (adolescent and adult groups are separate)"
+ ],
+ "safety_stop": [
+  "suicide or self-harm words",
+  "an overdose: not breathing, blue lips, won't wake up",
+  "dangerous withdrawal: a seizure, confusion, seeing things, shaking with a fever",
+  "harming someone else, or anyone in danger right now"
+ ],
+ "first_steps": [
+  "Free screening call",
+  "Screening read by a nurse or counselor",
+  "Assessment",
+  "Consents and the privacy notice",
+  "Releases of information",
+  "Records from a past program",
+  "The plan check and any prior approval",
+  "Group agreement"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "firststeps",
+  "classes",
+  "groups",
+  "children"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "the program's own word, optional: the program's state license or certification for outpatient substance use treatment, if it has one; each counselor's own credential or clinical license, as the owner gives it; a prescriber's license for medication visits. Rosie never looks a license up and never says one is checked",
+ "staff_skills": "addiction counselor, clinical counselor or social worker, prescriber, adolescent groups, family sessions, intensive outpatient, approved court-ordered assessments and classes, home-based sessions, Spanish",
+ "messages_never": "that the person is in addiction treatment, what is used, drug screen results, diagnoses, medicines, court or probation details, and money details never go in a text, a voicemail or an answer to another AI: only the secure page; texts use the program's plain display name (never 'recovery' or 'addiction'), the day, the time and the place",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/addiction+counselor+and+outpatient+treatment",
+  "pexels": "https://www.pexels.com/search/addiction%20counselor%20and%20outpatient%20treatment/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

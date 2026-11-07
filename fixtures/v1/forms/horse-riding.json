@@ -1,0 +1,833 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "horse-riding",
+  "name": "Horse boarding, riding lessons and stables",
+  "type": "chair",
+  "started_from": "dog-trainer"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K01",
+   "field": "Class timetable: day, time, teacher, room (sent as a photo or typed)",
+   "type": "schedule",
+   "need": "R for class work",
+   "shows": "booking page (sessions with seats left)",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K02",
+   "field": "Seats Rosie can book per session, the fewest to run, the cutoff",
+   "type": "numbers",
+   "need": "R for class work",
+   "shows": "seats left; owner decides at the cutoff",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K03",
+   "field": "Trial seats per class (one trial each)",
+   "type": "number",
+   "need": "P",
+   "shows": "booking page",
+   "source": "A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K06",
+   "field": "Stays: a start and an end date, a price per night or day, drop-off and pick-up times",
+   "type": "dates",
+   "need": "R when the work has stays",
+   "shows": "booking page, confirmation",
+   "source": "A4-68, B4-85",
+   "google": "no",
+   "turned_on_by": "fact multiday"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps; fact forms"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children; fact animals"
+  }
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "children",
+  "classes",
+  "animals",
+  "multiday"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|full|none",
+   "paths": [
+    "list|full|none",
+    "list|card|counter",
+    "list|deposit|counter"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|deposit|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "guided trail ride",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$65",
+   "deposit": null,
+   "rest": null,
+   "paid": "$65",
+   "fee": "$40",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "The main story: a $65 guided trail ride, paid in full when booking."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "private riding lesson",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$75",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$40",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $75 private lesson. A card is saved for the $40 late-cancel fee; paid at the barn office."
+  },
+  {
+   "flow": "A",
+   "path": "list|deposit|counter",
+   "name": "summer riding camp (one week)",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$450",
+   "deposit": "$100",
+   "rest": "$350",
+   "paid": null,
+   "fee": "$50",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $450 summer camp week: a $100 deposit now, and the $350 rest paid at the barn office on the first day."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "lesson at the customer's farm",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$85",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$40",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: an $85 lesson on the customer's own farm, on their own horse. The saved card is charged at DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|deposit|bill",
+   "name": "pony party at a home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$450",
+   "deposit": "$150",
+   "rest": "$300",
+   "paid": null,
+   "fee": "$60",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A $450 pony party at a home: a $150 deposit now, and the $300 rest on the bill after the party."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Guided trail ride",
+   "price": "$65 a rider (example)",
+   "kind": "one price",
+   "length": "about 90 minutes on the trail, with a guide",
+   "where": "at the stable",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Private riding lesson",
+   "price": "$75 (example)",
+   "kind": "one price",
+   "length": "1 hour with a head instructor on a school horse",
+   "where": "at the stable",
+   "before": "a card saved for the $40 late-cancel fee",
+   "after": "paid at the barn office"
+  },
+  {
+   "name": "Summer riding camp (one week)",
+   "price": "$450 a week (example)",
+   "kind": "a series of days, a seat in a session",
+   "length": "5 days, 9:00am to 3:00pm, children 7 to 14 (example)",
+   "where": "at the stable",
+   "before": "a $100 deposit",
+   "after": "the $350 rest paid at the barn office on the first day"
+  },
+  {
+   "name": "Lesson at the customer's farm, on their own horse (flow B)",
+   "price": "$85 (example)",
+   "kind": "one price",
+   "length": "1 hour",
+   "where": "at the customer's farm",
+   "before": "a card saved for the $40 fee",
+   "after": "the saved card is charged at DONE"
+  },
+  {
+   "name": "Pony party at a home (flow B)",
+   "price": "$450 (example)",
+   "kind": "one price, a party",
+   "length": "about 2 hours",
+   "where": "at the customer's home, on flat grass away from roads and pools",
+   "before": "a $150 deposit now",
+   "after": "the $300 rest paid on the bill after the party"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "how much riding so far: never, a few times, or rides on their own (sets the lesson, the horse and whether a trail ride fits)",
+   "each rider's age (sets the service)",
+   "how many riders",
+   "for boarding: the move-in date and the kind of horse",
+   "for flow B: a farm or a home, and the town; for a lesson, the customer's own horse and an arena or flat field"
+  ],
+  "after_time": [
+   "anything the instructor should know (a past fall, nerves around horses)",
+   "a favorite school horse, if there is one"
+  ],
+  "secure_page_only": [
+   "each rider's weight (the stable's limit for its horses), never in a text or through the AI",
+   "the waiver with the equine activity warning where the state's rules require it, signed by each rider (a parent signs for anyone under 18)",
+   "health notes that matter for riding (pregnancy, a recent surgery or concussion, seizures, a horse allergy)",
+   "an emergency contact",
+   "for a horse brought in for a lesson on the customer's farm (flow B): the owner's own word on the horse's vaccines and Coggins test date, and any emergency vet OK the owner sets",
+   "for a pony party: the place's ground, and the number and ages of the children"
+  ],
+  "who_may_book": "an adult for themselves; a parent or legal guardian books for anyone under 18 and signs; for boarding, the horse's owner or someone the owner authorizes"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "a rider fell and is hurt, a head injury, someone kicked or trapped under a horse, a loose horse on a road",
+    "say": "Call 911 now. Don't move someone who may have a neck or back injury. Stay clear of a loose horse.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "a horse that's colicking, down, bleeding or badly lame (a boarder's own horse)",
+    "what": "the stable's own line and the horse's vet first; Rosie gives no animal health advice"
+   },
+   {
+    "words": "pregnant",
+    "what": "no riding (the stable's rule); a barn visit or a pony ride for a child can still be booked"
+   },
+   {
+    "words": "a recent concussion, surgery or seizure",
+    "what": "the booking waits for the instructor's private read; Rosie gives no medical advice"
+   }
+  ],
+  "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "Waiver with the equine activity warning",
+    "when": "signed on the secure page while booking",
+    "who": "every rider; a parent or guardian signs for anyone under 18; at a pony party, each child's own parent",
+    "goodFor": "1 year",
+    "result": "signed: it books; not signed: no riding until it's signed"
+   },
+   {
+    "name": "Rider's weight and level",
+    "when": "on the secure page while booking",
+    "who": "every rider",
+    "result": "fits a horse: it books; over the limit or not ready: another service (a draft-horse lesson or a barn visit), before any money is taken"
+   },
+   {
+    "name": "Barn tour",
+    "when": "before a boarding agreement",
+    "who": "new boarders",
+    "result": "the owner then books the move-in"
+   },
+   {
+    "name": "Coggins test and vaccines",
+    "when": "on the secure page before a horse comes on the property, and kept current while it boards",
+    "who": "every horse that boards or hauls in",
+    "goodFor": "the Coggins test: 12 months, or as the state's rules set (a switch); vaccines: the barn's yearly list",
+    "result": "on file and in date: the horse may come; missing or ended: it doesn't come on the property"
+   },
+   {
+    "name": "Board agreement",
+    "when": "signed on the secure page before the move-in",
+    "who": "the horse's owner",
+    "result": "signed: the move-in books; its terms set the monthly board, extras, notice to end and emergency care"
+   },
+   {
+    "name": "Party place check (flow B)",
+    "when": "on the secure page while booking",
+    "who": "the host",
+    "result": "flat grass away from roads and pools: it books; otherwise the owner calls first"
+   }
+  ],
+  "prep": "wear long pants and boots or closed shoes with a heel; no loose jewelry; arrive 15 minutes early; eat and drink water first",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "beginner lessons, jumping, dressage, trail guide, pony handler, camp counselor, barn care for boarders",
+  "licenses_or_certificates": "each instructor's certificate and ratings are the stable's own word, shown to the owner; not checked by Rosie (D96)",
+  "supervision": "one guide for up to 6 trail riders; a second guide for any rider under 12 on the trail; camp keeps 1 adult for 6 campers (the stable's rule)",
+  "who_oks": "the head instructor OKs a rider's level for trails and jumping and reads health notes; the owner OKs fees, refunds and new boarders",
+  "stand_in": "another instructor who teaches that level may take a lesson, offered first, never assumed; a trail ride's guide may change, nothing moves for the riders"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": false,
+  "animals_fact": true,
+  "who_may_book": "an adult for themselves; a parent or legal guardian books for anyone under 18 and signs; for boarding, the horse's owner or someone the owner authorizes",
+  "minors_texts": "a minor's texts go to the parent or guardian"
+ },
+ "visit": {
+  "check_in": "at the barn office: the check-in code and the waiver on file; the guide ticks names for a trail ride or a camp day; at the customer's farm or home (flow B): the code at the gate",
+  "done": "the check-in code or the guide's roster, then DONE from the instructor",
+  "changes_at_visit": "a ride or lesson stopped for weather or a horse that goes lame: the rest moves to the indoor arena, another horse, or a new time, with no fee for the part not given",
+  "before_work": "every rider gets a fitted helmet; the instructor or guide checks boots, matches the horse, and checks the tack; the horse is checked sound before it works"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "none checked by Rosie: no state license to teach riding in most places; a stable registration or inspection is the owner's own word, where the state's rules ask for one (a switch from the state form)",
+  "who": "the stable for its own registration or inspection; each instructor for their own certificate, if the owner shows one",
+  "ask": "optional: the stable's registration number and any instructor certificate number the owner wants shown; nothing is checked",
+  "insurance": "liability insurance is the stable's own matter; optional for the booking",
+  "background": "any background check for staff is the owner's own step, outside Rosie"
+ },
+ "never_in_a_text": "weight, health notes, a child's details and the horse's vet records never go in a text: only the secure page",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "sobriety",
+   "gear",
+   "weather"
+  ],
+  "pf.staff": [
+   "horses"
+  ],
+  "pf.visit": [
+   "children",
+   "boarding"
+  ]
+ },
+ "duplicate_spellings_dropped": [
+  "pf.staff.certificates"
+ ]
+}

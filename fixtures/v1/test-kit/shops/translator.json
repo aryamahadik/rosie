@@ -1,0 +1,148 @@
+{
+ "id": "translator",
+ "name": "Translator and interpreter",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "notary",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Translator and interpreter",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Translator and interpreter",
+   "staff": "Ana and Luis (interpreters)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "48 hours before"
+   },
+   "main": "photos|full|none",
+   "services": [
+    {
+     "combo": "photos|full|none",
+     "price_kind": "Quoted from photos first",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Certified translation",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$90",
+     "fee": "$90",
+     "story": "A 2-page birth certificate, priced at $90 from photos, paid in full when booking.",
+     "due_now_at_booking": 90,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Video interpreting",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "A 1-hour video interpreting session at $90; the card is saved and charged at DONE for the time used.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Translator and interpreter",
+   "staff": "Diego and Mei (interpreters)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "48 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "On-site interpreting",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A 2-hour on-site session at $150; the card is saved for the $150 late-cancel fee; the bill comes after for the time used.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "On-site interpreting",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The same session, the saved card charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "On-site interpreting",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A clinic on account: nothing taken when booking; its bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "[{\"name\":\"On-site interpreting\",\"price\":\"list\",\"example\":\"$75 an hour, 2-hour minimum ($150) (the example agency's own price)\",\"length\":\"2 hours or more, billed by the half hour after the minimum\",\"where\":\"B: the customer's appointment (a clinic, a lawyer's office, a school meeting, a business meeting, a wedding)\",\"money\":\"B: a card saved for the late-cancel fee; billed after for the time used\"},{\"name\":\"Video interpreting\",\"price\":\"list\",\"example\":\"$90 an hour, 1-hour minimum\",\"length\":\"1 hour or more\",\"where\":\"A: by video\",\"money\":\"A: a card saved; the saved card is charged at DONE for the time used\"},{\"name\":\"Certified document translation\",\"price\":\"photos\",\"example\":\"$45 a page for a birth certificate or a diploma, priced from photos of the pages\",\"length\":\"brought to the office once for the original to be seen; the certified translation is ready in 3 business days\",\"where\":\"A: at the office\",\"money\":\"A: the full price when booking, once the photo price is OK'd\"}]",
+ "questions_before_times": "The language pair; the kind of appointment in general words only (medical, legal or court, school, business, personal), since it sets who may go (a certificate) and how long; the date, start time and expected length; for documents, how many pages and the date they're needed by (a need-by date).",
+ "safety_stop": [
+  "A medical emergency or danger described in the request (an interpreter is no emergency service)."
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "results",
+  "monthlybill",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "B": "48 hours before"
+  }
+ },
+ "license": "optional; never verified by Rosie (D96)",
+ "staff_skills": "Each person's language pairs and certificates (court, medical); only people whose pairs and certificates fit are offered.",
+ "messages_never": "What the appointment is about (a diagnosis, a court case, an immigration matter), the person served's name for an organization's booking, and anything in the documents. Texts say only 'your interpreting visit' or 'your translation'.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/translator+and+interpreter",
+  "pexels": "https://www.pexels.com/search/translator%20and%20interpreter/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,238 @@
+{
+ "id": "oral-surgeon",
+ "name": "Oral surgeon",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Oral surgeon",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Oral Surgery",
+   "staff": "Ruth (oral surgeon) and Marco (surgical assistant)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient consult with X-rays and a scan",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 new patient consult with X-rays and a scan. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient consult with X-rays and a scan",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same consult where the office turns on its $20 missed-visit fee. A card is saved for it, never for a fee-free patient.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Tooth removal (local numbing)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A tooth removal with local numbing, $140: a $40 deposit when booked, and the $100 rest paid at the chair after the removal.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Stitch removal and check",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 stitch removal and check, paid in full when booked. Nothing more is owed after.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Night guard, quoted from photos",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A night guard quoted from Alex's photos at $90. A $20 deposit once the quote is OK'd, and the $70 rest at the fitting.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Post-surgery problem",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A sore spot after a removal the same day. Only the $25 check is promised; any treatment is priced first, with Alex's yes.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Surgery",
+   "staff": "Jonah (oral surgeon) and Lucy (surgical assistant), who travel with a portable kit",
+   "customer": "Alex M. (patient, lives at Riverside care home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Check and dressing change at a care home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $179 check and dressing change at Riverside care home. Nothing is taken. The office bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Check and dressing change at a care home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The same check, paid privately: nothing is taken when booking, and Rosie texts the bill when Jonah texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Broken tooth or loose stitch at a care home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A broken tooth or a loose stitch at the care home. Only the $89 visit fee is promised; the repair is priced at the visit, with Alex's yes first.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Multi-tooth extraction plan",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A multi-tooth extraction plan, quoted by Jonah from the care-home photos and X-rays at $640. A $160 deposit once the plan is OK'd, and Rosie texts the bill for the $480 rest.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types in a surgical chair, each with a set length; a tooth removal is a surgery visit with a set length and a recovery check after it; a post-surgery problem is booked the same day with the owner's OK; every visit needs a free chair",
+ "questions_before_times": [
+  "for you, your child, or someone you help (a care home resident)",
+  "new or returning patient",
+  "which visit: the office's own visit types only (a new patient consult, a tooth removal, a stitch check, a night guard, or a post-surgery problem), never a symptom typed into the AI",
+  "a dental or medical plan (its name only) or paying yourself",
+  "early morning, midday or afternoon"
+ ],
+ "safety_stop": [
+  "face or jaw swelling with a fever, or trouble breathing or swallowing",
+  "bleeding after a tooth removal that won't stop, or a tooth knocked out",
+  "swallowed something poisonous, or too much of a medicine"
+ ],
+ "first_steps": [
+  "Health history, consent and the plan's papers",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "A signed surgical consent",
+  "The care home's OK"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "children",
+  "incare",
+  "photos",
+  "extrawork",
+  "documents",
+  "aftercare"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "each oral surgeon holds their own license from the state's dental board; a surgical assistant holds one only where the state licenses assistants",
+ "staff_skills": "oral surgeons: extractions, surgical consults, night guards and post-surgery care; surgical assistants: X-rays, scans, chair setup, recovery checks and the work the state allows; only people cleared for mobile visits go to care homes and homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results, the medicines or the surgeon's name (when the surgeon comes to a care home or home, the name stays, for the door check); X-rays and scans never go through Rosie",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/oral+surgeon",
+  "pexels": "https://www.pexels.com/search/oral%20surgeon/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

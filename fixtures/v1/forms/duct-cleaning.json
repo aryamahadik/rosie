@@ -1,0 +1,987 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "duct-cleaning",
+  "name": "Air duct and dryer vent cleaning",
+  "type": "service",
+  "started_from": "chimney"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K07",
+   "field": "Items taken per day (drop-off) and daily caps",
+   "type": "number",
+   "need": "R when the work is a drop-off",
+   "shows": "times card (a full day is not shown)",
+   "source": "S1-03 block 12, A4-14",
+   "google": "no",
+   "turned_on_by": "fact dropoff"
+  },
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  }
+ ],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|full|none",
+    "photos|none|counter",
+    "visit|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|none|bill",
+    "photos|deposit|card",
+    "visit|card|card"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Filter wash",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a $35 hood filter degrease. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Filter wash",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $35 hood filter degrease. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Furnace filter clean",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A washable furnace filter clean, $55, paid in full when booking."
+  },
+  {
+   "flow": "A",
+   "path": "photos|none|counter",
+   "name": "Exhaust fan clean",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "An exhaust fan clean, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up."
+  },
+  {
+   "flow": "A",
+   "path": "visit|none|counter",
+   "name": "Heavy grease filter clean",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A heavy grease filter set, priced at the counter. Only the $25 look is promised."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Air duct cleaning",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a $179 air duct cleaning, then a yearly dryer vent plan. A card is saved for the $89 late-cancel fee and charged $179 when Marek texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Air duct cleaning",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A $179 air duct cleaning. Nothing is taken. Rosie texts the bill after the visit."
+  },
+  {
+   "flow": "B",
+   "path": "photos|deposit|card",
+   "name": "Post-remodel duct cleaning",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": "$160",
+   "rest": "$480",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "A post-remodel duct cleaning, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest is charged to the card at DONE."
+  },
+  {
+   "flow": "B",
+   "path": "visit|card|card",
+   "name": "Whole-building duct cleaning",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "A whole-building duct cleaning, priced at the walkthrough before any work. A card is saved for the $89 fee."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Vent cover wash",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$20",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Furnace filter clean",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$55",
+   "paid": "$55",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Filter wash (plan)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Dryer vent cleaning",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "card",
+   "price": "$150",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Duct camera inspection",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$199",
+   "paid": "$199",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Dryer vent cleaning (yearly plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Air duct cleaning",
+   "price": null,
+   "kind": "set by the customer's answers (heating and cooling systems, vents, returns, square feet)",
+   "length": "about 3 hours for a crew of two",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Dryer vent cleaning",
+   "price": null,
+   "kind": "set by the customer's answers (length of the run, floors, wall or roof exit)",
+   "length": "about 1 hour for one technician",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Duct camera inspection",
+   "price": null,
+   "kind": "from the list",
+   "length": "about 1 hour",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Post-remodel duct cleaning",
+   "price": null,
+   "kind": "quoted from the customer's photos first",
+   "length": "half a day",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Multi-unit or whole-building duct cleaning",
+   "price": null,
+   "kind": "quoted at a walkthrough, before any work",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Free estimate",
+   "price": null,
+   "kind": "free",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "By the hour",
+   "price": null,
+   "kind": "per hour",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Add-ons",
+   "price": null,
+   "kind": "one price each, added only when the customer asks",
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Yearly dryer vent plan",
+   "price": null,
+   "kind": "each visit at the dryer vent cleaning's list price",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Late-cancel fee",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "not booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Filter, register and vent cover washing at the business (Lee Vent Shop)",
+   "price": null,
+   "kind": "one price by item, from photos, or at the counter",
+   "length": null,
+   "where": "dropped off at the shop; nothing is washed at the customer's place",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "What needs cleaning: the air ducts, the dryer vent, or both",
+   "Air ducts: how many heating and cooling systems, how many vents and returns, and about how many square feet",
+   "Dryer vent: electric or gas dryer, how long the run is, how many floors, and whether it exits through the wall or the roof",
+   "When the ducts or the dryer vent were last cleaned",
+   "Signs of trouble: clothes taking two cycles to dry, a very hot laundry room, lint outside, dust blowing from the vents",
+   "A home built before 1980, or ducts wrapped in old insulation (an asbestos check comes first)",
+   "Any animals heard in the ducts or the vent",
+   "At the counter: which items, and what they're made of"
+  ],
+  "after_time": [
+   "Who will be home: the customer, or someone else (their name and mobile go on the secure page)",
+   "Where the furnace or air handler is, and the attic or crawl space access",
+   "Pets, and where they'll be",
+   "Where the dryer vent comes out, and parking",
+   "Own or rent: the landlord's OK for anything beyond cleaning"
+  ],
+  "secure_page_only": [
+   "The street address",
+   "Gate or lock codes",
+   "The landlord's name and mobile",
+   "Photos inside the home",
+   "The card"
+  ],
+  "who_may_book": "An adult who owns or rents the home, or someone the owner allows. A renter books cleaning; the landlord's OK is needed for anything beyond cleaning."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "smoke or flames from a dryer, a vent, a furnace or the ducts",
+   "a gas smell or a carbon monoxide alarm",
+   "sewage or a sewage backup",
+   "suspected asbestos on ducts or pipes",
+   "a mold patch over the state's size cutoff",
+   "dead animals or heavy droppings in the ducts",
+   "sparking or exposed wiring",
+   "an attic or crawl space floor that isn't safe"
+  ],
+  "go_on": "Yes, with the part left out (asbestos, mold, droppings, sewage, wiring, a floor), and for signs of a clogged dryer vent. No, for smoke or flames now, a gas smell or a carbon monoxide alarm.",
+  "stop_action": [
+   "Smoke or flames now: get everyone out of the house, then call 911 from outside. Rosie never places the call. No booking until the fire department clears it.",
+   "A gas smell or a carbon monoxide alarm: get everyone outside now, then call 911 and the gas company. No booking until it's safe.",
+   "Signs of a clogged dryer vent (clothes damp after a full cycle, a very hot dryer or laundry room, lint at the outside vent) are not an emergency: stop using the dryer until the vent is cleaned. The booking goes on.",
+   "Suspected asbestos, mold over the cutoff, droppings, sewage: Rosie says a duct cleaner can't take that part on and points to a specialist. The rest of the home can still be booked with that part left out.",
+   "Sparking wires or an unsafe attic floor: stay out of the area; no booking for it until it's fixed.",
+   "Animals heard in the ducts or the vent: a wildlife company first. Protected birds nesting in an outside vent stay until they leave; no cleaning or cap removal until then."
+  ],
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Clear about 3 feet around the vents, the furnace and the dryer",
+   "Move small items and rugs off the floor vents",
+   "Keep pets in another room",
+   "At the counter: bring the filters dry, with their frames"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": [
+   "Air duct cleaning with negative pressure (a crew of two)",
+   "Dryer vent cleaning, including roof exits",
+   "Duct camera inspections",
+   "Counter work: degreasing filters, registers, vent covers and lint trap screens"
+  ],
+  "licenses_or_certificates": "None per person unless the state's form says so. A trade group's certificate shows only as the person gave it, not checked.",
+  "who_oks": "The owner OKs fees, walkthrough quotes, repairs over the limit and same-day jobs. The office manager may OK prices if the owner sets it.",
+  "stand_in": "Another crew lead with the same skill, at the same window and price.",
+  "crews": "Two per whole-home duct job: a lead, who holds the entry code and texts DONE, and a helper. A person who works alone (a dryer vent technician) adds an emergency contact, and a missed safety check gives that contact the job's address only."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult who owns or rents the home, or someone the owner allows. A renter books cleaning; the landlord's OK is needed for anything beyond cleaning.",
+  "minors_texts": "Nobody under 18 books."
+ },
+ "visit": {
+  "check_in": "The check-in code at the door, entered by the crew lead. The on-my-way text names the crew lead, with a photo.",
+  "done": "DONE with the bill's lines and the after photos or the camera video. The report goes with the receipt."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "Cleaning air ducts and dryer vents needs no state license in most places. Where a state or city licenses home improvement or HVAC work, its form asks for it. Cutting, sealing or repairing ducts, replacing a dryer vent, and gas or electric work can need an HVAC or contractor license, or a gas fitter's license, where the state requires one; this business cleans only. Asbestos removal and mold removal over the state's size cutoff are separate licensed trades and are not offered. The vent shop's counter: business registration only.",
+  "who": "The business. Crew members and shop techs need no license of their own unless the state's form says so.",
+  "ask": "The company's business registration, or its contractor or HVAC license, where the state's form asks for one.",
+  "insurance": "General liability and workers' comp are common. 'Insured' is shown as given by the business, not checked by Rosie.",
+  "background": "Crews work inside homes: the business's own word that they are checked, or a check Rosie holds where the state's rules require one. It is shown as given by the business, not checked by Rosie."
+ },
+ "never_in_a_text": [
+  "Gate or lock codes, and where a key is kept",
+  "Card details",
+  "Photos from inside the home. The photo report and camera video open on the secure page.",
+  "Health reasons, like an allergy behind a product to avoid"
+ ],
+ "languages": "English and Spanish.",
+ "unmapped_keys": {
+  "pf.first_steps": [
+   "first_clean",
+   "wildlife",
+   "size_check"
+  ],
+  "pf.staff": [
+   "new_person_ok"
+  ],
+  "pf.license": [
+   "trade_certificates",
+   "not_this_work"
+  ],
+  "pf.messages": [
+   "danger_words"
+  ],
+  "pf.visit": [
+   "counter",
+   "how_it_works",
+   "weather",
+   "findings",
+   "a_hazard_found",
+   "work_sold_at_the_home"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,153 @@
+{
+ "id": "escape-room",
+ "name": "Escape room",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "gym",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Escape room",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Escape room",
+   "staff": "Dana and the front desk",
+   "customer": "Alex M. (a first-timer) · other players and guests",
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private escape room",
+     "price": "$128",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$128",
+     "fee": "$128",
+     "story": "A private room for 4 players: $128, paid in full when booked.",
+     "due_now_at_booking": 128,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Team building",
+     "price": "$560",
+     "deposit": "$280",
+     "rest": "$280",
+     "paid_now": null,
+     "fee": "$280",
+     "story": "Team building for 16 players in 2 rooms: $560. A $280 deposit now; the rest on the bill after.",
+     "due_now_at_booking": 280,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birthday party",
+     "price": "$260",
+     "deposit": "$100",
+     "rest": "$160",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A birthday party for 8: $260. A $100 deposit now, and $160 at the counter on the day.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Escape room",
+   "staff": "Marcus and Priya (game masters who go out)",
+   "customer": "Alex M. (books for the office) · coworkers",
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   },
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Mobile escape game",
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The mobile escape game at an office, 12 players: $450. A $150 deposit now; the $300 rest on the bill after.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Home party escape game",
+     "price": "$300",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$300",
+     "fee": "$300",
+     "story": "A home party escape game for 8: $300, paid in full when booked.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"A\":[{\"name\":\"Private escape room\",\"price\":\"list, the example venue's $32 a player, 4 players at least ($128)\",\"length\":\"60-minute game, plus a 10-minute briefing; 15 minutes to reset the room\",\"booked as\":\"a space: one room for one group, 2 to 8 players; a game master must be free to run it\",\"place\":\"at the venue\",\"money\":\"paid in full when booked\"},{\"name\":\"Team building\",\"price\":\"list, $35 a player, 10 to 30 players across 2 to 4 rooms at once, with a 20-minute debrief\",\"booked as\":\"several rooms at the same start, for one group\",\"place\":\"at the venue\",\"money\":\"half as a deposit when booked; the rest on the bill Rosie sends after\"},{\"name\":\"Birthday party\",\"price\":\"list, $260 for up to 8 players: a room plus 45 minutes in the party room\",\"booked as\":\"a room and the party room\",\"place\":\"at the venue\",\"money\":\"a $100 deposit when booked; the $160 rest at the counter on the day\"}],\"B\":[{\"name\":\"Mobile escape game\",\"price\":\"list, $450 for up to 12 players; $25 each extra, up to 30\",\"length\":\"90 minutes, plus 30 minutes to set up\",\"booked as\":\"a game master and the game kit, at a set start\",\"place\":\"at the customer's place: an office, a school, a home or a hall, with a room and tables for the teams\",\"money\":\"a $150 deposit when booked; the $300 rest on the bill Rosie sends after\"},{\"name\":\"Home party escape game\",\"price\":\"list, $300 for up to 8 players\",\"length\":\"60 minutes\",\"booked as\":\"a game master and the game kit\",\"place\":\"at the customer's home\",\"money\":\"paid in full when booked\"}]}",
+ "questions_before_times": [
+  "How many players? (sets the room size, the price and how many rooms)",
+  "Is anyone under 14? (an adult must play in the room with them)",
+  "Which room or theme, if they have one in mind"
+ ],
+ "safety_stop": [
+  "someone is hurt, can't breathe, chest pain, a seizure now: the 911 safety message, no booking",
+  "drunk or high players: not today (turned away at the door)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "groups",
+  "spaces",
+  "forms",
+  "children",
+  "discounts",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "B": "2 days before"
+  }
+ },
+ "license": "none for the venue itself: the business registration and the owner's ID are on file; nothing is looked up",
+ "staff_skills": "game master (trained on each room), host for parties and team events, the B travelling game master",
+ "messages_never": "a player's health condition, a seizure warning answer, a child's name or age, waiver answers, anything seen on the room cameras",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/escape+room",
+  "pexels": "https://www.pexels.com/search/escape%20room/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

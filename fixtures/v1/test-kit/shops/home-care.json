@@ -1,0 +1,206 @@
+{
+ "id": "home-care",
+ "name": "Home care aide",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Home care aide",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Home care aide",
+   "staff": "Nina and Leah (care managers)",
+   "customer": "Alex M. (customer, planning care for a father) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Care consultation",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 care consultation with Nina, Sat Oct 24 at 11:00am. Nothing is taken: a YES books it. Alex pays at the front desk after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Care consultation",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 consultation at an office that set a $20 missed-meeting fee. A card is saved for it, and nothing is taken.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Care consultation",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 consultation on a Saturday, when Nina works alone with no front desk. Rosie texts the bill when Nina texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Family meeting",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 family meeting at the office, up to 4 family members, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Home care aide",
+   "staff": "Gloria and Tasha (caregivers)",
+   "customer": "Alex M. (customer, books for a father) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home care visit",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "The main story: Frank's first care visit, Thu Oct 22, 8am to 12pm with Gloria: 4 hours at $30, $120. A card is saved, and it's charged when Gloria texts DONE. Then every Tue and Thu.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home care visit",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "The same care, billed by the week: a card is saved for the late-cancel fee, and Rosie texts one bill each Friday for the week's visits.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home care visit",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "Care paid by a long-term care insurer that Lee Home Care bills itself. Nothing is taken at booking, and Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Live-in care",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "Live-in care for two days, Thu to Sat, priced by Sam after a call: 2 days at $320, $640. Over $500, so Sam OKs it. A card is saved and charged when Gloria texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: care visits at the client's home on set days, the same caregiver each time where possible, after a free home visit and a care plan.\",\"list\":[{\"name\":\"Free home visit (assessment)\",\"price_kind\":\"free\",\"length\":\"60 to 90 minutes, with the care manager\",\"where\":\"at the client's home; family can join by phone\",\"money\":\"nothing taken; it's the first step before any care\"},{\"name\":\"Home care visit\",\"price_kind\":\"per hour, with a 3-hour minimum a visit\",\"example\":\"$30 an hour (the example agency's own price): the first visit, 4 hours, is $120\",\"what\":\"personal care (bathing, dressing, toileting help), meals, laundry, tidying, company, walks, medicine reminders\",\"where\":\"at the client's home\",\"money\":\"card saved at booking; each visit charged at DONE for the hours worked\"},{\"name\":\"Care plan visits\",\"price_kind\":\"per visit, from the care plan\",\"example\":\"every Tue and Thu, 9am to 1pm, $120 a visit, with the same caregiver\",\"where\":\"at the client's home\",\"money\":\"card saved; each visit charged at its own DONE, or one bill each Friday for the week\"},{\"name\":\"Rides and errands\",\"price_kind\":\"per hour, plus mileage\",\"example\":\"$30 an hour plus 70 cents a mile, in the caregiver's insured car\",\"where\":\"from the client's home\",\"money\":\"added to the visit's charge\"},{\"name\":\"Overnight care (awake)\",\"price_kind\":\"per hour\",\"example\":\"$32 an hour, a 10-hour shift\",\"where\":\"at the client's home\"},{\"name\":\"Live-in care\",\"price_kind\":\"priced after a call with the care manager, by the day\",\"example\":\"two days at $320 a day: $640 (Sam OKs any price over $500)\",\"where\":\"at the client's home, as a stay with a start and an end\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Holidays\",\"price_kind\":\"1.5 times the hourly rate\"},{\"name\":\"Late-cancel fee\",\"price_kind\":\"one price\",\"example\":\"the 3-hour minimum, $90, only if Sam confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Care consultation at the care planning office\",\"price_kind\":\"one price\",\"example\":\"$35 for an hour with a care manager, at the office or by video; $75 at the client's home (the example office's own prices)\",\"money\":\"nothing taken; paid at the front desk. Where the office sets a $20 missed-meeting fee (the example), a card is saved for it. With nobody at the front desk, like Nina's Saturday mornings, Rosie texts the bill. At the client's home: a card saved, and the bill texted after\",\"free_note\":\"Many agencies make the first consultation free. $35 is only this example office's price, never a rule.\"},{\"name\":\"Family meeting at the office\",\"price_kind\":\"one price\",\"example\":\"$55, up to 4 family members, 1 hour, paid in full when booking\"},{\"name\":\"Other care planning office services\",\"price_kind\":\"one price, from the office's list\",\"example\":\"a follow-up meeting $40, a phone check-in $20, a care planning session $140 (2½ hours): the example office's own prices\",\"money\":\"a card saved for the $20 missed-meeting fee; paid at the front desk\"},{\"name\":\"Written care plan\",\"price_kind\":\"priced for each family after the consultation, and the owner OKs it\",\"example\":\"$90 for the example office\",\"money\":\"a card saved for the $20 fee; paid at the front desk\"}],\"capacity\":\"One caregiver per visit. One client per booking; a couple at one address gets one care plan.\",\"nobody_home\":\"No. The client is always there; a care visit never happens in an empty home.\",\"online\":\"The care consultation can be by video. Care itself is always in person.\",\"not_offered\":\"Medical tasks: nursing, wound care, shots, giving medicines, therapy. Medicaid-paid visits, which start with the state's approval and its own visit check-in system: handed to the agency's own line, not booked by Rosie.\"}",
+ "questions_before_times": [
+  "Who gets the care, and how the booker is related",
+  "Who decides for them: themselves, a power of attorney, or a guardian",
+  "Have they agreed to try care?",
+  "What help: from the agency's own task list (bathing, meals, home help, rides, company)",
+  "Who pays: private, long-term care insurance, the VA, or Medicaid (Medicaid goes to the agency's own line)",
+  "Days and times, and how many hours a visit"
+ ],
+ "safety_stop": [
+  "fallen and can't get up",
+  "hurt, bleeding, or not responding",
+  "trouble breathing, chest pain, signs of a stroke",
+  "words about suicide or self-harm",
+  "abuse or neglect"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "documents",
+  "monthlybill",
+  "extrawork",
+  "video",
+  "incare",
+  "multiday"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "Where the state licenses home care agencies, the agency needs that license before it can be booked. Some states license only hands-on personal care, some license companion care too, and some license none.",
+ "staff_skills": "[\"Personal care: bathing, dressing, toileting help\",\"Companion care and home help\",\"Rides, in an insured car with a checked driver's license\",\"Overnight and live-in care\",\"Dementia care, where trained\"]",
+ "messages_never": "[\"Health notes, medicines, diagnoses, what care the client gets (bathing, toileting)\",\"Lockbox and door codes\",\"Why a visit changed: a caregiver's or the client's private reasons\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/home+care+aide",
+  "pexels": "https://www.pexels.com/search/home%20care%20aide/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

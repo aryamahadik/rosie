@@ -1,0 +1,125 @@
+{
+ "id": "towing",
+ "name": "Towing & roadside",
+ "booking_type": "Urgent",
+ "pattern": "urgent",
+ "built_from": "locksmith",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Towing & roadside",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Towing & roadside",
+   "staff": "Remy and Nina (at the yard window)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": null,
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Yard car pick-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a car pick-up at the yard window. Nothing is taken: a YES books the time. Alex shows a photo ID and the registration, and pays the $35 storage at the window.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Towing & roadside",
+   "staff": "Kyle and Marcus (tow drivers; one is on call each shift)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Tow",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 tow ($125 hook-up + 9 loaded miles at $6), sent now. A card is saved on the secure page and charged $179 when Kyle texts DONE at the shop. The $89 dry-run fee is kept only for a late cancel or a no-show, if Sam confirms it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Roadside tow for a motor club",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A motor club or insurer's roadside plan pays the company directly: nothing is taken from Alex, and Sam bills the plan his own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Urgent dispatch: every tow and roadside call is sent now, to the driver on call, with an arrival estimate, never a window. A pick-up window at the yard for a stored car.\",\"at the customer's place\":[{\"name\":\"Tow (flatbed or wheel-lift)\",\"price\":\"$125 hook-up + $6 a loaded mile (the example: 9 miles to the shop, $179)\",\"length\":\"about 30 minutes at the car, plus the drive\",\"time\":\"sent now, to the driver on call\",\"before\":\"\",\"after\":\"the saved card charged the agreed total when the driver texts DONE at drop-off\",\"rule\":\"all-wheel drive and 4x4 by flatbed only\"},{\"name\":\"After hours (8pm to 6am)\",\"price\":\"$40 more, shown before anyone is sent\"},{\"name\":\"Winching (a car off the road or stuck)\",\"price\":\"$75 more\",\"rule\":\"quoted at the car, done only after the customer's yes\"},{\"name\":\"Jump start\",\"price\":\"$95\",\"length\":\"about 20 minutes\",\"time\":\"sent now\",\"before\":\"a card saved\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Tire change (the customer's spare)\",\"price\":\"$95\",\"length\":\"about 30 minutes\",\"time\":\"sent now\"},{\"name\":\"Fuel delivery\",\"price\":\"$95 plus the fuel at cost\",\"length\":\"about 20 minutes\",\"time\":\"sent now\"},{\"name\":\"Car lockout (roadside help)\",\"price\":\"$95\",\"length\":\"about 20 minutes\",\"time\":\"sent now\",\"rule\":\"a photo ID checked against the registration inside before the driver leaves\"},{\"name\":\"Dry run (cancelled after the truck heads out, or no tow at the car)\",\"price\":\"$89\",\"rule\":\"only if Sam confirms; no answer, no fee\"},{\"name\":\"A motor club or insurer's roadside plan\",\"price\":\"the plan pays the company directly\",\"before\":\"nothing taken\",\"after\":\"Sam bills the plan his own way\"},{\"name\":\"Yard to your door (a stored car towed home)\",\"price\":\"priced as a tow, from the yard\"}],\"at the yard (Lee's Tow Yard)\":[{\"name\":\"Car pick-up\",\"price\":\"storage: free for 48 hours, then $35 a day (the example: $35 for Alex)\",\"length\":\"15 minutes at the window\",\"before\":\"nothing taken\",\"after\":\"paid at the yard window\",\"bring\":\"a photo ID and proof of ownership (the registration or title), or the owner's written OK\"},{\"name\":\"Long stay (weeks, asked for ahead)\",\"price\":\"a weekly rate made for that customer, which Sam OKs (the example: $90 a week)\",\"before\":\"nothing taken\",\"after\":\"paid at the window at pick-up\"},{\"name\":\"Adjuster visit (an insurer's adjuster looks at the car)\",\"price\":\"$40\",\"length\":\"30 minutes\"},{\"name\":\"Jump start at pick-up\",\"price\":\"$20 more\"},{\"name\":\"Motorcycle pick-up\",\"price\":\"storage: $25 a day after 48 hours\"},{\"name\":\"Tire change at pick-up (the customer's spare)\",\"price\":\"$55 more\",\"length\":\"30 minutes\"},{\"name\":\"Fleet pick-up (several cars at once)\",\"price\":\"$140 handling, plus storage\",\"length\":\"2½ hours\"},{\"name\":\"Items from a stored car\",\"price\":\"free, in yard hours\"}],\"fees\":\"The dry-run fee: $89, only if Sam confirms. The yard has no fee for a missed pick-up time; storage keeps counting.\",\"capacity\":\"One driver and one truck per call. The example fleet: two flatbeds and a wheel-lift. Up to 2 people ride in the cab.\",\"nobody home\":\"A tow or a roadside call needs the customer, or a driver they name, at the car with a photo ID and the keys. At drop-off, a closed shop's key drop box is fine, with photos.\",\"online\":\"No.\",\"out of scope\":\"Only tows the car's owner or driver asks for: never private-property tows, police or rotation tows, or repossessions.\"}",
+ "questions_before_times": [
+  "Is anyone hurt? Is the car in a traffic lane? Any smoke? (Any yes: 911 first, no booking)",
+  "Where are you: the road, the direction, an exit or mile marker? (The exact spot comes from the phone, on the secure page.)",
+  "Whose car is it: yours, or one you drive with the owner's OK? (A rental: the rental company's roadside line first.)",
+  "The car: year, make, model and color. Is it all-wheel drive?",
+  "What happened: won't start, a flat, out of fuel, locked out, or a crash?",
+  "Where should it go: a shop, home, or the yard?",
+  "How many people need a ride: none, 1 or 2?",
+  "Does a motor club or insurer's roadside plan pay? (Just its name here.)"
+ ],
+ "safety_stop": [
+  "anyone hurt",
+  "a crash, or a car stopped in a traffic lane",
+  "smoke, fire or a fuel smell",
+  "a child or a pet left inside the car"
+ ],
+ "first_steps": [],
+ "facts": [
+  "sentnow",
+  "dropoff",
+  "forms",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "window",
+   "B": "setstart"
+  }
+ },
+ "license": "Where the state's rules require it: a towing permit or license for the company (some states also want one per truck), and a tow operator license for each driver. Trucks that cross state lines may need a federal carrier (USDOT) number. Where none is required: identity checked, and 'license: what the business says'.",
+ "staff_skills": "[\"Flatbed\",\"Wheel-lift\",\"Winching\",\"Roadside help: jump starts, tire changes, fuel, car lockouts\",\"The yard window: releases, with ID and ownership checks\",\"Auto repair: mechanics only\"]",
+ "messages_never": "[\"the exact pickup spot (it goes only to the driver sent)\",\"ID numbers or photos of an ID\",\"the plate or VIN\",\"a roadside plan's member number\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/towing+roadside",
+  "pexels": "https://www.pexels.com/search/towing%20%26%20roadside/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,159 @@
+{
+ "id": "chiropractor",
+ "name": "Chiropractor",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Chiropractor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Chiropractic",
+   "staff": "Dr. Chen and Dr. Diaz (chiropractors) and the front desk",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 new patient visit with Dr. Chen. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same visit where the clinic turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Chiro",
+   "staff": "Dr. Brooks and Dr. Moore (chiropractors), who bring a portable table",
+   "customer": "Alex M. (a new patient, at home) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First house call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 first house call with Dr. Brooks. A card is saved for the $89 no-show fee, and charged $179 when Dr. Brooks texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "First house call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same house call with nothing saved. Rosie texts the $179 bill when Dr. Brooks texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "First house call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A house call after a car accident. Nothing is taken, and the office bills the auto claim its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types on a treatment table, each with a set length; a new patient's first visit is a history, an exam, and a first adjustment only if the chiropractor finds it safe; X-rays only when the chiropractor orders them; a care plan's visits are booked as a series only with the patient's own yes, and each is paid when it happens; a re-exam after each block of care",
+ "questions_before_times": [
+  "for you, your child, or someone you help",
+  "new or returning patient (a new patient gets the 60-minute new patient visit)",
+  "which visit: the clinic's own visit types only, never a symptom typed into the AI",
+  "a car accident or a work injury (then it's billed to that claim)",
+  "a health plan (its name only), Medicare, or paying yourself",
+  "mornings, midday or evenings"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, a sudden very bad headache, or sudden weakness, numbness, a drooping face or slurred speech",
+  "numbness in the groin or inner thighs, new trouble controlling the bladder or bowels, leg weakness that's getting worse, back pain with a fever, or a head injury or trouble walking after a crash or fall"
+ ],
+ "first_steps": [
+  "Health history and consent",
+  "The plan check",
+  "The claim for a car accident or work injury",
+  "A written price estimate for self-pay patients",
+  "A Medicare cost notice",
+  "A re-exam before more adjustments",
+  "The employer's OK for a workplace care day"
+ ],
+ "facts": [
+  "plans",
+  "planbill",
+  "forms",
+  "children",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each chiropractor holds their own active chiropractic license (DC) from the state where the patient is seen",
+ "staff_skills": "chiropractors: exams, adjustments, reading X-rays, kinesio taping; prenatal care only by a chiropractor trained for it (here Dr. Chen); the front desk: check-in, plan checks, estimates and payment; only people cleared for house calls go to homes and workplaces",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the results or the chiropractor's name (on a house call the chiropractor's name stays, for the door check); X-rays and results never go through Rosie",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/chiropractor",
+  "pexels": "https://www.pexels.com/search/chiropractor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

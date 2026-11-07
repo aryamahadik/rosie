@@ -1,0 +1,174 @@
+{
+ "id": "baker",
+ "name": "Custom cake baker",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Custom cake baker",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Custom cake baker",
+   "staff": "Mara and Ines (bakers at the shop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Tasting for 2",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$40",
+     "story": "The main story: a $55 tasting for 2 with Mara, paid in full when booking. A cake from the price board, like a $40 6-inch cake picked up at the counter, is paid the same way.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "2-tier party cake (serves 30)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": "$55",
+     "fee": "$40",
+     "story": "A $140 2-tier party cake for 30, picked up Sat at 11:00am. A $40 deposit now, and the $100 rest charged to the saved card at pickup.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Custom cake",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom cake picked up at the shop, quoted by Mara from Alex's photos at $90 (Sam OKs every custom cake quote). A $20 deposit when booked, and the $70 rest charged to the saved card at pickup.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Custom cake baker",
+   "staff": "Nico and Ellis (decorators who deliver)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Custom tiered cake for 80",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a 3-tier cake for 80, quoted from Alex's photos at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest charged to the saved card when Nico texts DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "2-tier cake for 30",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 2-tier cake for 30 from the menu, delivered. A $40 deposit now, and the $110 rest charged to the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "2-tier cake for 30",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The same $150 2-tier cake for 30, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Cake Studio's own list)\":[{\"service\":\"Custom tiered cake, delivered and set up\",\"price kind\":\"quoted from photos and answers first (servings, tiers, flavors, the design)\",\"price\":\"the quote (the example: $640 for 3 tiers for 80)\",\"length\":\"a 2-hour delivery window, done before the event starts\",\"place\":\"at the venue or the customer's home\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest charged to the saved card when the baker texts DONE\",\"note\":\"The owner OKs quotes over $500. A cake stand is lent with a $50 damage hold.\"},{\"service\":\"Wedding cake\",\"price kind\":\"quoted after a design call, and a tasting if the couple wants one\",\"price\":\"the quote (the example's starting price: $6 a serving)\",\"length\":\"a 2-hour delivery window\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest charged to the saved card at DONE (the design locks 14 days before)\",\"note\":\"Orders close 3 weeks before. The owner OKs every wedding cake.\"},{\"service\":\"2-tier cake for 30, from the menu\",\"price kind\":\"one price\",\"price\":\"$150, delivered\",\"length\":\"a 2-hour delivery window\",\"place\":\"at the customer's place\",\"before\":\"a $40 deposit, or the full price\",\"after\":\"the rest charged to the saved card at DONE, or nothing more\"},{\"service\":\"Sheet cake for 40\",\"price kind\":\"one price\",\"price\":\"$179, delivered\",\"length\":\"a 2-hour delivery window\",\"place\":\"at an office, a venue or a home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same day only when the kitchen has room, and a same-day order asks the owner first\"},{\"service\":\"Cupcake tower, 4 dozen\",\"price kind\":\"by person\",\"price\":\"$199, or $249 when Sam makes it\",\"length\":\"a 2-hour delivery window\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Cake cutting\",\"price kind\":\"per unit\",\"price\":\"$2 a slice\",\"length\":\"added to a delivered cake\",\"place\":\"at the event\",\"before\":\"with the main order, or added on the day\",\"after\":\"added on the day: one pay link\",\"note\":\"Only with the customer's written yes, at the price shown before booking\"},{\"service\":\"Serving staff for dessert tables\",\"price kind\":\"per hour, by person\",\"price\":\"$140 an hour with Nico, $120 with anyone else (the example)\",\"length\":\"1-hour minimum\",\"place\":\"at the event\",\"before\":\"with the main order\",\"after\":\"with the main order\"},{\"service\":\"Dessert table for 25, or for 40\",\"price kind\":\"one price\",\"price\":\"$149, or $189\",\"length\":\"a set start time\",\"place\":\"at the venue\",\"before\":\"a 25% deposit\",\"after\":\"the rest charged to the saved card at DONE\",\"note\":\"Served dessert tables only under a serving permit and a food manager where the state's rules require them\"},{\"service\":\"Wedding dessert table\",\"price kind\":\"quoted after a venue walk-through\",\"price\":\"the quote\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the wedding cake's contract and deposit\",\"after\":\"with the wedding cake's rest\"},{\"service\":\"Delivery and setup\",\"price kind\":\"travel fee\",\"price\":\"free within 10 miles; $89 up to 25 miles (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"added to the order\",\"after\":\"with the rest\",\"note\":\"Never shipped or sent by a courier app\"},{\"service\":\"Repeat orders, like an office's monthly birthday cake\",\"price kind\":\"one price a delivery\",\"price\":\"the menu cake's own price (the example: $150 for a 2-tier cake)\",\"length\":\"a 2-hour delivery window each time\",\"place\":\"at the customer's place\",\"before\":\"each delivery booked and paid like a single order\",\"after\":\"nothing more\",\"note\":\"Only when the customer asks for it. Skip, pause or end by text.\"}],\"at the business (the example: Lee's Bakeshop's own list)\":[{\"service\":\"Tasting for 2\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min at the tasting table\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Credited to a wedding cake ordered within 30 days (the example's own rule)\"},{\"service\":\"Dozen cupcakes, 6-inch cake, cookie box, smash cake (for a first birthday)\",\"price kind\":\"one price\",\"price\":\"$35, $40, $20, $25\",\"length\":\"a pickup slot: the same day from the case when it's in stock, or 2 days' notice for words or colors\",\"place\":\"at the shop's counter\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"2-tier party cake (serves 30)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"a pickup slot, 2 days' notice\",\"place\":\"at the shop's counter\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest charged to the saved card at pickup\"},{\"service\":\"Custom cake\",\"price kind\":\"quoted from photos first\",\"price\":\"the quote (the example: $90)\",\"length\":\"a pickup slot, 2 days' notice\",\"place\":\"at the shop's counter\",\"before\":\"a $20 deposit, once the quote is OK'd\",\"after\":\"the rest charged to the saved card at pickup\"},{\"service\":\"Wedding cake design\",\"price kind\":\"priced at a design consult\",\"price\":\"only the $25 consult is promised\",\"length\":\"30 min\",\"place\":\"at the shop, or by video\",\"before\":\"the $25 consult\",\"after\":\"the cake is booked as its own order\"},{\"service\":\"Dozen cupcakes, delivered\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"a delivery window\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same cupcakes, booked in flow B\"}],\"capacity\":\"The kitchen's own limit of tiered cakes a week and a weekend (the example: 6 a weekend). Pickups by slots, set by how many cakes the shop makes in a day. A design call or a tasting books the baker's time.\",\"nobody needs to be there\":\"Never: a cake is handed to a person, who checks it and signs for it.\",\"online\":\"A design call by video, as a first step for a custom or wedding cake. Cakes are never shipped.\"}",
+ "questions_before_times": [
+  "What it's for, and the event's date and start time",
+  "How many servings, and how many tiers if they know",
+  "Flavors and fillings, from the menu",
+  "Pickup or delivery; for a delivery, the place's name and town",
+  "Any food allergies or diets to plan for: yes or no only"
+ ],
+ "safety_stop": [
+  "Someone is having a bad allergic reaction right now: trouble breathing, a swollen face or throat",
+  "A fire or a gas smell, at the kitchen or the venue"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "extrawork",
+  "forms",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Always for food: a food permit from the health department for the kitchen the cakes are made in. A home kitchen sells only under its state's cottage food rules. Dessert tables served at a venue may need a serving permit. All from the state form.",
+ "staff_skills": "[\"Custom tiered and wedding cakes (leads only)\",\"Menu cakes, sheet cakes and cupcakes\",\"Delivering and setting up tiered cakes\",\"Tastings and design calls\",\"Dessert tables, with a food manager where required\"]",
+ "messages_never": "Allergies, diets and any health detail stay on the secure page, with their own yes. Only the baker making the cake and the manager see them, for that order. They're deleted the day after the pickup or delivery.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/custom+cake+baker",
+  "pexels": "https://www.pexels.com/search/custom%20cake%20baker/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

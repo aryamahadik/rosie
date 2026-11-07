@@ -1,0 +1,147 @@
+{
+ "id": "planner",
+ "name": "Wedding & event planner",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "photographer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Wedding & event planner",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Wedding & event planner",
+   "staff": "Nadia and Elena (planners at the studio)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "photos|deposit|bill",
+   "services": [
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Full planning",
+     "price": "$8,500",
+     "deposit": "$2,550",
+     "rest": "$5,950",
+     "paid_now": null,
+     "fee": "$2,550",
+     "story": "The main story: full planning for Alex and Robin's wedding, quoted at $8,500 after Nadia's free first call (over $500, so Sam OKs it). Both sign the contract, and a $2,550 retainer holds the date. The $5,950 rest is billed in stages, each one when Nadia texts DONE for it (two stages of $2,975 in the example); Rosie never bills on a date by itself.",
+     "due_now_at_booking": 2550,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Planning consult (1 hour)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$150",
+     "story": "A $150 planning consult (1 hour) for a couple who plans it themselves, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Extra planning meeting (1 hour)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "An extra planning meeting (1 hour) after the contract's 10 are used: $150, nothing taken to book, and Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free first call (45 min)",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The free first call (45 minutes) with the planner who would lead the wedding: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Wedding & event planner",
+   "staff": "Julian and Gabe (planners on the day)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Month-of coordination",
+     "price": "$2,400",
+     "deposit": "$600",
+     "rest": "$1,800",
+     "paid_now": null,
+     "fee": "$600",
+     "story": "The main story: month-of coordination for Alex and Robin's wedding at Cedar Hill Farm, Thu Oct 22, quoted at $2,400 after Julian's free first call (over $500, so Sam OKs it). Both partners and Sam sign the contract, a $600 retainer holds the date, and the $1,800 rest is charged to the saved card when Julian texts DONE after the day. An extra hour on the night is priced first and needs a yes.",
+     "due_now_at_booking": 600,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the business (the example: Lee Planning Studio's own list, at the studio or by video)\":[{\"service\":\"Free first call (45 min)\",\"price kind\":\"free\",\"price\":\"$0\",\"length\":\"45 min\",\"place\":\"at the studio or by video\",\"before\":\"nothing\",\"after\":\"nothing\",\"note\":\"Always with the planner who would lead the wedding, by name. It's how full and partial planning get their quote.\"},{\"service\":\"Full planning\",\"price kind\":\"quoted after the free first call\",\"price\":\"the quote (the example: $8,500)\",\"length\":\"about 8 to 18 months: 10 planning meetings, the venue and vendor search, the budget and design, the final walkthrough, the rehearsal, and the day with 2 planners\",\"place\":\"meetings at the studio or by video; the walkthrough, rehearsal and day at the venue\",\"before\":\"a signed contract, then a 30% retainer that holds the date\",\"after\":\"the rest in two set payments: 35% due six months before, 35% due 30 days before, each billed by text a week ahead\",\"note\":\"One wedding a date per lead planner. The owner OKs every quote.\"},{\"service\":\"Partial planning\",\"price kind\":\"quoted after the free first call\",\"price\":\"the quote (the example: $4,800)\",\"length\":\"from 6 months out: 4 planning meetings, the final walkthrough, the rehearsal and the day\",\"place\":\"as full planning\",\"before\":\"a signed contract, then a 30% retainer\",\"after\":\"the rest in set payments, billed by text\"},{\"service\":\"Planning consult (1 hour)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the studio or by video\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"For couples who plan it themselves: a checklist, a budget plan or vendor ideas.\"},{\"service\":\"Extra planning meeting (1 hour)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the studio or by video\",\"before\":\"nothing\",\"after\":\"Rosie texts the bill\",\"note\":\"Only after a contract's included meetings are used, and only if the couple asks.\"},{\"service\":\"Welcome party or brunch, planned and run\",\"price kind\":\"quoted\",\"price\":\"from $900 (the example)\",\"length\":\"3 hours on site\",\"place\":\"at the venue\",\"before\":\"added to the contract, signed\",\"after\":\"with the planning's payments\"}],\"at the customer's place (the example: Lee Weddings & Events' own list)\":[{\"service\":\"Free first call (45 min)\",\"price kind\":\"free\",\"price\":\"$0\",\"length\":\"45 min\",\"place\":\"by video, at the office, or at the couple's venue\",\"before\":\"nothing\",\"after\":\"nothing\",\"note\":\"With the planner who would lead the day. It's how month-of coordination, full planning and party coordination get their quote.\"},{\"service\":\"Month-of coordination\",\"price kind\":\"quoted after the free first call\",\"price\":\"the quote (the example: $2,400)\",\"length\":\"from 8 weeks out: 2 planning meetings by video, the final walkthrough, the rehearsal, and the day with 2 planners (up to 11 hours)\",\"place\":\"at the couple's venue\",\"before\":\"a signed contract, then a 25% retainer that holds the date\",\"after\":\"the rest charged to the saved card when the day is done\",\"note\":\"The couple has planned it and booked their own vendors. The owner OKs every quote.\"},{\"service\":\"Full planning at the venue\",\"price kind\":\"quoted after the free first call\",\"price\":\"the quote\",\"length\":\"as the studio's full planning\",\"place\":\"at the couple's venue\",\"before\":\"a signed contract, then a 30% retainer\",\"after\":\"the rest billed in stages, each when the planner texts DONE for it\"},{\"service\":\"Corporate event planning (Lee Corporate Events)\",\"price kind\":\"quoted after a first call\",\"price\":\"the quote\",\"length\":\"set by the event\",\"place\":\"at the company's venue\",\"before\":\"a signed contract, then a retainer\",\"after\":\"the rest on the bill after the event, or on the company's invoice\"},{\"service\":\"Party coordination (an engagement party or a shower)\",\"price kind\":\"quoted after a free first call\",\"price\":\"the quote\",\"length\":\"set by the party, a few hours on the day\",\"place\":\"at the host's home or venue\",\"before\":\"a signed contract, then a 25% retainer\",\"after\":\"the rest charged to the saved card when the party is done\",\"note\":\"An outdoor party moves, with no fee, when the forecast is over the weather limit.\"},{\"service\":\"Extra hour on the day\",\"price kind\":\"per hour, per planner\",\"price\":\"$150 an hour for each planner (the example)\",\"length\":\"1 hour\",\"place\":\"at the event\",\"before\":\"nothing: asked on the night\",\"after\":\"one pay link after\",\"note\":\"Only with the couple's written yes by text, at the rate shown before booking.\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 40 miles; beyond, $1 a mile round trip (the example)\",\"length\":\"\",\"place\":\"at the venue\",\"before\":\"added to the quote\",\"after\":\"with the rest\"}],\"capacity\":\"One wedding a date for each lead planner, with an associate planner on the day. Meetings book the planner's own time.\",\"what Rosie never books\":\"Other vendors. The couple signs and pays each vendor (venue, caterer, photographer, florist, DJ) directly. Rosie books and takes money only for the planner's own time and work.\",\"nobody needs to be home\":\"Never: a planner works with the couple or at the event.\",\"online\":\"The free first call, planning meetings and consults can be video calls. Consults are held only at the studio or by video.\"}",
+ "questions_before_times": [
+  "What it is: a wedding, an engagement party, a corporate event or another party",
+  "The date, or a season if there's no date yet",
+  "The area, and the venue's name and town if there is one (for travel)",
+  "About how many guests",
+  "Which service: full planning, partial planning, month-of coordination, a consult, or not sure",
+  "Indoors, outdoors or both"
+ ],
+ "safety_stop": [
+  "Someone hurt, a fire, or danger at the venue right now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "video",
+  "stages"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "No state license for planning or coordinating weddings and events in most places. A local business license where the city or county asks for one: from the state form.",
+ "staff_skills": "[\"Full planning (leads only)\",\"Month-of coordination\",\"Planning consults\",\"Corporate events\",\"Design and rentals\"]",
+ "messages_never": "The budget, the guest list, family details, access or health needs and gate codes stay on the secure page. Texts to the owner, the planners or the couple carry none of them: only names, dates, times, places and the planner's fee.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/wedding+event+planner",
+  "pexels": "https://www.pexels.com/search/wedding%20%26%20event%20planner/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

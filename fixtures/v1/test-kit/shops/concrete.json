@@ -1,0 +1,202 @@
+{
+ "id": "concrete",
+ "name": "Concrete and driveway contractor",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Concrete and driveway contractor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Concrete and driveway contractor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Finish consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Finish consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Finish consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Finish consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Pattern mock-up session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Pattern mock-up session, $55, paid in full when booking; credited to the job if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Driveway design package",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Driveway design package, $140; a $40 deposit now; the $100 rest at the showroom desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Concrete and driveway contractor",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Driveway replacement",
+     "price": "$2,700",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Driveway replacement: the $89 estimate visit, nothing taken; Dario's written quote; the contract, a $900 deposit and stage bills; the last $2,700 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Driveway replacement",
+     "price": "$2,700",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same driveway, but Sam bills each stage and the last payment his own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Driveway replacement",
+     "price": "$2,700",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same driveway, with a card saved for the $89 estimate visit fee when Alex books.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Walkway section replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A walkway section replaced, priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Estimate visit, then project: the job is booked only after a written quote and a signed contract\",\"B\":[{\"name\":\"Estimate visit\",\"price\":\"$89, credited to the job if Alex signs (the example business's own price; a free estimate is a starting option)\",\"length\":\"30 to 60 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken (or a card saved for the $89)\",\"after\":\"billed only if no contract follows\"},{\"name\":\"Driveway replacement\",\"price\":\"quoted after the estimate visit by the square foot: a written quote within 3 business days, good for 30 days\",\"length\":\"about 3 to 5 work days, then the slab cures\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"stage bills as each checked stage is done; the last after the walk-through\"},{\"name\":\"Patio, walkway or garage floor slab\",\"price\":\"quoted after the estimate visit\",\"length\":\"1 to 3 work days\",\"where\":\"at the customer's place\",\"before\":\"the same as the driveway\",\"after\":\"the same, in stages\"},{\"name\":\"Steps, stoops and curbs\",\"price\":\"quoted after the estimate visit\",\"length\":\"1 to 2 work days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Stamped, colored or exposed-aggregate finish\",\"price\":\"quoted as part of the slab\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Concrete removal and haul-away\",\"price\":\"quoted after the estimate visit\",\"length\":\"half a day to 2 days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Walkway section replacement\",\"price\":\"priced from photos (example: $640); over $500, Sam OKs it\",\"length\":\"1 day\",\"where\":\"at the customer's place\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Crack repair\",\"price\":\"$179, from the list (up to 20 feet)\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Concrete sealing\",\"price\":\"$150, from the list (up to 500 square feet); also a yearly plan\",\"length\":\"2 to 3 hours\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Slab inspection report\",\"price\":\"$199, with a written report\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Change order\",\"price\":\"priced, written and signed by both before the changed work; added to the next stage bill\"},{\"name\":\"Permit, utility locate, concrete order and haul-away\",\"price\":\"in every quote\"}],\"A\":[{\"name\":\"Finish consult\",\"price\":\"$35, 30 minutes\",\"where\":\"at the showroom; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the showroom desk\"},{\"name\":\"Color and pattern picks\",\"price\":\"$40\",\"where\":\"at the showroom\",\"before\":\"a card saved\",\"after\":\"at the showroom desk\"},{\"name\":\"Sample slab\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the showroom\"},{\"name\":\"Sealer sample\",\"price\":\"$15, an add-on at a consult\",\"where\":\"at the showroom\"},{\"name\":\"Stain color pick\",\"price\":\"$25\",\"where\":\"at the showroom\"},{\"name\":\"Pattern mock-up session\",\"price\":\"$55, 60 minutes; credited to the job if Alex signs\",\"where\":\"at the showroom\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Driveway design package (layout, finish, 3D drawing)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the showroom\",\"before\":\"the $40 fee held (over 2 hours), or a $40 deposit\",\"after\":\"at the showroom desk\"},{\"name\":\"Custom pattern\",\"price\":\"priced from the customer's photos and measurements (example: $90); Sam OKs each one\",\"where\":\"at the showroom\"},{\"name\":\"Stain correction\",\"price\":\"priced at the showroom after a $25 consult\",\"where\":\"at the showroom\"}],\"capacity\":\"One estimator or advisor per booking; 2 pours a day at most per crew; the showroom's design table is saved with long sessions\",\"skills\":\"Estimates and running a job: crew leads. Finish consults: finish advisors. Sawing, pumping and sealing: subcontractors.\",\"nobody_home\":\"Estimates and sealing: nobody needs to be home if the gate or lockbox is set. Pour days: an adult on the booking is reachable by phone.\",\"online\":\"No video or phone finish consult: it uses the sample slabs at the showroom\",\"smallest_job\":\"A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes no pour under 100 square feet).\"}",
+ "questions_before_times": [
+  "What do you want poured or fixed? (driveway, patio, walk, steps, garage floor)",
+  "Rough size, length by width, or just a guess",
+  "When should it be finished?",
+  "Is there an old slab to take out first?"
+ ],
+ "safety_stop": [
+  "gas smell, hissing near a gas line, sparking or smoking wires, a carbon monoxide alarm",
+  "a slab, step or wall giving way, a sinkhole opening, a retaining wall leaning and moving"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "stages",
+  "photos",
+  "extrawork",
+  "firststeps",
+  "multiday",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: a contractor or concrete registration or license for the company, where the state's form requires one (often by job size or kind of work)",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or lockbox codes\",\"The budget\",\"Contract, change order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/concrete+and+driveway+contractor",
+  "pexels": "https://www.pexels.com/search/concrete%20and%20driveway%20contractor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

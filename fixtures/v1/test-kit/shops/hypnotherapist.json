@@ -1,0 +1,164 @@
+{
+ "id": "hypnotherapist",
+ "name": "Hypnotherapist",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "massage",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Hypnotherapist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Hypnotherapist",
+   "staff": "Ruth and Dan (hypnotherapists)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "50-min hypnotherapy session",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The main story: a 50-minute hypnotherapy session at Lee Hypnosis Studio with Ruth, $120. A card is saved for the studio's $60 fee, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "50-min hypnotherapy session (6-session pack)",
+     "price": "$660",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$660",
+     "fee": "$60",
+     "story": "A 6-session pack, $660, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 660,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "video session (50 min)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A video session, $120. A card is saved, and charged when Ruth texts DONE after the session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Hypnotherapist",
+   "staff": "Pedro and Ines (hypnotherapists who visit)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "50-min hypnotherapy at home",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$80",
+     "story": "The main story: a 50-minute session at Alex's home with Pedro, $160. A card is saved for the $80 fee, and Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "50-min hypnotherapy at home, paid in full",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$140",
+     "fee": "$70",
+     "story": "A home session paid in full, $140, when booking. A no-show can use it up, if Sam confirms.",
+     "due_now_at_booking": 140,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one-to-one sessions of 50 minutes, with a practitioner the client picks or any free one; video sessions; packs of sessions; a home or office visit",
+ "questions_before_times": [
+  "what the client wants to work on, in their own words (a habit, sleep, stress, confidence)",
+  "in the studio, by video, or at a home or office",
+  "a practitioner by name, or a woman or a man, only if the client asks",
+  "for a teen (16 or 17): the age; a parent or guardian books"
+ ],
+ "safety_stop": [
+  "thoughts of harming yourself or someone else, or a crisis right now",
+  "a seizure, fainting, chest pain, trouble breathing, or hearing voices that tell someone to act",
+  "epilepsy, a recent head injury, or a psychosis diagnosis"
+ ],
+ "first_steps": [
+  "Intake form",
+  "Practitioner's read of a flag",
+  "A teen's consent"
+ ],
+ "facts": [
+  "packs",
+  "firststeps",
+  "forms",
+  "video",
+  "aftercare",
+  "children"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "8pm the day before"
+  }
+ },
+ "license": "none checked by Rosie: hypnotherapy has no state license in most places; a certificate or membership is the practitioner's own word, optional, and never checked (D96)",
+ "staff_skills": "hypnotherapy for habits, sleep, stress and confidence; relaxation and take-home audio; only practitioners with the training a booking names are offered",
+ "messages_never": "the reason for a visit, goals, health answers, medicines, a doctor's note and the practitioner's notes never go in a text or through the AI: only the secure page and the client's private record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/hypnotherapist",
+  "pexels": "https://www.pexels.com/search/hypnotherapist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

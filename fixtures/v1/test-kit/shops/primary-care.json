@@ -1,0 +1,149 @@
+{
+ "id": "primary-care",
+ "name": "Primary care doctor",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "pediatrician",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Primary care doctor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Family Medicine",
+   "staff": "Helen (family doctor) and Irene (nurse practitioner)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$210",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Alex's new patient visit with Helen, billed to Alex's plan. Nothing is taken. The desk checks the plan, and Alex pays the $30 copay at the front desk. Sick visits, checkups and self-pay visits ($210 for a new patient) are paid the same way; a balance after the plan pays is the office's own bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$210",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Sam confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee House Calls",
+   "staff": "Victor and Simon (nurse practitioners), who visit with a medical bag",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $179 house call for Alex with Victor. Nothing is taken. The office bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same house call, paid by Alex himself: nothing is taken, and Rosie texts the $179 bill when Victor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits of a set length, booked with a family doctor or a nurse practitioner by name; a new patient's first visit is longer and the owner OKs it; same-day sick times open each morning for current patients first; yearly checkups for current patients; follow-ups and fasting labs are booked by the office at checkout, never offered by text or to an AI; other shots are picked by the clinician at the visit, a flu shot can also be booked, and no shot is ever paid up front; a house call has a 2-hour arrival window",
+ "questions_before_times": [
+  "a new or a current patient",
+  "which visit: the office's own visit types only, never a symptom typed into the AI",
+  "a plan (its name only) or self-pay",
+  "for a video visit: which state the patient will be in",
+  "who the visit is for: the person booking, a child, or another adult"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, signs of a stroke (a drooping face, a weak arm, slurred speech, a sudden severe headache), fainting, or very heavy bleeding",
+  "an overdose, or swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "Health history, medicines, the consent and the privacy notice",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "Records from the last doctor",
+  "Sam's OK for a new patient"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each family doctor (MD or DO), internist, nurse practitioner, physician assistant and nurse holds their own active license from the state where the patient is during the visit; which roles need which license comes from the state's form (a switch)",
+ "staff_skills": "family doctors and nurse practitioners: new patients, yearly checkups, sick visits, video visits and house calls; nurses: flu shots and shot-only visits on the clinician's order; home blood work: someone whose license or certificate covers drawing blood; only people cleared for house calls go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, symptoms, medicines, test results or the clinician's name (at a house call the clinician's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/primary+care+doctor",
+  "pexels": "https://www.pexels.com/search/primary%20care%20doctor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

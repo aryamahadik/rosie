@@ -1,0 +1,174 @@
+{
+ "id": "event-staffing",
+ "name": "Event security and staffing",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Event security and staffing",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Event security and staffing",
+   "staff": "Dana and Lou (the office)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Staffing plan meeting",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$20",
+     "story": "The main story: a staffing plan meeting, $75, paid in full when booking.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Planning call by video",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 20-minute planning call by video. Nothing is taken.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Event security and staffing",
+   "staff": "Jo and Nico (the crew)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Two guards for 6 hours",
+     "price": "$480",
+     "deposit": "$120",
+     "rest": "$360",
+     "paid_now": null,
+     "fee": "$120",
+     "story": "The main story: two guards for 6 hours at $40 an hour each ($480). A $120 deposit now, and the $360 rest charged to the saved card when Jo marks the shift done.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Usher shift, 2 people for 4 hours",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$240",
+     "fee": "$75",
+     "story": "A usher shift, 2 people for 4 hours, $240, paid in full when booking.",
+     "due_now_at_booking": 240,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Ushers and bartenders by the hour",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "Ushers and bartenders by the hour, priced at the event by the hours worked. A card is saved for the $75 late-cancel fee; the bill comes after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Guard shift, 3 hours",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "A guard shift for a 3-hour club night, $120 ($40 an hour). A card is saved, and $120 is charged when Jo marks it done.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (flow B)\":[{\"service\":\"Two guards for a 6-hour party\",\"price kind\":\"per guard hour\",\"price\":\"$40 an hour per guard, 2 guards and a 4-hour minimum; the 6-hour example is $480\",\"length\":\"the event's hours, plus 30 minutes to arrive before the start\",\"place\":\"at the venue, up to 25 miles\",\"before\":\"a $120 deposit when booking\",\"after\":\"the rest charged to the saved card when the shift is marked done, from the hours worked\"},{\"service\":\"Ushers and bartenders, by the hour\",\"price kind\":\"priced at the event by hours worked\",\"price\":\"the rate on the contract, per person per hour; a card saved for the $75 late-cancel fee\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"a card saved\",\"after\":\"the bill after the event, from the hours worked\"},{\"service\":\"Usher shift, 2 people for 4 hours\",\"price kind\":\"one price\",\"price\":\"$240: $30 an hour each\",\"length\":\"4 hours\",\"place\":\"at the venue\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"}],\"at the business (flow A)\":[{\"service\":\"Staffing plan meeting at the office\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"45 minutes\",\"place\":\"at Lee Staffing Office, 23 Mesa Rd\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"service\":\"Planning call by video\",\"price kind\":\"free\",\"price\":\"free\",\"length\":\"20 minutes\",\"place\":\"by video or phone\",\"before\":\"nothing taken\",\"after\":\"nothing\"}],\"capacity\":\"One lead per crew. A crew of 2 covers up to 100 guests; 4 covers up to 300. Bartenders only with a current card.\",\"nobody needs to be there\":\"Never: a crew leaves no one in charge. The lead checks out with the venue's contact.\",\"online\":\"Planning calls by video or phone.\"}",
+ "questions_before_times": [
+  "The event date, the start and end times",
+  "How many guests, and how many staff the venue wants: guards, ushers or bartenders",
+  "The town or ZIP, and the kind of site: a venue, a home, a park, a street, an office",
+  "Is there a set entry point and a number of gates or doors to staff?",
+  "Is alcohol served, and does the venue hold its own license?"
+ ],
+ "safety_stop": [
+  "A weapon, a fight, or someone hurt at the event right now",
+  "A medical emergency now (trouble breathing, a heart attack, a seizure)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "forms",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "The company's state security or guard license where the state requires one, and a registration for the company. Each guard holds the state's guard card where it's required. Bartenders hold a server card where the state's rules require one. A certificate of insurance (general liability, and liquor liability where bartenders pour) for any venue that asks.",
+ "staff_skills": "[\"Event security and crowd posts\",\"Ushers and ticket checks\",\"Bartending with ID checks\",\"Plan meetings for the venue's rules\"]",
+ "messages_never": "Names of people to be watched for, venue codes, card details and any health detail. The shift's list stays on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/event+security+and+staffing",
+  "pexels": "https://www.pexels.com/search/event%20security%20and%20staffing/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

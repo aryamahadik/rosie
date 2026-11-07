@@ -1,0 +1,210 @@
+{
+ "id": "tattoo",
+ "name": "Tattoo studio",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tattoo studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tattoo studio",
+   "staff": "Theo and Nina (tattoo artists)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "photos|deposit|counter",
+   "services": [
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Custom tattoo",
+     "price": "$300",
+     "deposit": "$100",
+     "rest": "$200",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a custom tattoo, priced by Theo from Alex's reference photos at $300 and OK'd by Sam. A $100 deposit now, the $200 rest at the desk.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Half sleeve session",
+     "price": "set at the session",
+     "deposit": "$100",
+     "rest": "set at the session",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A half sleeve session by the hour ($180 an hour), from $540 and set at the session. A free consult comes first. The $100 drawing fee is the deposit, counted toward the price.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Flash tattoo",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 flash tattoo from the studio's flash wall. A $40 deposit now, the $100 rest at the desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Lobe piercing",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $35 lobe piercing for an adult. Nothing is taken: a YES books it. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free consult",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 30-minute consult with Theo. Nothing is taken, and nothing is paid after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tattoo studio",
+   "staff": "Dante and Kira (artists in the mobile studio)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "photos|deposit|bill",
+   "services": [
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Custom piece in the mobile studio",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a custom forearm piece in the mobile studio, priced by Dante from Alex's photos at $640 and OK'd by Sam. A $160 deposit now, the $480 rest on the bill Rosie texts.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Small flash in the mobile studio",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 small flash piece from the mobile studio's list. A $40 deposit now, the rest on the bill Rosie texts.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Cover-up in the mobile studio",
+     "price": "set at the visit",
+     "deposit": "$89",
+     "rest": "set at the visit",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A cover-up of an old tattoo, priced at the visit once Dante sees it. The $89 trip fee is paid up front as the deposit, counted toward the bill.",
+     "due_now_at_booking": 89,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "sessions booked with a chosen artist; a custom piece's length is set by its design, a big piece runs over several sessions",
+ "questions_before_times": [
+  "tattoo or piercing",
+  "where on the body, and about how big",
+  "the style: flash from the wall, or custom",
+  "color, or black and grey",
+  "a cover-up of an old tattoo, or new skin",
+  "first tattoo or not",
+  "for a big piece: a consult first"
+ ],
+ "safety_stop": [
+  "trouble breathing, or a swollen face, lips or throat after a tattoo or piercing",
+  "a high fever, or red streaks spreading from a new tattoo or piercing"
+ ],
+ "first_steps": [
+  "Consent and health form",
+  "Free consult",
+  "Design shared before the session",
+  "Event or mobile studio permit"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "documents",
+  "groups",
+  "extrawork",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "always: tattooing and body piercing are licensed where the state's rules require it (a switch from the state form)",
+ "staff_skills": "custom work, flash, lettering, cover-ups, piercing; only the artist who drew a custom piece is offered for it",
+ "messages_never": "health answers, health questions, healing photos, reference images and ID details never go in a text or through the AI: only the secure page and the customer's record; the artist answers health questions in their own words on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tattoo+studio",
+  "pexels": "https://www.pexels.com/search/tattoo%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

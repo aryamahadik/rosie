@@ -1,0 +1,174 @@
+{
+ "id": "fertility",
+ "name": "Fertility clinic",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Fertility clinic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Fertility",
+   "staff": "Maya (doctor) and Joel (nurse coordinator)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "New patient consult",
+     "price": "$220",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a new patient consult billed to the patient's plan. Nothing is taken; Rosie texts the patient's share once the plan pays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient consult",
+     "price": "$220",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The same consult where the clinic turns on its $150 no-show fee: a card is saved for it, never for a fee-free patient, and the owner confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video consult",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$120",
+     "fee": "$0",
+     "story": "A self-pay video consult ($120), paid in full when booking; nothing more after the visit.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "IVF cycle",
+     "price": "$12000",
+     "deposit": "$3000",
+     "rest": "$9000",
+     "paid_now": null,
+     "fee": "$250",
+     "story": "An IVF cycle: a $3,000 deposit when booking; the rest is billed by the clinic's own bill, never charged on a set day.",
+     "due_now_at_booking": 3000,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Nurses",
+   "staff": "Ines and Paul (nurses, with a supply bag)",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Injection teaching at home",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: an injection teaching visit at home with a nurse. Nothing is taken; the clinic bills the patient's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Injection teaching at home",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home visit, paid by the patient: nothing is taken, and Rosie texts the $95 bill when the visit is marked DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "fertility clinic: consults and monitoring with a named doctor or the next open clinician; procedure days (an IUI, an egg retrieval or an embryo transfer) with the procedure team and a companion; a home nurse visit for injection teaching; a semen analysis dropped off in a private room at the clinic; a video consult counts as at the clinic",
+ "questions_before_times": [
+  "the kind of visit (new consult, monitoring, procedure day, injection teaching at home)",
+  "whether it's a video consult (counts as at the clinic)",
+  "a health plan or self-pay (only the plan's name here)",
+  "for a procedure day: the adult who will drive the patient home, named on the booking",
+  "for a home visit: the town and whether the patient can come to the door"
+ ],
+ "safety_stop": [
+  "heavy bleeding, severe belly or pelvic pain, dizziness or fainting, trouble breathing, or chest pain, after a procedure or a stimulation medicine"
+ ],
+ "first_steps": [
+  "A private history for a new patient",
+  "Consent for a procedure",
+  "The plan check",
+  "The procedure day's companion"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "video",
+  "extrawork",
+  "documents",
+  "dropoff"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "a state physician license for each reproductive doctor, and the clinic's license where the state requires one; a nurse's license for injection teaching; the lab's certificate for any semen analysis the state names; the clinic's registration where the state's rules require it",
+ "staff_skills": "reproductive medicine, monitoring, IUI and retrieval support, embryology, semen analysis, injection teaching, counseling referral, Spanish",
+ "messages_never": "the history, the names of tests or procedures, cycle or pregnancy details, results, medicines, ID numbers and plan details never go in a text: only the secure page; texts say only the clinic's name, the day, the time and the place",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/fertility+clinic",
+  "pexels": "https://www.pexels.com/search/fertility%20clinic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

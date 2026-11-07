@@ -1,0 +1,162 @@
+{
+ "id": "obgyn",
+ "name": "OB-GYN",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] OB-GYN",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Women's Care",
+   "staff": "Dana (OB-GYN doctor) and Mira (nurse practitioner)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a new patient visit with the doctor, billed to the patient's plan. Nothing is taken. The desk checks the plan, and the patient pays the copay ($40, example) at the front desk; a self-pay patient pays $240 there the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and the owner confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video follow-up visit",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$20",
+     "story": "A self-pay video follow-up ($85), paid in full when booking; nothing more after the visit.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Visits",
+   "staff": "Kit and Rosa (nurse practitioners, with a medical bag)",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Postpartum check at home",
+     "price": "$199",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a postpartum check at home with a nurse practitioner. Nothing is taken; the practice bills the patient's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Postpartum check at home",
+     "price": "$199",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home visit, paid by the patient: nothing is taken, and Rosie texts the $199 bill when the visit is marked DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "OB-GYN office: a patient books a visit with a named doctor or nurse practitioner (or the next open clinician who takes new patients); a video visit counts as at the office; a home visit by a nurse practitioner for a postpartum check or a patient who can't easily leave home; no walk-in line; same-day sick visits are offered first",
+ "questions_before_times": [
+  "the kind of visit (new, checkup, prenatal, birth control, a home visit)",
+  "whether it's a video visit (it counts as at the office)",
+  "a health plan or self-pay (only the plan's name here)",
+  "for a teen (under 18): whether the teen books alone, where the state's rules allow it",
+  "for a home visit: the town, and whether the patient can come to the door"
+ ],
+ "safety_stop": [
+  "heavy bleeding with dizziness or fainting, severe belly or pelvic pain, chest pain, trouble breathing, or a sudden severe headache, during pregnancy or after birth"
+ ],
+ "first_steps": [
+  "A health history for a new patient",
+  "Consent for a pelvic exam or procedure",
+  "The plan check",
+  "A teen's visit"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "a state medical license for each OB-GYN doctor and nurse practitioner, and the practice's registration where the state's rules require it; a state or federal registration for any in-office procedure or ultrasound the state names; a home-visit license where the state requires one for care at the patient's home",
+ "staff_skills": "obstetrics, gynecology, prenatal and postpartum care, contraception and IUD placement, in-office ultrasound, chaperones, Spanish",
+ "messages_never": "the diagnosis, a pregnancy, the names of tests or procedures, results, medicines, ID numbers and plan details never go in a text: only the secure page; texts say only the practice's name, the day, the time and the place",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/ob+gyn",
+  "pexels": "https://www.pexels.com/search/ob-gyn/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

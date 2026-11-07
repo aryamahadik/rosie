@@ -1,0 +1,134 @@
+{
+ "id": "art-classes",
+ "name": "Art classes",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "dance",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Art classes",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Art classes",
+   "staff": "Vera (painter and teacher) and the front desk",
+   "customer": "Alex M. (a parent, for Alex's daughter Mia, 9) · other parents and students",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial class",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$35",
+     "fee": "$20",
+     "story": "The main story: Mia's $35 trial class in Vera's Painting 1, Sat Oct 24 at 11:00am (12 seats, 2 trial seats), paid in full when booking. A private lesson at the studio ($55), an adult sketch night ($20) and the 8-week term ($140) are paid this way too.",
+     "due_now_at_booking": 35,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trial class",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 trial at a studio that takes nothing online: a YES books Mia's seat, and Alex pays at the front desk. Adult sketch nights can work this way too.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Art classes",
+   "staff": "Mateo (a painter who travels)",
+   "customer": "Alex M. (an adult student) · other customers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Private lesson at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $150 private painting lesson (60 minutes) at Alex's home with Mateo. A card is saved for the $40 fee, and the $150 is charged when Mateo texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The same $150 lesson, paid in full when booking, as some painters ask. A $150 group class at a host's place is paid in full this way too.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a seat in a set class time by art, age group and level, with a set number of seats, a few trial seats and a waitlist; each learner booked is checked in on their own. Private lessons book one teacher, at the school, at a home, or by video. A class at a host's place (a school, a company office, a library) books a teacher's time for a group",
+ "questions_before_times": [
+  "who is learning: the adult themselves, or the parent's child (the age sets the class)",
+  "which art, and the level: never studied, some before, or a fluent speaker who wants a refresher",
+  "the goal: travel, school, work, or fun",
+  "at the school, by video, or at home",
+  "for a class at a host's place: how many learners, their ages, and the place"
+ ],
+ "safety_stop": [
+  "someone hurt or unwell right now: a deep cut from a blade, a bad burn, a hard fall, a head injury, fainting, chest pain, trouble breathing"
+ ],
+ "first_steps": [
+  "Waiver and the child's details",
+  "The pick-up list and the photo yes or no",
+  "Placement for a learner who knows some of the art"
+ ],
+ "facts": [
+  "classes",
+  "children",
+  "waitlist",
+  "groups",
+  "video",
+  "forms"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "none for a art studio or a painter in most places; where the state's form names a license or registration, the owner adds it as an optional item. Rosie checks no license, certificate, insurance or background check",
+ "staff_skills": "painting, drawing, watercolor and acrylics for adults and kids; children's classes only for teachers the owner OKs for children",
+ "messages_never": "a child's last name, age, learning or health notes, allergies, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the class, and link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/art+classes",
+  "pexels": "https://www.pexels.com/search/art%20classes/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

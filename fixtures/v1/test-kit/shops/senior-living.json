@@ -1,0 +1,140 @@
+{
+ "id": "senior-living",
+ "name": "Senior living advisor",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "realtor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Senior living advisor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Senior living advisor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Free care-needs call",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free care-needs call at the office. Nothing is taken, and nothing is paid after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free community tour",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free community tour, arranged by the advisor: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Senior living advisor",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Free care-needs visit at home",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free care-needs visit at Alex's mother's home. Nothing is taken; the business's own way covers the rest (the communities pay the advisor).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free home visit to tour a care plan",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free home visit to tour a community's care plan in person: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Free care-planning: one-to-one calls and visits with a named advisor, by phone or video, at the office, or at the family's home (flow B). The communities pay the advisor, so no family pays Rosfield's business anything. Every family starts with the intake and the advisor's consent notice.\",\"at the office, by phone or video (Lee Senior Living, the example office's own terms)\":[{\"name\":\"Free care-needs call\",\"length\":\"30 minutes\",\"price\":\"free\",\"where\":\"by phone, by video, or at the office\",\"before\":\"nothing taken\",\"after\":\"nothing after\"},{\"name\":\"Free community tour\",\"length\":\"about 90 minutes, with the community's own staff\",\"price\":\"free\",\"where\":\"at a community the family picks\",\"before\":\"nothing taken\",\"after\":\"nothing after\"},{\"name\":\"Follow-up call\",\"length\":\"20 minutes\",\"price\":\"free\",\"where\":\"by phone or video, for a current family\",\"before\":\"nothing taken\",\"after\":\"nothing after\"}],\"at home (Lee Home Care Planning, the example office's own terms)\":[{\"name\":\"Free care-needs visit at home\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"at the family's home, with the older adult's yes\",\"before\":\"nothing taken\",\"after\":\"the business's own way\"},{\"name\":\"Free home visit to tour a care plan\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"at the home\",\"before\":\"nothing taken\",\"after\":\"nothing after\"}],\"late-cancel and no-show fee\":\"None: the advisor's services are free to the family, so no fee is ever charged.\",\"travel area\":\"Home visits within the owner's set distance (a sign-up setting; the example is 25 miles); outside it, a call instead.\",\"capacity\":\"One advisor per call or visit. A family may add one more adult to a visit with the older adult's yes.\",\"online\":\"Calls and video visits count as at the office. The confirmation carries the advisor's own link.\",\"booking window\":\"Up to 60 days ahead.\",\"nobody named\":\"The office's advisors are listed with no ranking and no 'best' label.\"}",
+ "questions_before_times": [
+  "Which advisor? The family names one, or sees the office's advisors listed with no ranking.",
+  "What's the reason for calling, in a few words: a move, a new care need, or a question about options? No medical details in the chat.",
+  "By phone, by video, at the office, or at the older adult's home (flow B)?",
+  "New or returning family? A new family starts with the intake and the advisor's notice."
+ ],
+ "safety_stop": [
+  "someone says they may hurt themselves or someone else",
+  "danger right now, a fall, or a medical emergency",
+  "an overdose, or swallowed medicine or a chemical",
+  "someone says an older adult is being hurt, scared, hit, starved or robbed, or is being kept from help"
+ ],
+ "first_steps": [],
+ "facts": [
+  "nomoney",
+  "documents",
+  "firststeps",
+  "forms",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "nomoney": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "None by default. Where a state's form names a placement registration for an advisor, it is a switch and the owner adds it. A credential an advisor lists is the advisor's own word, shown as stated.",
+ "staff_skills": "[\"Care-needs calls\",\"Community tours\",\"Home visits\",\"Move-in planning\"]",
+ "messages_never": "[\"anything about the older adult's health, care needs, memory, medicines, money or family\",\"what was said in a call or visit\",\"why a booking was declined\",\"crisis words or an abuse report\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/senior+living+advisor",
+  "pexels": "https://www.pexels.com/search/senior%20living%20advisor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

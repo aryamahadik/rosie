@@ -1,0 +1,187 @@
+{
+ "id": "sharpening",
+ "name": "Knife and tool sharpening",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Knife and tool sharpening",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Knife and tool sharpening",
+   "staff": "Gus and Rita (sharpeners)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Knife set",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 knife set (up to 5 knives) from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Blade restoration",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A rusty, chipped knife set, priced after a look. Only the $10 edge check is promised. Gus's written estimate is OK'd before any work, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Knife set",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same $35 knife set, with the bill texted once it's ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Knife and tool sharpening",
+   "staff": "Hank and Nora (mobile sharpeners)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "7am the day of",
+    "B": "6pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Kitchen visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 kitchen visit (up to 30 knives and tools) at Alex's place. A card is saved for the $89 trip fee, which is charged only for a late cancel or a no-show, and only on Sam's yes. Hank works alone, so the saved card is charged for the visit when Hank texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Kitchen visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 kitchen visit. A card is saved for the $89 trip fee. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Big batch sharpening",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A big, mixed batch priced at the visit. A card is saved for the $89 trip fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Kitchen visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A restaurant kitchen on account: the $179 visit. Nothing is taken when it books, and Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the knives and tools are left at the shop and picked up when they're READY; or a mobile sharpener comes to a home, a kitchen or a salon\",\"list\":[{\"name\":\"Kitchen knife set (up to 5 knives)\",\"price\":\"one price (the example shop: $35)\",\"length\":\"about 30 minutes while you wait, or left for the day\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Scissor and shear sharpening\",\"price\":\"one price per pair\",\"length\":\"left for the day\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Garden tool, pruner and axe sharpening\",\"price\":\"one price per tool\",\"length\":\"about 20 minutes while you wait\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Restaurant knife batch (up to 30 knives)\",\"price\":\"one price\",\"length\":\"left 1 to 2 days\",\"place\":\"at the shop, or in the truck at the kitchen\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Blade restoration (chipped, bent or rusty blades)\",\"price\":\"quoted after an edge check (the example: $10, counted toward the work): a written estimate, OK'd before any work\",\"length\":\"the edge check is about 15 minutes; more time needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Saw and mower blade grinding\",\"price\":\"one price per blade; set by size\",\"place\":\"at the shop, or at the customer's place\"},{\"name\":\"Kitchen visit (up to 30 knives and tools)\",\"price\":\"one price (the example: $179 at the customer's place)\",\"length\":\"about 2 hours\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Big batch, priced at the visit\",\"price\":\"priced at the visit; a written estimate OK'd before any work\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Trip to a home, kitchen or salon\",\"price\":\"the trip fee (the example: $89), counted toward the work\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"}],\"capacity\":\"drop-off slots every 30 minutes in open hours; one sharpener per batch; the shop's one wet grinder is saved like equipment\",\"parts\":\"handles, rivets and polishing compounds are in stock; a new handle or part is ordered once the customer says yes, 3 to 7 business days\",\"warranty\":\"on the receipt (the example: a 30-day edge promise: a blade that isn't sharp is redone free); never for chips from use, or a blade that was dropped after sharpening\",\"nobody_home\":\"no: someone must be there to hand over the knives and OK the work\",\"online\":\"no: a blade is sharpened in hand\"}",
+ "questions_before_times": [
+  "What needs sharpening: kitchen knives, scissors or shears, garden tools, an axe, a saw or mower blades",
+  "How many pieces, and are any chipped, bent or rusty?",
+  "Are the blades wrapped or in a sleeve or a box?",
+  "For a visit at the customer's place: a home, a kitchen or a salon, and the address"
+ ],
+ "safety_stop": [
+  "fire",
+  "sparks near fuel or something that burns",
+  "someone badly cut or hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "7am the day of",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "none for sharpening; the business registration, where the city or state asks for one",
+ "staff_skills": "[\"kitchen knife sharpening\",\"scissor and shear sharpening\",\"garden tool, axe and saw sharpening\",\"blade restoration\",\"on-site visits in the truck\"]",
+ "messages_never": "[\"A gate or door code\",\"Photos of the customer's home or kitchen\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/knife+and+tool+sharpening",
+  "pexels": "https://www.pexels.com/search/knife%20and%20tool%20sharpening/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

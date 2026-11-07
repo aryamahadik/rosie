@@ -1,0 +1,177 @@
+{
+ "id": "speech-therapist",
+ "name": "Speech therapist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "physical-therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Speech therapist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Speech Therapy",
+   "staff": "Iris and Elise (speech therapists)",
+   "customer": "Alex M. (parent of Lily, 4) · other families and clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Speech and language evaluation",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Lily's evaluation with Iris. Nothing is taken. The desk checks the plan, and Alex pays the $35 copay at the front desk. Weekly sessions are paid the same way, one at a time. A self-pay family pays $140, then $110 a session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Speech and language evaluation",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same evaluation where the clinic turns on its $20 late-cancel fee, free to cancel until 24 hours before. A card is saved for it, never for a fee-free family, and Sam confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Speech therapy session",
+     "price": "$110",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A Saturday-morning visit, when the front desk is closed: a card is saved, and the $110 session is charged to it when Iris texts DONE. Video sessions are paid this way too.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Speech",
+   "staff": "Caleb (speech therapist and audiologist) and Tia (speech therapy assistant)",
+   "customer": "Alex M. (parent of Max, 2, at home) · other families and clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home evaluation",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: Max's home evaluation with Caleb. Nothing is taken. The office bills the family's health plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home evaluation",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same visit, paid by the family itself: a card is saved, and the $179 is charged when Caleb texts DONE. Free to cancel until 7am on the day; after that, an $89 fee only if Sam confirms it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one client with one therapist at a time, each visit with a set length; every new client starts with an evaluation by a speech therapist; the evaluation sets the plan of care (how many sessions a week, for how many weeks), and those sessions are booked as a weekly plan with the parent's or client's own yes, or one at a time",
+ "questions_before_times": [
+  "who it's for: your child (and their age), or you",
+  "for a child: are you the parent or legal guardian (often clear from 'my daughter')",
+  "what it's about, in a few words: speech and language, stuttering, voice, or feeding and swallowing (it sets the evaluation and its length; never the details)",
+  "languages spoken at home (a therapist who speaks it, or an interpreter)",
+  "a school plan (IEP) for speech: none, has one and wants private too, or wants the school's services",
+  "a doctor's referral: yes, or not yet",
+  "a health plan (its name only), Medicaid, or paying yourself",
+  "for a video session: which state the client will be in during the session",
+  "days and times that suit you, like after preschool"
+ ],
+ "safety_stop": [
+  "sudden trouble speaking or understanding, a drooping face, or weakness on one side (stroke signs), at any age",
+  "choking now, trouble breathing, turning blue, or a child who can't swallow at all",
+  "words about self-harm"
+ ],
+ "first_steps": [
+  "The evaluation",
+  "The referral",
+  "Intake, consent and health history forms",
+  "The plan check",
+  "A written price estimate for self-pay families",
+  "The plan's OK for the sessions after the evaluation"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "children",
+  "firststeps",
+  "results"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "always: each speech-language pathologist (a speech therapist) holds their own active license from the state's board; a speech therapy assistant or a clinical fellow works only with the credential the state's form asks for, if any",
+ "staff_skills": "speech therapists: evaluations, re-checks, the plan of care, and every session; assistants: sessions only, under a speech therapist's plan of care, where the state allows; feeding and swallowing work only by a therapist trained for it (Iris, Caleb); each therapist's languages (Iris: Spanish); only people cleared for home visits go to homes and preschools; hearing tests only by an audiologist",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the child's name, the visit type, the reason, the plan, test results or health details; at the clinic, no therapist's name in a family's texts; at home, the therapist's name stays, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/speech+therapist",
+  "pexels": "https://www.pexels.com/search/speech%20therapist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

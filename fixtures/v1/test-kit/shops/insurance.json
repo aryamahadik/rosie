@@ -1,0 +1,94 @@
+{
+ "id": "insurance",
+ "name": "Insurance agent",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "advisor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Insurance agent",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Insurance agent",
+   "staff": null,
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free review",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free Medicare review by phone or video. Nothing is taken, nothing is saved, and nothing is paid through Rosie.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Insurance agent",
+   "staff": null,
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free insurance meeting at the customer's home. Nothing is taken, nothing is saved, and nothing is paid through Rosie.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a free meeting with a named agent who is licensed for that kind of insurance in the customer's state. Flow A: by phone, by video, or at the office. Flow B: at the customer's home, or a free seat at a seminar on set days at a host's place, like a community center.\",\"at the business (the example agency's own list)\":[{\"name\":\"Medicare review\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"by phone or video, or at the office\",\"first\":\"the scope form, for Medicare health or drug plans\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\"},{\"name\":\"Policy review call\",\"length\":\"45 minutes\",\"price\":\"free\",\"note\":\"home, auto or life insurance; no scope form\"},{\"name\":\"Joint plan review\",\"length\":\"90 minutes\",\"price\":\"free\",\"note\":\"for a couple; each signs their own scope form and says yes to texts\"},{\"name\":\"Follow-up call\",\"length\":\"15 minutes\",\"price\":\"free\",\"note\":\"booked by the customer, or by the agent with the customer's yes\"},{\"name\":\"Office meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"rule\":\"the agent's or Sam's OK first\"},{\"name\":\"Medicare class, for people turning 65\",\"length\":\"90 minutes\",\"price\":\"free\",\"rule\":\"the agent's or Sam's OK first\"},{\"name\":\"Dental, vision or hearing plans, added to a Medicare review\",\"length\":\"15 more minutes\",\"price\":\"free\",\"rule\":\"only with the customer's yes, and a new scope form signed first\"}],\"at the customer's place (the example agency's own list)\":[{\"name\":\"Home plan review\",\"length\":\"75 minutes\",\"price\":\"free\",\"where\":\"the customer's home, Tue to Fri, 9am to 3pm\",\"first\":\"the scope form, signed in writing on the secure page\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\",\"rule\":\"a set start time, never a window; never a drop-in\"},{\"name\":\"Joint home plan review\",\"length\":\"90 minutes\",\"price\":\"free\",\"where\":\"the customer's home\",\"note\":\"for a couple; each signs their own scope form\"},{\"name\":\"Supplement review\",\"length\":\"45 minutes\",\"price\":\"free\",\"where\":\"the customer's home\"},{\"name\":\"Medicare seminar seat\",\"length\":\"90 minutes\",\"price\":\"free\",\"where\":\"a host's place, like a community center or a library, on set days, with the host's OK\",\"rule\":\"what a seminar may cover, and whether anyone may sign up there, come from the plan rules (a switch)\"}],\"the insurance itself\":\"Never quoted, compared, sold, bound or changed in Rosie. Quotes, applications, enrollment, policy changes and claims happen in the agency's own tools or the plan company's own enrollment app, after the meeting.\",\"how the agent is paid\":\"By the insurance company, never through Rosie. Premiums go to the insurance company. A fee-based review only where the agency truly charges one and the state's rules allow it (a switch, off by default): it's agreed in writing and billed the agency's own way, outside Rosie.\",\"travel area\":\"The business's setting (the example: 25 miles).\",\"capacity\":\"One agent per booking. A spouse, partner or helper may join.\",\"online\":\"Phone and video meetings count as at the business. The agent must be licensed for the customer's home state, and for the state the customer is in that day where the state's rules require it.\",\"booking window\":\"Up to 60 days ahead, with at least 2 hours' notice (the business's settings).\",\"plan season\":\"Extra hours during the yearly plan enrollment season (the agency's setting). The season's dates come from the plan rules (a switch), never typed into a flow.\",\"blocked times\":\"Meetings and other work block times, from the agent's calendar or a BLOCK text.\"}",
+ "questions_before_times": [
+  "Which kind of insurance? Medicare health or drug plans, a Medicare supplement, dental or vision, life, home or auto.",
+  "Which state is your permanent home? The state only.",
+  "By phone, by video or at the office? Or at your home?",
+  "An agent by name, or the soonest one? Rosie never ranks or suggests one."
+ ],
+ "safety_stop": [
+  "someone is in danger right now",
+  "a medical emergency, like chest pain",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [],
+ "switches": {},
+ "settings": {},
+ "license": "Always. Each agent: their own state insurance license for the customer's state, with the line for that kind of insurance (health for Medicare and health plans, life for life insurance, property and casualty for home and auto). The agency: its own agency license where the state's rules require it.",
+ "staff_skills": "Medicare plans, life insurance, home and auto, seminars, Spanish.",
+ "messages_never": "[\"Medicare, Social Security, policy or health plan ID numbers\",\"health details, doctors or medicine names\",\"income or bank details\",\"advice: which plan to pick, or what a plan covers or costs\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/insurance+agent",
+  "pexels": "https://www.pexels.com/search/insurance%20agent/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

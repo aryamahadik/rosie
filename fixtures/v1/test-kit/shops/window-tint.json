@@ -1,0 +1,186 @@
+{
+ "id": "window-tint",
+ "name": "Window tinting",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "tires",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Window tinting",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Window tinting",
+   "staff": "Rudy and Ines (tint installers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Sides and rear tint",
+     "price": "$249",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: sides and rear window tint (carbon film) for Alex's car, $249 from the shop's board. Nothing is taken: a YES books the bay, and Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Sides and rear tint",
+     "price": "$249",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same $249 tint with the car left at the shop. Rosie texts the bill with READY, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full-car ceramic tint",
+     "price": "$449",
+     "deposit": "$100",
+     "rest": "$349",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "Full-car ceramic film, $449 in all: film cut and ordered for the car, so a $100 deposit is taken at booking and credited to the bill. Alex pays the $349 rest at the counter.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Full-car ceramic tint",
+     "price": "$449",
+     "deposit": "$100",
+     "rest": "$349",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The same full-car ceramic film with the car left at the shop. The $349 rest is on the bill Rosie texts with READY.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Window tinting",
+   "staff": "Troy and Lucia (tint installers)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Sides and rear tint",
+     "price": "$338",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: sides and rear tint (carbon film) at Alex's home, $338 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Troy texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home window film",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Home window film, priced at the visit after measuring. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Full-car ceramic tint",
+     "price": "$538",
+     "deposit": "$100",
+     "rest": "$438",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Full-car ceramic film fitted at home: $538 with the trip fee. A $100 deposit orders the film at booking; the $438 rest is on the bill after DONE.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"a bay booked by time slot at the shop: the customer waits at the shop or leaves the car and picks it up when it is READY; the van comes to a home or an office for mobile work\",\"list\":[{\"name\":\"Sides and rear windows, carbon film\",\"price\":\"one price by the car's body; the example shop's own price: $249 at the shop, $338 by the van (the $89 trip fee is in it)\",\"length\":\"about 1.5 hours\",\"place\":\"at the shop; at a home or office by the van\",\"before\":\"nothing taken at the shop; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill Rosie texts when the car is ready\"},{\"name\":\"Sides and rear windows, dyed film\",\"price\":\"the entry film: $110 in the example, at the shop\",\"length\":\"about 1.5 hours\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Full-car ceramic film (all side and rear windows)\",\"price\":\"one price by the car's body, film cut and ordered for the car: $449 at the shop in the example, $538 by the van (the $89 trip fee is in it), with a $100 deposit at booking\",\"length\":\"about 3 hours\",\"place\":\"at the shop; at a home or office by the van\",\"before\":\"a deposit (the example: $100), credited to the bill\",\"after\":\"the rest at the counter, or the bill\"},{\"name\":\"Front two windows\",\"price\":\"one price, to match the film on the rest: $90 in the example (by the van: $179, the $89 trip fee in it)\",\"length\":\"about 45 minutes\",\"place\":\"at the shop; at a home or office by the van\",\"before\":\"nothing taken at the shop; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Windshield sun strip\",\"price\":\"one price: $20 in the example at the shop, $109 by the van (the $89 trip fee is in it)\",\"length\":\"15 minutes\",\"place\":\"at the shop; at a home or office by the van\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Clear heat-block film for the windshield\",\"price\":\"one price: $149 in the example, only where the state's rules allow a clear film there\",\"length\":\"about 1 hour\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Old film removal, per window\",\"price\":\"one price a window: $40 in the example, added only with the customer's yes when old film is found\",\"place\":\"at the shop, or at the van\"},{\"name\":\"Home or office window film\",\"price\":\"priced at the visit by the square foot after measuring (the example: from $12 a square foot); only the trip fee is promised\",\"length\":\"2 to 4 hours, by the number of windows\",\"place\":\"at the customer's home or office, by the van\",\"before\":\"a card saved for the trip fee\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Storefront window film\",\"price\":\"priced at the visit, by the square foot after measuring (the example: from $12 a square foot); only the trip fee is promised\",\"length\":\"half a day or more\",\"place\":\"at the customer's business, by the van\",\"before\":\"a card saved for the trip fee\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Old film removal, extra windows by the van\",\"price\":\"$40 a window, added only with the customer's yes\",\"place\":\"by the van\"},{\"name\":\"Tint meter check\",\"price\":\"free, 10 minutes: a meter reading of a window's film against the state's limit\",\"place\":\"at the shop\"},{\"name\":\"Free re-check\",\"price\":\"free, within 30 days of any job: bubbles that don't dry, edges that lift (the example shop's own promise)\",\"length\":\"15 minutes\",\"place\":\"at the shop\"},{\"name\":\"Trip fee for the van\",\"price\":\"one fee, part of each mobile job's price (the example: $89)\",\"place\":\"at a home or office\"}],\"film_list\":\"film types (carbon, ceramic, clear heat-block), the darkness of each in percent of light let through, and the maker's warranty; the owner lists them on the shop's board\",\"capacity\":\"the shop's 2 bays book by time; one car per booking; the van does one car at a time and needs a garage or shade, dry air and little dust\",\"booked_as\":\"a bay's time at the shop, not a person: the shop names the installer; the van books a person\",\"wait_or_leave\":\"the customer waits at the shop, or leaves the car and picks it up when READY\",\"van\":\"a car at a home or office, or home and office windows; the first branch of the arrival window\",\"nobody_home\":\"no: an adult on the booking hands over the keys and meets the installer\",\"online\":\"no: film goes on the car in person\"}",
+ "questions_before_times": [
+  "Year, make, model and body (sedan, coupe, SUV, truck)",
+  "Which windows: the front two, sides and rear, every window, the windshield strip",
+  "How dark: the film's percent, or 'the darkest that is legal'",
+  "Is there old film on the windows now? Is it peeling or bubbling?",
+  "Wait at the shop, or leave the car?",
+  "For the van: a home or an office, and the town"
+ ],
+ "safety_stop": [
+  "someone hurt, or a crash that just happened",
+  "a fire, or smoke from the car",
+  "a child or a pet shut inside a hot car"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "aftercare",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: no state license for installing window film by default; the business registration; an installer registration only where the state's rules require one. Film darkness limits are a rule for every window (pf.rules), not a license.",
+ "staff_skills": "[\"car window film, flat and curved glass\",\"old film removal\",\"home and office window film\",\"mobile work in the van\"]",
+ "messages_never": "[\"The plate or the VIN\",\"A medical exemption paper, or why a car has one\",\"A gate or garage code, or where the keys are left\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/window+tinting",
+  "pexels": "https://www.pexels.com/search/window%20tinting/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

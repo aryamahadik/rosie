@@ -1,0 +1,184 @@
+{
+ "id": "shooting",
+ "name": "Shooting instructor and range",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "driving-school",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Shooting instructor and range",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Shooting instructor and range",
+   "staff": "Dale and Nora (range safety officers and instructors)",
+   "customer": "Alex M. (new shooter) · other shooters",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "first-time shooter package",
+     "price": "$89",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$89",
+     "fee": "$25",
+     "story": "The main story: a $89 first-time shooter package, paid in full when booking. Range ammunition is bought at the counter.",
+     "due_now_at_booking": 89,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "indoor lane hour",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$15",
+     "story": "An indoor lane hour, $25. A card is saved for the $15 no-show fee, and Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "1-hour private lesson",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A 1-hour private lesson, $95. A card is saved for the $25 fee, and the saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "carry-permit class",
+     "price": "$199",
+     "deposit": "$50",
+     "rest": "$149",
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The $199 carry-permit class: a $50 deposit now, and the $149 rest paid at the counter at the first class.",
+     "due_now_at_booking": 50,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Shooting instructor and range",
+   "staff": "Gabe and Nadia (instructors who travel to homes and land)",
+   "customer": "Alex M. (customer, shooter at home) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "in-home safety lesson",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $120 in-home safety and safe-storage lesson at Alex's home. The saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "safety class seat",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$45",
+     "fee": "$20",
+     "story": "A $45 seat at a classroom safety course at a host's place, paid in full.",
+     "due_now_at_booking": 45,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "private coaching series (4 visits)",
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Private coaching on the customer's land: a $150 deposit on the $600 series, and the $450 rest on the bill after the last visit.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a lane (indoor) or a bench (outdoor) booked by the hour like a space, with a range safety officer on duty; lessons book an instructor's time plus a lane; classes are seats on a timetable; flow B: an instructor's time at the customer's home or private land, and classroom seats at a host's place",
+ "questions_before_times": [
+  "new to shooting, or experienced (new shooters get the package or a lesson, and the safety briefing)",
+  "how many shooters, and the age of each (sets the lane and who may come)",
+  "a rental firearm, or their own",
+  "for a class: which class",
+  "for flow B: a home or private land, and the town"
+ ],
+ "safety_stop": [
+  "someone shot or hurt now, a firearm accident, a threat to hurt someone",
+  "words about ending one's life or hurting oneself"
+ ],
+ "first_steps": [
+  "Waiver and range rules",
+  "Safety briefing",
+  "Photo ID",
+  "Barred-person yes for a rental",
+  "Home or land checklist (flow B)"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "children",
+  "classes",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: a range needs no state license in most places; the business registration and the range's local permits are the owner's own word; where the state's rules require a training certificate for a class, the owner says so (a switch from the state form)",
+ "staff_skills": "range safety officer, handgun instructor, rifle instructor, carry-permit instructor, youth instructor, in-home safety lessons",
+ "messages_never": "whether someone owns firearms, which ones, serial numbers, permit numbers, the barred-person answer, health notes and any crisis words never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/shooting+instructor+and+range",
+  "pexels": "https://www.pexels.com/search/shooting%20instructor%20and%20range/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

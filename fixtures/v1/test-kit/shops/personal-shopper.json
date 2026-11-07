@@ -1,0 +1,193 @@
+{
+ "id": "personal-shopper",
+ "name": "Personal shopper",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "coach",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Personal shopper",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Personal shopper",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Style brief",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: a $55 style brief by video, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Shopping check-in",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 shopping check-in: a card is saved for the $20 late-cancel fee, and the $35 is charged when the shopper texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Shopping day from your list",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $90 shopping day from the client's list: a $20 deposit now, and the $70 rest on the saved card at DONE.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Gift pick",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $25 gift pick at the office: nothing is taken, and the client pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Personal shopper",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Shopping trip from home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 shopping trip from home; a card is saved for the $89 visit fee and the $179 is charged when the shopper texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Closet and shopping day",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $640 closet and shopping day, quoted from the client's list photos: a $160 deposit now, and the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Team shopping",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 team shopping visit at a company's office: nothing is taken, and the bill is texted after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Shopping visit at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 shopping visit at home, paid in full when booking; a late cancel may keep the $89 visit fee.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Personal shopping: a style brief and shopping check-ins by video, by phone or at the office (flow A), and a shopping trip that starts at a client's home or a team shopping visit at a company's office (flow B). Every new client starts with a free intro call. Items are bought by the client at the stores, and Rosie never takes money for items.",
+ "questions_before_times": [
+  "What are you shopping for: a look for work or an event, a gift, or a refresh of the closet?",
+  "Roughly when, how many items, and how many people?",
+  "At the office, by video or phone, or at your home?"
+ ],
+ "safety_stop": [
+  "someone in danger or hurt right now, at home or in a store",
+  "crisis words"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "firststeps",
+  "forms",
+  "documents",
+  "photos",
+  "groups",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "No license is needed for this work in most places. A registration or certificate the state asks for is the business's own to add. It is optional, and nothing is looked up.",
+ "staff_skills": "",
+ "messages_never": "Body measurements, sizes, health or skin concerns, the budget or the items a client shares, and when a home will be empty.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/personal+shopper",
+  "pexels": "https://www.pexels.com/search/personal%20shopper/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

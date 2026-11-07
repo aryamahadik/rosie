@@ -1,0 +1,226 @@
+{
+ "id": "windows",
+ "name": "Window & gutter cleaner",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Window & gutter cleaner",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Window & gutter cleaner",
+   "staff": "Emery and Rory (screen techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Window screen repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 window screen repair. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Patio screen door rebuild",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A patio screen door rebuild, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Storm window repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A storm window repair, priced at the counter. Only the $25 bench check is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Window & gutter cleaner",
+   "staff": "Ellis and Shay (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Windows inside and out",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: 18 windows inside and out, $179. A card is saved for the $89 trip fee at booking. Ellis texts DONE with the lines, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Windows inside and out",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 windows. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Windows inside and out",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 windows. A card is saved and charged $179 when Ellis texts DONE, the way plan customers pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Outside windows only",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Outside windows only, $150, paid in full when booking: Sam's setting for that service.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "3-story home windows",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 3-story home's windows, priced from photos at $640. Sam OKs it. A $160 deposit now; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Hard-water stain treatment",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Hard-water stain treatment, priced at the visit after a test spot. A card is saved; the $89 trip fee is owed even after a no to the price.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a crew at the customer's home or storefront, priced by window count and stories, often repeating in spring and fall.\",\"list\":[{\"name\":\"Windows inside and out\",\"price_kind\":\"per unit: up to 20 windows on a home up to 2 stories, then a price for each window over 20\",\"example\":\"$179 for up to 20 windows, $8 for each one over (the example business's own prices)\",\"length\":\"set by the answers: about 2 hours for a crew of two, up to 20 windows\",\"where\":\"at the customer's place; an adult must be home for the inside windows\",\"money\":\"a card saved for the $89 trip fee; Rosie texts the bill after\",\"weather\":\"outside work has a weather limit Sam sets: rain all day or wind over 25 mph moves it, free\"},{\"name\":\"Outside windows only\",\"price_kind\":\"per unit, the same way\",\"example\":\"$150 for up to 20 windows\",\"length\":\"about 2 hours for one person\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"Sam's example: paid in full when booked\",\"weather\":\"the same weather limit\"},{\"name\":\"3-story home windows\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for a 3-story home with 34 windows and a steep back roof\",\"length\":\"a day for the tall-ladder crew\",\"where\":\"at the customer's place; only the crew set up for 3 stories goes\",\"money\":\"a 25% deposit once the quote is OK'd, where the state's caps allow; the rest on the bill\"},{\"name\":\"Hard-water stain treatment\",\"price_kind\":\"quoted at the visit, after a test spot on the glass\",\"example\":\"only the $89 trip fee is promised; the example visit: $245 (stain treatment $165, glass sealant $80)\",\"where\":\"at the customer's place\",\"money\":\"a card saved for the $89 trip fee; the bill after\"},{\"name\":\"Solar panel cleaning\",\"price_kind\":\"one price, up to 20 panels\",\"example\":\"$199\",\"where\":\"at the customer's place, dry roof only\",\"money\":\"a card saved for the $89 trip fee; the bill after\"},{\"name\":\"Plan: windows every spring and fall\",\"price_kind\":\"a per-visit price\",\"example\":\"$179 a visit, twice a year\",\"where\":\"at the customer's place\",\"money\":\"a card saved; each visit charged at its own DONE\"},{\"name\":\"Storefront glass\",\"price_kind\":\"a per-visit price, on a plan\",\"example\":\"every 2 weeks, outside glass, one bill a month\",\"where\":\"at the customer's shop; nobody needs to be there\",\"money\":\"Rosfield's bill once a month\"},{\"name\":\"By the hour\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour, 1-hour minimum\",\"where\":\"at the customer's place\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, added only when the customer asks\",\"example\":\"skylight $25 (dry roof only); rescreen 3 torn screens $95; tracks and sills $160\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: a card saved at booking, charged only for a late cancel or no way in that Sam confirms, or owed when a job priced at the visit isn't done\",\"where\":\"not booked alone\"},{\"name\":\"Gutter cleaning (the second kind of work)\",\"price_kind\":\"by stories, up to 160 feet of gutter\",\"example\":\"1 story $149, 2 stories $189, debris bagged and taken away, downspouts cleared; gutter guards: a free estimate visit, then a quote\",\"length\":\"about 2 hours for a crew of two\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"a card saved for the $89 trip fee; the bill after\"},{\"name\":\"Screen and storm window repair at the shop (Lee Screen Repair)\",\"price_kind\":\"one price by size, from photos, or at the counter\",\"example\":\"screen repair $35, pet screen $40, screen wash $20, spline repair $25, screen door $55, storm window rebuild $140, patio screen door rebuild from photos, storm window repair priced at the counter after a $25 bench check\",\"where\":\"dropped off at the shop; a screen can also be fixed at the customer's home ($75)\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"instant_booking\":\"Homes up to 2 stories with a normal roof and under 40 windows book from the list. Taller, steeper or bigger homes, and businesses, are priced from photos first.\",\"capacity\":\"A crew of two for inside and out on a full home; one person for outside only. A drop-off needs one person at the counter.\",\"nobody_home\":\"Yes, for outside windows only, gutters and storefront glass. DONE with after photos confirms it. Inside windows need an adult home.\",\"online\":\"No.\",\"not_offered\":\"Glass replacement in a frame, roof repair, rope or lift work unless a crew is set up for it.\",\"drop_off_slots\":\"Screens and storm windows are booked into drop-off slots by the shop's daily number, with no screen tech named.\"}",
+ "questions_before_times": [
+  "How many stories, and how steep is the roof?",
+  "How many windows, and inside and out, or outside only?",
+  "Storm windows or screens, and how many?",
+  "Skylights or solar panels?",
+  "For gutters: gutter guards, and about how many feet, if known",
+  "For a drop-off: the screen's size, or the storm window's size and what's broken"
+ ],
+ "safety_stop": [
+  "a power line touching the house, a gutter or a tree near the windows",
+  "a gutter or downspout hanging loose",
+  "broken glass in a window",
+  "a wasp or bee nest at a window or gutter",
+  "someone fell from a ladder or a roof"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "documents",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Usually none for window or gutter cleaning. Where the state's or city's rules require a business registration or license, the form asks for it.",
+ "staff_skills": "[\"Windows up to 2 stories, inside and out\",\"3-story homes and steep roofs (the tall-ladder crew)\",\"Hard-water stain treatment\",\"Gutter cleaning\",\"Screen and storm window repair, and door rebuilds\"]",
+ "messages_never": "[\"Gate, door and alarm codes\",\"Where a key is kept\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/window+gutter+cleaner",
+  "pexels": "https://www.pexels.com/search/window%20%26%20gutter%20cleaner/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

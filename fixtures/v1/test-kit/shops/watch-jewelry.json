@@ -1,0 +1,203 @@
+{
+ "id": "watch-jewelry",
+ "name": "Watch and jewelry repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Watch and jewelry repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Watch and jewelry repair",
+   "staff": "Elena and Victor (bench jewelers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Watch service",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a watch that stopped. Only the $25 watch check is promised. Elena's written estimate is OK'd before any work, and Alex pays at the counter at pick-up, with an ID.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Battery change",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $35 watch battery change from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Stone replacement",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 stone replacement, with the stone ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Watch service",
+     "price": null,
+     "deposit": "$25",
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A watch service from $110, priced after the watch check. The $25 check is paid up front as the deposit, counted toward the final price.",
+     "due_now_at_booking": 25,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Watch and jewelry repair",
+   "staff": "Simon and Ruth (mobile jewelers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Watch visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 watch visit (up to 5 watches: battery, band and clean) at Alex's place. A card is saved for the $89 trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Simon works alone, so the saved card is charged for the visit when Simon texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Watch visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 watch visit. A card is saved for the $89 trip fee. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Jewelry repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A broken clasp and a loose stone, priced at the visit. A card is saved for the $89 trip fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Ring repair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A custom ring repair, priced from photos of the ring at $640. Sam OKs it. A $160 deposit orders the parts, and the rest is on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the watch or jewelry is left at the shop and picked up when it's READY; or a mobile jeweler services watches and sizes rings at a home or office\",\"list\":[{\"name\":\"Watch battery change\",\"price\":\"one price (the example shop: $35)\",\"length\":\"about 20 minutes while you wait\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Watch band sizing and repair\",\"price\":\"one price\",\"length\":\"about 20 minutes while you wait, or left for the day\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Ring sizing\",\"price\":\"one price (a larger or smaller size changes the price)\",\"length\":\"left 2 to 5 days\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Jewelry cleaning and polish\",\"price\":\"one price\",\"length\":\"about 30 minutes while you wait\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Chain, clasp and prong repair\",\"price\":\"one price for a standard repair; a bigger one is quoted at the bench\",\"length\":\"left 2 to 5 days\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Watch service (movement overhaul, crystal and gasket)\",\"price\":\"quoted after a watch check (the example: $25, counted toward the service): a written estimate with parts and labor lines, OK'd before any work\",\"length\":\"the watch check is about 30 minutes; more time needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Stone replacement (a stone ordered in)\",\"price\":\"priced from the shop's list once the stone is chosen\",\"length\":\"left 1 to 2 weeks\",\"place\":\"at the shop\",\"before\":\"a deposit orders the stone: the example shop takes $40 toward a $140 stone\",\"after\":\"the rest at the counter\"},{\"name\":\"Custom ring repair\",\"price\":\"priced from photos for a first quote; confirmed at the bench\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"a deposit of 25% once the quote is OK'd, to order the parts\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Home or office watch visit (up to 5 watches: battery, band and clean)\",\"price\":\"one price (the example: $179 at the customer's place)\",\"length\":\"about 2 hours\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Trip to a home or office\",\"price\":\"the trip fee (the example: $89), counted toward the repair\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"}],\"capacity\":\"drop-off slots every 30 minutes in open hours; one jeweler per piece; the bench's soldering station and ultrasonic cleaner are saved like equipment\",\"parts\":\"batteries, bands, pins and gaskets are in stock and set aside for each booking; stones, crystals and movement parts are ordered once the customer says yes, 3 to 15 business days\",\"warranty\":\"on the receipt (the example: 12 months on watch service, 90 days on jewelry repair); never for drops, lost stones, or water damage after a seal test the customer declined\",\"nobody_home\":\"no: someone must be there to hand over the piece and OK the work\",\"online\":\"no: a watch or a ring is fixed in hand\"}",
+ "questions_before_times": [
+  "The piece: watch, ring, chain, bracelet, earring or other; brand and kind, picked from a list",
+  "What's wrong: stopped, battery, loose band, cracked crystal, wrong size, broken clasp, loose stone, or something else",
+  "Is it a gift, an heirloom or insured?",
+  "For a visit at the customer's place: a home or an office, and the address"
+ ],
+ "safety_stop": [
+  "fire",
+  "smoke",
+  "someone burned or hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "none for repair itself; the business registration, where the city or state asks for one; a precious metals or secondhand dealer license only if the shop buys gold or used jewelry, where the city or state requires one",
+ "staff_skills": "[\"watch batteries and bands\",\"watch service and repair\",\"ring sizing and soldering\",\"stone setting\",\"chain and clasp repair\",\"on-site visits\"]",
+ "messages_never": "[\"A piece's value, appraisal or serial number\",\"Photos of the pieces\",\"A door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/watch+and+jewelry+repair",
+  "pexels": "https://www.pexels.com/search/watch%20and%20jewelry%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

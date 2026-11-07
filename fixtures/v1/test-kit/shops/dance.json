@@ -1,0 +1,138 @@
+{
+ "id": "dance",
+ "name": "Dance studio",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "yoga",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Dance studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Dance studio",
+   "staff": "Hannah and Nora (dance teachers) and the front desk",
+   "customer": "Alex M. (a parent, for Alex's daughter Lily, 6) · other parents and dancers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial class",
+     "price": "$15",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$15",
+     "fee": "$15",
+     "story": "The main story: Lily's $15 trial class in Hannah's Ballet 1, Sat Oct 24 at 11:00am (12 spots, 2 trial spots), paid in full when booking. An adult drop-in ($22), a private lesson ($75), and the registration fee and first month of tuition at enrollment are paid this way too.",
+     "due_now_at_booking": 15,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trial class",
+     "price": "$15",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$15",
+     "story": "The same $15 trial at a studio that takes nothing online: a YES books Lily's spot, and Alex pays at the front desk. Adult drop-ins can work this way too.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Dance studio",
+   "staff": "Luis and Felix (dance teachers who travel)",
+   "customer": "Alex M. (with Alex's partner, Jamie) · other customers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First-dance lesson",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 wedding first-dance lesson (75 minutes) at Alex's home with Luis. A card is saved, and it's charged $179 when Luis texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "First-dance lesson",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$179",
+     "fee": "$89",
+     "story": "The same $179 first-dance lesson, paid in full when booking, as some teachers ask. A $150 class at a preschool, school or senior center is paid in full this way too.",
+     "due_now_at_booking": 179,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a spot in a set class time by style, age group and level, with a set number of spots, a few trial spots and a waitlist; each dancer booked is checked in on their own. Private lessons book one teacher, at the studio or a home. A class at a host's place (a preschool, a school, a senior center) books a teacher's time for a group",
+ "questions_before_times": [
+  "who is dancing: the parent's own child, or the adult themselves",
+  "for a child: the age (it sets the age group) and the style (ballet, tap, jazz, hip-hop)",
+  "danced before? which style, and for how long (it sets the level; a trained dancer is placed by Sam)",
+  "for a private or wedding lesson: the goal, and at the studio or at home",
+  "for a class at a host's place: how many dancers, their ages, and the place"
+ ],
+ "safety_stop": [
+  "someone hurt or unwell right now: a hard fall, a head injury, an ankle they can't stand on, fainting, chest pain, trouble breathing"
+ ],
+ "first_steps": [
+  "Waiver and the child's details",
+  "The pick-up list and the photo yes or no",
+  "Placement for a trained dancer"
+ ],
+ "facts": [
+  "classes",
+  "children",
+  "plans",
+  "packs",
+  "forms",
+  "waitlist",
+  "groups",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "from the state form: teaching dance usually needs no state license; some places register a dance studio, or set rules for selling classes ahead (a bond, a written contract, a cancel right)",
+ "staff_skills": "ballet, tap, jazz, hip-hop, contemporary, ballroom and wedding dances; Creative Movement for ages 3 to 5",
+ "messages_never": "a child's last name, age, health notes, allergies, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the class, and link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dance+studio",
+  "pexels": "https://www.pexels.com/search/dance%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

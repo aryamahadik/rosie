@@ -1,0 +1,171 @@
+{
+ "id": "tires",
+ "name": "Tire shop",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tire shop",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tire shop",
+   "staff": "Leo and Grace (tire techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "4 new tires, installed",
+     "price": "$868",
+     "deposit": "$100",
+     "rest": "$768",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: 4 new tires for Alex's size, ordered in: $868 installed, with road-hazard protection. A $100 deposit is taken once Sam OKs and orders them, credited to the bill. Alex waits about an hour and pays the $768 rest at the counter.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Flat repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A $35 flat repair, or tires already on the rack: nothing is taken, and a YES books the bay. Alex waits and pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Flat repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The $35 flat repair with the car left at the shop. Rosie texts the bill with READY, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "4 new tires, installed",
+     "price": "$868",
+     "deposit": "$100",
+     "rest": "$768",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The 4 ordered tires, with the car left at the shop. The $768 rest is on the bill Rosie texts with READY.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tire shop",
+   "staff": "Diego and Malik (tire techs)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": null,
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Seasonal tire swap",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 seasonal swap in Alex's driveway. The winter tires, already on their own wheels, go on. A card is saved for the $89 trip fee, and Rosie texts the bill after Diego texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "4 new tires, fitted at home",
+     "price": "$885",
+     "deposit": "$100",
+     "rest": "$785",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "4 new tires ordered in for Alex's size and fitted at home: $885 with the trip fee. A $100 deposit is taken once Sam OKs the order; the rest is on the bill after DONE.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"a bay booked by time slot at the shop: the customer waits about an hour, or leaves the car; the van comes to a home or office for mobile work\",\"list\":[{\"name\":\"New tires, installed\",\"price\":\"per tire from the tire list for the car's size, installed: the tire, mount and balance, a valve or sensor kit and disposal, multiplied out for the set; any state tire fee and tax added where the state has them\",\"length\":\"about 1 hour for 4\",\"place\":\"at the shop; also at a home or office by the van\",\"before\":\"tires on the rack: nothing taken; tires ordered in: a deposit, taken once the owner OKs the order (nothing is charged while the OK is pending)\",\"after\":\"at the counter, or the bill Rosie texts when it's ready\"},{\"name\":\"Mount and balance, the customer's own tires\",\"price\":\"per tire, from the shop's board\",\"length\":\"about 1 hour for 4\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Flat repair (plug and patch)\",\"price\":\"one price; free with road-hazard protection\",\"length\":\"30 minutes\",\"place\":\"at the shop; at a home or office by the van, with the trip fee\",\"before\":\"nothing taken at the shop; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Tire rotation, valve stems, TPMS sensor reset\",\"price\":\"one price each, from the board\",\"length\":\"15 to 30 minutes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Seasonal swap, tires on their own wheels\",\"price\":\"one price for 4\",\"length\":\"30 minutes at the shop, about 45 at a home\",\"place\":\"at the shop, or at a home or office by the van\",\"before\":\"nothing taken at the shop; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Wheel alignment\",\"price\":\"one price, offered after a look at the tire wear\",\"length\":\"about 1 hour\",\"place\":\"at the shop only (it needs the alignment rack)\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"TPMS sensor, replaced and programmed\",\"price\":\"per sensor, only with the customer's yes\",\"place\":\"found on the lift, or at the van\"},{\"name\":\"Road-hazard protection\",\"price\":\"per tire for a set term, optional, sold with new tires\",\"place\":\"kept with the car; a claim books a free repair, or a free replacement if the tire can't be repaired\"},{\"name\":\"Lug-nut re-check\",\"price\":\"free, about 50 miles after any job that takes the wheels off\",\"length\":\"10 minutes\",\"place\":\"at the shop\"},{\"name\":\"Re-balance\",\"price\":\"free within 30 days of any job the shop or the van balanced (the example shop's own promise)\",\"length\":\"30 minutes\",\"place\":\"at the shop, or by the van\"},{\"name\":\"Fleet lot visit\",\"price\":\"per hour, with a 1-hour minimum (the example: $120 an hour)\",\"place\":\"the van at a business's lot\"},{\"name\":\"Trip fee for the van\",\"price\":\"one fee, part of each mobile job's price\",\"place\":\"at a home or office\"}],\"tire_list\":\"brand, model, size, load and speed rating, on the rack, held for a booking, on order and due; the owner or a tech texts arrivals ('IN 4 AltiMAX')\",\"ordered_tires\":\"times start after the distributor's promised arrival (the example: next weekday by 10am if ordered by 3pm), plus a buffer the owner sets; the owner OKs each order before it's placed\",\"capacity\":\"a set number of bays with set start times (the example shop: 3 bays, starts at 8:00am, 11:00am, 2:00pm and 3:00pm); one tech per bay; the alignment rack is saved like equipment\",\"booked_as\":\"a bay's time, not a person: the customer picks a time, and the shop names the tech and the bay\",\"wait_or_leave\":\"both: wait in the waiting room, or leave the car and get READY\",\"van\":\"one tech per van, in a 2-hour arrival window; the van carries a tire machine and a balancer\",\"nobody_home\":\"a seasonal swap or a flat repair on a parked car can be done with nobody there: the car is left where agreed, with the keys and any wheel-lock key as agreed, and DONE comes with a photo\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "Year, make, model and wheel size, to find the tire size",
+  "What kind of tire: all-season, all-weather, winter or performance",
+  "How many tires",
+  "Wait at the shop, or leave the car?",
+  "For the van: a home or an office, and the town"
+ ],
+ "safety_stop": [
+  "a blowout or a crash",
+  "a car stopped in traffic",
+  "someone hurt",
+  "a fire or smoke from a wheel"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "aftercare",
+  "sentnow",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  }
+ },
+ "license": "if: no state license for selling and fitting tires by default; a repair-shop registration where the state's rules require one for alignments or repairs; a scrap-tire hauler registration where the state requires one to haul old tires",
+ "staff_skills": "[\"tire fitting and balancing\",\"flat repair\",\"TPMS service\",\"wheel alignment\",\"the van's mobile jobs\",\"wheel repair\"]",
+ "messages_never": "[\"The VIN or the plate\",\"A gate, garage or key-box code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tire+shop",
+  "pexels": "https://www.pexels.com/search/tire%20shop/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

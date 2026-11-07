@@ -1,0 +1,159 @@
+{
+ "id": "tailor",
+ "name": "Tailoring and alterations",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tailoring and alterations",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tailoring and alterations",
+   "staff": "Linh and Marisol (tailors)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Wedding gown alterations",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a wedding gown. The first fitting is free and nothing is taken to book. Linh prices each item in writing; Alex pays a 50% deposit when she OKs it, and the rest at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pants hem",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 pants hem from the shop's board. Nothing is taken: a YES books it. It's ready in 5 days, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Wedding gown alterations",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The wedding gown, picked up on a Saturday morning: Linh texts DONE at the final fitting, and Alex pays the rest by the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Pants hem",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The $35 pants hem, picked up on a Saturday morning: Linh texts DONE at pick-up, and Alex pays by the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tailoring and alterations",
+   "staff": "Nadia and Ivan (tailors who make house calls)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Alterations at home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a fitting at home for a suit and a dress. Only the $89 house call is promised, with a card saved for it. Nadia prices each item at the fitting. The clothes come back Thu Oct 29, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Suit package",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 suit package at home, from the price list. A card is saved for the $89 house call. The suit comes back Thu Oct 29, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: a fitting at the shop, the garment is left, then READY and a pick-up\",\"list\":[{\"name\":\"Pants hem\",\"price\":\"one price, $35 at the example shop\",\"length\":\"a 15-minute fitting, or left at the counter; ready in 5 days\",\"place\":\"at the shop; or at the customer's home for $75, the shop's own house call with Linh (sewn at the shop and brought back)\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Jacket sleeves\",\"price\":\"one price, $40\",\"length\":\"a 15-minute fitting; ready in 5 days\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Button, seam or small repair\",\"price\":\"one price, $20\",\"length\":\"left at the counter; ready in 3 days\",\"place\":\"at the shop\"},{\"name\":\"Zipper replaced\",\"price\":\"one price, $55\",\"place\":\"at the shop\"},{\"name\":\"Kids' hem (12 and under)\",\"price\":\"one price, $25\",\"place\":\"at the shop, with a parent\"},{\"name\":\"Suit package (jacket and pants, fitted and pressed)\",\"price\":\"one price, $140\",\"length\":\"a 30-minute fitting; ready in 7 days\",\"place\":\"at the shop\"},{\"name\":\"Bridal alterations\",\"price\":\"quoted at the visit: a free 60-minute first fitting, then each item priced in writing\",\"length\":\"three fittings, about 8, 4 and 1 week before the wedding; pick-up at the last one\",\"place\":\"at the shop, only with the master tailor\",\"before\":\"nothing taken\",\"after\":\"a 50% deposit when the written price is OK'd; the rest at pick-up\"},{\"name\":\"Rush\",\"price\":\"+30% on every item when needed within 4 weeks, shown in the first price; within 10 days, the owner says first if it can be done\",\"place\":\"any\"},{\"name\":\"House call (Lee Mobile Tailoring)\",\"price\":\"$89, held; credited to the work\",\"place\":\"at the customer's home, office or venue\",\"before\":\"the $89 held\",\"after\":\"Rosie texts the bill after the clothes come back\"},{\"name\":\"Suit package at home\",\"price\":\"one price, $179\",\"place\":\"at the customer's place; sewn at the shop and brought back\",\"before\":\"the $89 house call held\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Alterations at a home fitting\",\"price\":\"quoted at the visit, item by item\",\"place\":\"at the customer's place; sewn at the shop and brought back on a booked return\"},{\"name\":\"Dress hem\",\"price\":\"one price, $55 at the shop; $65 at a home fitting\",\"length\":\"a 30-minute fitting\",\"place\":\"at the shop, or at the customer's place\"},{\"name\":\"Bridal party fittings\",\"price\":\"quoted at the visit, per dress; half when the written price is OK'd\",\"place\":\"at the customer's place or a venue, only with Nadia\"},{\"name\":\"Custom sewing\",\"price\":\"$120 an hour, 1-hour minimum ($140 with Nadia)\",\"place\":\"added to a job, never booked alone\"},{\"name\":\"Wedding-day dressing (steaming and bustling)\",\"price\":\"one price, $199 ($249 when Sam goes himself), for up to 4 hours at the venue\",\"place\":\"at the venue, at a set start time\"}],\"turnaround\":\"days until ready, per service: a hem in 5 days; bridal work planned back from the wedding date\",\"included\":\"one more adjustment after a fitting; a free fix of anything that comes loose before the event, or within 30 days of a house call's return\",\"capacity\":\"one tailor per fitting; the fitting room with the mirror and the stand is saved for bridal fittings\",\"nobody_home\":\"no: a fitting needs the customer there; a returned garment can be handed to an adult the customer named\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What needs changing: hem, take in, let out, sleeves, bustle, a repair, or other",
+  "The garment and the fabric, in the customer's words",
+  "The date it's needed by, like a wedding",
+  "How many items"
+ ],
+ "safety_stop": [],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "none for tailoring and alterations unless the state's form names one; the business registration, where the state asks for one",
+ "staff_skills": "[\"alterations\",\"bridal\",\"suits\",\"repairs\",\"house calls\",\"makeup\"]",
+ "messages_never": "[\"Body measurements\",\"A photo of the customer in the garment\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tailoring+and+alterations",
+  "pexels": "https://www.pexels.com/search/tailoring%20and%20alterations/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

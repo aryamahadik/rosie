@@ -1,0 +1,278 @@
+{
+ "id": "gutters",
+ "name": "Gutter installer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "roofer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Gutter installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Gutter installer",
+   "staff": "Mara and Kofi (studio consultants)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Style consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Style consult, $35 at the studio; a card saved for the $20 missed-consult fee; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Style consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Style consult, $35; nothing taken; a YES books it; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Drainage plan session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Drainage plan session, $55, paid in full when booking; it counts toward the gutters if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full drainage plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Full drainage plan, $140; a $40 deposit now; the $100 rest at the studio desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Photo gutter plan",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Photo gutter plan, priced from Alex's photos and measurements at $90 (Sam OKs it); a card saved for the $20 fee; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Copper gutter match",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Copper gutter match, priced at the studio once Mara sees the old section: only the $25 consult is promised; a card saved; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Gutter installer",
+   "staff": "Felix and Ines (estimators and crew leads)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Gutter repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Sagging, leaking gutters: a repair priced at the visit (the $89 inspection fee is owed even after a no), nothing taken; Rosie texts the bill after. A bigger job, like Harper J.'s $2,400 gutter and drain line, becomes its own job: a signed quote and stage payments.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Gutter repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same repair priced at the visit, but Sam bills it the business's own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Gutter repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same repair priced at the visit, with a card saved for the $89 inspection fee when Alex books.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Gutter repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 gutter repair from the list (up to 20 feet re-hung and resealed); a card saved for the $89 fee; Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Gutter guard install",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "Gutter guards priced from photos at $640 (over $500, so Sam OKs it); a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Gutter repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 gutter repair for a returning customer: nothing taken; Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Gutter cleaning",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 gutter cleaning, paid in full when booking (also the yearly plan).",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Inspection, then project: new gutters are booked only after a written estimate and a signed contract\",\"B\":[{\"name\":\"Gutter inspection and estimate\",\"price\":\"$89, counted toward the gutter work if Alex signs (the example business's own price; a free estimate is a common starting option)\",\"length\":\"30 to 45 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken (or a card saved for the $89 fee)\",\"after\":\"billed only if no contract follows\",\"report\":\"photos of each run, the feet measured, the downspouts and their drains, the fascia checked for rot; a written estimate the same day, good for 30 days\"},{\"name\":\"New seamless gutters (whole house)\",\"price\":\"quoted after the inspection; the example: 160 feet of 5-inch seamless aluminum at $11 a foot ($1,760), plus 6 downspouts at $85 ($510), plus $330 for taking down the old gutters and hauling them away ($2,600 in all)\",\"length\":\"1 day for a house up to 200 feet, per crew\",\"where\":\"at the customer's place; nobody needs to be home on the work day\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"the balance after the final walk-around\"},{\"name\":\"Rotted fascia (the board behind the gutter)\",\"price\":\"$14 a foot, photos first; up to 20 feet OK'd in the contract\",\"where\":\"added to a new gutter job, never booked alone\"},{\"name\":\"Gutter repair (re-hang and reseal up to 20 feet, from the list)\",\"price\":\"$179, from the list\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Gutter repair (bigger or unclear damage, quoted at the visit)\",\"price\":\"quoted at the visit (example: $245)\",\"where\":\"at the customer's place\",\"before\":\"nothing, or a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Gutter cleaning (house up to 2 stories)\",\"price\":\"$150, from the list\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"note\":\"Often rebooked every spring and fall, as a yearly plan\"},{\"name\":\"Gutter guards (priced from photos and feet)\",\"price\":\"priced from photos (example: $640 for the back of the house); over $500, Sam OKs it\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"before\":\"a written contract where the state's rules require one, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Gutter flow test and report (for a sale or an insurer)\",\"price\":\"$199, with a written report\",\"length\":\"60 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken, or a card saved for the $89 fee\",\"after\":\"Rosie texts the bill; the report is sent the same day or the next\"},{\"name\":\"Buried drain line (a pipe that carries downspout water away)\",\"price\":\"quoted after the inspection; digging starts only after the utility locate\",\"where\":\"at the customer's place\",\"note\":\"A contract first; waits for the drain installer's own license, where the state asks\"},{\"name\":\"Gutter check on a plan\",\"price\":\"the list price each visit; for rentals and other buildings\",\"where\":\"at the customer's place; nobody needs to be home\"},{\"name\":\"Photo quote\",\"price\":\"free; a written quote from the photos Alex sends, for small jobs\",\"where\":\"by text or the secure page; nobody comes\",\"before\":\"nothing taken\",\"after\":\"nothing more; Alex can book a visit from the quote\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a job, never booked alone\"}],\"A\":[{\"name\":\"Style consult\",\"price\":\"$35, 30 minutes\",\"where\":\"at the studio; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the studio desk\"},{\"name\":\"Downspout and color pick\",\"price\":\"$40\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Quick studio chat\",\"price\":\"free, 15 minutes\",\"where\":\"at the studio\",\"before\":\"nothing taken\",\"after\":\"nothing more\"},{\"name\":\"Sample kit\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Guard match\",\"price\":\"$25\",\"where\":\"at the studio\"},{\"name\":\"Drainage plan session (a plan of the house with its new gutters and drains)\",\"price\":\"$55, 60 minutes; counts toward the gutters if Alex signs with Lee Gutters\",\"where\":\"at the studio\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Full drainage plan (gutters, downspouts, guards, extensions)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the studio\",\"before\":\"a card saved for the $40 fee (over 2 hours), or a $40 deposit\",\"after\":\"at the studio desk\"},{\"name\":\"Photo gutter plan\",\"price\":\"priced from the customer's photos and measurements (example: $90); Sam OKs each one\",\"where\":\"at the studio\"},{\"name\":\"Copper gutter match\",\"price\":\"priced at the studio after a $25 consult, once the consultant sees the old section\",\"where\":\"at the studio\"}],\"capacity\":\"One estimator or consultant per booking; one crew per job, up to 200 feet in a day; the studio's layout table is saved with long sessions\",\"skills\":\"Inspections and estimates: estimators. Installs: crew leads with their crews. Buried drain lines: licensed installers. Studio: consultants.\",\"nobody_home\":\"Gutter work outside: nobody needs to be home; a start photo and day-end photos. An adult is needed only if the inspection needs a look inside at a wet wall or the basement.\",\"online\":\"No video consult: gutter picks use the sample runs at the studio\"}",
+ "questions_before_times": [
+  "What's wrong: gutters that overflow, sag or leak, a storm, or an old house?",
+  "What are the gutters made of now, if you know: aluminum, steel, vinyl or copper?",
+  "About how many feet of gutter, or how big is the house?",
+  "How many stories is the house?",
+  "Is water getting into the house or the basement now?"
+ ],
+ "safety_stop": [
+  "a tree or limb on the house or across the gutters, power lines down on or near the house",
+  "a wall or ceiling sagging or bulging under the water, gutters pulling the roof edge down",
+  "a gas smell, sparking or smoking wires"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "photos",
+  "multiday",
+  "extrawork",
+  "stages",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: a contractor, home improvement or gutter license or registration for the company, where the state's form requires one (some states license gutter work with roofing or siding, some under a home improvement registration, some not at all)",
+ "staff_skills": "",
+ "messages_never": "[\"Insurance claim details\",\"Gate or lockbox codes\",\"Contract, change order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/gutter+installer",
+  "pexels": "https://www.pexels.com/search/gutter%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

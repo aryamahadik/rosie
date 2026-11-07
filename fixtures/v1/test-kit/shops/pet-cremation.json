@@ -1,0 +1,172 @@
+{
+ "id": "pet-cremation",
+ "name": "Pet cremation and pet cemetery",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "funeral",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet cremation and pet cemetery",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet cremation and pet cemetery",
+   "staff": "Dara and Noah (garden staff)",
+   "customer": "Alex M. (the family) · other families",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private cremation, up to 50 lb",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$190",
+     "fee": "$0",
+     "story": "The main story: a private cremation for a dog up to 50 lb, $190, paid in full when booking. No fee.",
+     "due_now_at_booking": 190,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Drop-off cremation",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A drop-off cremation at a set time: $190, paid at the desk when the family collects the urn.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Private garden visit",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A private visit to the garden: free, nothing taken. An urn or plaque is paid at the desk only if the family chooses one.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet cremation and pet cemetery",
+   "staff": "Ruth and Gus (pick-up crew)",
+   "customer": "Alex M. (the family) · other families",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home pick-up and private cremation",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a home pick-up and private cremation, $240 with the pick-up. Nothing is taken; the bill is texted after the ashes are returned.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Home pick-up, paid in full",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$240",
+     "fee": "$0",
+     "story": "A home pick-up, paid in full when booking: $240. No fee.",
+     "due_now_at_booking": 240,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home pick-up and private cremation",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A home pick-up, $240, paid the business's own way at the return of the ashes: cash or check.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a private cremation with a memorial garden (flow A: the family comes to the garden or drops the pet off); a home pick-up and cremation (flow B: the business goes to the family or the vet)",
+ "questions_before_times": [
+  "What kind of pet, and about how much does it weigh?",
+  "Where is the pet now: at home, at a vet's, or at the garden?",
+  "Would the family like a visit to the garden first, or a pick-up?",
+  "Is a same-day pick-up needed? Yes, no or not sure."
+ ],
+ "safety_stop": [
+  "someone in danger right now (call 911)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "sentnow"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "No state license for a pet cremation or pet cemetery in most places. Where the state or a city asks for a crematory permit or the business registration, the owner names it: shown as given, never checked by Rosie.",
+ "staff_skills": "garden staff (visits and keepsakes), pick-up drivers (home pick-ups and the vet's), crematory operator",
+ "messages_never": "",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+cremation+and+pet+cemetery",
+  "pexels": "https://www.pexels.com/search/pet%20cremation%20and%20pet%20cemetery/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

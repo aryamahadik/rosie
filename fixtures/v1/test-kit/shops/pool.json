@@ -1,0 +1,195 @@
+{
+ "id": "pool",
+ "name": "Pool & spa service",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pool & spa service",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pool & spa service",
+   "staff": "Nico and Toni (shop techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Filter clean",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 filter clean. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pump seal",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A new pump seal, priced at $90 from photos of the pump and its label. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Motor repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A pump motor that hums but won't start, priced at the counter after a $25 bench test. Paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pool & spa service",
+   "staff": "Derek and Luis (pool techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Pool clean-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 pool clean-up first, then a weekly plan. A card is saved and charged $179 when Derek texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Pool clean-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $179 pool clean-up. Nothing is taken. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Green-pool cleanup",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A green pool, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Pump repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A leaking pump, priced at the visit. Only the $89 trip fee is promised. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: visits at the customer's pool, often weekly, priced by the pool's size. The shop side takes drop-offs and walk-in water tests.\",\"list\":[{\"name\":\"Pool clean-up\",\"price_kind\":\"one price by the pool's size\",\"example\":\"up to 20,000 gallons: $179 (the example business's own price)\",\"length\":\"about 1½ hours, one tech\",\"includes\":\"skim, brush, vacuum, empty the baskets, clean the filter, test and balance the water, check the equipment\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Weekly service plan\",\"price_kind\":\"a price a visit\",\"example\":\"$45 a visit, chemicals included\",\"length\":\"about 30 minutes\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved; each visit charged at its own DONE, or once a month for that month's visits, told the day before\"},{\"name\":\"Green-pool cleanup\",\"price_kind\":\"quoted from the customer's photos first; the owner OKs it\",\"example\":\"$640 for a dark green 20,000-gallon pool\",\"length\":\"about 1¾ hours on site to shock, brush and clean the filter; the pool clears over the next days with the pump running\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\",\"second_visit\":\"a second visit at a price set in the signed estimate (the example: $95) if the water isn't clear in 3 days. It's the estimate's price, not a free return\"},{\"name\":\"Pump or equipment repair\",\"price_kind\":\"quoted at the visit, before any work\",\"example\":\"only the $89 trip fee is promised; the example quote: pump seal $165 and pump lid $80\",\"where\":\"at the customer's place; only under the company's license where the state licenses repairs\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Opening (spring) and closing (fall)\",\"price_kind\":\"one price each\",\"example\":\"$275 each\",\"where\":\"at the customer's place\",\"season\":\"the months the owner sets; a closing only once the water is clear and balanced\"},{\"name\":\"Hot tub clean\",\"price_kind\":\"one price\",\"example\":\"$150: drain, clean and refill\",\"where\":\"at the customer's place\"},{\"name\":\"Leak detection\",\"price_kind\":\"one price\",\"example\":\"$199, with a written report within 2 days\",\"where\":\"at the customer's place\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or a visit the tech can't get into, if the owner confirms it; owed when a repair quoted at the visit isn't done\",\"where\":\"not booked alone\"},{\"name\":\"Labor\",\"price_kind\":\"by the hour\",\"example\":\"$120 an hour, 1-hour minimum\",\"where\":\"not booked alone: added to a repair\"},{\"name\":\"Pressure washing (the second kind of work)\",\"price_kind\":\"from the list\",\"example\":\"pool deck $149; deck and patio $189; a whole house wash: a free estimate, then a quote\",\"where\":\"at the customer's place; nobody needs to be home\",\"weather\":\"a weather limit the owner sets; a move for weather is free\"},{\"name\":\"At the shop: water test\",\"price_kind\":\"free\",\"length\":\"about 5 minutes\",\"where\":\"a walk-in at the counter, in a line\",\"money\":\"nothing\"},{\"name\":\"At the shop: filter clean\",\"price_kind\":\"one price\",\"example\":\"$35 a cartridge filter; ready in 2 days. Or at the customer's home: $75, on a card saved when booking and charged when done\",\"where\":\"dropped off at the shop\",\"money\":\"nothing taken; paid at the counter at pick-up\"},{\"name\":\"At the shop: other drop-offs\",\"price_kind\":\"one price each\",\"example\":\"filter grid clean $40, hot tub filter $20, quick rinse while you wait $25, filter deep clean with an acid soak $55, pool robot rebuild $140\"},{\"name\":\"At the shop: pump seal\",\"price_kind\":\"quoted from photos of the pump and its label\",\"example\":\"$90\",\"money\":\"paid at the counter at pick-up\"},{\"name\":\"At the shop: motor repair\",\"price_kind\":\"quoted at the counter after a bench test\",\"example\":\"only the $25 bench test is promised; the example quote: motor repair $110 and a new shaft seal $15\",\"money\":\"paid at the counter at pick-up\"}],\"capacity\":\"One tech per visit. Visits can book by route days for an area, set by the owner. The shop takes a set number of drop-offs a day.\",\"nobody_home\":\"Yes, for plan visits and outdoor work: the tech uses the gate code shown that day. DONE with photos confirms it, the latched gate included.\",\"online\":\"No.\",\"not_offered\":\"Pool building and remodeling, gas lines and new gas heaters, electrical work, fences.\"}",
+ "questions_before_times": [
+  "How big is the pool: gallons, or length and width",
+  "Can you see the bottom? (No: it's priced from photos as a green pool)",
+  "Just once, or every week",
+  "For a repair: what the pump or filter is doing, and is it still running",
+  "Is it a public, shared or HOA pool? (Only a tech with a pool operator certificate)",
+  "For pressure washing: what and about how big",
+  "At the shop: the filter's size and how many cartridges; for a pump seal, photos of the pump and its label"
+ ],
+ "safety_stop": [
+  "someone in the water, a child missing near a pool, a drowning",
+  "chemical fumes, a chemical spill, or chemicals mixed",
+  "a sparking pump, a shock in the water, bare wires near the pool",
+  "a gas smell near a pool heater"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "tips",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Cleaning, water care, weekly visits, openings and closings: usually none. Equipment repair and draining a pool for a repair: a pool contractor license where the state or county licenses it. Some counties license pool cleaning too. Each state's form says which.",
+ "staff_skills": "[\"Weekly service and clean-ups\",\"Green pools\",\"Openings and closings\",\"Equipment repair, under the company's license\",\"Leak detection\",\"Hot tubs\",\"Pressure washing\",\"At the shop: filter cleaning, pump and motor repair, pool robots\"]",
+ "messages_never": "[\"Gate codes, lock combos and alarm codes\",\"Where a key is hidden\",\"Whether children live at the home\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pool+spa+service",
+  "pexels": "https://www.pexels.com/search/pool%20%26%20spa%20service/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,148 @@
+{
+ "id": "wellness-studio",
+ "name": "Float, sauna, cryotherapy and wellness studio",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "spa",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Float, sauna, cryotherapy and wellness studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Float, sauna, cryotherapy and wellness studio",
+   "staff": "Tara and Eli (attendants)",
+   "customer": "Alex M. (customer) · other guests",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "60-min float",
+     "price": "$79",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$79",
+     "fee": "$40",
+     "story": "The main story: a 60-minute float, $79, paid in full when booking. Sauna suites and cryotherapy are paid this way too.",
+     "due_now_at_booking": 79,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "contrast suite (sauna and cold plunge)",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A $65 contrast suite for one or two. A card is saved for the $25 late-cancel fee, and it's paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Float, sauna, cryotherapy and wellness studio",
+   "staff": "Kai and Noor (attendants who visit)",
+   "customer": "Alex M. (customer) · other guests",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "mobile sauna and cold plunge at home",
+     "price": "$650",
+     "deposit": "$200",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$200",
+     "story": "The main story: a $650 mobile sauna and cold plunge at a home: a $200 deposit now, and the $450 rest charged to the saved card at DONE, after the visit.",
+     "due_now_at_booking": 200,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "wellness day at an office (for 6)",
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A $600 wellness day at an office: a $150 deposit from the host, the rest billed by Rosie after the visit.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "private rooms booked by time like a space (float rooms, sauna suites, the cryotherapy chamber, the contrast suite, the red light bed, the compression chairs), with a trained staff member on duty; no person is named; flow B: a mobile sauna and cold plunge delivered to a home or event and run by a staff member, and wellness days at a host's place where guests book seats",
+ "questions_before_times": [
+  "which service, and the length",
+  "new to the studio, or been before (sets the first-float price and the briefing)",
+  "one person or two (suites for two)",
+  "the age of anyone under 18",
+  "for flow B: a home, an event or an office, the town, and how many guests"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, fainting, a seizure, someone not answering in a float room or sauna"
+ ],
+ "first_steps": [
+  "Waiver and health questions",
+  "Doctor's written OK",
+  "Blood pressure check",
+  "First-visit briefing"
+ ],
+ "facts": [
+  "plans",
+  "packs",
+  "groups",
+  "forms",
+  "children",
+  "aftercare",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "8pm the day before"
+  }
+ },
+ "license": "no state license for float, sauna or cryotherapy in most places; a local health permit where the local rules treat float tanks, plunge pools or saunas as pools or spas (the business's own permit, shown as its word; none is checked by Rosie, D96)",
+ "staff_skills": "front desk, float rooms, cryotherapy operator (trained by the maker), sauna and plunge, mobile sauna driver and setup",
+ "messages_never": "health answers, blood pressure readings, a doctor's OK and a child's details never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/float+sauna+cryotherapy+and+wellness+studio",
+  "pexels": "https://www.pexels.com/search/float%2C%20sauna%2C%20cryotherapy%20and%20wellness%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

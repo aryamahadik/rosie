@@ -1,0 +1,203 @@
+{
+ "id": "foundation",
+ "name": "Foundation repair and basement waterproofing",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Foundation repair and basement waterproofing",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Foundation repair and basement waterproofing",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Plan consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Plan consult, $35 at the office; a card saved for the $20 missed-consult fee; paid at the office desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Plan consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Plan consult, $35; nothing taken; a YES books it; paid at the office desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Waterproofing plan session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Waterproofing plan session, $55, paid in full when booking; credited to the job if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Basement repair plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Basement repair plan, $140; a $40 deposit now; the $100 rest at the office desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Foundation repair and basement waterproofing",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Foundation repair job",
+     "price": "$2,880",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Foundation repair job: the $89 estimate visit, nothing taken; Abel's written quote; the contract, a $960 deposit and stage bills; the last $2,880 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Foundation repair job",
+     "price": "$2,880",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same foundation repair job, but Sam bills each stage and the last payment his own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Foundation repair job",
+     "price": "$2,880",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same foundation repair job, with a card saved for the $89 estimate visit fee when Alex books.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Crack injection, one crack",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Crack injection, one crack, priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Estimate visit, then project: the job is booked only after a written quote and a signed contract\",\"B\":[{\"name\":\"Estimate visit\",\"price\":\"$89, credited to the job if Alex signs (the example business's own price; a free estimate is a starting option)\",\"length\":\"60 to 90 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken (or a card saved for the $89)\",\"after\":\"billed only if no contract follows\"},{\"name\":\"Foundation repair job\",\"price\":\"quoted after the estimate visit: a written quote within 3 business days, good for 30 days (the example: $9,600)\",\"length\":\"about 1 to 3 work days\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"stage bills as each checked stage is done; the last after the walk-through\"},{\"name\":\"Wall anchors and carbon fiber straps\",\"price\":\"quoted after the estimate visit\",\"length\":\"1 to 3 work days\",\"where\":\"at the customer's place\",\"before\":\"the same as the foundation repair job\",\"after\":\"the same, in stages\"},{\"name\":\"Piers (underpinning)\",\"price\":\"quoted after the estimate visit; an engineer's plan where the rules require it\",\"length\":\"2 to 5 work days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Interior drain and sump pump\",\"price\":\"quoted after the estimate visit\",\"length\":\"2 to 4 work days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Exterior waterproofing\",\"price\":\"quoted after the estimate visit\",\"length\":\"3 to 6 work days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Crawl space encapsulation\",\"price\":\"quoted after the estimate visit\",\"length\":\"1 to 3 work days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Crack injection, one crack\",\"price\":\"priced from photos (example: $640); over $500, Sam OKs it\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Downspout extensions\",\"price\":\"$179, from the list\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Sump pump check\",\"price\":\"$150, from the list; also a yearly check plan\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Foundation inspection\",\"price\":\"$199, with a written report (cracks measured, floor level, water paths)\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Change order\",\"price\":\"priced, written and signed by both before the changed work; added to the next stage bill\"},{\"name\":\"Permit, utility locate, engineer's plan and haul-away\",\"price\":\"in every quote\"}],\"A\":[{\"name\":\"Plan consult\",\"price\":\"$35, 30 minutes\",\"where\":\"at the office; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the office desk\"},{\"name\":\"Crack photo review\",\"price\":\"$40\",\"where\":\"at the office\",\"before\":\"a card saved\",\"after\":\"at the office desk\"},{\"name\":\"Crack monitor\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the office\"},{\"name\":\"Printed plan\",\"price\":\"$15, an add-on at a consult\",\"where\":\"at the office\"},{\"name\":\"Water path review\",\"price\":\"$25\",\"where\":\"at the office\"},{\"name\":\"Waterproofing plan session\",\"price\":\"$55, 60 minutes; credited to the job if Alex signs\",\"where\":\"at the office\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Basement repair plan (wall review, drain layout, 3D drawing)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the office\",\"before\":\"the $40 fee held (over 2 hours), or a $40 deposit\",\"after\":\"at the office desk\"},{\"name\":\"Custom drain sketch\",\"price\":\"priced from the customer's photos and measurements (example: $90); Sam OKs each one\",\"where\":\"at the office\"},{\"name\":\"Plan update\",\"price\":\"priced at the office after a $25 consult\",\"where\":\"at the office\"}],\"capacity\":\"One estimator or advisor per booking; one install crew per job; the office's desk is saved with long sessions\",\"skills\":\"Estimates and running a job: crew leads. Plan consults: plan advisors. Piers, anchors and drains: install crews. Stamped plans: a structural engineer. Wiring: a licensed electrician.\",\"nobody_home\":\"Estimates and small jobs: nobody needs to be home if the basement is reachable. Work days: an adult on the booking is reachable by phone.\",\"online\":\"A plan consult can be a video or phone call (counts as at the office)\",\"smallest_job\":\"A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes no repair under $1,500 and sends smaller ones to the list jobs).\"}",
+ "questions_before_times": [
+  "What is the problem? (a crack, a bowing wall, a sloping floor, water coming in)",
+  "Where in the home, and about how long is it",
+  "When did you first see it, and has it changed",
+  "The year the home was built, and the kind of foundation if you know it"
+ ],
+ "safety_stop": [
+  "gas smell, hissing near a gas line, sparking or smoking wires, a carbon monoxide alarm",
+  "a wall or floor giving way right now, a loud crack with movement, a ceiling sagging or falling"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "stages",
+  "photos",
+  "extrawork",
+  "firststeps",
+  "multiday",
+  "banktransfer",
+  "video"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: a contractor or foundation repair registration or license for the company, where the state's form requires one (often by job size or kind of work)",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or lockbox codes\",\"The budget\",\"Contract, change order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/foundation+repair+and+basement+waterproofing",
+  "pexels": "https://www.pexels.com/search/foundation%20repair%20and%20basement%20waterproofing/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,195 @@
+{
+ "id": "small-engine",
+ "name": "Small engine and lawn mower repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Small engine and lawn mower repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Small engine and lawn mower repair",
+   "staff": "Wes and Dana (mechanics)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Won't-start repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a push mower that won't start. Only the $45 bench check is promised. Wes's written estimate is OK'd before any work, the part is ordered, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Blade sharpening",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $35 blade sharpening from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Won't-start repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same mower repair, with the bill texted once it's ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Riding mower battery and starter",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 riding mower battery and starter, ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Small engine and lawn mower repair",
+   "staff": "Marcus and Tara (mechanics)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Riding mower tune-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 riding mower tune-up at Alex's home. A card is saved for the $89 trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Engine repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A mower that won't start, priced at the visit. A card is saved for the $89 trip fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Riding mower tune-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The $179 riding mower tune-up. A card is saved, and charged when Marcus texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Deck rebuild",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A riding mower deck rebuild, priced from photos of the deck and its model plate at $640. Sam OKs it. A $160 deposit orders the parts, and the rest is on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the machine is left at the shop and picked up when it's READY; or a mobile mechanic comes to the yard or garage\",\"list\":[{\"name\":\"Blade sharpening and balance\",\"price\":\"one price (the example shop: $35)\",\"length\":\"about 30 minutes while you wait, or left for the day\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Oil change, spark plug and air filter\",\"price\":\"one price for each\",\"length\":\"about 1 hour while you wait, when the part is in stock\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Mower tune-up (push or self-propelled)\",\"price\":\"one price\",\"length\":\"left 1 to 3 days; spring is slower\",\"place\":\"at the shop\"},{\"name\":\"Riding mower tune-up\",\"price\":\"one price (the example: $179 at the customer's place)\",\"length\":\"about 2 hours\",\"place\":\"at the customer's place, or at the shop\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Won't start or runs rough\",\"price\":\"quoted after a bench check (the example: $45, counted toward the repair): a written estimate with parts and labor lines, OK'd before any work\",\"length\":\"the bench check is about 30 minutes; more time needs a new yes\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken at the shop\",\"after\":\"at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Chainsaw, trimmer and blower repair\",\"price\":\"tune-ups at one price; a carburetor rebuild or other repair quoted after a bench check\",\"place\":\"at the shop\"},{\"name\":\"Generator and pressure washer service\",\"price\":\"one price; repairs quoted after a bench check\",\"place\":\"at the shop, or at the customer's place\"},{\"name\":\"Spring start-up and winterizing\",\"price\":\"one price\",\"length\":\"left 1 to 2 days\",\"place\":\"at the shop, or at the customer's place\"},{\"name\":\"Part ordered in (starter, battery, deck belt, engine)\",\"price\":\"priced from the shop's list; a riding mower deck rebuild priced from photos of the deck and the model plate\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"a deposit orders the part: the example shop takes $40 toward a $140 battery and starter, and 25% toward a deck rebuild\",\"after\":\"the rest at the counter, or on the bill\"},{\"name\":\"On-site visit at a yard or garage\",\"price\":\"the trip fee (the example: $89), counted toward the repair\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"}],\"capacity\":\"drop-off slots every 30 minutes in open hours; one mechanic per machine; the shop's one lift is saved like equipment\",\"parts\":\"a common part (plug, filter, belt, blade) is in stock and set aside for each booking; any other is ordered once the customer says yes, 1 to 5 business days\",\"warranty\":\"on the receipt (the example: 90 days on parts and labor); never for bad fuel, misuse or a machine that was never serviced; a brand's own warranty work only if the shop is its authorized dealer\",\"nobody_home\":\"no: someone must be there to show the machine and OK the work\",\"online\":\"no: a machine is fixed in hand\"}",
+ "questions_before_times": [
+  "The machine: push mower, riding mower, chainsaw, trimmer, blower, generator or other; make and model, picked from a list",
+  "What's wrong: won't start, runs rough, smokes, leaks, won't cut, or a tune-up",
+  "Is there gas in it? Old gas can spoil.",
+  "For a visit at the customer's place: the address, and where the machine is kept"
+ ],
+ "safety_stop": [
+  "fire",
+  "smoke from the engine",
+  "a carbon monoxide alarm",
+  "someone cut or hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "none for repair itself; the business registration, where the city or state asks for one; a brand's own warranty work only if the shop is that brand's authorized dealer",
+ "staff_skills": "[\"push and riding mower service\",\"engine rebuilds\",\"chainsaw, trimmer and blower repair\",\"generator and pressure washer service\",\"on-site visits\"]",
+ "messages_never": "[\"A gate or garage code\",\"The machine's serial number\",\"Proof of purchase or warranty papers\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/small+engine+and+lawn+mower+repair",
+  "pexels": "https://www.pexels.com/search/small%20engine%20and%20lawn%20mower%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

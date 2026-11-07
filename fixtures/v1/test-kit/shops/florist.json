@@ -1,0 +1,152 @@
+{
+ "id": "florist",
+ "name": "Florist",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Florist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Florist",
+   "staff": "Elliot and Hazel (designers at the shop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Wedding consultation",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 45-minute wedding consultation with Elliot at the shop. Nothing is taken: a YES books it, and nothing is paid after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Everyday arrangement",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 everyday arrangement picked up at the shop, paid in full when ordered.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Courthouse wedding set",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $140 courthouse wedding set (a bouquet and 2 boutonnieres) picked up Saturday: a $40 deposit now, and the $100 rest paid at pickup, at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Florist",
+   "staff": "Luca and Felix (designers and drivers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "photos|deposit|bill",
+   "services": [
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Anniversary brunch flowers",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: flowers for Alex's parents' anniversary brunch at Maple Hall, quoted from the plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest on the bill after the event.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Sympathy arrangement, delivered",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$20",
+     "story": "A $150 sympathy arrangement for Alex's aunt's service, delivered to Brookside Funeral Home before 11am, paid in full when ordered. Everyday deliveries go the same way.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Floral Design's own list)\":[{\"service\":\"Event flowers (weddings, parties, brunches), delivered and set up\",\"price kind\":\"quoted from the plan first (the date, the venue, the tables or guests, the colors, photos)\",\"price\":\"the quote (the example: $640 for an anniversary brunch, 8 tables)\",\"length\":\"a 2-hour setup window before the event\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit (a wedding: a 30% deposit that holds the date)\",\"after\":\"the rest on the bill after the event (a wedding: the rest on the bill after the wedding)\",\"note\":\"Delivery, setup and the pickup of loaned vases are in the quote. Sam OKs every wedding, and every quote over $500.\"},{\"service\":\"Sympathy arrangement, delivered\",\"price kind\":\"one price\",\"price\":\"$150, delivery included\",\"length\":\"a 2-hour delivery window that ends before the service\",\"place\":\"at a funeral home or the family's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Gentle words only, no rating and no sales text after.\"},{\"service\":\"Standing spray, delivered\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"a delivery window before the service\",\"place\":\"at a funeral home\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Everyday arrangement, delivered\",\"price kind\":\"one price\",\"price\":\"the shop's own price plus delivery\",\"length\":\"a delivery window, Mon to Sat\",\"place\":\"at the recipient's home or office\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Same-day delivery when ordered by noon. The recipient gets no texts.\"},{\"service\":\"Ceremony arch flowers\",\"price kind\":\"one price, by person\",\"price\":\"$199, or $249 designed by Sam\",\"length\":\"set up with the event\",\"place\":\"at the venue\",\"before\":\"with the event\",\"after\":\"with the event\"},{\"service\":\"Flower wall or hanging installation\",\"price kind\":\"quoted after a free venue walk-through\",\"price\":\"the quote\",\"length\":\"set up with the event\",\"place\":\"at the venue, where it allows hanging pieces\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill after the install\"},{\"service\":\"On-site florist time\",\"price kind\":\"per hour, by person\",\"price\":\"$120 an hour, $140 with Luca (the example)\",\"length\":\"1-hour minimum\",\"place\":\"at the event\",\"before\":\"nothing: asked on the day\",\"after\":\"one pay link\",\"note\":\"Only with the customer's written yes, at the rate shown before booking.\"},{\"service\":\"Plant care (the second kind of work): a plant visit, porch planters, a pest treatment\",\"price kind\":\"one price\",\"price\":\"$89 a visit for up to 10 plants, $149 for porch planters, $189 for a pest treatment (the example)\",\"length\":\"a 2-hour window\",\"place\":\"at the customer's home or office; nobody needs to be there for outdoor planters\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"A pest treatment only by a plant tech with a current applicator license, where required.\"}],\"at the business (the example: Lee's Flower Shop's own list)\":[{\"service\":\"Wedding consultation\",\"price kind\":\"one price\",\"price\":\"free (at the shop or by video); $75 as a walk-through at the venue\",\"length\":\"45 min\",\"place\":\"at the shop's design table, by video, or at the venue\",\"before\":\"nothing: a YES books it\",\"after\":\"nothing to pay\",\"note\":\"Leads to the proposal, which holds the date for 7 days.\"},{\"service\":\"Everyday arrangement, picked up\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"a 15-minute pickup slot\",\"place\":\"at the shop's counter\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Hand-tied bouquet · boutonniere · corsage, picked up\",\"price kind\":\"one price\",\"price\":\"$40 · $20 · $25\",\"length\":\"a pickup slot\",\"place\":\"at the counter\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Courthouse wedding set (a bouquet and 2 boutonnieres), picked up\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"a pickup slot on the wedding day\",\"place\":\"at the counter\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at pickup, at the counter\"},{\"service\":\"Custom arrangement\",\"price kind\":\"priced from the customer's photos\",\"price\":\"the quote (the example: $90)\",\"length\":\"a pickup slot\",\"place\":\"at the counter\",\"before\":\"the full price, once Sam OKs it\",\"after\":\"nothing more\"},{\"service\":\"Your vase, filled while you wait\",\"price kind\":\"priced at the counter\",\"price\":\"a $25 design fee, plus the flowers picked\",\"length\":\"about 20 min\",\"place\":\"at the counter\",\"before\":\"nothing\",\"after\":\"at the counter\"},{\"service\":\"Weekly flowers plan\",\"price kind\":\"one price\",\"price\":\"$35 a week\",\"length\":\"a pickup slot each Saturday\",\"place\":\"at the counter\",\"before\":\"a card saved\",\"after\":\"each charge only after its own yes and a reminder (a plan, not in this work's money paths)\"}],\"capacity\":\"Sam takes 2 weddings a Saturday at most. Pickup orders are capped at a daily number Sam sets.\",\"note\":\"Every price is the example businesses' own, not a standard.\"}",
+ "questions_before_times": [
+  "An event: the date, the venue's town, how many tables or guests, the colors, and a flower budget if there is one",
+  "A sympathy order: the day and time of the service, and the funeral home",
+  "An everyday order: the occasion, and pickup or delivery",
+  "A consultation: a wedding or another event, and about how many guests"
+ ],
+ "safety_stop": [],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "forms",
+  "extrawork",
+  "capacitycheck"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Floral design and a flower shop: no state license in most places. The business registration, and a seller's permit for sales tax where the state's form asks for one. Plant care that treats plants for pests: a pest control license for the company and an applicator license for each plant tech, where the state's rules require them. All from the state's form.",
+ "staff_skills": "Luca leads quoted events and does plant care. Felix does sympathy pieces, deliveries and setups. Elliot leads consultations and custom pieces at the shop, and Hazel does everyday work at the counter.",
+ "messages_never": "[\"Allergy details\",\"The name of the person who died\",\"A card message\",\"A recipient's address\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/florist",
+  "pexels": "https://www.pexels.com/search/florist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

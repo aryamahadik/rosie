@@ -1,0 +1,183 @@
+{
+ "id": "pilates",
+ "name": "Pilates studio",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "yoga",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pilates studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pilates studio",
+   "staff": "Nadia and Elena (Pilates instructors)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Reformer Flow class",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: a reformer in Nadia's $55 Reformer Flow class, Sat 11:00am (8 reformers), paid in full when booking. Alex is new, so the waiver and health questions are on the secure page.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Mat class",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 Mat class, or a class from Alex's pack. A card is saved for the studio's $20 late-cancel or no-show fee. Anything owed is paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pilates studio",
+   "staff": "Leo and Dev (instructors who travel)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Private session at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 private session at Alex's home with Leo, who brings a portable reformer. A card is saved and charged $179 when Leo texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Mat class at an office",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$20",
+     "story": "A $150 mat class at an office, for up to 12 people, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Private session at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $179 private session at home, for a client Sam bills after. Nothing is taken when booking. Rosie texts the bill after the session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Team Pilates event",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A team Pilates event at an office, priced from photos of the room at $640. Sam OKs it. A $160 deposit now, and the rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a reformer (or a mat or tower) in a set class time; each machine is one spot, so a class never takes more people than machines; a waitlist; each person booked is checked in on their own. Private and duet sessions book one instructor, at the studio, a home or an office",
+ "questions_before_times": [
+  "new to the studio, or been before (sets any intro offer, the waiver and the health questions)",
+  "the class (reformer, mat, tower, prenatal) or a private or duet session",
+  "reformer experience: none, some, or a year or more",
+  "for the teen class: the client's age",
+  "for a session away from the studio: home or office, how many people, and mat or a portable reformer"
+ ],
+ "safety_stop": [
+  "someone unwell right now: chest pain, fainting, trouble breathing, or pregnant with bleeding or strong pain"
+ ],
+ "first_steps": [
+  "Waiver",
+  "Health questions and health note",
+  "Intro private session"
+ ],
+ "facts": [
+  "classes",
+  "packs",
+  "firststeps",
+  "forms",
+  "waitlist",
+  "video",
+  "children",
+  "tips",
+  "spaces",
+  "capacitycheck",
+  "extrawork",
+  "discounts",
+  "documents"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "from the state form: teaching Pilates usually needs no state license; massage needs one where the state's rules require it; some places register fitness studios or health clubs",
+ "staff_skills": "reformer, mat, tower, prenatal, teens, post-rehab; only instructors cleared for prenatal work teach prenatal classes or read prenatal notes",
+ "messages_never": "health answers and notes, injuries, pregnancy, conditions, doctor's notes and incident notes never go in a text or through the AI, to the client, the owner or the staff: texts say only 'a health note' with a secure link",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pilates+studio",
+  "pexels": "https://www.pexels.com/search/pilates%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

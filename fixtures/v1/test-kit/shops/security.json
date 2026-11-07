@@ -1,0 +1,250 @@
+{
+ "id": "security",
+ "name": "Security systems installer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Security systems installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Security systems installer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Showroom consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Showroom consult, $35, with Kayla; a card saved for the $20 missed-visit fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Showroom consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Showroom consult, $35; nothing taken; a YES books it; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Home security plan (60 minutes)",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Home security plan, $55, 60 minutes, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Recorder rebuild (new drive, setup, test)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Recorder rebuild, $140; a $40 deposit now; the $100 rest at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Keypad repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Keypad repair: the $25 bench check promised, nothing taken; Kayla's $125 price at the counter, paid there.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Doorbell repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Doorbell repair, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Security systems installer",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Security system (survey, then install)",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Security system: the $89 site survey, nothing taken; Jamal's two-option quote, $1,240 to buy; the contract, a $124 deposit, monitoring's own yes, the cancel window and the permit; the $1,116 balance on the bill Rosie texts once the system passes its test.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Security system (survey, then install)",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same system, but Sam bills the deposit and the balance his own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Security system (survey, then install)",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same system, with a card saved for the $89 site-survey fee when he books, charged only for a late cancel or no-show.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Outdoor cameras",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Outdoor cameras priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Video doorbell install",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Video doorbell install, $179 from the list (or a $199 home security check, or a $150 alarm checkup); a card saved for the $89 trip fee; Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Site survey, then project: a system is put in only after a written quote, a signed contract and any cancel window\",\"B\":[{\"name\":\"Site survey\",\"price\":\"$89, credited to the system if Alex buys (the example business's own price; a free site survey is the safe start, and the old example's was free)\",\"length\":\"about 1 hour\",\"where\":\"at the customer's place\",\"before\":\"nothing taken (or a card saved for the $89 fee)\",\"after\":\"billed only if no contract follows\"},{\"name\":\"Security system (alarm, cameras, monitoring)\",\"price\":\"quoted at the site survey, with two options: buy, or lease for 36 months (the example: $1,240 to buy)\",\"length\":\"about 5 hours to install in a one-floor house\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"the balance on the bill, once the system passes its test\"},{\"name\":\"Outdoor cameras\",\"price\":\"priced from photos of the outside walls (example: $640); over $500, Sam OKs it\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Video doorbell install\",\"price\":\"$179, from the list\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Alarm checkup\",\"price\":\"$150, from the list; also a yearly plan\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Home security check\",\"price\":\"$199, with a written report\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Monitoring, equipment bought\",\"price\":\"$34.99 a month, month to month, with its own yes\"},{\"name\":\"Monitoring, equipment leased\",\"price\":\"$64.99 a month for 36 months, with a $199 install\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a job, never booked alone\"},{\"name\":\"Permit\",\"price\":\"in every quote that needs one\"}],\"A\":[{\"name\":\"Showroom consult\",\"price\":\"$35, 30 minutes\",\"where\":\"at the showroom; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-visit fee\",\"after\":\"paid at the showroom counter\"},{\"name\":\"App setup\",\"price\":\"$40\",\"where\":\"at the showroom\",\"before\":\"a card saved\",\"after\":\"at the counter\"},{\"name\":\"Battery swap\",\"price\":\"$20, an add-on for devices Alex brings\"},{\"name\":\"Footage export\",\"price\":\"$25: saving camera video to a drive\"},{\"name\":\"Backup battery\",\"price\":\"$15, sold at a visit\"},{\"name\":\"Home security plan\",\"price\":\"$55, 60 minutes\",\"where\":\"at the showroom\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Recorder rebuild (new drive, setup, test)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the showroom's repair bench\",\"before\":\"a $40 deposit\",\"after\":\"at the counter\"},{\"name\":\"Doorbell repair\",\"price\":\"priced from the customer's photos (example: $90); Sam OKs each one\"},{\"name\":\"Keypad repair\",\"price\":\"priced at the counter after a $25 bench check (example: $110)\",\"where\":\"while Alex waits, or left at the counter\"}],\"capacity\":\"One tech per survey, install or service visit; the showroom's one repair bench is saved with each repair\",\"skills\":\"Surveys, installs and outdoor cameras: Jamal. Surveys, doorbells, checkups and service visits: Rafael. Fire alarm work: Jamal, with that license. Showroom: Kayla (repairs and house calls too) and Devin.\",\"nobody_home\":\"Never: an adult is home for every visit at the property\",\"online\":\"No video consult: the showroom is for seeing and trying devices\",\"drop_off\":\"A device left at the counter for repair: checked in with the code, a READY text, and picked up with the code\"}",
+ "questions_before_times": [
+  "A house, a townhouse or a condo? How many floors and outside doors?",
+  "Pets over 40 lb? (for pet-friendly motion sensors)",
+  "Smoke and fire monitoring too?",
+  "Any old alarm parts in the home?",
+  "Wi-Fi at home?"
+ ],
+ "safety_stop": [
+  "a break-in happening now, someone who may be inside, an alarm going off now",
+  "smoke, fire, a smoke alarm or carbon monoxide alarm going off"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "monthlybill",
+  "dropoff",
+  "documents",
+  "extrawork",
+  "banktransfer"
+ ],
+ "switches": {
+  "sensitive": false,
+  "no2": false,
+  "welfare": false,
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: an alarm or low-voltage license for the company, where the state's form requires one. Fire alarm work (smoke and heat detectors on an alarm) can need its own license or class.",
+ "staff_skills": "",
+ "messages_never": "[\"Wi-Fi passwords\",\"Contract, permit and lease papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/security+systems+installer",
+  "pexels": "https://www.pexels.com/search/security%20systems%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

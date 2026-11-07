@@ -1,0 +1,240 @@
+{
+ "id": "movers",
+ "name": "Movers",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Movers",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Movers",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Vault visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Vault visit, $35 at the warehouse; a card saved for the $20 missed-visit fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Vault visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Vault visit, $35; nothing taken; a YES books it; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Vault load-in",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Vault load-in, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Pack-out help",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Pack-out help, $140 (up to 2½ hours); a $40 deposit now; the $100 rest at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom crate",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom crate priced from Alex's photos at $90, OK'd by Sam; a card saved for the $20 fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Movers",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Household move",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "Household move: the in-home survey is free, nothing taken; Tomás's written estimate of $3,390; signed, with a $200 deposit; the $3,190 balance on the bill Rosie texts at delivery, before unloading.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Household move",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same move, but Sam takes the deposit and the balance his own way, like a certified check at the door; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Piano move",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "An upright piano move priced from photos at $640 (over $500, so Sam OKs it); a signed estimate; a 25% deposit of $160; the $480 rest on the bill at delivery.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Loading help",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Loading help, 2 movers for up to 2 hours, $179 from the list; a card saved for the $89 late-cancel fee; $179 charged when Tomás texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Single-item move",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A single-item move in town, $150, paid in full when booking (Lee Storage's $75 delivery from a vault is paid the same way).",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Survey, then the move: a household move is booked only from a written estimate, signed after a survey of the goods\",\"B\":[{\"name\":\"In-home survey\",\"price\":\"free\",\"length\":\"about 45 minutes\",\"where\":\"at the customer's home (or by live video, which counts as at the business)\",\"before\":\"nothing taken\",\"after\":\"nothing billed\"},{\"name\":\"Household move\",\"price\":\"quoted after the survey: a written estimate (the example's kind: not-to-exceed, so the customer pays the estimate or less if the load weighs less)\",\"length\":\"one day for the example's 90 miles; long-distance moves run several days, with a delivery window\",\"where\":\"from one address to another\",\"before\":\"nothing at booking the survey; a deposit when the estimate is signed (the example: $200, credited to the move)\",\"after\":\"the balance at delivery, before unloading, on the bill Rosie texts (pay link, the crew chief's phone, or a certified check)\"},{\"name\":\"Piano move\",\"price\":\"priced from photos (example: $640); over $500, Sam OKs it\",\"where\":\"from one address to another\",\"before\":\"a signed estimate, then a 25% deposit\",\"after\":\"the rest on the bill at delivery\"},{\"name\":\"Loading help\",\"price\":\"$179 from the list: 2 movers for up to 2 hours, loading or unloading the customer's own truck or container (the example's own price)\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 late-cancel fee\",\"after\":\"charged to the saved card when the crew chief texts DONE\"},{\"name\":\"Single-item move\",\"price\":\"$150 from the list (the example's own price)\",\"where\":\"in town\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Photo inventory\",\"price\":\"$199: every item photographed and listed before the move, for the customer's own insurance; the report is ready 2 days later\"},{\"name\":\"Stairs\",\"price\":\"$90 a flight, at either end, in the estimate\"},{\"name\":\"Packing\",\"price\":\"optional, priced per box in the estimate\"},{\"name\":\"Taking apart and rebuilding, wrapping, crating\",\"price\":\"priced per item in the estimate; a crate is built at the warehouse\"},{\"name\":\"Full value protection\",\"price\":\"priced in the estimate (the example: $9 for each $1,000 declared); the basic coverage the rules allow instead only with the customer's signed choice\"},{\"name\":\"Junk hauling (Lee Hauling)\",\"price\":\"its own plug-in: a curbside haul-away needs nobody home\"}],\"A\":[{\"name\":\"Vault visit\",\"price\":\"$35, 30 minutes: a dock hand brings the customer's storage vault down to the dock\",\"where\":\"at the warehouse; or a delivery from the vault to the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-visit fee\",\"after\":\"paid at the warehouse counter\"},{\"name\":\"Evening vault visit\",\"price\":\"$40, after 5pm\",\"where\":\"at the warehouse\",\"before\":\"a card saved\",\"after\":\"at the counter\"},{\"name\":\"Photo list\",\"price\":\"$20, an add-on: every item in the vault photographed and listed\",\"where\":\"at the warehouse\"},{\"name\":\"Corner guards\",\"price\":\"$15, an add-on at a crate pickup\",\"where\":\"at the warehouse\"},{\"name\":\"Box drop-in\",\"price\":\"$25: up to 5 boxes added to the vault at the dock\",\"where\":\"at the warehouse\"},{\"name\":\"Vault load-in\",\"price\":\"$55, 60 minutes: the crew unloads the customer's car or van into a vault\",\"where\":\"at the warehouse\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Pack-out help\",\"price\":\"$140, up to 2½ hours: the crew loads the customer's truck from the vault\",\"where\":\"at the warehouse\",\"before\":\"the $40 fee held (over 2 hours), or a $40 deposit\",\"after\":\"at the counter\"},{\"name\":\"Custom crate\",\"price\":\"priced from photos (example: $90); Sam OKs each one\",\"where\":\"built at the warehouse\"},{\"name\":\"Odd-size crate\",\"price\":\"priced at the dock after a $25 look\",\"where\":\"at the warehouse\"}],\"capacity\":\"Surveys: one crew chief. A move: a crew of a set size (the example: 3) and a truck (a 26-ft or a 20-ft) free on the move date; two crews. Vault visits: one dock hand and the forklift.\",\"skills\":\"Surveys, estimates and running a move: crew chiefs. Vault visits, crating and load-ins: dock hands.\",\"nobody_home\":\"A move needs someone at each end to sign the bill of lading and the inventory. A curbside haul-away needs nobody home.\",\"online\":\"A survey can be by live video from the customer's phone (counts as at the business)\",\"not_a_broker\":\"Rosie lists the business that does the move, never a broker. A container the customer loads alone is loading help, not a household move.\"}",
+ "questions_before_times": [
+  "From and to: the town at each end",
+  "Home size: bedrooms, plus any storage, basement or garage",
+  "Floors at each end: stairs, an elevator, a loading dock",
+  "Heavy or special items: a piano, a safe, gym gear, art",
+  "Packing: you, us, or some of each",
+  "The move date, and how flexible it is"
+ ],
+ "safety_stop": [
+  "someone in danger right now, a fire, a gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "extrawork",
+  "photos",
+  "video"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "always for household moves: the company's carrier authority. Moves across state lines need the federal household goods authority (a USDOT number, plus the federal mover number); moves inside one state need that state's mover permit, where its form has one",
+ "staff_skills": "",
+ "messages_never": "[\"Street addresses: they stay on the secure page and the crew's day list\",\"Door, gate and building codes\",\"Declared values and the coverage picked\",\"Why a booking is private\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/movers",
+  "pexels": "https://www.pexels.com/search/movers/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

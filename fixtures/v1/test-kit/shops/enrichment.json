@@ -1,0 +1,151 @@
+{
+ "id": "enrichment",
+ "name": "Kids' enrichment and after-school programs",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "camp",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Kids' enrichment and after-school programs",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Kids' enrichment and after-school programs",
+   "staff": "Ruth and Iris (lead and assistant) and the front desk",
+   "customer": "Alex M. (a parent, for Noa, 9, and Rafi, 7) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "After-school term",
+     "price": "$240",
+     "deposit": "$60",
+     "rest": "$180",
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The main story: Alex enrolls Noa, 9, in the after-school term at the program center: $240 for 10 weeks, a $60 deposit when enrolling, and the $180 rest charged to the saved card at the end of the term.",
+     "due_now_at_booking": 60,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Holiday program day",
+     "price": "$65",
+     "deposit": "$60",
+     "rest": "$180",
+     "paid_now": "$65",
+     "fee": "$65",
+     "story": "A holiday program day for Rafi, 7: $65, paid in full when booking.",
+     "due_now_at_booking": 65,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free visit",
+     "price": "free",
+     "deposit": "$0",
+     "rest": "$0",
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 45-minute visit to see the program, with nothing taken and nothing owed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Kids' enrichment and after-school programs",
+   "staff": "Remy and Clara (teachers who go to a home or a school)",
+   "customer": "Alex M. (the host parent, for Lia, 8) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home science club",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a home science club for Lia, 8, and up to 5 friends: $150, a card saved for the $40 fee, and the $150 charged to the saved card when the teacher texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "In-school enrichment program (10 children)",
+     "price": "$250",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "An in-school program: $25 a child for a 10-week term, nothing taken to book, and one bill to the school after the term.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a seat in a term or a drop-in session for one child, with a set number of places by age; a home or school session books a teacher for a group of children at the customer's place (flow B)",
+ "questions_before_times": [
+  "which program, and the start date",
+  "the child's age and grade",
+  "how many children, for a home or school program",
+  "a term or a drop-in visit"
+ ],
+ "safety_stop": [
+  "a child not breathing, unresponsive, or hurt badly right now"
+ ],
+ "first_steps": [
+  "Waiver on the secure page",
+  "Pick-up list on the secure page",
+  "Health questions on the secure page"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "children",
+  "waitlist",
+  "forms",
+  "incare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none from the state for enrichment or tutoring in most places; where the state licenses a child-care or after-school program, the business shows its own license only once it is on file; teachers hold the certificates the business says they hold (the business's own word)",
+ "staff_skills": "homework help, science, art, reading, coding, sports, music; the age groups each teacher may work with",
+ "messages_never": "a child's name and age, health notes, a learning need or a pick-up detail in texts to anyone but the parent: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/kids+enrichment+and+after+school+programs",
+  "pexels": "https://www.pexels.com/search/kids'%20enrichment%20and%20after-school%20programs/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

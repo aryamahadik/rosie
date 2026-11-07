@@ -1,0 +1,260 @@
+{
+ "id": "chimney",
+ "name": "Chimney sweep",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Chimney sweep",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Chimney sweep",
+   "staff": "Rory and Shay (counter techs at the hearth shop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Door gasket refit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 door gasket refit at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Door gasket refit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 door gasket refit. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Stove door rebuild",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 stove door rebuild. A $40 deposit now, and $100 at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Cap fitting",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 cap fitting: a stainless cap sized to Alex's flue, paid in full when booking and picked up at the counter.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom cap",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom cap for an odd-size flue, priced from Alex's photos at $90. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Stove casting repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A cracked stove casting, priced at the counter. Only the $25 look is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Chimney sweep",
+   "staff": "Wes and Dale (chimney sweeps)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Chimney sweep and inspection",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 chimney sweep and inspection, one flue. A card is saved for the $89 trip fee (a late cancel or nobody home). Rosie texts the bill after the sweep.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Wood stove sweep",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Fall season: a $150 wood stove sweep. A $40 deposit now, and the $110 rest on the bill after.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Chimney sweep and inspection",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Off-season: a $179 chimney sweep. Nothing is taken. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Chimney leak repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A chimney leak, priced at the visit. A card is saved for the $89 trip fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Crown repair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A crown repair, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Chimney Sweeps' own list)\":[{\"service\":\"Trip fee (find the problem)\",\"price kind\":\"one price\",\"price\":\"$89, taken off the work\",\"place\":\"at the customer's place\",\"note\":\"Goes on the jobs below; not booked alone. The late-cancel and nobody-home fee.\"},{\"service\":\"Chimney sweep and inspection (Level 1)\",\"price kind\":\"per unit: per flue, set by the customer's answers\",\"price\":\"$179 for the first flue, $79 for each extra flue\",\"length\":\"2 hours, 30 minutes more for each extra flue\",\"place\":\"at the customer's place\",\"before\":\"the $89 trip fee held\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Wood stove sweep and inspection\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"the $89 trip fee held; in the fall season, a $40 deposit if the owner sets one\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Level 2 camera inspection, with the sweep\",\"price kind\":\"set by the customer's answers\",\"price\":\"$199 (the example), by person: $249 when the owner goes\",\"length\":\"2½ hours\",\"place\":\"at the customer's place\",\"before\":\"the $89 trip fee held\",\"after\":\"Rosie texts the bill\",\"note\":\"Set by the answers: a home sale, a new stove or fuel, or signs of a chimney fire. Booked for one of those, the owner OKs it first; added to a booked sweep, it's a list price. The camera report link comes later.\"},{\"service\":\"Chimney leak repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 trip fee is promised\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"the $89 trip fee held\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Rain cap, put on after a sweep\",\"price kind\":\"one price, quoted with the sweep's findings\",\"price\":\"$160 (the example)\",\"place\":\"at the customer's place\",\"note\":\"Put on the same day only if the customer says yes to the quote\"},{\"service\":\"Chimney cap install, on its own\",\"price kind\":\"one price\",\"price\":\"$179 (the example)\",\"length\":\"2 hours\",\"place\":\"at the customer's place\",\"before\":\"the $89 trip fee held\",\"after\":\"Rosie texts the bill\",\"note\":\"Done from the roof: nobody needs to be home, and DONE comes with a photo. A weather limit: dry, and not windy.\"},{\"service\":\"Crown repair\",\"price kind\":\"quoted from the customer's photos, or from the sweep's photos\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"The owner OKs any quote over $500. A signed contract above the plug-in's amount.\"},{\"service\":\"Stainless liner, or a chimney rebuild\",\"price kind\":\"a free estimate visit, then a written quote\",\"price\":\"the quote (the example: $2,400, paid in stages)\",\"length\":\"1 to 3 days\",\"place\":\"at the customer's place\",\"note\":\"A permit where the local rules require one. A crew of two.\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted jobs; not booked alone\"},{\"service\":\"Yearly sweep plan\",\"price kind\":\"each visit at the sweep's list price\",\"note\":\"Its own yes on the secure page. Each August, a text to pick a September time. Each visit is booked and paid like a single one. Ends with one tap.\"},{\"service\":\"Stove work (the second kind of work): gas stove serviced $149, stovepipe installed $189, an insert install by free estimate\",\"note\":\"Gas work only by a stove installer with a gas fitter's license, where the state requires one\"}],\"at the business (the example: Lee Hearth Shop's counter board)\":[{\"service\":\"Door gasket refit (bring the stove door)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Stove glass, cut and fitted\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New door handle\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the shop\",\"note\":\"Often added at the visit\"},{\"service\":\"Ash pan repair\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\"},{\"service\":\"Cap fitting: a stainless cap sized to the flue, with its screen, picked up at the counter\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Stove door rebuild (gasket, glass and latch)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the shop\",\"before\":\"the $40 fee held (over 2 hours), or a $40 deposit\",\"after\":\"paid at the counter\"},{\"service\":\"Custom cap (an odd-size or multi-flue top)\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Only Rory makes them, at the welding bench. The owner OKs each quote.\"},{\"service\":\"Casting repair (a cracked stove part)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 look is promised\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a stove part or a chimney top\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"note\":\"Only where the owner offers it\"}],\"capacity\":\"One sweep per booking. A liner or a rebuild needs a crew of two. Custom caps need the shop's one welding bench.\",\"skills each needs\":\"Level 2 inspections need the flue camera. Gas stove work needs a gas fitter. Masonry repairs need the masonry skill. Custom caps and casting repairs need Rory.\",\"nobody home\":\"A cap or crown job done from the roof: nobody needs to be home, and DONE comes with a photo. A sweep needs an adult home, since the fireplace is inside.\",\"online\":\"A video check only, where the owner offers it. No sweep or repair by video.\",\"season\":\"Fall books up weeks ahead. The owner can set a fall deposit and a list for sooner times (see the gaps).\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at the owner's list. No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "What the chimney serves: a fireplace, a wood stove, an insert or a furnace",
+  "The fuel: wood, gas, pellet or oil",
+  "How many flues",
+  "Any signs of an old chimney fire: puffy black flakes, a warped damper, cracked tiles",
+  "A home sale, a new stove or a new fuel (these make it a Level 2)",
+  "Any animals heard in the chimney",
+  "At the counter: which stove, and its maker if known"
+ ],
+ "safety_stop": [
+  "A chimney fire now: a loud roar, flames or sparks from the top, smoke filling the house",
+  "A carbon monoxide alarm, or a gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "documents",
+  "waitlist",
+  "stages",
+  "extrawork"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Sweeping and inspecting a chimney has no state license in most places. Where a state or city licenses chimney or home repair work, its form asks for it. Repairs (caps, crowns, liners, rebuilds) can need a contractor license or registration where the state or city requires one. Gas stove and insert work needs a gas fitter's license where the state licenses gas work. The hearth shop's counter: business registration only.",
+ "staff_skills": "[\"Sweeping and Level 1 inspections\",\"Level 2 camera inspections\",\"Caps, crowns and masonry repairs\",\"Liners and rebuilds (a crew of two)\",\"Gas stove and insert work (a gas fitter, where the state licenses one)\",\"Counter work, custom caps and casting repairs\"]",
+ "messages_never": "Gate or lock codes, card details, and photos from inside the home. The photo report opens on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/chimney+sweep",
+  "pexels": "https://www.pexels.com/search/chimney%20sweep/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

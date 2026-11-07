@@ -1,0 +1,199 @@
+{
+ "id": "surveyor",
+ "name": "Land surveyor",
+ "booking_type": "Service",
+ "pattern": "service",
+ "built_from": "inspector",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Land surveyor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Land surveyor",
+   "staff": "Irene and Vera (surveyors at the office)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Records consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 records consult. A card is saved for the office's $20 fee. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Records consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 records consult. Nothing is taken: a YES books it. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Second look at a survey",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A second look at another firm's survey, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Records consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 records consult on a Saturday morning, when Irene works alone with no front desk: the saved card is charged when she texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Land surveyor",
+   "staff": "Dominic and Hugo (survey crew chiefs)",
+   "customer": "Alex M. (landowner) · other customers",
+   "arrive": "window",
+   "cutoff": "6pm the day before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Boundary survey",
+     "price": "$495",
+     "deposit": "$250",
+     "rest": "$245",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $495 boundary survey. A $250 deposit when booking, the $245 rest on the bill after the signed survey is delivered.",
+     "due_now_at_booking": 250,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Boundary survey",
+     "price": "$495",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $495 boundary survey. Nothing is taken. Rosie texts the bill after, and the signed survey goes out once it's paid.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Corner re-stake",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 corner re-stake, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "5-acre parcel survey",
+     "price": "$640",
+     "deposit": "$320",
+     "rest": "$320",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 5-acre parcel, priced from the deed and aerial photos at $640. Sam OKs it. A $320 deposit now, the $320 rest on the bill after.",
+     "due_now_at_booking": 320,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: one fieldwork visit at the property, priced by the lot's size, with a signed survey drawing later.\",\"list\":[{\"name\":\"Boundary survey\",\"price_kind\":\"set by the customer's answers (lot size, and whether the corners are marked)\",\"example\":\"lot up to ¼ acre: $495; ¼ to ½ acre: $595; ½ to 1 acre: $695 (the example business's own prices)\",\"length\":\"about 3 hours in the field for a crew of two; the signed survey and the corner markers follow in about 10 business days\",\"where\":\"at the property; nobody needs to be there\",\"money\":\"a deposit at booking, the rest on the bill after the signed survey is delivered\"},{\"name\":\"Corner re-stake\",\"price_kind\":\"one price\",\"example\":\"$150, about 1 hour: marks reset at the corners of a lot already surveyed\",\"where\":\"at the property\",\"money\":\"booked like the first survey; paid in full when booking (the example business's setting)\"},{\"name\":\"Construction staking (the second kind of work)\",\"price_kind\":\"quoted from the plans first\",\"example\":\"the corners and the building layout marked for a new build\",\"where\":\"at the property\"},{\"name\":\"Topographic survey\",\"price_kind\":\"set by the surveyor at the visit from the tract's size and terrain; only the $89 trip fee is promised before\",\"example\":\"a wooded tract: priced after a walk-through; the fee never depends on where the lines fall\",\"where\":\"at the property\"},{\"name\":\"Large lot or complex boundary\",\"price_kind\":\"quoted from the deed, old plats and aerial photos first\",\"example\":\"a 5-acre parcel: $640, with a deposit; Sam OKs any quote over $500\",\"where\":\"at the property\"},{\"name\":\"Elevation certificate\",\"price_kind\":\"one price, an add-on\",\"example\":\"$199 (a flood-zone elevation reading); $249 when Sam goes himself\",\"where\":\"at the property\"},{\"name\":\"Fence line location\",\"price_kind\":\"one price, an add-on at the visit\",\"example\":\"$160: the existing fence shown on the drawing, only if the client says yes first\",\"where\":\"at the property\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or no way in that Sam confirms, or a return trip when the ground was not safe or the locate was not done\",\"where\":\"never booked alone\"},{\"name\":\"Records consult, plat lookups and survey reviews (at Lee Survey Office)\",\"price_kind\":\"one price each\",\"example\":\"30-minute records consult $35; plat lookup $20; survey review, reading an old survey with you, $40; second look at another firm's survey $55; subdivision planning meeting, about 2½ hours, $140; at the property $75 (the example office's own prices)\",\"where\":\"at the office, by video, or at the property\",\"money\":\"card saved for the $20 fee; paid at the office after\"}],\"start_times\":\"A 2-hour arrival window, like 8 to 10am. The crew's exact time is texted on the way.\",\"notice\":\"2 days' notice by default, plus the time the utility locate takes (about 2 business days). A sooner time only if Sam says yes.\",\"capacity\":\"One crew per survey. Construction staking only with a crew that does it.\",\"nobody_home\":\"Yes: nobody needs to be there. The crew works outdoors; a gate code, if any, is set at booking and shown only to the crew on the day. The owner is welcome to meet the crew.\",\"online\":\"Records consults, plat lookups and survey reviews can be done by video.\",\"not_offered\":\"Legal advice, title insurance, fencing or building work, and any promise of where a line falls.\",\"partner_work\":\"None. Rosie never names or refers another business.\"}",
+ "questions_before_times": [
+  "The town or ZIP, and what kind of land: a lot in a neighborhood, a rural parcel, or a large tract",
+  "About how big the lot is, and whether the corners are marked now",
+  "What the survey is for: a fence, an addition, buying or selling, a boundary question, or a permit",
+  "Add-ons: an elevation certificate",
+  "Do you own the land, or do you have the owner's yes?"
+ ],
+ "safety_stop": [
+  "a gas smell or hissing",
+  "sparks or smoke",
+  "live wires hanging down",
+  "a threat from someone at the property"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "firststeps",
+  "results",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "6pm the day before"
+ },
+ "license": "Each surveyor who leads a survey and signs the plat holds their own state professional surveyor license. A crew member works under the licensed surveyor in charge, who signs. The company holds a firm license or registration where the state asks. Only a licensed surveyor signs a survey drawing.",
+ "staff_skills": "[\"Boundary surveys\",\"Large lots and complex boundaries\",\"Corner re-stakes\",\"Topographic surveys\",\"Elevation certificates\",\"Construction staking\",\"Records consults and survey reviews at the office\"]",
+ "messages_never": "[\"Gate and lock codes\",\"The street address or parcel number in a first text to someone new\",\"The signed survey or where any line falls: only the secure link\",\"A boundary dispute's details: only the secure page\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/land+surveyor",
+  "pexels": "https://www.pexels.com/search/land%20surveyor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

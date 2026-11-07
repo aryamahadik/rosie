@@ -1,0 +1,212 @@
+{
+ "id": "lawn",
+ "name": "Lawn care & landscaper",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Lawn care & landscaper",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lawn care & landscaper",
+   "staff": "Nico and Toby (mechanics)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Blade sharpening",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 blade sharpening. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Carburetor rebuild",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A carburetor rebuild, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Won't-start repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A mower that won't start, priced at the counter. Only the $25 diagnosis is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lawn care & landscaper",
+   "staff": "Andre and Luis (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First cut and cleanup",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 first cut and cleanup, then weekly mowing. A card is saved and charged $179 when Andre texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "First cut and cleanup",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 first cut. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Core aeration",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Core aeration, $150, paid in full when booking (the example's prepay price).",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Lawn renovation",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A lawn renovation, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Brush clearing",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Brush clearing on an overgrown lot, priced at the visit. A card is saved; the $89 trip fee is owed even after a no to the price, and the card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: lawn work at the customer's place, mostly a weekly plan on each town's route day, plus seasonal visits. Sam's second company, Lee Mower Shop, takes mowers in at its counter.\",\"list\":[{\"name\":\"First cut and cleanup\",\"price_kind\":\"set by the lawn's size (the customer's answer, or the county's lot record)\",\"example\":\"up to 1/2 acre, an overgrown lawn: $179 (the example business's own price)\",\"length\":\"about 2 hours for a crew of two\",\"where\":\"at the customer's place; someone home for the first walk-around, or nobody\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Weekly mowing (a plan)\",\"price_kind\":\"a price per cut, by lot size\",\"example\":\"up to 1/4 acre $55 a cut; up to 1/2 acre $70 a cut. Mow, trim, edge and blow\",\"length\":\"about 35 to 50 minutes\",\"where\":\"at the customer's place, on the town's route day (the example: Springfield on Thursdays); nobody needs to be home\",\"season\":\"April to Thu Nov 19 (the example); the plan pauses for winter and starts again in April after a text in March\",\"money\":\"card saved; each cut charged at its own DONE, or one bill a month if Sam picks it\"},{\"name\":\"Weed control and fertilizer (weed-and-feed)\",\"price_kind\":\"one price by lawn size\",\"example\":\"$79 up to 8,000 sq ft\",\"length\":\"about 30 minutes, one certified applicator\",\"where\":\"at the customer's place; nobody needs to be home\",\"first_step\":\"booked at least 2 days out, so neighbor notices can go out where the state's rules require them\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Fertilizer only\",\"price_kind\":\"one price\",\"example\":\"$59: offered instead of the weed-and-feed where the town bans weed sprays on home lawns\",\"where\":\"at the customer's place\"},{\"name\":\"Core aeration\",\"price_kind\":\"one price by lawn size\",\"example\":\"$150 up to 1/2 acre, paid in full when booking (the example's prepay price)\",\"length\":\"about 45 minutes\",\"where\":\"at the customer's place; nobody needs to be home\",\"first_step\":\"sprinkler heads and any buried dog-fence wire flagged first\"},{\"name\":\"Fall leaf cleanup\",\"price_kind\":\"one price by lot size\",\"example\":\"$199 up to 1/4 acre\",\"where\":\"at the customer's place, October to December\"},{\"name\":\"Lawn renovation (a patchy, weedy lawn)\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640: weeds out, aeration, overseeding and starter fertilizer\",\"where\":\"at the customer's place; certified applicator only, since it includes weed control\",\"money\":\"card saved, charged at DONE; a written estimate where the state's rules require one over an amount\"},{\"name\":\"Brush clearing (an overgrown lot)\",\"price_kind\":\"quoted at the visit, before any work\",\"example\":\"only the $89 trip fee is promised\",\"where\":\"at the customer's place\"},{\"name\":\"By the hour\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour for a crew of two, 1-hour minimum (beds, hedges, odd jobs)\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, done only when the customer asks\",\"example\":\"soil test $45 (results in 1 to 2 days); hedge trim from $60 by length (the example: $160 for a long hedge); bed edging $95; leaf haul-away $40\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89 for a one-time visit (a first cut, a cleanup, an aeration, a renovation or a visit priced on site); $25 for a plan mow or a spray. Only for a late cancel, a locked gate or a loose dog the owner confirms. Never more than the visit's price.\",\"where\":\"not booked alone\"},{\"name\":\"Snow plowing (the second kind of work)\",\"price_kind\":\"per plow, by driveway length\",\"example\":\"the example business's own list: a 2-car driveway $45 a plow, walks $25; a business lot gets a free estimate, then a quote\",\"where\":\"at the customer's place, December to March; nobody needs to be home\",\"money\":\"card saved; each plow charged at its own DONE\"},{\"name\":\"Mower repair at Lee Mower Shop (Sam's second company)\",\"price_kind\":\"one price, from photos, or at the counter\",\"example\":\"the example shop's own board (the old flowchart has no mower shop; this side is the example's own): blade sharpening $35, riding mower blades $40, chain sharpening $20, hedge trimmer sharpening $25, push mower tune-up $55, riding mower tune-up $140, a carburetor rebuild from photos, a mower that won't start priced at the counter after a $25 diagnosis\",\"where\":\"dropped off at the shop; blades can also be sharpened at the customer's home ($75, billed after)\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"capacity\":\"A mowing or cleanup crew is two people: a lead and a helper. A spray is one certified applicator. Each crew has a most-stops-a-day number Sam sets (the example: 22).\",\"route_days\":\"Weekly mowing is booked on each town's route day (the example: Springfield on Thursdays). Only that day's times show for a plan. A customer who wants another day is told the route day.\",\"nobody_home\":\"Yes for plan mows, sprays, aeration, leaf cleanups and plowing: a gate code or an unlocked gate. DONE with a photo confirms it.\",\"online\":\"No.\",\"not_offered\":\"Sprinkler repair, tree removal and tree work near power lines, and a single mow with no plan (Sam's setting: a one-off is the first cut and cleanup).\",\"drop_off_slots\":\"Lee Mower Shop books drop-off slots by how many mowers it takes in a day, with no mechanic named. Once a mower is in, it goes to a mechanic with the skill.\"}",
+ "questions_before_times": [
+  "About how big is the lawn: up to 1/4 acre, up to 1/2 acre, or bigger (or Rosie reads the county's lot record from the address)",
+  "When was it last mowed? (over 3 weeks means the first cut and cleanup)",
+  "Weekly mowing, or one visit",
+  "For a spray: anywhere it must not go, like a vegetable garden, a pond or a play area",
+  "For aeration: any sprinkler heads, or a buried dog fence?",
+  "For a drop-off at the mower shop: what kind of mower, and what it needs"
+ ],
+ "safety_stop": [
+  "a power line down in the yard",
+  "someone swallowed or splashed a lawn chemical",
+  "a gas smell",
+  "a wasp or hornet nest in the yard",
+  "a tree or a big limb down on the house"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "documents",
+  "tips",
+  "monthlybill"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Mowing, trimming, leaf cleanup, aeration and snow plowing: usually none. Any weed control, insect control or weed-and-feed done for pay: the state's pesticide business license, and a certified applicator for each spray. Where a town or county licenses landscapers, the state's form says so.",
+ "staff_skills": "[\"Mowing and cleanups\",\"Sprays and lawn renovation (certified applicator only)\",\"Aeration\",\"Snow plowing\",\"Mower repair at the shop: sharpening, tune-ups, carburetor work\"]",
+ "messages_never": "[\"Gate codes and lock combinations\",\"Health reasons for staying away from a product\",\"Neighbors' names or numbers: Rosie never texts the neighbors\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/lawn+care+landscaper",
+  "pexels": "https://www.pexels.com/search/lawn%20care%20%26%20landscaper/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

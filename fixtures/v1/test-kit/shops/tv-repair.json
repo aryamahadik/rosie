@@ -1,0 +1,164 @@
+{
+ "id": "tv-repair",
+ "name": "TV Repair",
+ "booking_type": "Fix",
+ "pattern": "fix",
+ "built_from": "appliance",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] TV Repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "TV Repair",
+   "staff": null,
+   "customer": null,
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|deposit|counter",
+   "services": [
+    {
+     "combo": "visit|deposit|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "TV repair at the shop",
+     "price": "$245",
+     "deposit": "$65",
+     "rest": "$180",
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a TV with no picture dropped off; the $65 bench check is paid as a deposit when booking and counts toward the repair; the rest is paid at pick-up.",
+     "due_now_at_booking": 65,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Game console HDMI port replacement",
+     "price": "$129",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A game console HDMI port replaced for $129, nothing taken when booking, paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "TV Repair",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|card|card",
+   "services": [
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "TV repair at home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$99",
+     "story": "The main story: a 75-inch TV fixed at home; the $99 trip and check is promised; the repair is priced in the home; the saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "TV wall mounting",
+     "price": "$149",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A 65-inch TV mounted on the wall for $149; a card is saved; it's charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Warranty TV repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$99",
+     "story": "A warranty repair at home: nothing taken; the plan is billed; Alex gets a bill only for anything it doesn't cover.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "repairs of TVs, sound systems, receivers, game consoles and projectors: carried in to the shop (dropped off, checked, priced, fixed, picked up) or, for big TVs, fixed in the home; TV wall mounting in the home",
+ "questions_before_times": [
+  "at the shop or at your home",
+  "what it is (a TV, a sound bar, a receiver, a game console, a projector)",
+  "the brand and screen size",
+  "what's wrong (no power, no picture, lines, no sound, a broken screen)",
+  "under a warranty or a protection plan?",
+  "for mounting: the screen size, the wall (drywall, brick, plaster), your mount or ours",
+  "the town"
+ ],
+ "safety_stop": [
+  "smoke, sparks, flames or a burning smell from a TV or device",
+  "a battery that is swollen, hot, hissing or leaking (a remote, a controller, a sound bar)",
+  "a TV that fell, or someone hurt under a TV or stand",
+  "water or a drink spilled into a plugged-in device",
+  "a shock from a device",
+  "an old tube TV opened at the back"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "planbill",
+  "forms",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "A business registration; where the state's rules require an electronic repair dealer registration, the business says its number (its own word) before it goes live.",
+ "staff_skills": "[\"bench repair\",\"in-home TV repair\",\"wall mounting\",\"warranty work for the brands the business is authorized for\"]",
+ "messages_never": "[\"device passcodes or account passwords\",\"what's on the customer's device\",\"gate or building codes\",\"the card\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tv+repair",
+  "pexels": "https://www.pexels.com/search/tv%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

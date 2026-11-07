@@ -1,0 +1,175 @@
+{
+ "id": "climbing-gym",
+ "name": "Climbing gym",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "gym",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Climbing gym",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Climbing gym",
+   "staff": "Dana and the front desk",
+   "customer": "Alex M. (a first-timer) · other climbers and guests",
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Intro to climbing class",
+     "price": "$59",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$59",
+     "fee": "$59",
+     "story": "The $59 intro to climbing class, paid in full when booked.",
+     "due_now_at_booking": 59,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Climbing session",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $25 climbing session. Nothing is taken: a yes saves the spot. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Private coaching",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A $75 private coaching hour. A card is saved for the gym's $25 fee. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birthday party",
+     "price": "$320",
+     "deposit": "$100",
+     "rest": "$220",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The $320 birthday party. A $100 deposit now, and $220 at the desk on the day.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Climbing gym",
+   "staff": "Marcus and Priya (operators who go out)",
+   "customer": "Alex M. (books for the school) · teachers and parents",
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "2 days before"
+   },
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Mobile climbing wall",
+     "price": "$750",
+     "deposit": "$250",
+     "rest": "$500",
+     "paid_now": null,
+     "fee": "$250",
+     "story": "The mobile climbing wall for a school fair: $750 for 3 hours. A $250 deposit now; the $500 rest on the bill after.",
+     "due_now_at_booking": 250,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Backyard party wall",
+     "price": "$550",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$550",
+     "fee": "$550",
+     "story": "The backyard party wall: $550 for 2 hours, paid in full when booked.",
+     "due_now_at_booking": 550,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"A\":[{\"name\":\"Climbing session (day pass)\",\"price\":\"list, $25\",\"length\":\"2 hours\",\"booked as\":\"a seat in a session: the gym's open-climbing window, with the number of spots the owner gives Rosie\",\"place\":\"at the gym\",\"money\":\"nothing taken when booked; paid at the desk\"},{\"name\":\"Intro to climbing class\",\"price\":\"list, $59 with the day pass and gear\",\"length\":\"90 minutes\",\"booked as\":\"a seat in a class: 6 seats, 1 instructor, at least 2 to run\",\"place\":\"at the gym\",\"money\":\"paid in full when booked\"},{\"name\":\"Belay check\",\"price\":\"free with any visit\",\"length\":\"15 minutes at check-in\",\"booked as\":\"a first step at the start of the first roped visit, not booked on its own\",\"place\":\"at the gym\",\"money\":\"nothing\"},{\"name\":\"Private coaching\",\"price\":\"list, $75\",\"length\":\"1 hour\",\"booked as\":\"a person's time; the customer may name a coach\",\"place\":\"at the gym\",\"money\":\"a card saved for a $25 late-cancel or no-show fee; paid at the desk\"},{\"name\":\"Kids' climbing class (ages 6 to 12)\",\"price\":\"list, $35\",\"length\":\"75 minutes\",\"booked as\":\"a seat in a class: 8 seats, 1 coach for 8 kids, at least 3 to run\",\"place\":\"at the gym\",\"money\":\"paid in full when booked; the child may be left with the coach\"},{\"name\":\"Birthday party\",\"price\":\"list, $320 for up to 10 climbers; $25 each extra climber\",\"length\":\"2 hours: 1 hour climbing with a staff belayer, 1 hour in the party room\",\"booked as\":\"a space (the party room) plus staff\",\"place\":\"at the gym\",\"money\":\"a $100 deposit when booked; the $220 rest at the desk on the day\"},{\"name\":\"Monthly membership / 10-visit punch card\",\"price\":\"$85 a month / $200\",\"booked as\":\"a credit that pays a climbing session or a class seat\",\"money\":\"charged when bought; the membership charges again monthly only after its own yes\"},{\"name\":\"Youth climbing team\",\"price\":\"$120 a month\",\"booked as\":\"a repeat plan: one weekly practice, a seat each week\",\"money\":\"a repeat plan with its own yes\"}],\"B\":[{\"name\":\"Mobile climbing wall at your event\",\"price\":\"list, $750 for 3 hours\",\"length\":\"3 hours of climbing, plus about 1 hour to set up and 1 to pack up\",\"booked as\":\"the wall (a thing: one event at a time) plus 2 staff operators; a set start\",\"place\":\"at the customer's place: a school, a park, a business or a yard, with flat ground 30 by 20 feet, truck access and 25 feet of clear sky\",\"money\":\"a $250 deposit when booked; the $500 rest on the bill Rosie sends after\"},{\"name\":\"Backyard party wall\",\"price\":\"list, $550 for 2 hours\",\"length\":\"2 hours\",\"booked as\":\"the wall plus 2 staff\",\"place\":\"at the customer's home\",\"money\":\"paid in full when booked\"}]}",
+ "questions_before_times": [
+  "How many climbers? (sets the class seats, the party size, or the wall's staff)",
+  "Has each climber climbed with ropes before, and passed a belay check at a gym? (sets whether the belay check comes first, or the intro class fits better)",
+  "For a child: which class age band (6 to 12)? Never the exact age.",
+  "B: the event's address, and the ground and space at the spot (flat, 30 by 20 feet, truck access)"
+ ],
+ "safety_stop": [
+  "someone fell or is hurt now, a head injury, can't move, chest pain: the 911 safety message, no booking",
+  "drunk, high, or plans to climb after drinking: not today (no climbing under the influence)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "classes",
+  "packs",
+  "plans",
+  "groups",
+  "firststeps",
+  "forms",
+  "children",
+  "spaces",
+  "waitlist",
+  "extrawork",
+  "documents",
+  "capacitycheck"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "B": "2 days before"
+  }
+ },
+ "license": "none for the gym itself: the business registration and the owner's ID are on file; nothing is looked up",
+ "staff_skills": "instructor (classes, coaching, belay checks), kids' coach, party host, mobile-wall operator, desk",
+ "messages_never": "injuries, health conditions, pregnancy, a fall or an incident report, a child's name or age, waiver answers",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/climbing+gym",
+  "pexels": "https://www.pexels.com/search/climbing%20gym/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

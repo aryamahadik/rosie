@@ -1,0 +1,230 @@
+{
+ "id": "holiday-lights",
+ "name": "Holiday lighting installer",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "windows",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Holiday lighting installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Holiday lighting installer",
+   "staff": "Isla and Bram (light techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Light strand repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 light strand repair. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Wreath and figure repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A wreath and figure repair, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Custom prop rebuild",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A custom prop rebuild, priced at the counter. Only the $25 bench check is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Holiday lighting installer",
+   "staff": "Mateo and Owen (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Porch and doorway lights",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: porch and doorway lights, $179. A card is saved for the $89 fee at booking. Mateo texts DONE with the lines, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Porch and doorway lights",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 porch lights. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Porch and doorway lights",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 porch lights on a season plan. A card is saved and charged $179 when Mateo texts DONE, after the plan's own yes.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Takedown only",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Takedown only, $150, paid in full when booking: Sam's setting for that service.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Roofline and window lights",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Roofline and window lights for a 2-story home, priced from photos at $640. Sam OKs it. A $160 deposit orders the lights; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Custom light display",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A custom light display, priced after the $89 walk-through (a card saved). Mateo's written quote; the agreement, a $1,600 deposit, a $400 change order; the last $2,000 on the bill Rosie texts. The January takedown is in the price.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a crew at the customer's home or business, priced by feet of roofline and stories, put up in the fall and taken down in January. Small fixed jobs book from the list; a whole display is quoted after a walk-through.\",\"B\":[{\"name\":\"Porch and doorway lights\",\"price\":\"$179, from the list: up to 30 feet, lights and clips supplied, installed in the fall and taken down in January\",\"length\":\"about 2 hours to install, 1 hour to take down\",\"where\":\"at the customer's place; nobody needs to be home for outside work\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\",\"weather\":\"no ladders in wind over 25 mph, rain or ice; the move is free\"},{\"name\":\"Takedown only\",\"price\":\"$150, from the list: up to 100 feet of the customer's own lights taken down and boxed\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Roofline and window lights, priced from photos\",\"price\":\"priced from the customer's photos (the example: $640 for a 2-story home); over $500, Sam OKs it; a 25% deposit orders the lights, the rest on the bill\",\"where\":\"at the customer's place\",\"before\":\"a deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Custom light display (roofline, trees, bushes, walkway)\",\"price\":\"quoted after a light walk-through: a written quote with a drawing within 1 business day, good for 14 days (the example: a $3,200 display with install and the January takedown)\",\"length\":\"install 1 to 2 days; takedown in January, included\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 walk-through fee; half the price as a deposit once the agreement is signed\",\"after\":\"the rest after the install, on the bill Rosie texts (or the business's own way)\"},{\"name\":\"Timer and controller setup\",\"price\":\"$199, from the list\",\"where\":\"at the customer's place\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Season plan\",\"price\":\"$179 a season (the example): the same porch and doorway lights put up each November and taken down each January; each season is booked and paid like a single one\",\"where\":\"at the customer's place\",\"before\":\"a card saved; its terms come with their own yes\",\"after\":\"the saved card is charged at DONE after the plan's yes and a reminder\"},{\"name\":\"Extra crew time\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a job for work beyond the booking, only with the customer's yes, never booked alone\"},{\"name\":\"Add-ons\",\"price\":\"one price each, added only when the customer asks and paid at the visit or on the bill with the rest: an extra tree wrap $25, a wreath $30, replacing a dead strand $20\"},{\"name\":\"Light walk-through fee\",\"price\":\"$89: a card saved at booking, charged only for a late cancel or no way in that Sam confirms, or owed when a display is quoted and the customer says no; credited to the display if Alex signs\",\"where\":\"not booked alone\"},{\"name\":\"Change order\",\"price\":\"an added tree or section: priced, written and signed before the work; added to the final bill\"},{\"name\":\"Event lighting (the second kind of work)\",\"price\":\"quoted from photos or a walk-through; weddings, parties and business storefronts; setup and takedown on set days\"},{\"name\":\"Light strand repair at the shop (Lee Light Shop)\",\"price\":\"one price by box, from photos, or at the counter: strand repair $35, bulb check $15 (an add-on), inflatable repair $40, plug and socket repair $25, strand test $20, wreath and figure repair from photos, custom prop rebuild priced at the counter after a $25 bench check\",\"where\":\"dropped off at the shop; a strand can also be fixed at the customer's home ($75)\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"instant_booking\":\"Homes up to 2 stories with a normal roof and up to 100 feet of roofline book from the list. Taller, steeper or bigger homes, trees, and businesses are priced from photos or a walk-through first.\",\"capacity\":\"A crew of two for roofline work; one person for porch and doorway lights and takedowns. A drop-off needs one person at the counter.\",\"nobody_home\":\"Yes, for outside work (install, takedown, repairs outdoors). DONE with after photos confirms it. The walk-through always needs an adult there or a video.\",\"online\":\"No. The walk-through can be done from the customer's photos for small homes.\",\"not_offered\":\"Roof repair, new outlets or wiring, tree trimming, lift work unless a crew is set up for it, and any work within 10 feet of a power line.\",\"drop_off_slots\":\"Strands, wreaths and props are booked into drop-off slots by the shop's daily number, with no light tech named.\"}",
+ "questions_before_times": [
+  "Which parts of the house: roofline, windows, porch, trees, bushes?",
+  "A house, a business or an event?",
+  "How many stories, and about how many feet of roofline?",
+  "When do you want the lights on, and until when?"
+ ],
+ "safety_stop": [
+  "a power line touching the house, its gutter or the lights, sparking or smoking wires, a gas smell",
+  "someone fell from a ladder or roof, or a ladder or lift tipped",
+  "a roof edge or gutter giving way"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "documents",
+  "tips",
+  "firststeps",
+  "multiday",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "if: most states license no holiday or event lighting. Only the business registration and insurance are kept. Electrical work (a new outlet, wiring, a bad circuit) is a licensed electrician's. Where the state's form asks for more, it comes from the state's form.",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or door codes\",\"The budget\",\"Quotes, agreements and change orders (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/holiday+lighting+installer",
+  "pexels": "https://www.pexels.com/search/holiday%20lighting%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

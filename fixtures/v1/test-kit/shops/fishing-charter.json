@@ -1,0 +1,136 @@
+{
+ "id": "fishing-charter",
+ "name": "Fishing and boat charter",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "rentals",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Fishing and boat charter",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Fishing and boat charter",
+   "staff": "Gus and Ana (captains at the dock)",
+   "customer": "Alex M. (customer) · other anglers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   },
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Private half-day inshore charter",
+     "price": "$600",
+     "deposit": "$150",
+     "rest": "$450",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a private half-day inshore charter for 4: $600, a $150 deposit when booking, the $450 rest paid at the dock before leaving.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Shared trip seat",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$140",
+     "fee": "$30",
+     "story": "A seat on a shared trip, $140, paid in full when booking.",
+     "due_now_at_booking": 140,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Fishing and boat charter",
+   "staff": "Ruth and Rafe (captains)",
+   "customer": "Alex M. (customer) · other anglers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Charter with dock pick-up",
+     "price": "$675",
+     "deposit": "$150",
+     "rest": "$525",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a full-day charter with dock pick-up: $675 ($600 plus the $75 pick-up). A $150 deposit when booking; the $525 rest charged to the saved card when the captain texts DONE.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "table: a boat booked for a set trip time by one group (a space with a passenger limit); a shared trip sells seats on a set departure (a seat in a session)",
+ "questions_before_times": [
+  "a private boat, or a seat on a shared trip",
+  "how many people in all, adults and children (sets the price and must fit the boat's limit)",
+  "inshore or offshore, and the date",
+  "for a pick-up: the kind of place (a home dock or a hotel marina) and the town"
+ ],
+ "safety_stop": [
+  "someone overboard or a boat in trouble on the water right now",
+  "someone unwell right now: chest pain, trouble breathing, a bad fall"
+ ],
+ "first_steps": [
+  "each passenger's waiver on the secure page before the trip (a parent or guardian signs for a child), good for the season",
+  "the passenger list (names and a shore contact) on the secure page by 6pm the evening before",
+  "fishing licenses: where the boat's license doesn't cover its passengers, each angler who needs one buys it before the trip, and the number goes on the secure page"
+ ],
+ "facts": [
+  "groups",
+  "forms",
+  "children",
+  "tips",
+  "multiday",
+  "extrawork",
+  "firststeps",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "72 hours before",
+   "B": "72 hours before"
+  }
+ },
+ "license": "always, to carry paying passengers: each captain holds the federal captain's license for the boat's waters and passenger count (a 6-passenger license for an uninspected boat, a master's license for an inspected boat), with the drug-testing program and medical certificate it requires; the business holds any charter or fishing guide license where the state's rules require one; each boat has its own registration or federal documentation, and an inspected boat its certificate of inspection",
+ "staff_skills": "which boats each captain may run; inshore, offshore, fly fishing",
+ "messages_never": "passengers' health details, shore contacts, fishing license numbers and dates of birth: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/fishing+and+boat+charter",
+  "pexels": "https://www.pexels.com/search/fishing%20and%20boat%20charter/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

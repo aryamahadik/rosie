@@ -1,0 +1,197 @@
+{
+ "id": "vehicle-wrap",
+ "name": "Vehicle wrap",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-body",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Vehicle wrap",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Vehicle wrap",
+   "staff": "Mateo and Sasha (installers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "photos|deposit|counter",
+   "services": [
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full color-change wrap",
+     "price": "$3,800",
+     "deposit": "$1,900",
+     "rest": "$1,900",
+     "paid_now": null,
+     "fee": "$1,900",
+     "story": "The main story: a satin black color change for a sedan, priced from Alex's photos at $3,800. Sam OKs the price, and Alex pays a $1,900 deposit (half, because the film is cut and ordered for the car). Alex pays the $1,900 rest at the counter at pick-up.",
+     "due_now_at_booking": 1900,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Full color-change wrap",
+     "price": "$3,800",
+     "deposit": "$1,900",
+     "rest": "$1,900",
+     "paid_now": null,
+     "fee": "$1,900",
+     "story": "The same color change, with the $1,900 rest on the bill Rosie texts with READY, so Alex can pay before pick-up.",
+     "due_now_at_booking": 1900,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Door lettering",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A $90 door lettering from the shop's board. Nothing is taken: a YES books the drop-off, and Alex pays at the counter the same day.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Door lettering",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same $90 lettering with the vehicle left at the shop. Rosie texts the bill with READY.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Vehicle wrap",
+   "staff": "Felix and Brooke (installers)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Door lettering",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: lettering on a work van at Alex's lot, $179 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Felix texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Fleet look at the lot",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A look at a fleet of vans at the lot, priced at the visit. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Fleet vans, lettering and graphics",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Lettering and graphics for three vans, priced from photos at $640. Sam OKs it, a $160 deposit orders the film, and the $480 rest is on the bill after DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the vehicle is left at the shop for 3 to 5 working days and picked up when it is READY; lettering and fleet graphics can also be done at a business's lot\",\"list\":[{\"name\":\"Full color-change wrap\",\"price\":\"priced from photos: the vehicle's size, the film chosen and the paint's condition; the example sedan: $3,800\",\"length\":\"3 to 5 working days\",\"place\":\"at the shop: a drop-off\",\"before\":\"a 50% deposit ($1,900 in the example) once the price is OK'd, credited to the bill; the film is cut and ordered for the vehicle\",\"after\":\"the rest at pick-up, at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Hood wrap\",\"price\":\"one price from the board: $700 in the example\",\"length\":\"1 to 2 days\",\"place\":\"at the shop\",\"before\":\"nothing taken; a $350 deposit if the owner turns one on\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Mirror caps wrap\",\"price\":\"$55 in the example (a door handle set is $40, a fuel door $20)\",\"length\":\"1 hour\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Chrome delete, per piece\",\"price\":\"$25 in the example\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Door lettering\",\"price\":\"one price: $90 in the example at the shop, $179 by the van (the $89 trip fee is in it)\",\"length\":\"1 hour\",\"place\":\"at the shop; at a business's lot by the van\",\"before\":\"nothing taken at the shop; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Fleet vans and trucks, lettering and graphics\",\"price\":\"priced from photos of the vehicles and the design proof: $640 for three vans in the example\",\"length\":\"a day or more\",\"place\":\"at the business's lot, by the van\",\"before\":\"a 25% deposit once the quote is OK'd ($160 in the example)\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Paint protection film, front end\",\"price\":\"priced from photos, from $1,400 in the example\",\"length\":\"2 to 3 working days\",\"place\":\"at the shop\",\"before\":\"a 50% deposit once the price is OK'd\",\"after\":\"the rest at pick-up\"},{\"name\":\"Wrap or film removal\",\"price\":\"$60 a panel in the example; found on a vehicle and added only with the customer's yes\",\"place\":\"at the shop, or by the van\"},{\"name\":\"Design proof\",\"price\":\"free: the first two proofs; after that $120 an hour, with the owner's OK\",\"length\":\"within 2 business days\",\"place\":\"online, before the film is ordered\"},{\"name\":\"Free 30-day re-check\",\"price\":\"free, within 30 days of any job: lifting edges, bubbles (the example shop's own promise)\",\"length\":\"30 minutes\",\"place\":\"at the shop\"},{\"name\":\"Mirror caps wrap, at the lot\",\"price\":\"$144 by the van in the example (the $55 shop price and the $89 trip fee)\",\"place\":\"at a business's lot, by the van\"},{\"name\":\"Chrome delete, 4 pieces, at the lot\",\"price\":\"$199 by the van in the example, the trip fee in it\",\"place\":\"at a business's lot, by the van\"},{\"name\":\"Trip fee for the van\",\"price\":\"one fee, part of each mobile job's price (the example: $89)\",\"place\":\"at a business's lot\"}],\"never\":\"a wrap over the plate, the lights or the glass the state's rules protect is never done; the wrap shop sells no vehicles\",\"capacity\":\"3 install bays; one vehicle per booking; the clean room and the plotter are saved like equipment; drop-off slots name no installer\",\"drop_off_window\":\"drop-off times by the shop's daily number, with no installer named\",\"nobody_home\":\"no: an adult on the booking hands over the keys and meets the installer\",\"online\":\"no: a vehicle is wrapped in person; the design proof is online\"}",
+ "questions_before_times": [
+  "Year, make, model and color of the vehicle",
+  "What you want: a full color change, a partial wrap, lettering, chrome delete, paint protection film or a removal",
+  "Is the paint original? Any repainted panels, peeling clear coat or rust?",
+  "Is the vehicle leased or financed?",
+  "For a business: how many vehicles, and do you have the logo files?",
+  "For lettering at your lot: where the vehicle is parked, and if there is a covered space"
+ ],
+ "safety_stop": [
+  "someone hurt, or a crash that just happened",
+  "a fire, or smoke from the vehicle",
+  "someone dizzy or sick from fumes in the shop"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork",
+  "multiday",
+  "documents",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "if: no state license for wrapping vehicles by default; the business registration; a garage or shop registration only where the state's rules require one for a shop that holds customers' vehicles",
+ "staff_skills": "[\"vinyl wrap install\",\"paint protection film\",\"lettering and decals\",\"design proofs\",\"wrap removal\"]",
+ "messages_never": "[\"The VIN or the plate\",\"Logo files and design notes\",\"A lot or gate code, or where the keys are left\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/vehicle+wrap",
+  "pexels": "https://www.pexels.com/search/vehicle%20wrap/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

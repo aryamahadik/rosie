@@ -1,0 +1,194 @@
+{
+ "id": "college-admissions",
+ "name": "College admissions consultant",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "coach",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] College admissions consultant",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "College admissions consultant",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Strategy session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: a $55 strategy session by video, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Essay review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 essay review: a card is saved for the $20 late-cancel fee, and the $35 is charged when the advisor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Application package",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $640 application package, quoted from the family's answers: a $160 deposit now, and the $480 rest at the front desk.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Quick check",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $25 quick check at the office: nothing is taken, and the family pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "College admissions consultant",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Campus visit at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 campus visit at home; a card is saved for the $89 visit fee and the $179 is charged when the advisor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Application package at home",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $640 application package at the family's home, quoted from the family's answers: a $160 deposit now, and the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Family info night",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 family info night at a host's place: nothing is taken, and the bill is texted after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Campus visit at home, paid in full",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 campus visit at home, paid in full when booking; a late cancel may keep the $89 visit fee.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "College advising: strategy sessions, essay reviews and an application plan, by video, by phone or at the office (flow A), and a campus visit at a family's home or a family information night at a host's place (flow B). Every new family starts with a free intro call with the student and a parent. Advice is not a promise of admission.",
+ "questions_before_times": [
+  "Who is the session for: the student, a parent, or both? What's the goal: a plan, essays, or a visit?",
+  "Roughly when, and how many people?",
+  "At the office, by video or phone, or at your home?"
+ ],
+ "safety_stop": [
+  "someone in danger or hurt right now, at school, at home or anywhere",
+  "crisis words, from the student or a parent",
+  "a student who says an adult is hurting them"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "firststeps",
+  "forms",
+  "documents",
+  "children",
+  "groups",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "No license is needed for this work in most places. A registration or certificate the state asks for is the business's own to add. It is optional, and nothing is looked up.",
+ "staff_skills": "",
+ "messages_never": "A student's grades, test scores, school records, learning needs, family money or aid, health, and anything the family shares about the student's life.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/college+admissions+consultant",
+  "pexels": "https://www.pexels.com/search/college%20admissions%20consultant/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

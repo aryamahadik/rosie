@@ -1,0 +1,109 @@
+{
+ "id": "swim",
+ "name": "Swim school",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "dance",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Swim school",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Swim school",
+   "staff": "Grace and Rosa (swim instructors) and the front desk",
+   "customer": "Alex M. (a parent, for their 4-year-old, Noah) · other parents and swimmers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial lesson",
+     "price": "$20",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$20",
+     "fee": "$20",
+     "story": "The main story: Noah's $20 trial lesson in Grace's Preschool 1, Sat Oct 24 at 11:00am, paid in full when booking. A single lesson ($28), a private lesson ($65) and each month of a monthly session ($112 for 4 weekly lessons, billed on the 1st with a text the day before) are paid this way too. A late cancel or a no-show: the price may be kept, only with Sam's OK. A missed monthly lesson gets a make-up with notice. Thunder or a pool closure: a free make-up or a refund.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Swim school",
+   "staff": "Marcus and Leo (swim instructors who teach at families' pools)",
+   "customer": "Alex M. (a parent, for their 6-year-old, Sofia) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson at your pool",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$75",
+     "story": "The main story: Sofia's $75 private lesson at the family's pool with Marcus, Thu Oct 22 at 4:30pm, paid in full when booking. A $150 group lesson at a host pool and a pool party lifeguard ($120) are paid this way too. Late or nobody at the pool: the $75 may be kept, only with Sam's OK. Thunder or an unsafe pool: a free make-up or a refund.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a spot in a set 30-minute group lesson by age and level, with a set number of swimmers per instructor, 1 trial spot per lesson and a waitlist; each swimmer is checked in on their own. A private lesson books one instructor, at the school's pool or the family's own pool. A lesson at a host pool (a community center, an apartment pool) books an instructor's time, with the host's OK",
+ "questions_before_times": [
+  "who is swimming: the parent's own child, or the adult themselves",
+  "for a child: the age (it sets the lesson group)",
+  "comfort in water: puts their face in? floats? swims a few strokes alone? (it sets the level)",
+  "for a private lesson: at the school's pool or the family's own pool, and the goal",
+  "for a lesson at home: is the pool fenced, with a gate that latches?"
+ ],
+ "safety_stop": [
+  "a child who was in the water and is now coughing hard, struggling to breathe or very sleepy; someone hurt or unwell right now"
+ ],
+ "first_steps": [
+  "Waiver and the child's details",
+  "The pick-up list and the photo yes or no",
+  "Placement",
+  "A seizure history",
+  "The home pool check"
+ ],
+ "facts": [
+  "classes",
+  "children",
+  "plans",
+  "forms",
+  "waitlist",
+  "groups"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "from the state form: teaching swimming usually needs no state license; a pool used for lessons may need a health permit and inspections where the state's or county's rules require it (a switch); some places register a swim school or set rules for selling lessons ahead",
+ "staff_skills": "group lessons by level, Parent and Tot, private lessons, adult beginners, swimmers with extra needs, lifeguarding",
+ "messages_never": "a child's last name, age, health notes (like ear tubes or seizures), skills note, pick-up list or photos never go in a text; texts to the parent may use the child's first name only; texts to Sam or the staff carry no child details at all: they name the parent and the lesson, and link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/swim+school",
+  "pexels": "https://www.pexels.com/search/swim%20school/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

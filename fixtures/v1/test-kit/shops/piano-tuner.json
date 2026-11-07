@@ -1,0 +1,244 @@
+{
+ "id": "piano-tuner",
+ "name": "Piano tuner",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "appliance",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Piano tuner",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Piano tuner",
+   "staff": "Luca and Joan (studio techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Piano buying consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 piano buying consult at the studio. A card is saved for the studio's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Piano buying consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 piano buying consult. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video check of a piano",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 video check of a piano, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full piano plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 full piano plan. A $40 deposit now, and $100 at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Pedal repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A worn pedal, priced at the counter. Only the $25 bench check is promised; a card is saved; Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Piano tuner",
+   "staff": "Anton and Mei (piano tuners)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Piano tuning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 piano tuning from the price list. A card is saved for the $89 late-cancel and no-show fee. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Piano tuning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 tuning for a returning customer. Nothing is taken before. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Piano repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A piano with sticking keys, priced at the visit. A card is saved; the $89 visit is owed even after a no to the price, and counts toward the repair. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Piano repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same piano repair, priced at the visit. Nothing is taken before. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Humidity-control system",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A humidity-control system, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Yearly tuning",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 yearly tuning (the plan's visit), paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Home visit at a set price (a tuning), or a visit to look and then a quote (a repair or a regulation). The tuner comes to the piano: a piano is never moved for these.\",\"B\":[{\"service\":\"Piano tuning (upright, spinet or grand, to standard pitch)\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"about 90 minutes\",\"place\":\"at the customer's home, school or studio\",\"before\":\"a card saved for the $89 late-cancel and no-show fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Recommended once or twice a year. A new or just-moved piano needs more. The piano should be in a quiet room, at room temperature.\"},{\"service\":\"Yearly tuning (the yearly plan's visit)\",\"price kind\":\"one price\",\"price\":\"$150 a visit, a plan customer's price\",\"length\":\"about 90 minutes\",\"place\":\"at the customer's home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Pitch raise (a piano flat by more than a quarter tone)\",\"price kind\":\"priced at the visit, before any work\",\"price\":\"the example: $160, added to the tuning\",\"length\":\"adds about an hour\",\"place\":\"at the customer's home\",\"note\":\"Needs the customer's yes first. A second tuning 2 to 4 weeks later holds the pitch; it is booked at the list price.\"},{\"service\":\"Piano repair (sticking keys, a squeak, a loose pedal, a broken string)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 visit is promised, counted toward the repair (example: $245)\",\"length\":\"60 to 90 minutes\",\"place\":\"at the customer's home\",\"before\":\"nothing, or a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Regulation and voicing (a grand or an upright, over several days)\",\"price kind\":\"quoted after a visit; a written contract above the plug-in's amount\",\"price\":\"its own quote (the example: $2,400, billed in three stages)\",\"length\":\"1 to 3 days; a grand's action may go to the workshop\",\"place\":\"at the customer's home, or the workshop\",\"before\":\"a deposit only after the contract is signed\",\"after\":\"stage bills, the last after a walk-through\"},{\"service\":\"Humidity-control system install (a heater bar and a humidistat inside the piano)\",\"price kind\":\"priced from photos\",\"price\":\"the quote (the example: $640; over $500, Sam OKs it)\",\"length\":\"about 2 hours\",\"place\":\"at the customer's home\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"Needs a free outlet near the piano\"},{\"service\":\"Pre-purchase piano check (for a used piano the customer is thinking of buying)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"about 60 minutes\",\"place\":\"at the seller's place or the buyer's\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill; written notes the same day\"},{\"service\":\"Piano appraisal (for insurance or a sale)\",\"price kind\":\"one price\",\"price\":\"$199, with a written report\",\"length\":\"about 60 minutes\",\"place\":\"at the customer's home\",\"before\":\"nothing, or a card saved for the $89 fee\",\"after\":\"Rosie texts the bill; the report comes the same day or the next\"},{\"service\":\"Recital or venue tuning (a school, a church, a hall)\",\"price kind\":\"quoted by the owner; the organization books and pays\",\"price\":\"the owner's own price\",\"place\":\"at the venue, at a set time before the event\",\"note\":\"A venue contact meets the tuner and opens the room\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's home\",\"note\":\"Goes on quoted repairs; not booked alone\"}],\"A\":[{\"service\":\"Piano buying consult\",\"price kind\":\"one price\",\"price\":\"$35, 30 minutes\",\"place\":\"at the studio; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the studio counter\",\"note\":\"Try the pianos on the floor with a studio tech and hear what to look for. No piano is sold through Rosie.\"},{\"service\":\"Quick piano chat\",\"price kind\":\"free\",\"price\":\"free, 15 minutes\",\"place\":\"at the studio\",\"before\":\"nothing taken\",\"after\":\"nothing more\"},{\"service\":\"Written notes (a one-page summary of the consult, sent the same day)\",\"price kind\":\"one price\",\"price\":\"$20, an add-on to a consult\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a piano\",\"price kind\":\"one price\",\"price\":\"$55, 60 minutes, by video\",\"place\":\"at the business (a video session)\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"note\":\"The customer shows the piano on video; the tech says what to check or whether a visit is needed\"},{\"service\":\"Full piano plan (buying advice, three pianos tried, written notes)\",\"price kind\":\"one price\",\"price\":\"$140, 2½ hours\",\"place\":\"at the studio\",\"before\":\"a card saved for the $40 fee (over 2 hours), or a $40 deposit\",\"after\":\"paid at the studio counter\"},{\"service\":\"Part repair at the workshop (a pedal, a key set, a music desk)\",\"price kind\":\"quoted at the counter\",\"price\":\"only the $25 bench check is promised, credited to the repair\",\"length\":\"30 min, or left until it's ready\",\"place\":\"at the studio's bench\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The part stays at the studio until it is ready\"}],\"capacity\":\"One tuner per booking; a regulation or an install on a grand may need two people to lift. The studio's bench takes a few small parts a day.\",\"skills each needs\":\"Tuning: any tuner. Regulation, voicing and string work: a technician cleared for it. Humidity systems: the installing tech.\",\"nobody home\":\"Never: an adult (18 or older) is home for the whole visit, since the tuner works in a room with the instrument. At the studio, a small part can be left.\",\"online\":\"A video check of a piano only. No tuning or repair is done by video.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. A moved piano: the tuner does not move pianos; a piano mover is another kind of business.\"}",
+ "questions_before_times": [
+  "What kind of piano: an upright, a spinet, a grand or a baby grand? Acoustic only (digital pianos are not tuned)",
+  "The brand, and about how old it is",
+  "When was it last tuned? (more than a year can mean a pitch raise)",
+  "Was it moved lately? (a moved piano needs about 2 weeks to settle)",
+  "Is anything wrong: sticking keys, a buzz, a broken string?"
+ ],
+ "safety_stop": [
+  "A piano that tipped over or fell, or anyone hurt or pinned by one",
+  "Smoke, flames, sparks or a burning smell from the piano's humidity heater, a lamp or an outlet; or a gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "photos",
+  "extrawork",
+  "firststeps",
+  "multiday",
+  "video",
+  "dropoff",
+  "banktransfer"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Most states don't license piano tuning or repair. Some register repair businesses, and some cities want a business license: the state's or city's form says. Safe default: the business registration on file, shown on the listing.",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or lock codes\",\"The street address (the secure page has it)\",\"Contract and change-order papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/piano+tuner",
+  "pexels": "https://www.pexels.com/search/piano%20tuner/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

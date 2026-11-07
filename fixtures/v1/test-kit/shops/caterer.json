@@ -1,0 +1,295 @@
+{
+ "id": "caterer",
+ "name": "Caterer",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "photographer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Caterer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Caterer",
+   "staff": "Remy and Sasha (chefs at the kitchen)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Tasting for 4",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 tasting for 4 (2½ hours). A $40 deposit now, and the $100 rest at the kitchen.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Fruit tray",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 fruit tray picked up at the counter with Chef Remy. A card is saved for the kitchen's $20 fee. Alex pays at pickup.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Fruit tray",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 fruit tray for a returning customer. Nothing is taken: a YES books it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Tasting for 4",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 tasting for 4. A $40 deposit now, and the $100 rest charged to the saved card when Remy marks it done.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Tasting for 2",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 tasting for 2, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom grazing board",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom grazing board, priced from photos of the table at $90. Booked once Sam OKs it, and paid at pickup.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Event menu",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An event menu at a $25 menu consult: Remy prices the menu there, and Alex pays at the kitchen. A card is saved for the $20 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Caterer",
+   "staff": "Rowan and Emery (event chefs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Office breakfast for 20",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An office breakfast for 20, quoted from Alex's plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest charged to the saved card when Rowan marks it done.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Office breakfast for 20",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same breakfast, with the rest on the bill after the event, so extras on the day are added.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Hot breakfast for 10",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 hot breakfast for 10 at Alex's office. A card is saved for the $89 delivery fee if it's cancelled late. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Hot breakfast for 10",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 hot breakfast for 10 for a weekly office order. A card is saved, and $179 is charged when Rowan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Boxed lunch for 10",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 boxed lunch for 10, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Boxed lunch for 10",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $150 boxed lunch. A $40 deposit now, and the $110 rest charged to the saved card when Rowan marks it done.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Taco bar for about 30",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A taco bar for about 30, priced at the event by the plates served. Only the $89 delivery fee is promised; a card is saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Event Catering's own list)\":[{\"service\":\"Office breakfast for 20, delivered and set up\",\"price kind\":\"quoted from the plan first (the guest count, the menu, photos of the room)\",\"price\":\"the quote (the example: $640)\",\"length\":\"a 2-hour setup window\",\"place\":\"at the customer's office or venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill after the event\"},{\"service\":\"Hot breakfast for 10, delivered and set up\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"a 2-hour setup window\",\"place\":\"at the customer's office or home\",\"before\":\"the $89 delivery fee held\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Boxed lunch for 10, delivered\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"a 2-hour delivery window\",\"place\":\"at the customer's office\",\"before\":\"the full price, or a $40 deposit\",\"after\":\"nothing more\"},{\"service\":\"Wedding or party dinner (50 guests or more)\",\"price kind\":\"quoted from the plan first, per guest\",\"price\":\"the quote (the example's family style: $95 a guest)\",\"length\":\"a set start time, with setup hours before\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill after the event, set by the final count\",\"note\":\"The owner OKs every wedding. A tasting comes first. The final count is due 14 days before (the example's setting).\"},{\"service\":\"Beer and wine bar, 4 hours (up to 20 guests)\",\"price kind\":\"one price\",\"price\":\"$189\",\"length\":\"4 hours\",\"place\":\"at the venue\",\"before\":\"the $89 delivery fee held\",\"after\":\"Rosie texts the bill\",\"note\":\"Only under the business's liquor license, and an event permit where the state's rules require one. Only bartenders with a current card.\"},{\"service\":\"Bartender, 3 hours (the hosts buy the drinks)\",\"price kind\":\"one price\",\"price\":\"$149\",\"length\":\"3 hours\",\"place\":\"at the venue, where it allows\",\"before\":\"the $89 delivery fee held\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Wedding bar\",\"price kind\":\"quoted after a venue walk-through\",\"price\":\"the quote (the example: $25 a guest 21 and over)\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the wedding's contract and deposit\",\"after\":\"with the wedding's rest\"},{\"service\":\"Taco bar\",\"price kind\":\"priced at the event, by the plates served\",\"price\":\"only the $89 delivery fee is promised\",\"length\":\"a 2-hour setup window\",\"place\":\"at the customer's office or home\",\"before\":\"the $89 delivery fee held\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Carving station (add-on)\",\"price kind\":\"by person\",\"price\":\"$199 with Rowan, $249 with Sam\",\"length\":\"the event's hours\",\"place\":\"at the event\",\"before\":\"with the main booking\",\"after\":\"with the main booking\"},{\"service\":\"Extra service time on the day\",\"price kind\":\"per hour, by person\",\"price\":\"$140 an hour with Rowan, $120 with anyone else (the example)\",\"length\":\"1 hour\",\"place\":\"at the event\",\"before\":\"nothing: asked at the event\",\"after\":\"one pay link after\",\"note\":\"Only with the customer's written yes, at the rate shown before booking\"},{\"service\":\"Delivery\",\"price kind\":\"delivery fee\",\"price\":\"the example's $89 within 25 miles; farther, quoted\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"held or added to the quote\",\"after\":\"with the rest\"}],\"at the business (the example: Lee's Kitchen's own list)\":[{\"service\":\"Tasting for 4 (the full event menu)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours\",\"place\":\"at the kitchen's tasting table\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the kitchen\",\"note\":\"Credited to a catering order booked within 30 days (the example's own rule)\"},{\"service\":\"Tasting for 2\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the kitchen\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Fruit tray (serves 10), picked up\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"a pickup slot\",\"place\":\"at the kitchen's counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Salad tray (serves 10), picked up\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"a pickup slot\",\"place\":\"at the kitchen's counter\",\"before\":\"a card saved\",\"after\":\"paid at the counter\"},{\"service\":\"Cookie box (a dozen)\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"an add-on\",\"place\":\"at the kitchen's counter\",\"before\":\"with the order\",\"after\":\"paid at the counter\"},{\"service\":\"Kids' snack box\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"a pickup slot\",\"place\":\"at the kitchen's counter\",\"before\":\"a card saved\",\"after\":\"paid at the counter\"},{\"service\":\"Custom grazing board\",\"price kind\":\"quoted from photos first (the table and the guest count)\",\"price\":\"the quote (the example: $90)\",\"length\":\"a pickup slot, 2 days' notice\",\"place\":\"at the kitchen's counter\",\"before\":\"a card saved\",\"after\":\"paid at pickup\"},{\"service\":\"Event menu\",\"price kind\":\"quoted at a menu consult\",\"price\":\"only the $25 consult is promised\",\"length\":\"30 min\",\"place\":\"at the kitchen\",\"before\":\"a card saved\",\"after\":\"paid at the kitchen\"},{\"service\":\"Fruit tray delivered and set out\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"a delivery window\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same tray, booked in flow B\"}],\"capacity\":\"The kitchen's own limit of events a day (the example: 2 off-site events on a Saturday) and a guest minimum for full-service events (the example: 50). Pickups by slots, set by how many orders the kitchen makes in a day. A big event books its lead chef, cooks, servers and bartenders together.\",\"nobody needs to be there\":\"Never: food is handed to a person, who checks it.\",\"online\":\"None: tastings and pickups are at the kitchen.\"}",
+ "questions_before_times": [
+  "What it's for: a meeting, a party, a wedding or a pickup order",
+  "The date, and the place's name and town (for the delivery fee and the travel area)",
+  "About how many guests, and how many are 21 or over if there's a bar",
+  "The style: drop-off, buffet, family style, plated or stations",
+  "A bar? Full bar, beer and wine, bartending only, or none",
+  "Does the place have a kitchen, power and water for the food?"
+ ],
+ "safety_stop": [
+  "A fire, a gas smell, or someone hurt at the venue right now",
+  "Someone has a bad allergic reaction now (trouble breathing, swelling)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "forms",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Always for food: a food service permit for the kitchen the food is made in, from the health department. Bar service: a liquor license, or a caterer's permit, where the state's rules require one. All from the state form.",
+ "staff_skills": "[\"Quoted events and weddings (leads only)\",\"Hot breakfasts and drop-offs\",\"Bar service\",\"Carving station\",\"Tastings\",\"Grazing boards\"]",
+ "messages_never": "Allergies, diets and any health detail stay on the secure page, with their own yes. Only the lead chef and the manager see them, for that event. They're deleted the day after.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/caterer",
+  "pexels": "https://www.pexels.com/search/caterer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

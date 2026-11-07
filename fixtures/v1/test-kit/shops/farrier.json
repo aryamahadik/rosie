@@ -1,0 +1,192 @@
+{
+ "id": "farrier",
+ "name": "Farrier",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "groomer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Farrier",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Farrier",
+   "staff": "Rowan and Cass (shop farriers)",
+   "customer": "Alex M. (customer, with Dusty) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Trim, 4 feet",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 trim for Dusty at the shop. A card is saved for the shop's $20 late-cancel and no-show fee. Alex pays at the counter after the trim.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trim, 4 feet",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 trim for a horse the shop knows. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Corrective shoeing",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Corrective shoeing, priced at the shop once Rowan sees the hooves. Only the $25 hoof evaluation is promised. A card is saved for the $20 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Farrier",
+   "staff": "Tate and Wren (farriers)",
+   "customer": "Alex M. (customer, with Juniper) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Full set of shoes, 4 feet",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: a $179 full set of shoes for Juniper at Alex's barn. A card is saved for the $50 trip fee, and charged $179 when Tate texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Full set of shoes, 4 feet",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The same $179 set of shoes. A card is saved for the $50 fee. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Trim, 4 feet",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A $65 trim for a barn Sam knows. Nothing is taken. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Corrective shoeing",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "Corrective shoeing, priced at the barn once Tate sees the hooves. Only the $50 trip fee is promised. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a farrier comes to the customer's barn on a set day, usually every 6 to 8 weeks, and the owner or a handler holds the horse. A horse can also be trailered to the farrier's shop, where the owner stays with it.\",\"list\":[{\"name\":\"Hoof check, new horse\",\"price_kind\":\"free\",\"length\":\"15 minutes\",\"where\":\"at the barn, with the owner or a handler there\",\"money\":\"nothing taken\",\"note\":\"The farrier looks at how the horse stands and at the hooves before any work. A shop visit with a hoof evaluation is $25 when it leads to corrective work.\"},{\"name\":\"Trim, 4 feet\",\"price_kind\":\"one price\",\"example\":\"$65 at the barn, $35 at the shop (the example business's own prices)\",\"length\":\"about 30 minutes\",\"where\":\"at the customer's barn, or at the shop\",\"money\":\"barn: a card saved, charged at DONE; shop: a card saved, paid at the counter\"},{\"name\":\"Full set of shoes, 4 feet\",\"price_kind\":\"one price\",\"example\":\"$179 at the barn, $140 at the shop\",\"length\":\"about 60 to 90 minutes\",\"where\":\"at the customer's barn, or at the shop\",\"money\":\"barn: a card saved for the trip fee, charged at DONE; shop: a card saved, paid at the counter\"},{\"name\":\"Front shoes, 2 feet\",\"price_kind\":\"one price\",\"example\":\"$55 at the shop\",\"where\":\"at the shop\"},{\"name\":\"Pull shoes, 4 feet\",\"price_kind\":\"one price\",\"example\":\"$20 at the shop\"},{\"name\":\"Foal or yearling trim\",\"price_kind\":\"one price\",\"example\":\"$25 at the shop\"},{\"name\":\"Trim with wall repair\",\"price_kind\":\"one price\",\"example\":\"$40 at the shop\"},{\"name\":\"Hoof pads\",\"price_kind\":\"per hoof, added to a visit\",\"example\":\"$20 a hoof, only after the customer's yes\"},{\"name\":\"Reset a thrown shoe, one foot\",\"price_kind\":\"one price\",\"example\":\"$45 at the barn. A shoe that comes off within 7 days of a visit is reset free.\"},{\"name\":\"Corrective or therapeutic shoeing\",\"price_kind\":\"priced after the farrier looks\",\"example\":\"therapeutic shoes (egg bar, wedge) from $199; only the trip fee ($50 at the barn) or the $25 hoof evaluation (at the shop) is promised until the owner says yes\",\"where\":\"at the barn, or at the shop\",\"money\":\"a card saved; charged at DONE (barn) or paid at the counter (shop)\",\"note\":\"Often follows a vet's written plan. Only the lead farrier does it.\"},{\"name\":\"Late cancel or no-show\",\"price_kind\":\"a fee, never more than the visit's own price\",\"example\":\"up to $50 at the barn and $20 at the shop, only if the owner confirms it\",\"where\":\"not booked alone\"}],\"capacity\":\"One farrier does about 6 horses a day. Up to 4 horses of one owner go on one booking; a bigger barn is booked as more visits. The shop works on 3 horses a day in two bays.\",\"nobody_home\":\"No. The owner or an adult handler stays with the horse for the whole visit. A child alone never holds a horse.\",\"online\":\"No.\",\"not_offered\":\"Sedation or any vet care, horse training, boarding and teeth floating (other work). A horse that can't be caught or held safely isn't worked on until a handler is there or a vet has sedated it.\"}",
+ "questions_before_times": [
+  "How many horses, their ages, and about how much each weighs",
+  "Has any horse ever kicked, bitten or struck at a person? (a yes sends the request to the owner first)",
+  "Shod or barefoot now, and what's needed: a trim, new shoes, a reset, or something corrective",
+  "How long since the last visit, and any lameness or a crack the owner knows about",
+  "The barn: a private barn, a boarding stable or a field, and a covered, level, dry place to work"
+ ],
+ "safety_stop": [
+  "a horse that is hurt, bleeding badly, down, in colic pain or can't put weight on a leg, right now",
+  "a person kicked, stepped on or bitten and hurt",
+  "a horse loose on a road or lost right now",
+  "a horse with hot, painful hooves that won't walk",
+  "a horse that can't be held safely"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "plans",
+  "forms",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Usually none: most places license neither farriers nor horse shoeing. A farrier may hold a voluntary certification, which shows only as the business's own word. A city or county may ask for a business license. The state's or city's form says which.",
+ "staff_skills": "[\"Trims and steel shoes\",\"Corrective and therapeutic shoeing (lead farrier only)\",\"Hot shoeing and custom shoes at the forge\",\"Young and nervous horses\",\"Barn calls in the truck\"]",
+ "messages_never": "[\"Gate, barn and tack-room codes\",\"Where a key is kept\",\"A horse's health conditions, medicines and vet records\",\"The vet-care spending limit\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/farrier",
+  "pexels": "https://www.pexels.com/search/farrier/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

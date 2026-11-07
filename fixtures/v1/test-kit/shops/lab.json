@@ -1,0 +1,198 @@
+{
+ "id": "lab",
+ "name": "Lab tests and mobile blood draw",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Lab tests and mobile blood draw",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Lab & Draw",
+   "staff": "Bea and Oren (phlebotomists)",
+   "customer": "Alex M. (a patient with a doctor's order) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Fasting blood test (basic metabolic panel)",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a fasting blood test on a doctor's order. Nothing taken when booking; the plan is billed, then the patient's share is billed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Direct-to-you wellness panel",
+     "price": "$79",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$79",
+     "fee": "$0",
+     "story": "A direct-to-you wellness panel ($79), paid in full when booking; nothing more after the draw.",
+     "due_now_at_booking": 79,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Complete blood count",
+     "price": "$20",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A self-pay draw on a doctor's order with no plan, paid at the desk after the draw.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Draw",
+   "staff": "Tomas and Lucia (mobile phlebotomists)",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Mobile blood draw",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$65",
+     "story": "The main story: a mobile draw on a doctor's order. Nothing taken; the plan is billed, then the $65 visit fee and any share are billed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Direct-to-you panel at home",
+     "price": "$79",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$79",
+     "fee": "$65",
+     "story": "A direct-to-you panel drawn at home, paid in full when booking.",
+     "due_now_at_booking": 79,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Mobile blood draw",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$65",
+     "story": "A mobile draw with a card saved; the $65 visit fee is charged to that card at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Employer drug test",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$65",
+     "story": "An employer's drug tests at the workplace, billed to the employer's account its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "clinic: a patient books a short draw slot at the patient service center (one of its draw chairs, staffed by whoever is on; nobody is booked by name), or a mobile draw at home, at work or in a care home; walk-ins wait in line for the next chair; tests come from a doctor's order or the lab's direct-to-you list; results come later",
+ "questions_before_times": [
+  "which test, or whether there's a doctor's order (sets the length, fasting and price)",
+  "does the test need fasting (the order or the test list says; sets morning-only times)",
+  "a health plan or self-pay (only the plan's name here)",
+  "for a child: the child's age",
+  "for a mobile draw: the town, and whether the patient can come to the door",
+  "for a drug test: the employer's account (who pays)"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, fainting with an injury, or bleeding that won't stop"
+ ],
+ "first_steps": [
+  "The doctor's order",
+  "Consent for a direct-to-you test",
+  "The plan check",
+  "Fasting",
+  "A 24-hour collection container",
+  "Employer drug test papers"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "results",
+  "dropoff",
+  "spaces",
+  "incare",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "the lab's federal certificate for the kinds of tests it runs, and the state's lab license where the state requires one; a phlebotomist's certificate where the state requires one; collector training for drug tests (federal transport tests follow the federal collection rules); a doctor's order where the state requires one for a test",
+ "staff_skills": "phlebotomy, children's draws, glucose tolerance tests, drug-test collection, paternity collection, mobile draws, Spanish",
+ "messages_never": "the test names, the order, results, health answers, medicines, ID numbers and plan details never go in a text: only the secure page; texts say only the lab's name, the day, the time and the place; a drug test or a paternity test is never named in a text",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/lab+tests+and+mobile+blood+draw",
+  "pexels": "https://www.pexels.com/search/lab%20tests%20and%20mobile%20blood%20draw/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

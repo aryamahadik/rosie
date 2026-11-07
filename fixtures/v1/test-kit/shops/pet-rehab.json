@@ -1,0 +1,151 @@
+{
+ "id": "pet-rehab",
+ "name": "Pet hydrotherapy and rehab",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "vet",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet hydrotherapy and rehab",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Pet Rehab",
+   "staff": "Dana and Omar (rehab therapists), with the front desk",
+   "customer": "Alex M. (owner of Biscuit) · other pet owners",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Hydrotherapy session",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a hydrotherapy session on the vet's clearance; nothing taken when booked; paid at the front desk after the session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Hydrotherapy session",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A session with a card saved for the $40 no-show fee, charged only if the owner says yes after a missed session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Rehab package, four sessions",
+     "price": "$340",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$340",
+     "fee": "$0",
+     "story": "A four-session rehab package at $340, paid in full when booked, after the written estimate.",
+     "due_now_at_booking": 340,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Rehab",
+   "staff": "Priya and Ben (rehab therapists, home visits)",
+   "customer": "Alex M. (owner of Pepper, at home) · other pet owners",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home rehab visit (trip included)",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a home rehab visit; nothing taken when booked; Rosie sends the one bill after the visit, trip included.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home rehab visit, insurance claim",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A home rehab visit the owner claims from its pet insurance; the center's own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Pet hydrotherapy and rehab: an assessment, then sessions in a warm-water pool or on a land treadmill, with a home exercise plan; a referring vet's clearance comes first; in person at the center, and at the owner's home for some exercises.",
+ "questions_before_times": [
+  "Which kind of session: an assessment, a pool or treadmill session, or a home visit?",
+  "Is the pet a dog or a cat, and about how big is it?",
+  "Will an insurance plan pay? Just its name here."
+ ],
+ "safety_stop": [
+  "the pet can't breathe, collapses, bleeds badly, or may have eaten poison",
+  "crisis words from a person, or thoughts of harming yourself",
+  "a bite or attack that hurt a person"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "dropoff",
+  "firststeps",
+  "forms",
+  "results",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Optional, and Rosie checks nothing. The center may list each therapist's license or credential, where the state licenses the work, and any insurance it carries; Rosie shows what the center enters, as given.",
+ "staff_skills": "each therapist's session kinds, as the center lists them",
+ "messages_never": "The injury, the diagnosis, the medicine, and the vet's letter. Texts name the pet's first name, the center, the date, the time, the place and a secure link.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+hydrotherapy+and+rehab",
+  "pexels": "https://www.pexels.com/search/pet%20hydrotherapy%20and%20rehab/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

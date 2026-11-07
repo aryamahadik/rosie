@@ -1,0 +1,229 @@
+{
+ "id": "duct-cleaning",
+ "name": "Air duct and dryer vent cleaning",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "chimney",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Air duct and dryer vent cleaning",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Air duct and dryer vent cleaning",
+   "staff": "Noor and Kofi (shop techs at the vent shop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Filter wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 hood filter degrease. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Filter wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 hood filter degrease. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Furnace filter clean",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A washable furnace filter clean, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Exhaust fan clean",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An exhaust fan clean, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Heavy grease filter clean",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A heavy grease filter set, priced at the counter. Only the $25 look is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Air duct and dryer vent cleaning",
+   "staff": "Marek and Nadia (duct cleaners)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Air duct cleaning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 air duct cleaning, then a yearly dryer vent plan. A card is saved for the $89 late-cancel fee and charged $179 when Marek texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Air duct cleaning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 air duct cleaning. Nothing is taken. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Post-remodel duct cleaning",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A post-remodel duct cleaning, priced from photos at $640. Sam OKs it. A $160 deposit now, and the $480 rest is charged to the card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Whole-building duct cleaning",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A whole-building duct cleaning, priced at the walkthrough before any work. A card is saved for the $89 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a fixed service at the customer's place, priced by the answers, often repeating once a year.\",\"list\":[{\"name\":\"Air duct cleaning\",\"price_kind\":\"set by the customer's answers (heating and cooling systems, vents, returns, square feet)\",\"example\":\"one system, up to 8 vents: $179 (the example business's own price); more vents or systems add to it\",\"length\":\"about 3 hours for a crew of two\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking for the late-cancel and lockout fee; the saved card is charged when the crew texts DONE; or nothing taken and Rosie texts the bill\"},{\"name\":\"Dryer vent cleaning\",\"price_kind\":\"set by the customer's answers (length of the run, floors, wall or roof exit)\",\"example\":\"$150 for a short run (the example business's own price); a long run or a roof exit adds to it\",\"length\":\"about 1 hour for one technician\",\"where\":\"at the customer's place\",\"money\":\"nothing taken, or the full price when booking, Sam's choice (the sign-up example pays it in full); otherwise a card saved and charged at DONE\"},{\"name\":\"Duct camera inspection\",\"price_kind\":\"from the list\",\"example\":\"$199 (the example business's own price), with the video\",\"length\":\"about 1 hour\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Post-remodel duct cleaning\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for a house after a remodel (construction dust in the ducts)\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"money\":\"a deposit where the state's caps allow ($160 in the example); the rest charged to the saved card at DONE\"},{\"name\":\"Multi-unit or whole-building duct cleaning\",\"price_kind\":\"quoted at a walkthrough, before any work\",\"example\":\"only the $89 fee is promised\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Free estimate\",\"price_kind\":\"free\",\"example\":\"about 30 minutes: a lead counts the vents and looks at the dryer vent run\",\"where\":\"at the customer's place\",\"money\":\"nothing taken, nothing after\"},{\"name\":\"By the hour\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour for a crew of two, 1-hour minimum\",\"where\":\"at the customer's place\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, added only when the customer asks\",\"example\":\"blower wheel cleaning $160; dryer vent cleaning added to a duct job $150; vent cover wash $20\"},{\"name\":\"Yearly dryer vent plan\",\"price_kind\":\"each visit at the dryer vent cleaning's list price\",\"example\":\"$150 a visit, every 12 months\",\"where\":\"at the customer's place\",\"money\":\"its own yes on the secure page; each visit is booked and paid like a single one; ends with one tap\"},{\"name\":\"Late-cancel fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or nobody home that the owner confirms, or owed when a walkthrough job isn't done\",\"where\":\"not booked alone\"},{\"name\":\"Filter, register and vent cover washing at the business (Lee Vent Shop)\",\"price_kind\":\"one price by item, from photos, or at the counter\",\"example\":\"hood filter degrease $35, register and grille wash $40, vent cover wash $20, lint trap screen wash $25, washable furnace filter clean $55, hood filter set $140, exhaust fan clean from photos $90, a heavy grease set priced at the counter after a $25 look\",\"where\":\"dropped off at the shop; nothing is washed at the customer's place\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"capacity\":\"A whole-home duct cleaning takes a crew of two with a truck-mounted or portable vacuum. A dryer vent takes one technician. A shop drop-off needs one person at the counter.\",\"nobody_home\":\"No. An adult must be home: vents are opened, the system is off during the work, and the customer signs off at the end. Roof-exit work is done from the roof or the ground with the adult home.\",\"online\":\"No. A camera video of the ducts is sent after the visit, not a video visit.\",\"not_offered\":\"Furnace, air conditioner and dryer repair, duct sealing or replacement, mold or asbestos removal, animal removal, chimney work.\",\"drop_off_slots\":\"Filters, registers and vent covers are booked into drop-off slots by the shop's daily number, with no washer named; the items go to a shop tech with the skill once they're in.\"}",
+ "questions_before_times": [
+  "What needs cleaning: the air ducts, the dryer vent, or both",
+  "Air ducts: how many heating and cooling systems, how many vents and returns, and about how many square feet",
+  "Dryer vent: electric or gas dryer, how long the run is, how many floors, and whether it exits through the wall or the roof",
+  "When the ducts or the dryer vent were last cleaned",
+  "Signs of trouble: clothes taking two cycles to dry, a very hot laundry room, lint outside, dust blowing from the vents",
+  "A home built before 1980, or ducts wrapped in old insulation (an asbestos check comes first)",
+  "Any animals heard in the ducts or the vent",
+  "At the counter: which items, and what they're made of"
+ ],
+ "safety_stop": [
+  "smoke or flames from a dryer, a vent, a furnace or the ducts",
+  "a gas smell or a carbon monoxide alarm",
+  "sewage or a sewage backup",
+  "suspected asbestos on ducts or pipes",
+  "a mold patch over the state's size cutoff",
+  "dead animals or heavy droppings in the ducts",
+  "sparking or exposed wiring",
+  "an attic or crawl space floor that isn't safe"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Cleaning air ducts and dryer vents needs no state license in most places. Where a state or city licenses home improvement or HVAC work, its form asks for it. Cutting, sealing or repairing ducts, replacing a dryer vent, and gas or electric work can need an HVAC or contractor license, or a gas fitter's license, where the state requires one; this business cleans only. Asbestos removal and mold removal over the state's size cutoff are separate licensed trades and are not offered. The vent shop's counter: business registration only.",
+ "staff_skills": "[\"Air duct cleaning with negative pressure (a crew of two)\",\"Dryer vent cleaning, including roof exits\",\"Duct camera inspections\",\"Counter work: degreasing filters, registers, vent covers and lint trap screens\"]",
+ "messages_never": "[\"Gate or lock codes, and where a key is kept\",\"Card details\",\"Photos from inside the home. The photo report and camera video open on the secure page.\",\"Health reasons, like an allergy behind a product to avoid\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/air+duct+and+dryer+vent+cleaning",
+  "pexels": "https://www.pexels.com/search/air%20duct%20and%20dryer%20vent%20cleaning/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

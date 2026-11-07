@@ -1,0 +1,209 @@
+{
+ "id": "inspector",
+ "name": "Home inspector",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Home inspector",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Home inspector",
+   "staff": "Grace and Priya (inspectors at the center)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Report review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 report review. A card is saved for the center's $20 fee. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Report review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 report review. Nothing is taken: a YES books it. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Second opinion review",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A second opinion on another firm's report, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Report review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 report review on a Saturday morning, when Grace works alone with no front desk: the saved card is charged when she texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Home inspector",
+   "staff": "Ethan and Luis (home inspectors)",
+   "customer": "Alex M. (buyer) · other customers",
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home inspection",
+     "price": "$425",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $425 home inspection. A card is saved and charged $425 when Ethan texts DONE. The report follows Fri.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home inspection",
+     "price": "$425",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $425 home inspection. Nothing is taken. Rosie texts the bill after, and the report goes out once it's paid.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Re-inspection of repairs",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 re-inspection of repairs, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Multi-unit inspection",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 4-unit building, priced from the listing's photos at $640. Sam OKs it. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|own",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Home inspection",
+     "price": "$425",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $425 home inspection paid at closing: Sam bills the title company his own way. The saved card covers it if the sale falls through.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: one inspection at the property, priced by the home's size, with a report ready later.\",\"list\":[{\"name\":\"Home inspection\",\"price_kind\":\"set by the customer's answers (square feet, year built, house or condo)\",\"example\":\"up to 2,000 sq ft: $425; 2,001 to 3,000 sq ft: $495; built before 1960: +$50; condo or townhouse: $325 (the example business's own prices)\",\"length\":\"about 3 hours on site, the last 30 minutes a walk-through with the client\",\"where\":\"at the property; nobody needs to be there at the start\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Radon test (the second kind of work)\",\"price_kind\":\"one price\",\"example\":\"$150: a 48-hour monitor, picked up 2 days later\",\"length\":\"20 minutes to set, 20 minutes to pick up\",\"where\":\"at the property, with closed-house conditions\",\"money\":\"card saved, or paid in full when booking\"},{\"name\":\"Sewer scope\",\"price_kind\":\"one price, an add-on\",\"example\":\"$199 (a camera through the sewer line from the cleanout)\",\"length\":\"about 45 minutes\",\"where\":\"at the property\"},{\"name\":\"Multi-unit or very large property\",\"price_kind\":\"quoted from the listing's details and photos first\",\"example\":\"a 4-unit building: $640; Sam OKs any quote over $500\",\"where\":\"at the property\"},{\"name\":\"Re-inspection of repairs\",\"price_kind\":\"one price\",\"example\":\"$150, about 1 hour\",\"where\":\"at the property\",\"money\":\"booked like the first inspection, with its own agreement: a card saved and charged at DONE, or paid in full when booking (the example business's setting)\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or no way in that Sam confirms, or a return trip when a utility was off\",\"where\":\"never booked alone\"},{\"name\":\"Report review (at Lee Inspection Center)\",\"price_kind\":\"one price\",\"example\":\"30 minutes $35; repair list help $40; a second opinion on another firm's report, 60 minutes, $55; a new build plan review, 2½ hours, $140; at the house $75 (the example center's own prices)\",\"where\":\"at the office, by video, or at the house\",\"money\":\"card saved for the $20 fee; paid at the office after\"}],\"start_times\":\"Set starts, like 8:30am and 1:00pm. The walk-through time is told at booking.\",\"notice\":\"2 days' notice by default, so access can be set up. A sooner time only if Sam says yes.\",\"capacity\":\"One inspector per inspection. Add-ons only with someone who does them.\",\"nobody_home\":\"Yes: nobody needs to be at the house to start. The inspector gets in with a lockbox code the agents set up. The client is welcome at the walk-through.\",\"online\":\"Report reviews can be done by video.\",\"not_offered\":\"Repairs, termite treatment, mold removal, appraisals, code inspections for a city.\",\"partner_work\":\"A termite report is done and paid to a licensed pest company, arranged by Sam. This business takes no referral fee.\"}",
+ "questions_before_times": [
+  "The town or ZIP, and what kind of property: a house, a condo or townhouse, or several units",
+  "About how many square feet, and the year built",
+  "Add-ons: a radon test, a sewer scope",
+  "The contract's inspection deadline, so the report is ready in time",
+  "Is the home lived in or empty?"
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "sparks or smoke",
+  "a carbon monoxide alarm",
+  "live wires hanging down",
+  "a sagging ceiling or a floor that gives way",
+  "sewage backing up"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "results",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "Home inspection: a state license for each inspector where the state licenses home inspectors, and a company license where the state asks for one too. Some states license nobody: then registration only. Radon testing: its own license or certificate where the state requires one. A termite (wood-destroying insect) report: only a holder of the state's pest-control license, where one is required.",
+ "staff_skills": "[\"Home inspections\",\"Condo and townhouse inspections\",\"Multi-unit buildings\",\"Radon tests\",\"Sewer scopes\",\"Re-inspections\",\"Report reviews and plan reviews\"]",
+ "messages_never": "[\"Lockbox, door and alarm codes\",\"The street address in a first text to someone new\",\"The report's findings: only the secure link\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/home+inspector",
+  "pexels": "https://www.pexels.com/search/home%20inspector/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

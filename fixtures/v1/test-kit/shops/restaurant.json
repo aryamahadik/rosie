@@ -1,0 +1,174 @@
+{
+ "id": "restaurant",
+ "name": "Restaurant",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Restaurant",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Restaurant",
+   "staff": "Devon and Mara (hosts)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Brunch for 8",
+     "price": "$280",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: brunch for 8 at the long table, free to book. A card is saved only for the $20-a-person no-show fee ($160 for 8) that Sam confirms. The bill is paid at the table.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Brunch for 2",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "Brunch for 2. Nothing is taken and no card is saved: a YES books it. The bill is paid at the table.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Restaurant",
+   "staff": "Nico and Lena (chefs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Brunch at home for 4",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: brunch at home for 4, $179. A card is saved for the $89 travel fee, kept only for a late cancel or a no-show. Nico texts DONE, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Brunch at home for 4",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Brunch at home for 4, $179. A card is saved and charged $179 when Nico texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Dinner party for 8",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A dinner party for 8, priced from kitchen photos at $640. Sam OKs it, since it's over $500. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Dinner party for 8",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The $640 dinner party. A $160 deposit now, and the $480 rest charged to the saved card when Nico marks it done.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "tables by party size and sitting (the table is the bookable space, not a person: the owner lists each space and its size at sign-up); the menu and its prices show; cooking at a customer's home or event is its own service",
+ "questions_before_times": [
+  "party size (sets the table and whether a card is saved)",
+  "brunch or dinner",
+  "inside, patio or back room (patio times only in good weather)",
+  "for cooking away: the address, the guest count and the kitchen"
+ ],
+ "safety_stop": [
+  "someone is choking",
+  "a severe allergic reaction now: a swelling face or throat, trouble breathing",
+  "someone collapsed",
+  "a fire, or a gas smell in the kitchen at a home event"
+ ],
+ "first_steps": [],
+ "facts": [
+  "spaces",
+  "groups",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "where the state's rules require it: a food service permit for the restaurant, and a caterer's permit for cooking at a customer's place or an event; a liquor license for any bar service",
+ "staff_skills": "",
+ "messages_never": "allergies, diet or health needs, gate or door codes",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/restaurant",
+  "pexels": "https://www.pexels.com/search/restaurant/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

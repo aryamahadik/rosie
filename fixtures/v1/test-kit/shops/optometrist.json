@@ -1,0 +1,161 @@
+{
+ "id": "optometrist",
+ "name": "Optometrist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Optometrist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Eye Care",
+   "staff": "Elena (eye doctor) and Clara (optician)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Eye exam with a contact lens fitting",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: an eye exam with a contact lens fitting, $165 on the list. Nothing is taken. The desk checks Alex's vision plan, and Alex pays the share at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Eye Visits",
+   "staff": "Marcus (eye doctor) and Leo (optician), who travel with a portable eye exam kit",
+   "customer": "Alex M. (patient, lives at Sunrise Gardens care home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Eye exam at the care home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a $179 eye exam at Sunrise Gardens care home. Nothing is taken. The office bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Eye exam at the care home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same eye exam, paid privately: nothing is taken, and Rosie texts the $179 bill when Marcus texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Eye check for a sore eye",
+     "price": "$245",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A sore, red eye at the care home. Only the $89 eye check is promised. Marcus prices any test or treatment at the visit, with Alex's yes first.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "New glasses, delivered and fitted",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$0",
+     "story": "New glasses from the exam's prescription, delivered and fitted at Sunrise Gardens: $150, a $40 deposit when booked, and Rosie texts the bill for the rest.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types in an exam room, each with a set length; an exam has two parts (the optician's pre-tests, then the eye doctor's exam); glasses and contacts are ordered after the exam and picked up, or delivered, when they're ready; every visit needs a free exam room",
+ "questions_before_times": [
+  "for you, your child, or someone you help (a care home resident)",
+  "new or returning patient",
+  "which visit: an eye exam, a contact lens fitting too, or an eye problem visit (the office's own visit types; never a symptom typed into the AI)",
+  "a vision plan or medical insurance (its name only), or paying yourself",
+  "early morning, midday or afternoon"
+ ],
+ "safety_stop": [
+  "sudden vision loss, sudden flashes of light, or a shadow or curtain across the vision",
+  "a chemical splash in the eye, or something stuck in it",
+  "an eye hit hard or cut, or sudden bad eye pain with a headache or throwing up"
+ ],
+ "first_steps": [
+  "Health history, consent and the plan's papers",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "The care home's or school's OK"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "children",
+  "incare",
+  "aftercare",
+  "extrawork",
+  "results"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each optometrist holds their own active license from the state's optometry board",
+ "staff_skills": "eye doctors: exams, contact lens fittings, dilating drops, eye problem visits and prescriptions; opticians: pre-tests, frames and lenses, glasses fittings and repairs, and teaching contact lens care; only people cleared for visits away go to care homes and schools",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, results or a prescription; at the office, not the eye doctor's name either; when the eye doctor or optician comes to a care home, school or home, their name stays, for the door check; a READY text says only that the order is ready to pick up",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/optometrist",
+  "pexels": "https://www.pexels.com/search/optometrist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

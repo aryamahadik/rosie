@@ -1,0 +1,148 @@
+{
+ "id": "detailing",
+ "name": "Car detailing",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Car detailing",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Car detailing",
+   "staff": "Kayla and Nina (shop detailers)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Express wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: an express wash at the shop, $35. A card is saved for the shop's $20 fee, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Ceramic coating with a one-step polish",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A ceramic coating at the shop: a $160 deposit holds the booking once the owner OKs it, and the $480 rest is paid at the counter.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Car detailing",
+   "staff": "Mateo and Tyler (mobile detailers)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Interior detail, mid-size car",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: an interior detail for a mid-size car, $179. A card is saved for the $50 late-cancel or no-access fee, and the bill is texted after the work.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Ceramic coating with a one-step polish",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A ceramic coating for a mid-size car: a $160 deposit (25%) holds the booking once Sam OKs it; the $480 rest is on the bill after the work.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"sizes\":\"Every package is priced and timed by the car's size: sedan; mid-size (small SUVs, wagons); large (big SUVs, vans, full-size trucks). The year, make and model set the size.\",\"list\":[{\"name\":\"Interior detail\",\"price\":\"one price by size (example: $149 · $179 · $209)\",\"length\":\"2 · 2½ · 3 hours\",\"place\":\"at the customer's place (mobile) or at the shop\",\"money\":\"a card saved for the late-cancel or no-access fee; paid after\"},{\"name\":\"Exterior detail\",\"price\":\"one price by size (example: $129 · $149 · $179)\",\"length\":\"1½ · 2 · 2½ hours\",\"place\":\"mobile or the shop; outside work follows the weather limit\",\"money\":\"a card saved; paid after\"},{\"name\":\"Full detail (inside and out)\",\"price\":\"one price by size (example: $249 · $289 · $349)\",\"length\":\"3½ · 4 · 5 hours\",\"place\":\"mobile or the shop\",\"money\":\"a card saved; paid after\"},{\"name\":\"Maintenance wash\",\"price\":\"one price by size (example: $129 · $150 · $169)\",\"length\":\"about 2 hours\",\"place\":\"mobile; also as a plan, only when the customer asks\",\"money\":\"a card saved; paid after each visit, on the bill Rosie texts\"},{\"name\":\"Ceramic coating with a one-step polish\",\"price\":\"one price by size (example: $540 · $640 · $740)\",\"length\":\"about 6 hours, then 24 hours kept dry\",\"place\":\"in a garage only: the customer's garage, or the shop\",\"money\":\"a 25% deposit, held until the owner OKs the booking; the rest after\",\"ok\":\"the owner OKs each one\"},{\"name\":\"Express wash (the shop)\",\"price\":\"one price (example: $35; large vehicles $40)\",\"length\":\"about 1 hour\",\"place\":\"the shop, or the customer's home for a set price (example: $75)\",\"money\":\"a card saved for the shop's fee; paid at the counter\"}],\"surcharges\":\"Set by the customer's answers and shown in the first price: heavy pet hair +$50 and 30 minutes, smoke odor +$75 and 45 minutes, heavy mud or sand +$40 and 30 minutes (example prices). Not sure: booked without it, agreed at the visit with photos.\",\"extras\":\"Travel: free within 15 miles, $25 more up to the travel area's edge (example). Add-ons only when the customer asks.\",\"not_offered\":\"Blood, needles or other body fluids (biohazard cleaning), window tint and body or paint repair unless the license list covers them.\",\"capacity\":\"One detailer per car; the shop takes a set number of cars a day (drop-off slots).\",\"skills\":\"Interior, exterior, paint polish and coating (only some detailers), pressure washing.\",\"nobody_home\":\"A plan's maintenance wash or an exterior detail can be done with nobody there, if the car is reachable (driveway or office lot) and any key is left as agreed.\",\"online\":\"Never by video or phone.\",\"promise\":\"The example business's quality promise: a missed spot found at the walk-through is fixed before leaving; one reported within 3 days gets a free touch-up of about 30 minutes.\",\"custom\":\"Work the list doesn't fit, like a paint correction (a machine polish for swirl marks), is priced for that car by the detailer after a look at the paint, and the owner OKs it. It's booked as its own visit, with a 25% deposit (example: $640 for a mid-size car).\"}",
+ "questions_before_times": [
+  "Year, make and model (sets the size)",
+  "Which package",
+  "Pet hair, smoke smell, heavy mud or sand: none, some or heavy, each",
+  "Where the car will be: a driveway, a garage, an apartment lot, an office lot or the street",
+  "Any HOA, building or office rule about washing cars",
+  "Morning or afternoon"
+ ],
+ "safety_stop": [
+  "Blood, needles or other body fluids in the car: no booking. Rosie says a biohazard cleaning company is the right call, and to call 911 if anyone is hurt."
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "photos",
+  "extrawork",
+  "firststeps",
+  "dropoff"
+ ],
+ "switches": {
+  "sensitive": false,
+  "cancelright": false
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "optional; never verified by Rosie (D96)",
+ "staff_skills": "Interior, exterior, paint polish and ceramic coating, pressure washing. Only detailers with the coating skill are offered for coatings.",
+ "messages_never": "Gate, garage or lockbox codes, where the keys are, and the license plate. They stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/car+detailing",
+  "pexels": "https://www.pexels.com/search/car%20detailing/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,152 @@
+{
+ "id": "spa",
+ "name": "Day spa",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Day spa",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Day spa",
+   "staff": "Nina and Leo (massage therapists), Mira and Clara (estheticians)",
+   "customer": "Alex M. (customer) · Jamie (second guest) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Swedish massage",
+     "price": "$130",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$65",
+     "story": "The main story: a $130 60-minute Swedish massage with Nina. A card is saved for the spa's $65 late-cancel and no-show fee. Alex pays at the desk, with any tip.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Couples Escape",
+     "price": "$510",
+     "deposit": "$255",
+     "rest": "$255",
+     "paid_now": null,
+     "fee": "$255",
+     "story": "The $510 Couples Escape for two. A $255 deposit now (half), counted toward it, and the $255 rest at the desk, with any tip. Each guest fills in their own health form.",
+     "due_now_at_booking": 255,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Day spa",
+   "staff": "Ethan and Iris (therapists who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "90-minute massage at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 90-minute massage at Alex's home with Ethan. A card is saved for the $89 late-cancel and no-show fee. Rosie texts the bill after, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "60-minute massage at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 60-minute massage at home, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Spa party at home for 4",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A $640 spa party at home for 4 guests, with Ethan and Iris. A $160 deposit now, and the $480 rest charged to the saved card when Ethan texts DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services and packages with a chosen provider; each part has its own length, its own kind of provider and its own room, in a set order",
+ "questions_before_times": [
+  "how many guests, and is everyone 18 or older",
+  "the service or package, and the massage length",
+  "for a couples booking or a party: each guest's service",
+  "a therapist by name (optional)"
+ ],
+ "safety_stop": [
+  "a reaction happening now to an oil or a skin product: a swelling face, lips or throat, or trouble breathing",
+  "chest pain, fainting or a fall during or after a treatment"
+ ],
+ "first_steps": [
+  "Health form (each guest's own, on the secure page)",
+  "A doctor's OK"
+ ],
+ "facts": [
+  "plans",
+  "packs",
+  "groups",
+  "forms",
+  "children",
+  "aftercare",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "switches from each state's form: a massage license for each person who gives massage, and an esthetics license for each person who gives facials and body treatments, where the state's rules require them",
+ "staff_skills": "massage (Swedish, deep tissue, hot stones, prenatal) and facials and body treatments; only people with the skill and the license for a part are offered for it",
+ "messages_never": "health answers (pregnancy, injuries, allergies, skin treatments) never go in a text or through the AI: only each guest's secure page and the providers serving that guest; a staff text says only that a note exists",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/day+spa",
+  "pexels": "https://www.pexels.com/search/day%20spa/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

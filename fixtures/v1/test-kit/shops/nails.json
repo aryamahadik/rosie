@@ -1,0 +1,230 @@
+{
+ "id": "nails",
+ "name": "Nail salon",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Nail salon",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Nail salon",
+   "staff": "Linh and Mai (nail techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Gel manicure",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 gel manicure with Linh. Nothing is taken: a YES books it. Alex pays at the desk, with any tip.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Gel manicure",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 gel manicure with a card saved for the salon's $20 fee, for a customer with 2 no-shows (the owner's setting).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full set with art",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 full set with art (2½ hours). A $40 deposit now, as for every art set over $80, and $100 at the desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Custom art set",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A custom art set under $80, priced from Alex's design photos and OK'd by Sam. Nothing is taken. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Custom art set",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom art set, priced from Alex's design photos at $90 and OK'd by Sam. A $20 deposit now, the $70 rest at the desk.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Nail salon",
+   "staff": "Tuan and Hana (nail techs who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Gel mani-pedi at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 gel mani-pedi at Alex's home. A card is saved for the $89 trip fee. Rosie texts the bill after, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Gel mani-pedi at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 gel mani-pedi at home. A card is saved and charged $179 when Tuan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "House call (gel manicure at home)",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$75",
+     "story": "A $150 spa pedicure at home, paid in full when booking.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Bridal party nails",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "Bridal party nails for five, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Bridal party nails",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The $640 bridal party nails. A $160 deposit now. The $480 rest is charged to the saved card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services with a chosen nail tech; the length is set by the service and by what's on the nails now (a removal adds time); a pedicure also books one of the salon's pedicure chairs",
+ "questions_before_times": [
+  "new or returning",
+  "hands, feet or both, and which services",
+  "what's on the nails now: nothing, gel, dip or acrylic, and from this salon or another (a removal adds time and price)",
+  "nail art: none, a little, or a custom design (design photos for a custom set)",
+  "which nail tech, or the first one free",
+  "for a bridal party or a nail party: how many people, and the date"
+ ],
+ "safety_stop": [
+  "an allergic reaction happening now: face, lips or throat swelling, or hard to breathe",
+  "nail glue, acetone or another product in the eye"
+ ],
+ "first_steps": [
+  "none: nail work needs no first visit"
+ ],
+ "facts": [
+  "children",
+  "extrawork",
+  "groups",
+  "photos",
+  "spaces",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: nail work (nail technology, manicuring or cosmetology, by the state's own name) is licensed where the state's rules require it",
+ "staff_skills": "manicure, pedicure, gel, dip, acrylic, nail art, custom art, lashes and brows; only nail techs who do custom art are offered for it",
+ "messages_never": "diabetes, infection, sore, reaction and allergy answers never go in a text or through the AI: only the secure page and the customer's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/nail+salon",
+  "pexels": "https://www.pexels.com/search/nail%20salon/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

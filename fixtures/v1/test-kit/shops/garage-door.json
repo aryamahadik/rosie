@@ -1,0 +1,260 @@
+{
+ "id": "garage-door",
+ "name": "Garage door technician",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Garage door technician",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Garage door technician",
+   "staff": "Gina and Hector (techs at the parts counter)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Remote set-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 remote set up at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Remote set-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 remote set up. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Opener gear kit",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 opener gear kit, fitted, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Opener board repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An older opener's board repair, priced from Alex's photos at $90. A card is saved for the $20 fee. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Opener part repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An opener part repair, priced at the counter. A card is saved for the $20 fee; only the $25 bench check is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Garage door technician",
+   "staff": "Andre and Luis (garage door techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Spring replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 spring replacement. A card is saved for the $89 visit fee; Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Spring replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 spring replacement. Nothing is taken before. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Spring replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 spring replacement. A card is saved and charged $179 when Andre texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Door off its track",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A door off its track, priced at the visit. Only a card is saved. Andre quotes it, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Door off its track",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A door off its track, priced at the visit. A card is saved, and the price Alex OKs is charged to it when Andre texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "New opener",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A new opener, priced from photos at $640 (Sam OKs it). A $160 deposit now, the $480 rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Tune-up and safety check",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 tune-up and safety check, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Bayside Garage Doors' own list)\":[{\"service\":\"Visit fee (find any problem)\",\"price kind\":\"one price\",\"price\":\"$89, taken off the repair\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the jobs below; not booked alone\"},{\"service\":\"Spring replacement (both springs)\",\"price kind\":\"one price\",\"price\":\"$179, the $89 visit included\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 visit fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Springs are always replaced as a pair, sized to the door (the business's rule): one new spring beside an old one leaves the door out of balance\"},{\"service\":\"Door repair (off track, cables, rollers, hinges)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 visit fee is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 visit fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Every part is listed on the quote, before any work\"},{\"service\":\"Opener repair (gears, sensors, limits)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 visit fee is promised\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 visit fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Tune-up and safety check\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Also a yearly plan\"},{\"service\":\"New opener, put in (with safety sensors)\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"Plugs into an outlet already on the ceiling. A new outlet or circuit is electrical work (see the license).\"},{\"service\":\"New garage door\",\"price kind\":\"free estimate visit first, then a quote\",\"price\":\"the quote (the example: $2,400, paid in stages)\",\"length\":\"a day\",\"place\":\"at the customer's place\",\"before\":\"a deposit once the estimate is signed\",\"after\":\"each stage billed when it's done\",\"note\":\"Never booked at once. The business pulls the permit, where the local rules require one.\"},{\"service\":\"Door safety inspection, with a written report\",\"price kind\":\"by person\",\"price\":\"the example: $199, or $249 when the owner goes himself\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 visit fee\",\"after\":\"Rosie texts the bill\",\"note\":\"The report link comes later\"},{\"service\":\"Urgent visit (a door stuck shut, a car inside)\",\"price kind\":\"one price\",\"price\":\"$129, taken off the repair\",\"length\":\"sent now: an arrival estimate, not a window\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $129 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Sent now to the tech on call, then the backup. Free to cancel until he texts OMW.\"}],\"at the business (the example: Bayside Door Parts' counter)\":[{\"service\":\"Remote set up (bring the old remote, or the opener's model)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the counter, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Opener board test (bring the opener's circuit board)\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New remote battery and case\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Keypad set up\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Opener gear kit, fitted (bring the opener's motor unit)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the counter\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Opener rebuild (gears, board and sensors)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the counter\",\"before\":\"a card saved for the $40 fee (over 2 hours)\",\"after\":\"paid at the counter\"},{\"service\":\"Older opener board repair\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The owner OKs each quote. Only Gina does board repairs.\"},{\"service\":\"Opener part repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 bench check is promised\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of an opener or a remote\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it. No spring or cable work is ever talked through by video.\"}],\"capacity\":\"One tech per booking. A new door or a heavy double door can need a crew of two. The counter's board repairs need its one test bench.\",\"skills each needs\":\"Springs and cables, openers, new doors and gates are separate skills. Board repairs at the counter need the board skill.\",\"nobody home\":\"Never: an adult (18 or older) must be home for the whole visit, ticked on the booking page.\",\"online\":\"A video check of an opener or a remote only, where the owner offers it. No repair is done by video.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Every part is listed on the quote. No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "What's wrong: it won't open or close, a loud bang, it's off its track, the opener, a remote, or a noise",
+  "Is a car stuck inside, and by when must it leave (this sets urgent)",
+  "How many doors, and single or double width",
+  "What the opener does: hums, clicks, or nothing",
+  "Is there a gap in a spring above the door: one, both, or can't tell",
+  "At the counter: which remote or opener, and its brand and model if known"
+ ],
+ "safety_stop": [
+  "Someone hurt, or pinned under the door"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "extrawork",
+  "firststeps"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Garage door work needs a license where the state, county or city licenses door or home repair contractors. Some places license it only above a job amount.",
+ "staff_skills": "[\"Springs and cables\",\"Doors off track, rollers and hinges\",\"Openers\",\"New doors\",\"Gates and gate openers\",\"Counter: remotes, keypads and boards\"]",
+ "messages_never": "Keypad and gate codes, card details, and photos from inside the garage: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/garage+door+technician",
+  "pexels": "https://www.pexels.com/search/garage%20door%20technician/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

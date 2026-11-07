@@ -1,0 +1,179 @@
+{
+ "id": "mini-golf",
+ "name": "Mini golf, go-karts and laser tag",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "restaurant",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Mini golf, go-karts and laser tag",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Mini golf, go-karts and laser tag",
+   "staff": "Gus and Mo (hosts)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Mini golf round for 4",
+     "price": "$48",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$48",
+     "fee": "$12",
+     "story": "The main story: a round for 4 on the course, $48 paid in full when booking. A late cancel or no-show keeps $12.",
+     "due_now_at_booking": 48,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birthday party package, 12 kids",
+     "price": "$180",
+     "deposit": "$40",
+     "rest": "$140",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A birthday party for 12 kids: a $40 deposit when booking, the $140 rest paid at the counter on the day.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Open round for 4, pay at the counter",
+     "price": "$48",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "An open round for 4: nothing taken, the bill paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Mini golf, go-karts and laser tag",
+   "staff": "Tess and Ray (crew)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Portable 9-hole course, 3-hour party for 12",
+     "price": "$300",
+     "deposit": "$60",
+     "rest": "$240",
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The main story: a portable 9-hole course for a 3-hour party for 12, $300. A $60 deposit now, the $240 rest charged to the saved card when the crew texts DONE.",
+     "due_now_at_booking": 60,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "School carnival course, 2 hours",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A school carnival course for up to 20 kids, 2 hours: $180, a card saved for the $40 late-cancel fee; the crew sends the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Portable course, 1 hour at home",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$90",
+     "fee": "$20",
+     "story": "A 1-hour portable course at home for up to 6, paid in full when booking: $90.",
+     "due_now_at_booking": 90,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "table: a course round is a space for an hour (up to 4 players); a party is a set time with a set number of players; go-karts and laser tag are added to a booking",
+ "questions_before_times": [
+  "which round, party or portable course, and the date and time",
+  "how many players, and each one's age group (under 7, 7 to 17, or adult)",
+  "for a party: the expected number of guests",
+  "for a portable course: the kind of place (a yard, a school, a park) and the town"
+ ],
+ "safety_stop": [
+  "someone hit by a kart, or a crash with someone hurt or bleeding, or someone choking or not breathing right now",
+  "a child missing from the course or the party"
+ ],
+ "first_steps": [
+  "a waiver for every player, signed on the secure page before the visit and good for 12 months; a parent signs for each child",
+  "the party's final headcount 3 days before (it sets the rest due)",
+  "a portable course: the customer confirms the flat area, any outlet the crew needs, and any permission the place needs, 3 days before"
+ ],
+ "facts": [
+  "groups",
+  "children",
+  "forms",
+  "spaces",
+  "capacitycheck",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "where the state's rules require it: the business's registration, and a permit for the go-karts or the course where the state requires one; a portable course follows the same rules where they cover it",
+ "staff_skills": "course host, kart marshal, party host, portable course crew",
+ "messages_never": "children's names, ages and health answers, and injury details: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/mini+golf+go+karts+and+laser+tag",
+  "pexels": "https://www.pexels.com/search/mini%20golf%2C%20go-karts%20and%20laser%20tag/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

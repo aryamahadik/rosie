@@ -1,0 +1,925 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "pest",
+  "name": "Pest control",
+  "type": "service",
+  "started_from": "cleaner"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "plans",
+  "firststeps",
+  "documents",
+  "extrawork"
+ ],
+ "switches": [
+  "cancelright"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "6pm the day before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|none|bill",
+    "visit|card|card"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Bug ID",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": null,
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a $35 bug ID at the counter. Nothing is taken: a YES books it. Alex pays at the counter."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "General pest service",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a $179 first service, then a plan every 3 months. A card is saved and charged $179 when Kevin texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "General pest service",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The same $179 first service. Nothing is taken. Rosie texts the bill after the visit."
+  },
+  {
+   "flow": "B",
+   "path": "visit|card|card",
+   "name": "Mouse control",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "Mouse control, priced at the visit. A card is saved for the $89 trip charge. Kevin quotes sealing and traps, $245, charged at DONE."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Tick ID",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$25"
+  },
+  {
+   "flow": "A",
+   "name": "Termite sample check",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$40"
+  },
+  {
+   "flow": "A",
+   "name": "Bug ID (pack)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Wasp nest removal",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "card",
+   "price": "$150",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Outside spray",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "card",
+   "price": "$99",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Plan visit",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "General pest, first service (with the plan)",
+   "price": null,
+   "kind": "one price",
+   "length": "about 90 minutes, inside and out",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "General pest, one time",
+   "price": null,
+   "kind": "one price",
+   "length": "about 90 minutes",
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Plan visit",
+   "price": null,
+   "kind": "a price per visit",
+   "length": "about 45 minutes",
+   "where": "at the customer's place; an outside-only visit needs nobody home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Wasp or hornet nest removal",
+   "price": null,
+   "kind": "one price",
+   "length": "about 45 minutes",
+   "where": "at the customer's place; a nest outside needs nobody home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Outside spray (spiders, ants around the house)",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "outside only; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Mouse control",
+   "price": null,
+   "kind": "priced at the visit: only the trip charge is promised",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Rodent-proofing (the whole home)",
+   "price": null,
+   "kind": "quoted at a visit (a mouse visit or an inspection), from the applicator's own photos, with a written contract",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Bed bug inspection, then treatment",
+   "price": null,
+   "kind": "inspection one price; treatment quoted from it",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Termite inspection, then treatment",
+   "price": null,
+   "kind": "inspection free; treatment quoted with a written report",
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Tent fumigation",
+   "price": null,
+   "kind": "quoted after an inspection; Sam OKs each one",
+   "length": null,
+   "where": "at the customer's place; everyone, pets and plants out until it's cleared",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Mosquito yard spray",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "outside only",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Hourly work",
+   "price": null,
+   "kind": "per hour",
+   "length": null,
+   "where": "added to a visit, never booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Trip charge",
+   "price": null,
+   "kind": "one price",
+   "length": null,
+   "where": "never booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Lawn care (the second kind of work)",
+   "price": null,
+   "kind": "from the list, per visit",
+   "length": null,
+   "where": "outside; nobody needs to be home",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Lee Pest Supply (Sam's own shop company)",
+   "price": null,
+   "kind": "the shop's board",
+   "length": null,
+   "where": "at the shop's counter; a bug ID can also be done at the customer's home ($75, billed after)",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "Which pests, and where: inside, outside or both",
+   "Since when, and about how many",
+   "A plan every 3 months, or just once ($179 first service on the plan, $249 once)",
+   "Termites, bed bugs or mice: an inspection first, or priced at the visit",
+   "At the shop: a sealed sample, or a photo only"
+  ],
+  "after_time": [
+   "Pets, fish tanks or birds at home, and where they'll be",
+   "Rooms to skip, or where the pests are worst",
+   "Gate and parking",
+   "Own or rent (the owner gets the notice too, where the rules require it)",
+   "An email for the written pesticide notice"
+  ],
+  "secure_page_only": [
+   "Health reasons to avoid a spray, like asthma, allergies or a pregnancy",
+   "Gate or door codes"
+  ],
+  "who_may_book": "An adult who lives in the home, or the owner or a manager they name. A renter may book; where the rules require it, the owner gets the pesticide notice too."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "a sting with swelling of the face or throat, trouble breathing, or feeling faint",
+   "bait, pesticide or spray swallowed by a person",
+   "someone sick after a spray, or a pesticide spill",
+   "a pet that ate bait",
+   "a wasp nest or a swarm by a door, or inside the home"
+  ],
+  "go_on": "Yes, after the safety steps, for a nest by a door or a pet that ate bait. No, for a sting with a reaction or anything a person swallowed, until everyone is safe.",
+  "stop_action": [
+   "A sting with a reaction: call 911 now, and use an epinephrine pen if they have one. No booking until everyone is safe.",
+   "Bait or pesticide swallowed: call Poison Control at 1-800-222-1222 with the label, or 911 if they aren't breathing, can't wake up or have a seizure. No booking in that chat.",
+   "A pet that ate bait: call a vet or a pet poison line, with the label. Rosie points to the business's line; the booking can go on.",
+   "A nest by a door: keep children and pets inside, use another door, and don't spray or hit the nest. The booking goes on, soonest first.",
+   "Honey bees: a beekeeper is suggested first.",
+   "Questions about whether a product is safe for pets, children or a pregnancy are answered only by the licensed applicator or Sam. Rosie never answers them."
+  ],
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Put food, dishes and pet bowls away",
+   "Clear the kitchen cabinets where the pests are seen",
+   "Cover fish tanks and turn off their air pumps",
+   "Keep pets where you said, away from treated rooms",
+   "Don't spray store-bought bug spray before the visit"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "skills": [
+   "General pest, wasps and mice: Kevin and Marco",
+   "Rodent-proofing, termites and lawn spraying: Kevin only",
+   "Bug IDs at the shop: Nina and Mei; heat treatments: Nina only"
+  ],
+  "licenses_or_certificates": "Each applicator holds a state applicator license in each category they work in. Where the state allows it, a technician works under a certified applicator, as its form says.",
+  "who_oks": "Sam OKs any price over $500 made for one customer. Pat may too; Sam's answer wins.",
+  "stand_in": "Only someone licensed in the same category. A stand-in the customer didn't book is offered first; no reply by the deadline, the stand-in keeps the time."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult who lives in the home, or the owner or a manager they name. A renter may book; where the rules require it, the owner gets the pesticide notice too.",
+  "minors_texts": "Nobody under 18 books. A teen at home isn't the adult who lets the applicator in."
+ },
+ "visit": {
+  "check_in": "Someone home: the code at the door, entered by the applicator. Inside work needs an adult (18 or older) home to let the applicator in. Outside-only work: no code; DONE with a photo.",
+  "done": "The service report before DONE: products and their registration numbers, active ingredients, amounts, areas treated, the applicator and license, the label's re-entry time, and the weather for outside work.",
+  "changes_at_visit": "Extra work (a wasp nest found) is priced before it's done, with the customer's yes. Mouse work is priced at the visit. A right to cancel where the state's rules give one for work sold at the home."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "Yes, where the state's form says so (nearly every state): a pest control license or registration for the company, and an applicator license for each person who applies pesticides.",
+  "who": "Both: the business, and each applicator. Where a state lets a technician work under a certified applicator, the state's form says how.",
+  "ask": "The company's license or registration number at sign-up. Each applicator's number and categories in their invite reply.",
+  "insurance": "Where the state's form asks for insurance or a bond, it's asked at sign-up. It is shown as given by the business, not checked by Rosie."
+ },
+ "never_in_a_text": [
+  "Health reasons to avoid a spray, like asthma, allergies or a pregnancy",
+  "Gate and door codes"
+ ],
+ "languages": "English and Spanish. The notice and the prep list in the customer's language where the business has it.",
+ "unmapped_keys": {
+  "pf.safety": [
+   "re_entry"
+  ],
+  "pf.first_steps": [
+   "inspection_first",
+   "notice",
+   "neighbors",
+   "bed_bugs",
+   "shop"
+  ],
+  "pf.staff": [
+   "safety_questions"
+  ],
+  "pf.license": [
+   "categories",
+   "shop",
+   "not_this_work"
+  ],
+  "pf.messages": [
+   "notice",
+   "after_stop"
+  ],
+  "pf.visit": [
+   "order",
+   "health_note",
+   "other_pests_found",
+   "re_entry",
+   "weather",
+   "shop"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,145 @@
+{
+ "id": "sitter",
+ "name": "Babysitter & nanny",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Babysitter & nanny",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Babysitter & nanny",
+   "staff": "Toni and Shay (play room leads)",
+   "customer": "Alex M. (parent) · other parents",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Drop-in play, one child",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: drop-in play for one child, $35, Sat 11:00am to 2:00pm. A card is saved for the club's $20 fee. Alex pays at the desk at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Saturday play camp with lunch",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Saturday play camp with lunch for one child, $55, 11:00am to 2:00pm, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Babysitter & nanny",
+   "staff": "Taylor and Devon (sitters)",
+   "customer": "Alex M. (parent) · other parents",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Evening sitting, two children (4½ hours)",
+     "price": "$108",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$72",
+     "story": "The main story: Taylor sits Thu 6:00 to 10:30pm, $24 an hour for two children: $108. A card is saved for the $72 late-cancel fee. Rosie texts the bill when Taylor texts DONE; Alex replies 1 or pays on the page, with a tip.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Evening sitting, two children (4½ hours)",
+     "price": "$108",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$72",
+     "story": "The same sitting. The saved card is charged $108 when Taylor texts DONE, plus any extra time Taylor agreed to stay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a sitter at the family's home for a set start and end, often the same sitter each time, sometimes on a plan. Less usual: a drop-in play room at the business.\",\"list\":[{\"name\":\"Evening or weekend sitting\",\"price_kind\":\"per hour, with a minimum\",\"example\":\"$24 an hour for 1 or 2 children, 3-hour minimum (the example agency's own price)\",\"length\":\"set by the parent's start and end\",\"where\":\"at the family's home\",\"money\":\"card saved at booking; the bill texted at the end, or the card charged at DONE\"},{\"name\":\"Each extra child, up to 4\",\"price_kind\":\"per hour\",\"example\":\"+$3 an hour\"},{\"name\":\"Daytime sitting (school's out)\",\"price_kind\":\"per hour, with a minimum\",\"example\":\"$24 an hour, 4-hour minimum\",\"where\":\"at the family's home\"},{\"name\":\"School pick-up, then sitting\",\"price_kind\":\"per hour, with a minimum\",\"example\":\"$24 an hour, 3-hour minimum; the parent puts the sitter on the school's pick-up list\",\"where\":\"school, then the family's home\"},{\"name\":\"Late-night rate\",\"price_kind\":\"per hour\",\"example\":\"$30 an hour after midnight\"},{\"name\":\"Overnight sitting\",\"price_kind\":\"one price\",\"example\":\"$180 for 7pm to 7am; the owner OKs it first\",\"where\":\"at the family's home\"},{\"name\":\"Parents home late\",\"price_kind\":\"per 15 minutes\",\"example\":\"$6 for each 15 minutes past the booked end, only if the sitter agrees to stay\"},{\"name\":\"After-school plan\",\"price_kind\":\"a price a visit\",\"example\":\"the same sitter, Mon to Fri, 3:00 to 6:00pm: $72 a visit (3 hours), charged after each visit\",\"where\":\"at the family's home\"},{\"name\":\"Meet-and-greet for a new family\",\"price_kind\":\"free\",\"example\":\"20 minutes with the sitter, at home or by video, before the first sitting\"},{\"name\":\"Tutoring (the second kind of work)\",\"price_kind\":\"per hour\",\"example\":\"homework help at home, $35 an hour, 1-hour minimum\"},{\"name\":\"Late cancel or nobody home\",\"price_kind\":\"one price\",\"example\":\"$72 (3 hours), only if the owner confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Drop-in play at the play room (the second company)\",\"price_kind\":\"one price a child\",\"example\":\"$35 for a 3-hour session; or $75 for play at the family's home (the example club's own prices)\",\"where\":\"at the business, or at home\",\"money\":\"at the club: card saved for the $20 fee, paid at the desk at pick-up; at home: card saved, the bill texted after\"},{\"name\":\"Saturday play camp with lunch\",\"price_kind\":\"one price a child\",\"example\":\"$55, 11:00am to 2:00pm (the example club's own price)\",\"where\":\"at the business\",\"money\":\"paid in full when booking\"},{\"name\":\"Kids' night out\",\"price_kind\":\"one price a child\",\"example\":\"$55, 6:00 to 10:00pm, pizza and a movie (the example club's own price)\",\"where\":\"at the business\",\"money\":\"paid in full when booking\"},{\"name\":\"Birthday group at the play room\",\"price_kind\":\"one price\",\"example\":\"$140 for up to 8 children, 2½ hours (the example club's own price)\",\"where\":\"at the business\"},{\"name\":\"Late pick-up at the play room\",\"price_kind\":\"per minute\",\"example\":\"$1 a minute after 10 minutes' grace, paid at the desk (the example club's own price)\"}],\"capacity\":\"One sitter for up to 4 children at home. The play room's spots come from its staff count and the state's ratio rules (the state form); each child takes one spot.\",\"nobody_home\":\"Never. The children are always home, and a parent is there at the start and at the end.\",\"online\":\"Tutoring can be by video. Sitting never is.\",\"not_offered\":\"Care for a child who is too sick to be left with a sitter, nursing care, and driving children unless the owner OKs a sitter to drive.\",\"seats\":\"The play room books a spot in a session (drop-in play, play camp, kids' night out), not a person's time. Nobody is booked by name there.\",\"second_company\":\"The play room, Lee Kids' Club, is the example business's own second company. The old flowchart has none; it shows how a sitting agency's drop-in child care would book.\"}",
+ "questions_before_times": [
+  "How many children (sets the rate)",
+  "The start and end time, or which session at the play room",
+  "Just this time, or a plan (like after school, Mon to Fri)",
+  "Will the sitter drive anyone? (needs the owner's OK)",
+  "Pets in the home"
+ ],
+ "safety_stop": [
+  "A child hurt, missing, alone, not breathing or choking",
+  "A serious allergic reaction",
+  "A report of harm to a child, by anyone",
+  "A sick child (fever, vomiting) before a sitting"
+ ],
+ "first_steps": [],
+ "facts": [
+  "children",
+  "forms",
+  "dropoff",
+  "plans",
+  "packs",
+  "classes",
+  "groups"
+ ],
+ "switches": {
+  "sensitive": false,
+  "no2": false,
+  "welfare": true,
+  "cancelright": false
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Usually none for a sitter in a family's home. A play room where parents leave children (drop-in child care) needs a child-care license where the state's rules require it. The state form says which.",
+ "staff_skills": "[\"Babies under 1\",\"Up to 4 children at once\",\"CPR and first aid (the card's date shows)\",\"Driving, only with the owner's OK\",\"Tutoring\",\"Play room lead\"]",
+ "messages_never": "[\"Children's names, ages and photos\",\"Allergies, medicines and health notes\",\"Custody notes and who may collect a child\",\"The street address and door codes\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/babysitter+nanny",
+  "pexels": "https://www.pexels.com/search/babysitter%20%26%20nanny/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

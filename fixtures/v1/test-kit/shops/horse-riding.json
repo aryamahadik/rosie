@@ -1,0 +1,155 @@
+{
+ "id": "horse-riding",
+ "name": "Horse boarding, riding lessons and stables",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "dog-trainer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Horse boarding, riding lessons and stables",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Horse boarding, riding lessons and stables",
+   "staff": "Hannah and Eli (instructors and guides at the stable)",
+   "customer": "Alex M. (rider) · other riders",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "guided trail ride",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$65",
+     "fee": "$40",
+     "story": "The main story: a $65 guided trail ride, paid in full when booking.",
+     "due_now_at_booking": 65,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "private riding lesson",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $75 private lesson. A card is saved for the $40 late-cancel fee; paid at the barn office.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "summer riding camp (one week)",
+     "price": "$450",
+     "deposit": "$100",
+     "rest": "$350",
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A $450 summer camp week: a $100 deposit now, and the $350 rest paid at the barn office on the first day.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Horse boarding, riding lessons and stables",
+   "staff": "June and Reed (handlers who travel to farms and homes)",
+   "customer": "Alex M. (customer, rider's parent) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "lesson at the customer's farm",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: an $85 lesson on the customer's own farm, on their own horse. The saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "pony party at a home",
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A $450 pony party at a home: a $150 deposit now, and the $300 rest on the bill after the party.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a lesson books an instructor's time plus a school horse matched to the rider; group lessons, trail rides and camp weeks are seats, with horses as the limit; boarding is a stall for a horse, from a move-in date, month to month; flow B: an instructor at the customer's own farm with the customer's own horse, and pony parties at a home",
+ "questions_before_times": [
+  "how much riding so far: never, a few times, or rides on their own (sets the lesson, the horse and whether a trail ride fits)",
+  "each rider's age (sets the service)",
+  "how many riders",
+  "for boarding: the move-in date and the kind of horse",
+  "for flow B: a farm or a home, and the town; for a lesson, the customer's own horse and an arena or flat field"
+ ],
+ "safety_stop": [
+  "a rider fell and is hurt, a head injury, someone kicked or trapped under a horse, a loose horse on a road"
+ ],
+ "first_steps": [
+  "Waiver with the equine activity warning",
+  "Rider's weight and level",
+  "Barn tour",
+  "Coggins test and vaccines",
+  "Board agreement",
+  "Party place check (flow B)"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "children",
+  "classes",
+  "animals",
+  "multiday"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: no state license to teach riding in most places; a stable registration or inspection is the owner's own word, where the state's rules ask for one (a switch from the state form)",
+ "staff_skills": "beginner lessons, jumping, dressage, trail guide, pony handler, camp counselor, barn care for boarders",
+ "messages_never": "weight, health notes, a child's details and the horse's vet records never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/horse+boarding+riding+lessons+and+stables",
+  "pexels": "https://www.pexels.com/search/horse%20boarding%2C%20riding%20lessons%20and%20stables/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

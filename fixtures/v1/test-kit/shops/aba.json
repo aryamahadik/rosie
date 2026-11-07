@@ -1,0 +1,164 @@
+{
+ "id": "aba",
+ "name": "ABA and autism therapy",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "speech-therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] ABA and autism therapy",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Family Care",
+   "staff": "Iris (behavior analyst) and Elise (behavior technician)",
+   "customer": "Alex M. (parent of Mia, 4) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Therapy session (2 hours)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: therapy sessions billed to the plan; nothing taken when booking; the family's copays come in one bill a month. The free intake call also runs here, with nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Therapy session (2 hours)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A self-pay family: a card is saved when booking, and that week's sessions are charged to it once a week. Nothing is charged for a late cancel.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Care",
+   "staff": "Caleb (behavior analyst) and Tia (behavior technician)",
+   "customer": "Alex M. (parent of Leo, 4, at home) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "In-home therapy session (2 hours)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: in-home sessions billed to the plan; nothing taken, and the copays come in one monthly bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "In-home therapy session (2 hours)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A self-pay family at home: the saved card is charged once a week for that week's sessions.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "In-home therapy session (2 hours)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A public program family: nothing is taken; the practice bills the program its own way, and the family pays nothing.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "clinic: a child with autism gets many sessions a week (often 10 to 40 hours) on a set weekly schedule, at the center, at home, or at school or daycare with the school's OK; each session is one-to-one with a behavior technician from the child's small team, under a supervising analyst; the analyst joins some sessions to supervise and meets the parents for training; the health plan's approval sets the hours for about 6 months at a time",
+ "questions_before_times": [
+  "the child's age",
+  "has the child been diagnosed (most plans need the diagnosis report)",
+  "where therapy would happen: at the center, at home, or at school or daycare",
+  "how many hours a week the family hopes for, and which days and times work",
+  "a health plan, self-pay or a public program (only the name here)",
+  "the language spoken at home"
+ ],
+ "safety_stop": [
+  "a child is missing (ran off from the center or a home session), a seizure over 5 minutes, trouble breathing, or a serious injury",
+  "suicide or self-harm words from a parent, a teen, or the child"
+ ],
+ "first_steps": [
+  "Free intake call",
+  "Diagnosis report and the doctor's referral",
+  "The plan's approval",
+  "Initial assessment",
+  "Treatment plan signed by the parent",
+  "Consents and the pick-up list",
+  "School's written OK",
+  "Reassessment and renewal"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "children",
+  "firststeps",
+  "classes",
+  "groups",
+  "monthlybill"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "the practice's own word, optional: each behavior analyst's national certification and any state license the practice names; each behavior technician's own registration; the practice's own license if it has one. Rosie never looks a license up and never says one is checked",
+ "staff_skills": "behavior analyst, behavior technician, trained on a given child's plan (per child), parent training, social skills groups, home sessions, school sessions, toddlers, Spanish, sign language",
+ "messages_never": "the child's diagnosis, behaviors, health, session data, progress and plan details never go in a text: only the secure page; texts say only the practice's name, the day, the time and the place, and name the child only by first initial",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/aba+and+autism+therapy",
+  "pexels": "https://www.pexels.com/search/aba%20and%20autism%20therapy/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

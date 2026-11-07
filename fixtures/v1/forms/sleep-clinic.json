@@ -1,0 +1,905 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "sleep-clinic",
+  "name": "Sleep clinic",
+  "type": "clinic",
+  "started_from": "primary-care"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "K06",
+   "field": "Stays: a start and an end date, a price per night or day, drop-off and pick-up times",
+   "type": "dates",
+   "need": "R when the work has stays",
+   "shows": "booking page, confirmation",
+   "source": "A4-68, B4-85",
+   "google": "no",
+   "turned_on_by": "fact multiday"
+  },
+  {
+   "id": "K07",
+   "field": "Items taken per day (drop-off) and daily caps",
+   "type": "number",
+   "need": "R when the work is a drop-off",
+   "shows": "times card (a full day is not shown)",
+   "source": "S1-03 block 12, A4-14",
+   "google": "no",
+   "turned_on_by": "fact dropoff"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms; fact firststeps"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children"
+  },
+  {
+   "id": "Q06",
+   "field": "Sensitive work switch (texts never name the service; initials; no rating, nothing sold; gentle words)",
+   "type": "switch",
+   "need": "S",
+   "shows": "every text and pay page",
+   "source": "S13-22, switch sensitive",
+   "google": "no",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q09",
+   "field": "Welfare check before any no-show words",
+   "type": "switch",
+   "need": "S",
+   "shows": "no-show steps",
+   "source": "S13-10, A8-14, switch welfare",
+   "google": "no",
+   "turned_on_by": "switch welfare"
+  },
+  {
+   "id": "V18",
+   "field": "Insurance plan billed (the customer's part is billed after the plan pays)",
+   "type": "choice",
+   "need": "P",
+   "shows": "booking page",
+   "source": "fact planbill, S1-13, A4-53, A9-20",
+   "google": "no",
+   "turned_on_by": "fact planbill"
+  }
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "multiday",
+  "dropoff"
+ ],
+ "switches": [
+  "sensitive",
+  "welfare"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|none|bill",
+   "paths": [
+    "list|none|bill",
+    "list|none|counter",
+    "list|full|none",
+    "list|card|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "2 days before",
+   "main_path": "list|none|own",
+   "paths": [
+    "list|none|own",
+    "list|none|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|bill",
+   "name": "New patient sleep consult",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$230",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$25",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a new patient sleep consult billed to the patient's plan; nothing is taken; Rosie texts the patient's share once the plan pays."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "CPAP mask fitting",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$25",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A self-pay CPAP mask fitting ($90), paid at the desk after the fitting."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Video follow-up visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$85",
+   "deposit": null,
+   "rest": null,
+   "paid": "$85",
+   "fee": "$0",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A self-pay video follow-up ($85), paid in full when booking; nothing more after the visit."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "New patient sleep consult",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$230",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$25",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The same consult where the center turns on its $25 late-cancel fee: a card is saved for it, never for a fee-free patient, and the owner confirms any charge."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|own",
+   "name": "Home sleep test set-up",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$160",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": null,
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The main story: a home sleep test set-up with a technologist. Nothing is taken; the center bills the patient's plan its own way."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Home sleep test set-up",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$160",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": null,
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The same home visit, paid by the patient: nothing is taken, and Rosie texts the $160 bill when the visit is marked DONE."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "New patient sleep consult",
+   "price": "billed to the health plan; self-pay from the center's price list (example: $230 self-pay)",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the center",
+   "before": "nothing taken",
+   "after": "the plan is billed; any share is billed after the plan pays"
+  },
+  {
+   "name": "Follow-up sleep visit",
+   "price": "billed to the plan; $120 self-pay (example)",
+   "kind": "one price",
+   "length": "30 min",
+   "where": "at the center",
+   "before": "nothing taken",
+   "after": "as above"
+  },
+  {
+   "name": "Overnight sleep study",
+   "price": "billed to the plan; self-pay from the center's price list (example: $1,150 self-pay)",
+   "kind": "one price",
+   "length": "a stay from 8pm to 6am at the center",
+   "where": "at the center",
+   "before": "nothing taken",
+   "after": "as above"
+  },
+  {
+   "name": "Home sleep test kit (picked up at the desk, returned by mail)",
+   "price": "billed to the plan; $150 self-pay (example)",
+   "kind": "one price",
+   "length": "5 min at the desk",
+   "where": "at the center's desk",
+   "before": "nothing taken",
+   "after": "as above"
+  },
+  {
+   "name": "CPAP mask fitting at the center",
+   "price": "billed to the plan; $90 self-pay (example)",
+   "kind": "one price",
+   "length": "30 min",
+   "where": "at the center",
+   "before": "nothing taken",
+   "after": "as above; a self-pay fitting is paid at the desk"
+  },
+  {
+   "name": "Video follow-up visit",
+   "price": "$85 self-pay (example), paid in full when booking",
+   "kind": "one price",
+   "length": "20 min",
+   "where": "by video (counts as at the center)",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Home sleep test set-up",
+   "price": "billed to the plan its own way; $160 self-pay (example)",
+   "kind": "one price",
+   "length": "40 min at the place; a 2-hour arrival window in the morning",
+   "where": "at the patient's home",
+   "before": "nothing taken (the bill after), or a card saved",
+   "after": "the center bills the plan its own way, or the bill is texted for a self-pay patient"
+  },
+  {
+   "name": "CPAP mask fitting at home",
+   "price": "billed to the plan its own way; $160 self-pay (example)",
+   "kind": "one price",
+   "length": "40 min at the place; a 2-hour arrival window in the morning",
+   "where": "at the patient's home",
+   "before": "nothing taken",
+   "after": "as above"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "the kind of visit (new consult, follow-up, overnight study, home test kit, mask fitting, home set-up)",
+   "whether it's a video follow-up (counts as at the center)",
+   "a health plan or self-pay (only the plan's name here)",
+   "for a child's overnight study: the child's age, and a parent who stays overnight",
+   "for a home visit: the town and whether the patient can come to the door"
+  ],
+  "after_time": [
+   "any access need",
+   "a note for the technologist: a past faint, or a bed partner who needs a say",
+   "for a home visit: the address, parking and any gate code"
+  ],
+  "secure_page_only": [
+   "the sleep history (on the secure page only)",
+   "the plan's member details",
+   "date of birth (every study is matched to the patient by two details)",
+   "medicines that matter, only where the study asks (sedating ones)",
+   "for an overnight study: who picks up a child in the morning",
+   "who may get the results: the patient; a parent or guardian for a child"
+  ],
+  "who_may_book": "an adult for themselves; a parent or guardian for a child (who stays overnight for a child's study); a bed partner may not book for the patient"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "chest pain, trouble breathing, or a stroke sign (face drooping, arm weakness, or trouble speaking)",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "a near-crash from falling asleep at the wheel, or a fall during the night",
+    "what": "the booking goes on; the sleep doctor is told that day, and the nurse line calls within the hour"
+   },
+   {
+    "words": "a question about a result or a medicine",
+    "what": "never answered by Rosie: the center's nurse line; the sleep doctor is told that day"
+   },
+   {
+    "words": "feels unsafe at home or with a partner",
+    "what": "the family-violence line's words come first, then the booking goes on privately; the team is told that day, with no detail in any text"
+   }
+  ],
+  "always": "the generic screen: danger to life, fire, gas, a medical emergency or self-harm → call 911 or 988, and no booking",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "A sleep history for a new patient",
+    "when": "on the secure page before the first consult",
+    "result": "done: booked; not done: the desk asks once, then the consult waits"
+   },
+   {
+    "name": "A parent's OK for a child's overnight study",
+    "when": "on the secure page before the study, with the overnight stay named",
+    "result": "OK on file: booked; no OK: no study"
+   },
+   {
+    "name": "The plan check",
+    "when": "by the desk before the visit",
+    "result": "covered, part covered (the share shown), or not covered (self-pay); where the plan's rules require it, a notice of likely non-coverage is signed before the visit"
+   },
+   {
+    "name": "The home test kit's pick-up and return",
+    "when": "at the desk when the kit is picked up; the box returned by mail",
+    "result": "returned: the test is read; not returned: the sleep doctor is told, and a new kit is offered with no charge"
+   }
+  ],
+  "prep": "for the reminder: a night's bag, pajamas, the usual medicines, photo ID and the plan card; for a study: no caffeine or alcohol for the day, and the sleep center's own instructions; for a home visit, clear the bedside",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "in-lab sleep studies, home sleep tests, CPAP mask fitting, pediatric sleep studies, Spanish",
+  "licenses_or_certificates": "a sleep doctor's state license; a technologist's certificate where the state requires one; the center keeps its own record (optional, never looked up by Rosie)",
+  "supervision": "the sleep doctor reads every study; a new technologist works under a senior one until signed off",
+  "who_oks": "the owner OKs new patients, refunds and any study price",
+  "stand_in": "a patient may ask for a named doctor; the next open one with the skill takes it otherwise; an overnight study stays with its night team"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "an adult for themselves; a parent or guardian for a child (who stays overnight for a child's study); a bed partner may not book for the patient",
+  "minors_texts": "a child's texts go to the parent or guardian"
+ },
+ "visit": {
+  "check_in": "at the desk: the code, then photo ID and the plan card checked against the secure page; an overnight study checks in in the evening with a technologist; a home visit: the code at the door, then photo ID",
+  "done": "the code, then DONE from the technologist; the sleep doctor reads the result; results go to the patient's secure page; Rosie keeps only booking records",
+  "changes_at_visit": "the sleep doctor adds a follow-up or a mask fitting: priced first, with the self-pay price shown; nothing else is sold at a visit"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "a state license for each sleep doctor and nurse practitioner; a sleep technologist's certificate where the state requires one; the sleep center's registration where the state's rules require it; a technologist who sets up a test or a mask at home only where the state allows it",
+  "who": "both: the center, and each clinician or technologist who sees patients",
+  "ask": "optional, for the owner's own page: each clinician's license number and the center's registration; nothing is needed to book",
+  "insurance": "the owner's own liability insurance; Rosie never verifies it",
+  "background": "the center's own background checks for staff who go into a patient's home, where its rules or the state require them; Rosie never verifies them"
+ },
+ "never_in_a_text": "the sleep history, test names, results, medicines, the child's details, ID numbers and plan details never go in a text: only the secure page; texts say only the center's name, the day, the time and the place",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "fasting"
+  ],
+  "pf.license": [
+   "scope",
+   "telehealth"
+  ],
+  "pf.messages": [
+   "results"
+  ],
+  "pf.visit": [
+   "cantGoAhead",
+   "rejected",
+   "dropOff"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,183 @@
+{
+ "id": "pet-waste",
+ "name": "Pet waste removal",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "dog-walker",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet waste removal",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet waste removal",
+   "staff": "Noor and Dale (yard planners)",
+   "customer": "Alex M. (customer, with Scout) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Video yard check",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 15-minute video yard check with Noor. Nothing is taken, and nothing is paid after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video yard check with a written plan",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 video yard check with a written plan, 45 minutes, paid in full when booking. Nothing more is owed after.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet waste removal",
+   "staff": "Kit and Remy (yard techs)",
+   "customer": "Alex M. (customer, with Scout) · other customers",
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Weekly yard cleanup, 1 dog",
+     "price": "$24",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$24",
+     "story": "The main story: a $24 weekly yard cleanup after Scout. A card is saved for the $24 late-skip fee, and charged $24 when Kit texts DONE after each visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Weekly yard cleanup, 1 dog",
+     "price": "$24",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$24",
+     "story": "A $24 cleanup. Nothing is taken. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "One-time cleanup",
+     "price": "$48",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$48",
+     "fee": "$24",
+     "story": "A one-time $48 cleanup for a customer with no plan, paid in full when booking.",
+     "due_now_at_booking": 48,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First big cleanup",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$24",
+     "story": "A first big cleanup of a yard not cleaned in a month, priced from photos at $90. Sam OKs it. A card is saved, and charged $90 when Kit texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a tech comes to the customer's yard on a set day, usually every week, while the customer is out. A video yard check from the planning desk can come first.\",\"list\":[{\"name\":\"Video yard check\",\"price_kind\":\"free\",\"length\":\"15 minutes\",\"where\":\"by video, with Lee Yard Plans (the second company)\",\"money\":\"nothing taken\",\"note\":\"The planner sees the yard, the gate and where the dogs stay, and says which plan fits. A heavy yard is priced from photos.\"},{\"name\":\"Yard plans (Lee Yard Plans)\",\"price_kind\":\"one price each\",\"example\":\"yard plan call, 30 min, $35 (a written plan for one yard); big yard plan, over a quarter acre, $40; plan update call, 15 min, $25; printed station map $20, added to a plan; community station plan, up to 4 waste stations, $140\",\"where\":\"by video, with Lee Yard Plans\",\"money\":\"paid in full when booked, like the written plan\"},{\"name\":\"Phone setup call\",\"price_kind\":\"free\",\"length\":\"10 minutes\",\"where\":\"by phone, with Lee Yard Scoop\",\"money\":\"nothing taken\",\"note\":\"Sets the day, the gate and the plan. The gate code is never said on the call: it goes on the secure page.\"},{\"name\":\"Video yard check with a written plan\",\"price_kind\":\"one price\",\"example\":\"$55 for an apartment community, an HOA or a dog park, with a written plan after (the example business's own price)\",\"length\":\"45 minutes\",\"where\":\"by video, with Lee Yard Plans\",\"money\":\"paid in full when booked\"},{\"name\":\"Weekly yard cleanup, 1 dog\",\"price_kind\":\"one price\",\"example\":\"$24 a visit (the example business's own price)\",\"length\":\"about 20 minutes, in a 2-hour window (like 9–11am)\",\"where\":\"at the customer's yard; nobody needs to be home\",\"money\":\"card saved at booking; charged after each visit, at DONE\",\"note\":\"Up to a quarter acre. The tech scoops every spot, bags the waste and takes it away, and latches the gate.\"},{\"name\":\"Twice-weekly cleanup, 1 dog\",\"price_kind\":\"one price\",\"example\":\"$20 a visit, two visits a week\",\"where\":\"at the customer's yard\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Every-2-weeks cleanup, 1 dog\",\"price_kind\":\"one price\",\"example\":\"$30 a visit\",\"where\":\"at the customer's yard\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Extra dog, same yard\",\"price_kind\":\"one price, added to a cleanup\",\"example\":\"$6 a visit\"},{\"name\":\"Yard deodorizer\",\"price_kind\":\"one price, added to a cleanup when booking\",\"example\":\"$15 a visit\"},{\"name\":\"One-time cleanup\",\"price_kind\":\"one price\",\"example\":\"$48 for a yard up to a quarter acre and 2 dogs, for a customer with no plan\",\"where\":\"at the customer's yard\",\"money\":\"paid in full when booked\"},{\"name\":\"First big cleanup\",\"price_kind\":\"priced from photos of the yard\",\"example\":\"$90 for a yard not cleaned in a month, up to a quarter acre; the owner OKs the price\",\"where\":\"at the customer's yard\",\"money\":\"card saved; charged at DONE\",\"note\":\"A yard left for a season or more, or a big one, is priced the same way.\"},{\"name\":\"Missed visit: late skip or no way in\",\"price_kind\":\"a fee, never more than the visit's own price\",\"example\":\"the $24 visit, only if the owner confirms it\",\"where\":\"not booked alone\"}],\"capacity\":\"One tech does about 12 yards a day. A yard up to a quarter acre with up to 3 dogs is on the list price; a bigger yard or more dogs is priced from photos and OK'd by the owner.\",\"nobody_home\":\"Yes: the tech works in the yard through the gate while the customer is out. Entry is an open gate, a latch or a gate code (the code is never in a text). DONE with a photo of the clean yard and the latched gate confirms it. A video yard check needs the customer on the call.\",\"online\":\"Yes, the video yard check, with or without a written plan, only. The cleanup itself is never online.\",\"not_offered\":\"Sewage, chemical or biohazard cleanup, lawn care and pest control (other kinds of work). A yard where a dog stays loose and can't be put inside or behind a second gate isn't booked.\"}",
+ "questions_before_times": [
+  "How many dogs, and how big each one is",
+  "Has any dog ever bitten or snapped at a person? (a yes sends the request to the owner first)",
+  "The yard: front, back or both; fenced or not; under or over a quarter acre",
+  "How long since the yard was last cleaned: a week, a month, or a season or more (a long time is priced from photos)",
+  "How often: every week, twice a week, every 2 weeks, or just once",
+  "How the tech gets in: an open gate, a latch, or a gate code"
+ ],
+ "safety_stop": [
+  "a dog that is hurt, very sick, struggling to breathe or ate something toxic, right now",
+  "a person bitten and hurt",
+  "a dog loose in the yard that attacks",
+  "a dog that got out of the yard and is lost right now",
+  "needles, broken glass, a dead animal, sewage or chemicals in the yard"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "plans",
+  "forms",
+  "photos",
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "Usually none: most places license neither pet waste removal nor yard cleanup. Some cities or counties ask for a business license, and some ask for a permit to haul waste away for pay. The state's or city's form says which.",
+ "staff_skills": "[\"Weekly and one-time yard cleanups\",\"First big cleanups of heavy yards\",\"Yards with nervous or protective dogs\",\"Yard deodorizing\",\"Video yard checks with a written plan (the planning desk)\"]",
+ "messages_never": "[\"Gate, door, garage and alarm codes\",\"Where a key is kept\",\"A dog's health conditions and medicines\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+waste+removal",
+  "pexels": "https://www.pexels.com/search/pet%20waste%20removal/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

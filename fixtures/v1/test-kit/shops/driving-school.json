@@ -1,0 +1,170 @@
+{
+ "id": "driving-school",
+ "name": "Driving school",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Driving school",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Driving school",
+   "staff": "Grace and Nina (instructors at the center's office)",
+   "customer": "Alex M. (customer and student) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "2-hour lesson",
+     "price": "$130",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$130",
+     "fee": "$20",
+     "story": "The main story: a $130 2-hour lesson from the office with Grace, paid in full when booking. A late cancel or a no-show: the $20 fee may be kept. The classroom course ($199) is paid this way too.",
+     "due_now_at_booking": 130,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "1-hour lesson",
+     "price": "$65",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $65 1-hour lesson from the office. A card is saved for the center's $20 fee, and Alex pays at the front desk after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Road-test car",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 road-test car: a warm-up from the office, then the center's car at the DMV test. A $40 deposit now, and the $100 rest charged to the saved card when Grace texts DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Driving school",
+   "staff": "Diego and Leo (instructors who pick students up)",
+   "customer": "Alex M. (customer, Lily's father) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Teen package: three 2-hour lessons",
+     "price": "$450",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$450",
+     "fee": "$89",
+     "story": "The main story: the $450 teen package, three 2-hour lessons with pick-up, paid in full when booking. The road-test car ($165) and single lessons can be paid this way too.",
+     "due_now_at_booking": 450,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Teen package: three 2-hour lessons",
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The $450 teen package with a $150 deposit now, and the $300 rest charged to the saved card when Diego texts DONE after the last lesson.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "2-hour lesson with pick-up",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "One $179 2-hour lesson with pick-up. A card is saved and charged $179 when Diego texts DONE. A missed lesson: the $89 fee, if Sam confirms.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "lessons booked by instructor and length, with a set start; packages booked as a series of lessons; a classroom course booked by seat in a session",
+ "questions_before_times": [
+  "the student's age (it sets the service: a teen package with a parent's OK, or adult lessons)",
+  "a learner's permit, and when it started",
+  "how much driving so far",
+  "the pick-up place: a home, a school or an office, and the town",
+  "one-on-one, or another student may ride along (shared times only, where the school offers them)",
+  "for the road-test car: the DMV test date, time and place"
+ ],
+ "safety_stop": [
+  "a crash happening now or just now with someone hurt, a car on fire, someone trapped",
+  "the student or the instructor seems impaired by alcohol or drugs"
+ ],
+ "first_steps": [
+  "Learner's permit on file",
+  "Parent's OK for a student under 18",
+  "Enrollment contract",
+  "Classroom hours before the first lesson"
+ ],
+ "facts": [
+  "plans",
+  "classes",
+  "forms",
+  "children",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "where the state's rules require it: a driving school license for the school, and an instructor license for each person who teaches (a switch from the state's form; most states have both)",
+ "staff_skills": "teens, adults, freeway, the road-test car, the hand-control car, motorcycle; only instructors cleared for teens teach a teen; only Grace takes the center's road-test car in the example",
+ "messages_never": "the permit number, the student's date of birth, health conditions and the parent's OK never go in a text or through the AI: only the secure page and the student's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/driving+school",
+  "pexels": "https://www.pexels.com/search/driving%20school/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

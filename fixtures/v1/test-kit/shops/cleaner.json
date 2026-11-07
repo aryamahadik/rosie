@@ -1,0 +1,227 @@
+{
+ "id": "cleaner",
+ "name": "House cleaner",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] House cleaner",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "House cleaner",
+   "staff": "Rowan and Sasha (rug cleaners)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Small rug wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 small rug wash. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Small rug wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 small rug wash. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Curtain cleaning",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Curtain cleaning, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Stain removal",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Stain removal, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Antique rug wash",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An antique rug, priced at the counter. Only the $25 inspection is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "House cleaner",
+   "staff": "Robin and Jamie (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Deep clean",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 deep clean first, then a plan. A card is saved for the $89 late-cancel fee and charged $179 when Robin texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Deep clean",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 deep clean. Nothing is taken. Rosie texts the bill after the clean.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Move-out clean",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A move-out clean, priced from photos at $640. Sam OKs it. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Heavy clean",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A heavy clean, priced at the visit before any work. A card is saved for the $89 late-cancel fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a fixed service at the customer's place, often repeating, priced by the home's size.\",\"list\":[{\"name\":\"Deep clean\",\"price_kind\":\"set by the customer's answers (bedrooms, bathrooms, square feet)\",\"example\":\"3 bed, 2 bath: $179 (the example business's own price)\",\"length\":\"set by the home's size: about 3 hours for a crew of two\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Standard clean\",\"price_kind\":\"set by the customer's answers\",\"example\":\"3 bed, 2 bath: $150 one time\",\"length\":\"about 2 hours for a crew of two\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Plan visits (standard clean)\",\"price_kind\":\"a per-visit price for each plan\",\"example\":\"every 1, 2 or 4 weeks: $125, $135 or $145 a visit\",\"length\":\"as the standard clean\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved; each visit charged at its own DONE\"},{\"name\":\"Move-out clean\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for a messy 4-bedroom move-out\",\"where\":\"at the customer's place, an empty home\",\"money\":\"card saved, or a deposit where the state's caps allow; the rest charged at DONE\"},{\"name\":\"Heavy clean\",\"price_kind\":\"quoted at the visit, before any work (a home not cleaned in a long time)\",\"example\":\"only the $89 visit fee is promised\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Window washing (the second kind of work)\",\"price_kind\":\"from the list, per home\",\"example\":\"inside windows $149; inside and outside $189 (the example business's own prices); skylights and high windows: a free estimate, then a quote\",\"length\":\"about 2 hours, one window washer\",\"where\":\"at the customer's place; outside only: nobody needs to be home\",\"money\":\"card saved; charged at DONE\",\"weather\":\"outside work has a weather limit Sam sets (rain or high wind); a move for weather is free\"},{\"name\":\"By the hour\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour for a crew of two, 1-hour minimum\",\"where\":\"at the customer's place\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, added only when the customer asks\",\"example\":\"inside the oven and fridge $160; inside windows $95; carpet shampoo $199\"},{\"name\":\"Visit fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or a lockout the owner confirms, or owed when a heavy clean isn't done\",\"where\":\"not booked alone\"},{\"name\":\"Rug and curtain care at the business\",\"price_kind\":\"one price by size, from photos, or at the counter\",\"example\":\"small rug $35, runner $40, cushion covers $20, bath mat $25, curtains $55, 8x10 rug $140, stain removal from photos, antique rug priced at the counter after a $25 inspection\",\"where\":\"dropped off at the business; a rug can also be washed at the customer's home ($75)\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"capacity\":\"A home clean takes a crew of two: a lead and a helper. A drop-off needs one person at the counter.\",\"nobody_home\":\"Yes, for plan visits: entry by lockbox, door code or a key the business holds. DONE with after photos confirms it.\",\"online\":\"No.\",\"not_offered\":\"Mold over the state's size cutoff, sewage, biohazards, home care. Outside windows only under window washing.\",\"drop_off_slots\":\"Rugs and curtains are booked into drop-off slots by the shop's daily number, with no rug cleaner named; the rug goes to a rug cleaner with the skill once it's in.\"}",
+ "questions_before_times": [
+  "Bedrooms, bathrooms and about how many square feet",
+  "Was the home cleaned by a professional in the last 30 days? (sets deep or standard)",
+  "Just once, or a plan every 1, 2 or 4 weeks",
+  "Pets, and where they'll be",
+  "For window washing: inside, outside or both, and how many floors",
+  "For a drop-off: the rug's size and what it's made of"
+ ],
+ "safety_stop": [
+  "mold patch over the state's size cutoff",
+  "sewage or a sewage backup",
+  "biohazards: blood, body fluids, needles",
+  "a gas smell",
+  "floors or stairs that aren't safe to walk",
+  "bedbugs or rodents"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "sentnow",
+  "dropoff",
+  "photos",
+  "tips",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Usually none for house cleaning. Where the state's or city's rules require a license or a business registration, the form asks for it.",
+ "staff_skills": "[\"Deep and standard cleans\",\"Move-out cleans\",\"Carpet shampoo\",\"Window washing\",\"Rug washing, stain removal, antique rugs\"]",
+ "messages_never": "[\"Entry, lockbox, door, garage and alarm codes\",\"Where a key is kept\",\"Health reasons, like an allergy behind a product to avoid\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/house+cleaner",
+  "pexels": "https://www.pexels.com/search/house%20cleaner/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

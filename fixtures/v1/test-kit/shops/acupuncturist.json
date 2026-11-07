@@ -1,0 +1,175 @@
+{
+ "id": "acupuncturist",
+ "name": "Acupuncturist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Acupuncturist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Acupuncture Clinic",
+   "staff": "Iris and Mia (acupuncturists)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Follow-up treatment",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 follow-up with Iris. A card is saved only for the clinic's $20 fee. Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Follow-up treatment",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same follow-up when a health plan or a claim pays, or for a fee-free patient. Nothing is taken. The desk checks the plan, and Alex pays any share at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Follow-up treatment",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same follow-up where Sam set Iris's Saturday mornings to run with nobody at the front desk. So the saved card is charged when Iris texts DONE, as Alex agreed.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Acupuncture",
+   "staff": "Noah and Leo (acupuncturists), who bring a portable table",
+   "customer": "Alex M. (patient, at home and not driving for a few weeks) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home treatment",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 home treatment. A card is saved for the $89 trip fee, owed only for a late cancel or nobody home. Rosie texts the bill when Noah texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home treatment",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same home treatment when a health plan or a claim pays. Nothing is taken. Lee Home Acupuncture bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home treatment",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same home treatment with a card saved. It's charged $179 when Noah texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits with one acupuncturist, each with a set length; at the clinic each visit also needs one of the treatment rooms; a new patient's first visit is longer (a health talk, then treatment); follow-ups after it; a treatment plan of weekly follow-ups is suggested in person, never pushed, and booked only with the patient's own yes",
+ "questions_before_times": [
+  "for you, your child, or someone you help",
+  "new or returning patient (a new patient gets the first visit)",
+  "which visit: the business's own visit types only, never a symptom typed into the AI",
+  "how you'll pay: yourself, or a plan by name only (a health plan, the VA, a work-injury or car-accident claim)",
+  "days and times that suit you"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, sudden weakness or numbness, a drooping face, or a sudden very bad headache",
+  "a fall with a head injury, or someone who can't get up"
+ ],
+ "first_steps": [
+  "Health history, the health flags and the consent",
+  "The acupuncturist reads the health answers",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "A doctor's referral or OK",
+  "A reaction last time"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "firststeps",
+  "children",
+  "aftercare"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always where the state licenses acupuncture: each acupuncturist holds their own active license from the state's board, under the title that state uses; a few states issue none (a switch from the state form)",
+ "staff_skills": "every acupuncturist: first visits, follow-ups, cupping and acupressure; child's visits only for those trained in them (the example: Iris); herbal consults only with the herbal certificate where the state's form asks (the example: Noah); home visits only for those Sam clears",
+ "messages_never": "texts to a patient carry only the business's name, the date, the time, the place, money lines and a secure link: never the visit type, the reason, the health answers or any result; a clinic text names no acupuncturist; a home visit keeps the acupuncturist's name for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/acupuncturist",
+  "pexels": "https://www.pexels.com/search/acupuncturist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

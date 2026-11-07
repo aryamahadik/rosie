@@ -1,0 +1,149 @@
+{
+ "id": "chef",
+ "name": "Private chef",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Private chef",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Private chef",
+   "staff": "Robin and Sage (chefs at the studio)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Cooking lesson (60 min)",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: a $55 cooking lesson at the studio, paid in full when booked. A late cancel may keep the $20 fee, only with Sam's OK.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Menu tasting for up to 4",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A menu tasting for up to 4 at the studio: a $40 deposit when booked, and the $100 rest paid at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Private chef",
+   "staff": "Marco and Luis (chefs who cook in customers' kitchens), with Jade (a server)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "photos|deposit|bill",
+   "services": [
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Private dinner for 10",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a private dinner for 10, quoted from the menu plan at $640. A 25% deposit ($160) holds the date; the $480 rest and the groceries at cost come on the bill after the dinner.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Cooking class at home for 2",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A cooking class at home for 2, $150 with groceries, paid in full when booked. A late cancel keeps only the $89 fee, with the owner's OK.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Private Chef's own list)\":[{\"service\":\"Private dinner, cooked and served in the customer's kitchen (the example: an anniversary dinner for 10)\",\"price kind\":\"quoted from the menu plan: a price per guest set once the chef plans the menu with the customer, plus the server's hours\",\"price\":\"the quote (the example: 4 courses at $55 a guest for 10 is $550, plus a server for 3 hours at $30 an hour, $90: $640)\",\"groceries\":\"at cost, with every receipt, on the bill after the dinner (the example's estimate: $300 to $350). Or, where the owner sets it, groceries are in the price per guest.\",\"length\":\"a set start time for the meal. The chef arrives about 3½ hours before, the server 1½ hours before, and cleanup ends about 1 hour after the meal.\",\"place\":\"the customer's own kitchen\",\"before\":\"a signed contract, then a 25% deposit that holds the date\",\"after\":\"Rosie texts the bill: the rest, the groceries at cost and any extra time. With groceries in the price: the rest is paid on the bill after the dinner, never on a set day.\"},{\"service\":\"Cooking class at home for 2\",\"price kind\":\"one price\",\"price\":\"$150, groceries included\",\"length\":\"2½ hours, at a set start time\",\"place\":\"the customer's kitchen\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Meal prep visit (meal prep)\",\"price kind\":\"one price\",\"price\":\"$149 for 1 week of meals (3 hours) or $189 for 2 weeks (4 hours), groceries included\",\"length\":\"3 or 4 hours, at a set start time\",\"place\":\"the customer's kitchen; the meals are labeled and left in the fridge\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Date-night dinner for 2 (a set menu)\",\"price kind\":\"one price\",\"price\":\"$179, groceries included\",\"length\":\"a set start time\",\"place\":\"the customer's kitchen\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Brunch for 6\",\"price kind\":\"one price, by person\",\"price\":\"$199 with Luis or Marco, $249 when Sam cooks it; groceries included\",\"length\":\"a set start time\",\"place\":\"the customer's kitchen\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"A server\",\"price kind\":\"per hour\",\"price\":\"$30 an hour, 3-hour minimum (the example's own price)\",\"length\":\"from 1½ hours before the meal to the end of cleanup\",\"place\":\"with a private dinner\",\"before\":\"in the dinner's quote\",\"after\":\"in the dinner's bill\",\"note\":\"Required for 9 guests or more (the example's own rule).\"},{\"service\":\"Extra time on the day\",\"price kind\":\"per hour\",\"price\":\"the example: $80 an hour for the team that stays; extra chef time is $140 an hour with Marco, $120 with anyone else\",\"length\":\"1 hour\",\"place\":\"at the dinner\",\"before\":\"nothing: asked at the dinner\",\"after\":\"on the bill, or one pay link when the dinner was paid before\",\"note\":\"Only with the customer's written yes, at the rate shown before booking.\"},{\"service\":\"Late-cancel or nobody-home fee\",\"price kind\":\"a fee\",\"price\":\"the example's $89, kept from a set-price service paid in full\",\"length\":\"\",\"place\":\"the customer's home\",\"before\":\"agreed when booking\",\"after\":\"kept only with the owner's OK; the rest is refunded\"}],\"at the business (the example: Lee Cooking Studio's own list)\":[{\"service\":\"Cooking lesson (60 min)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"the studio's kitchen\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Menu tasting for up to 4 (2½ hours)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours\",\"place\":\"the studio's chef's table\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\",\"note\":\"A custom tasting menu has a 15-minute planning call first, at least 2 days before.\"},{\"service\":\"Knife skills lesson (30 min)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"the studio, or the customer's home for $75 (flow B)\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Sauce lesson\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"45 min\",\"place\":\"the studio\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Bread lesson\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"20 min, alone or added to another lesson\",\"place\":\"the studio\",\"before\":\"the full price\",\"after\":\"nothing more; added at the studio, it's paid there\"},{\"service\":\"Kids' cooking lesson (12 and under)\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"30 min\",\"place\":\"the studio\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"A parent books it and stays for the whole lesson.\"},{\"service\":\"Lesson pack\",\"price kind\":\"a pack\",\"price\":\"5 lessons, the studio's own price\",\"length\":\"\",\"place\":\"the studio\",\"before\":\"paid when bought; each booking uses one lesson\",\"after\":\"nothing more\"}],\"late fees at the studio\":\"A late cancel (within 24 hours) or a no-show: the studio's $20 fee may be kept, only with the owner's OK; the rest is refunded.\",\"capacity\":\"One dinner a day for each lead chef (the example's own rule). A server for 9 guests or more. The studio's one chef's table, for one tasting at a time.\",\"nobody needs to be there\":\"Never: an adult on the booking is home while the chef cooks.\",\"online\":\"None in the example: lessons and tastings are at the studio, and dinners and classes in the customer's kitchen.\"}",
+ "questions_before_times": [
+  "What it's for: an anniversary, a birthday, a dinner party, a class or meal prep",
+  "The date, the meal time, and the town (for the travel area)",
+  "How many guests, and how many are children",
+  "The style: plated courses or family style",
+  "The kitchen: a working oven, how many burners, fridge space and room to work",
+  "Food the guests love, and anything they never eat (likes and dislikes only: allergies go on the secure page)"
+ ],
+ "safety_stop": [
+  "A fire, a gas smell, or someone hurt in the home right now",
+  "Someone has a bad allergic reaction now (trouble breathing, swelling)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "classes",
+  "tips",
+  "extrawork",
+  "children"
+ ],
+ "switches": {
+  "sensitive": false
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "A switch from the state's form. Cooking only in the customer's own kitchen usually needs no food permit, so the business gives its registration, or a business license where the state or city asks for one.",
+ "staff_skills": "[\"Private dinners priced from a plan (leads only)\",\"Set-price dinners and brunches\",\"Meal prep\",\"Cooking classes and lessons\",\"Menu tastings\",\"Kids' lessons\",\"Serving\"]",
+ "messages_never": "Allergies, diets and any health detail stay on the secure page, with their own yes. No text to the customer, the owner, the chef or the server carries them: a text says only how many special plates there are, and links to the secure page. They're deleted the day after the dinner.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/private+chef",
+  "pexels": "https://www.pexels.com/search/private%20chef/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,185 @@
+{
+ "id": "credit-counselor",
+ "name": "Credit counselor",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "cpa",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Credit counselor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Credit counselor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 first budget session at the office. Nothing is taken when Alex books; Alex pays at the desk after the session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "First session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 session at the office, with a card saved for the $20 late-cancel or no-show fee. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First session by video",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 budget session by video, with a card saved. The card is charged $35 when the counselor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Three-session budget package",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$20",
+     "story": "The three-session budget package: $150, paid in full when booked. Each session uses one of the three.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Credit counselor",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Budgets setup visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 budgets setup visit at home. Nothing is taken when booked. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Budgets setup visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 visit, with a card saved for the $89 visit fee. The bill is texted after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Budgets cleanup",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A household budget cleanup at home, priced from the documents at $240. The owner OKs it. A card is saved for the $40 fee, and the bill is texted after the review.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Budget counseling: one-to-one sessions with a named counselor, by video or at the office (flow A). A counselor visits a home for a household budget visit or a debt review (flow B). Every new client starts with the intake and the counseling agreement.\",\"at the office or by video (Lee Credit Counseling, the example agency's own prices)\":[{\"name\":\"First session\",\"length\":\"60 minutes\",\"price\":\"$35\",\"where\":\"at the office\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk\"},{\"name\":\"Debt question meeting\",\"length\":\"45 minutes\",\"price\":\"$40\",\"where\":\"at the office or by video\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk\"},{\"name\":\"Quick budget call\",\"length\":\"20 minutes\",\"price\":\"$25\",\"where\":\"by phone or video\",\"before\":\"nothing taken when booked\",\"after\":\"paid by card at DONE\"},{\"name\":\"Extra document review\",\"price\":\"$20\",\"where\":\"at the office or by video, added to a session and OK'd first\"},{\"name\":\"Debt planning meeting\",\"length\":\"60 minutes\",\"price\":\"$55\",\"where\":\"at the office or by video, for a current client\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk\"},{\"name\":\"Budgets catch-up session\",\"length\":\"2 hours\",\"price\":\"$140\",\"where\":\"at the office\",\"before\":\"a card saved for the $20 fee\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"First session by video\",\"length\":\"60 minutes\",\"price\":\"$35\",\"where\":\"by video or phone\",\"before\":\"a card saved for the $20 late-cancel or no-show fee\",\"after\":\"the saved card charged when the counselor texts DONE\"},{\"name\":\"Three-session budget package\",\"length\":\"three sessions of 60 minutes, one every 2 weeks, same counselor\",\"price\":\"$150 paid in full\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"rule\":\"booked as one series: all three times are saved at once, each with its own code and reminder\"},{\"name\":\"Budget review (follow-up)\",\"length\":\"30 minutes\",\"price\":\"$20\",\"where\":\"at the office or by video, for a current client\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk, or the saved card charged at DONE\"}],\"at the client's home (Lee Home Budgets, the example agency's own prices)\":[{\"name\":\"Budgets setup visit\",\"length\":\"90 minutes\",\"price\":\"$179\",\"where\":\"at the client's home\",\"before\":\"nothing taken when booked\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Debt plan setup visit\",\"length\":\"60 minutes\",\"price\":\"$150\",\"where\":\"at the client's home\",\"before\":\"nothing taken when booked\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Budgets cleanup\",\"length\":\"2 hours\",\"price\":\"priced from the documents first ($240 in the example); over the owner's limit needs the owner's OK\",\"before\":\"a card saved for the $89 fee\",\"after\":\"the bill Rosie texts after DONE\"}],\"late-cancel and no-show fee\":\"Office or video: $20, for a cancel less than 24 hours before, or a no-show. Home: the $89 visit fee, for a cancel after 6pm the day before, or a no-show. Only where the owner turns it on, and only with the owner's yes.\",\"travel area\":\"Home visits within the owner's set distance (a sign-up setting; the example is 25 miles); outside it, a quote first.\",\"capacity\":\"One counselor per session. A household review: up to the people the owner allows at one visit.\",\"online\":\"Video sessions count as at the office. The confirmation carries the counselor's own video link.\",\"booking window\":\"Up to 60 days ahead. A package saves its three times at once.\",\"nobody named\":\"The agency's counselors are listed with no ranking.\",\"visit fee\":\"Home visits: the $89 visit fee caps a late-cancel fee; it is never a charge on its own.\"}",
+ "questions_before_times": [
+  "Which counselor? The client names one, or sees the agency's counselors listed with no ranking.",
+  "What's the goal, in a few words: a budget, a plan for debts, or a question about a bill? No amounts, creditor names or account numbers in the chat.",
+  "At the office, by video or phone, or at your home (flow B)?",
+  "A single session, the three-session package, or a follow-up?",
+  "New or returning client? A new client starts with the intake and the counseling agreement."
+ ],
+ "safety_stop": [
+  "someone says they may hurt themselves or someone else",
+  "danger right now, or a medical emergency",
+  "an overdose, or swallowed medicine or a chemical",
+  "someone says they'll be hurt or made to pay by a person in their home, or they're afraid to go home over money"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "firststeps",
+  "packs",
+  "forms",
+  "documents"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "None by default: counseling needs no state license for a budget session. Where a state's form names a registration for debt counseling or a debt-management service, it is a switch and the owner adds it. The counselor's own certificate is shown as the counselor's word.",
+ "staff_skills": "[\"Budget counseling\",\"Debt plans (explained, not sold)\",\"Home budget visits\"]",
+ "messages_never": "[\"anything the client shares about money: income, bills, debts, a creditor, a balance, a late payment or a loss\",\"what was said in a session\",\"why a booking was declined\",\"crisis words or a safety answer\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/credit+counselor",
+  "pexels": "https://www.pexels.com/search/credit%20counselor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

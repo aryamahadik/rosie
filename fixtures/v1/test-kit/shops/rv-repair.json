@@ -1,0 +1,195 @@
+{
+ "id": "rv-repair",
+ "name": "RV repair and service",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] RV repair and service",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "RV repair and service",
+   "staff": "Walt and Corinne (technicians)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Roof A/C diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$149",
+     "story": "The main story: an RV whose roof A/C blows warm. Only the $149 diagnosis is promised, OK'd on the drop-off page. The repair waits for Alex's signed estimate, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Battery check",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 battery check from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Roof A/C diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$149",
+     "story": "The roof A/C repair, with the bill texted once the RV is ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Battery check",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 battery check, dropped off before work. Rosie texts the bill when it's ready.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "RV repair and service",
+   "staff": "Hal and Beth (technicians)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "2 days before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Water pump replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 water pump replacement at Alex's home. A card is saved for the $89 trip fee, and nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Leak repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A roof leak, priced at the visit. Only the $89 trip fee is promised, with a card saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Water pump replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 water pump replacement. A card is saved, and it's charged when Hal texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "New awning",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A new awning, priced from photos at $640. Sam OKs it. A $160 deposit now for the parts, and the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the RV is left at the shop and picked up when it's ready (jobs can take days)\",\"list\":[{\"name\":\"Diagnosis (A/C, refrigerator, furnace, water heater, slide-out, leveling jacks, electrical, leaks)\",\"price\":\"one price (the example shop: $149), OK'd in writing on the drop-off page\",\"length\":\"a set time, like 1 hour; more time is new work that needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Repair after a diagnosis\",\"price\":\"quoted at the visit: a written estimate with the most it can cost, signed before any repair\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with the ready text\"},{\"name\":\"Battery check, tire pressure check, smoke and carbon monoxide alarm test, fuse and bulb swap, brake and bearing check, slide-out lube and check\",\"price\":\"one price from the shop's board (the example shop: battery check $35)\",\"length\":\"30 to 60 minutes; wait or drop off\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Water pump replacement, water heater service\",\"price\":\"one price from the shop's list\",\"length\":\"about 1 to 2 hours\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Propane system leak test and safety check\",\"price\":\"one price\",\"length\":\"about 1 hour\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Roof seal inspection and reseal\",\"price\":\"inspection: one price; reseal: quoted from the roof's size, signed before the work\",\"length\":\"an hour for the inspection; a reseal takes a day or two\",\"place\":\"at the shop; also mobile (dry weather)\"},{\"name\":\"Winterizing and de-winterizing\",\"price\":\"one price, from the shop's list\",\"length\":\"about 1 to 2 hours\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Awning and body-part replacement\",\"price\":\"quoted from photos; the parts are ordered after the deposit (the example: $640, $160 deposit)\",\"length\":\"a few days to a few weeks, for the parts\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Tow-in\",\"price\":\"the tow's own price, booked with a towing company the customer picks, plus the diagnosis\",\"place\":\"the RV arrives by tow at any time, keys in the key box\"},{\"name\":\"Mobile RV repair (at a home, a storage lot or a campground)\",\"price\":\"one price, quoted from photos and the RV's details, or quoted at the visit\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee; nothing else taken\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Pre-purchase or pre-trip inspection\",\"price\":\"one price\",\"place\":\"at the shop, or where the RV for sale is parked\"}],\"capacity\":\"a daily cap on diagnoses (the example shop: 3 a day); one bay and one technician per job; a length and height limit for the bays (the example shop: up to 40 feet and 13 feet)\",\"drop_off_window\":\"drop-off slots by the shop's daily number (the example shop: 3 RVs a day), shown as drop-off times with no technician named; big rigs by appointment; plus an after-hours key box once the drop-off page is signed\",\"living_in\":\"the shop's rule, set by the owner: nobody lives in the RV while it is at the shop, and pets are never left inside; the customer says where they will stay\",\"loaners\":\"none: the shop lends no RVs\",\"shuttle\":\"none\",\"warranty\":\"on the receipt: 90 days on labor; parts as the maker covers them\",\"nobody_home\":\"a mobile job on a parked RV can be done with nobody there: the keys or the lockbox are used as agreed, and DONE comes with a photo; at a campground, the campground's rules apply\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What is the RV doing, and since when? In the customer's own words",
+  "Type (motorhome, travel trailer, fifth wheel, camper van), year, make and model",
+  "Length and height, and the mileage if it has an engine",
+  "Any propane smell, carbon monoxide alarm, burning smell or water near the wiring?",
+  "For a mobile job: where it's parked (home, storage lot, campground and site), and whether it has power and water hookups"
+ ],
+ "safety_stop": [
+  "a fire, or flames",
+  "a propane smell or hissing",
+  "a carbon monoxide alarm sounding",
+  "someone hurt or shocked"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "2 days before"
+ },
+ "license": "if: where the state registers repair shops or certifies technicians; a propane (LP-gas) certificate where the state requires one; an EPA certificate for refrigerant work",
+ "staff_skills": "[\"diagnosis\",\"roof and seals\",\"slide-outs and leveling jacks\",\"A/C and refrigeration\",\"propane and appliances\",\"12-volt and shore-power electrical\",\"plumbing and tanks\",\"brakes, axles and tires\",\"inspections\",\"mobile jobs\"]",
+ "messages_never": "[\"The VIN\",\"The campground gate code or the lockbox code\",\"The key-box code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/rv+repair+and+service",
+  "pexels": "https://www.pexels.com/search/rv%20repair%20and%20service/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,159 @@
+{
+ "id": "pool-builder",
+ "name": "Pool and hot tub builder",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pool and hot tub builder",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pool and hot tub builder",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Pool consult",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free pool consult at the design center, or a seat in the free pool school class. Nothing is taken and nothing is owed.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "3D design package",
+     "price": "$500",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$500",
+     "fee": "$0",
+     "story": "The 3D design package, $500, paid in full when booking and credited to the build if the contract is signed within 60 days.",
+     "due_now_at_booking": 500,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pool and hot tub builder",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Pool build",
+     "price": "$7,000",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a free site visit; a $68,000 pool in a signed contract; a $1,000 deposit after the cancel window; a bill for each stage when it is done and inspected, the last $7,000 after the final inspection.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Pool build",
+     "price": "$7,000",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same pool paid by the owners' lender: the stage draws go the business's own way, and Rosie sends no bills.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Hot tub install",
+     "price": "$2,800",
+     "deposit": "$700",
+     "rest": "$2,100",
+     "paid_now": null,
+     "fee": "free",
+     "story": "A hot tub install priced from photos at $2,800; the written estimate signed, a 25% deposit of $700, the rest billed after start-up.",
+     "due_now_at_booking": 700,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Site visit, then project: the build is booked only after a written proposal and a signed contract\",\"B\":[{\"name\":\"Site visit\",\"price\":\"free (the example business's own price; nothing taken and nothing owed)\",\"length\":\"about 90 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken\",\"after\":\"nothing owed; the written proposal follows within 5 business days\"},{\"name\":\"In-ground pool build (gunite)\",\"price\":\"from $65,000, set in the signed contract (example); built in stages over 8 to 12 weeks\",\"length\":\"8 to 12 weeks, in stages\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; after signing and the cancel window, a deposit (the example: 10% or $1,000, whichever is less, where the state caps home improvement deposits)\",\"after\":\"each stage billed when it's done and its inspection has passed: excavation, steel and plumbing, gunite, tile and coping, decking, equipment and electrical, plaster and start-up; the last after the final inspection and walk-through\"},{\"name\":\"Pool renovation (replaster, new tile, new equipment)\",\"price\":\"quoted at the site visit (example: $14,000 for a replaster and tile)\",\"length\":\"1 to 3 weeks\",\"where\":\"at the customer's place\",\"before\":\"the same as the build\",\"after\":\"billed in two stages\"},{\"name\":\"Hot tub install\",\"price\":\"priced from photos (example: $2,800 for a pad and a 50-amp hookup); the tub itself is sold in the business's own tools\",\"length\":\"1 to 2 work days\",\"where\":\"at the customer's place\",\"before\":\"a signed written estimate, then a 25% deposit\",\"after\":\"the rest billed after start-up\"},{\"name\":\"Pool equipment check\",\"price\":\"$179, from the list (example)\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Spring pool opening\",\"price\":\"$150, from the list (example); also a yearly plan\",\"length\":\"2 to 3 hours\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Pool safety inspection\",\"price\":\"$199, with a written report (example)\",\"length\":\"1 hour\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Change order\",\"price\":\"priced, written and signed by the owners before the changed work; added to the next stage bill\"},{\"name\":\"Permit, locate, inspections, and haul-away of dug soil\",\"price\":\"in every proposal\"}],\"A\":[{\"name\":\"Design consult\",\"price\":\"free, about 1 hour\",\"where\":\"at the design center, or by video or phone\",\"before\":\"nothing taken\",\"after\":\"nothing owed\"},{\"name\":\"3D design package\",\"price\":\"$500, 2 hours; credited to the build if the contract is signed within 60 days\",\"where\":\"at the design center\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Pool school (a monthly class for new pool owners)\",\"price\":\"free for the builder's customers, about 90 minutes; 16 seats\",\"where\":\"at the design center\",\"before\":\"nothing taken\",\"after\":\"nothing owed\",\"note\":\"water chemistry, equipment and pool safety: fences, alarms, covers, supervision of children; a child comes with a parent\"}],\"capacity\":\"each build has a project lead and subcontracted crews by stage; one excavation crew and one gunite crew set how many builds start each month\",\"skills\":\"Site visits and proposals: designers and project leads. Running the build: a project lead. Excavation, steel, gunite, tile, plaster and electrical: crews or licensed subcontractors.\",\"nobody_home\":\"build days need nobody home once the side gate and pets are handled; the site visit, the start-up walk-through and the final walk-through need an owner home\",\"online\":\"design consults by video for a first talk; no build work online\",\"smallest_job\":\"A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes no build under a plunge pool).\",\"seasons\":\"excavation and gunite only when the ground isn't frozen or soaked (the owner's call); hot tub installs all year\"}",
+ "questions_before_times": [
+  "what you want: a new in-ground pool, a renovation, or a hot tub install",
+  "the town or ZIP, and whether you own the home (only an owner can contract a build)",
+  "roughly the yard: size, slope, and whether a machine can get in (gate width, fences, trees)",
+  "for a hot tub: photos of the spot, the panel and the path from the street"
+ ],
+ "safety_stop": [
+  "a child or anyone in the water and not breathing, a drowning, an electric shock near water",
+  "a gas smell, a downed or sparking power line in the yard"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "stages",
+  "photos",
+  "extrawork",
+  "firststeps",
+  "multiday",
+  "banktransfer",
+  "video",
+  "classes"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "a contractor's license for pool and spa construction where the state's rules require one (a pool or spa specialty license, or a general building license); registration only where the state licenses none; electrical and plumbing hookups by people licensed for them where the rules require it; a local building permit for every in-ground pool, and for hot tub wiring",
+ "staff_skills": "",
+ "messages_never": "[\"gate and lockbox codes, the lender's details and any account numbers never go in a text: only the secure page\",\"The budget\",\"Contract, change order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pool+and+hot+tub+builder",
+  "pexels": "https://www.pexels.com/search/pool%20and%20hot%20tub%20builder/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

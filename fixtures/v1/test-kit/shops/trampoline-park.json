@@ -1,0 +1,179 @@
+{
+ "id": "trampoline-park",
+ "name": "Trampoline park and indoor playground",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "restaurant",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Trampoline park and indoor playground",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Trampoline park and indoor playground",
+   "staff": "Bea and Theo (front desk)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Open jump, 60 minutes, 4 jumpers",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$140",
+     "fee": "$20",
+     "story": "The main story: 4 open-jump passes, 60 minutes, $88 paid in full when booking.",
+     "due_now_at_booking": 140,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birthday party package, 10 jumpers",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A birthday party package for 10 jumpers: a $100 deposit when booking, the $229 rest at the front desk on the day.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Field trip, 20 jumpers",
+     "price": "$280",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A school field trip for 20 jumpers: nothing before, one bill to the school after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Trampoline park and indoor playground",
+   "staff": "Pim and Joss (party hosts)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Mobile play party, 2 hours",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a mobile play party for 2 hours: $150, a $40 deposit, the $110 rest charged to the saved card when the team texts DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Toddler party at home, 1 hour",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A toddler party at home: $179, a card saved for the $89 fee; Rosie texts the bill after the party.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Toddler play at home, paid in full",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$40",
+     "story": "A 1-hour toddler play at home, paid in full when booking: $75.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "table: timed jump sessions with a set number of jumpers per start time (a seat in a session), and party rooms booked for a set time (a space)",
+ "questions_before_times": [
+  "which session or party, and the date and time",
+  "how many jumpers, and each one's age group (toddler, 6 to 12, teen, adult)",
+  "for a party: the expected number of jumpers",
+  "for a mobile party: the kind of place (a yard, a school, a park) and the town"
+ ],
+ "safety_stop": [
+  "someone hurt or unwell right now: a head or neck injury, a broken bone, trouble breathing, not waking up"
+ ],
+ "first_steps": [
+  "a waiver for every jumper, signed on the secure page before the visit, good for 12 months; a party's guests' parents sign on a link the host forwards",
+  "the party's final headcount by 3 days before (it sets the food and the rest due)",
+  "a field trip: the chaperone list and each child's waiver the day before",
+  "a mobile party: the customer confirms the flat area, the power outlet and any permission the place needs (a school's or a park's) 3 days before, and marks sprinkler and underground lines before setup"
+ ],
+ "facts": [
+  "groups",
+  "children",
+  "forms",
+  "spaces",
+  "capacitycheck",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "if: where the state's amusement-ride or trampoline court rules apply, the park holds the state's permit or registration and passes its inspections; elsewhere the business registration only; a mobile inflatable party follows the same state rules where they cover inflatables",
+ "staff_skills": "court monitor, party host, mobile party attendant",
+ "messages_never": "children's names, ages and health answers, and injury details: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/trampoline+park+and+indoor+playground",
+  "pexels": "https://www.pexels.com/search/trampoline%20park%20and%20indoor%20playground/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

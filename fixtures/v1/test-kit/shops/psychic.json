@@ -1,0 +1,183 @@
+{
+ "id": "psychic",
+ "name": "Astrologer, psychic and tarot reader",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "coach",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Astrologer, psychic and tarot reader",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Astrologer, psychic and tarot reader",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Tarot reading",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 tarot reading at the studio. Nothing is taken when Alex books; Alex pays at the desk after the reading.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Tarot reading",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 tarot reading at the studio, with a card saved for the $20 late-cancel fee. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Tarot reading by video or phone",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 tarot reading by video, with a card saved. The card is charged $35 when the reader texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Six-reading package",
+     "price": "$330",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$330",
+     "fee": "$20",
+     "story": "The six-reading package: $330, paid in full when booked. Each reading uses one of the six, every two weeks.",
+     "due_now_at_booking": 330,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Astrologer, psychic and tarot reader",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Private home reading",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 private home reading. Nothing is taken when booked. Rosie texts the bill after the reading.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Private home reading",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 home reading, with a card saved for the $89 visit fee. The bill is texted after the reading.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Group circle at home",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A group circle at home for the host's guests, priced from the host's answers at $640. The owner OKs it. A $160 deposit now, and the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Readings: one-to-one tarot and astrology readings with a named reader, by video or phone or at the studio (flow A). A reader visits a client's home for a private reading or a small group circle, paid by the host (flow B). Every new client starts with a short first call and the reading agreement.\",\"at the studio (Lee Readings, the example studio's own prices; the master's numbers are not used as prices)\":[{\"name\":\"Tarot reading\",\"length\":\"45 minutes\",\"price\":\"$35\",\"where\":\"at the studio, by video, or by phone\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk; by video or phone a card is saved and charged at DONE\"},{\"name\":\"Tarot spread\",\"length\":\"60 minutes\",\"price\":\"$40\",\"where\":\"at the studio\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk\"},{\"name\":\"Mini reading (18 and up)\",\"length\":\"30 minutes\",\"price\":\"$25\",\"where\":\"at the studio, by video, or by phone\",\"before\":\"nothing taken when booked\",\"after\":\"paid at the desk\"},{\"name\":\"Full reading day\",\"length\":\"2½ hours\",\"price\":\"$140\",\"where\":\"at the studio\",\"before\":\"a card saved for the $40 late-cancel fee\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Birth chart\",\"price\":\"priced at the reading; only the $25 first meeting is promised\",\"where\":\"at the studio or by video\"},{\"name\":\"Tarot reading by video or phone\",\"length\":\"45 minutes\",\"price\":\"$35\",\"where\":\"by video or phone\",\"before\":\"a card saved for the $20 late-cancel fee\",\"after\":\"the saved card charged when the reader texts DONE\"},{\"name\":\"Six-reading package\",\"length\":\"six readings of 45 minutes, one every 2 weeks, same reader (3 months)\",\"price\":\"$330 paid in full\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"rule\":\"booked as one series: all six times are saved at once, each with its own code and reminder\"},{\"name\":\"Palm reading (add-on)\",\"price\":\"$20, added to a reading and OK'd first\",\"where\":\"at the studio or by video\"}],\"at the client's home (Lee Home Readings, the example studio's own prices)\":[{\"name\":\"Private home reading\",\"length\":\"60 minutes\",\"price\":\"$179\",\"where\":\"at the client's home\",\"before\":\"nothing taken when booked\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Group circle at home\",\"length\":\"90 minutes, 6 to 12 guests\",\"price\":\"priced from the host's answers first ($640 for the example group); over the owner's limit needs the owner's OK\",\"before\":\"a $160 deposit ($480 rest in the example, on the bill after DONE)\",\"after\":\"the rest on the bill Rosie texts after DONE\"}],\"late-cancel and no-show fee\":\"Studio: $20 ($40 for the full reading day), for a cancel less than 24 hours before, or a no-show, only where the owner turns it on. Home: the $89 visit fee, for a cancel after 6pm the day before, or a no-show. Only the owner's own yes sends a fee.\",\"travel area\":\"Home readings within the owner's set distance (a setting in the sign-up, the example is 25 miles); outside it, a quote first.\",\"capacity\":\"One reader per reading. A group circle: up to the number the host books, with the owner's limit.\",\"online\":\"Video and phone readings count as at the studio. The confirmation carries the reader's own video link.\",\"booking window\":\"Up to 60 days ahead. A package saves its three times at once.\",\"nobody named\":\"The studio's readers are listed with no ranking and no 'best' label.\",\"visit fee\":\"Home readings: the $89 visit fee is the least the bill takes for a visit. It caps a late-cancel fee, and is the only price promised for a short add-on.\"}",
+ "questions_before_times": [
+  "Which reader? The client names one, or sees the studio's readers listed with no ranking.",
+  "What kind of reading: tarot, astrology, a palm add-on, or a follow-up? No topic details in the chat.",
+  "At the studio, by video or phone, or at your home (flow B)?",
+  "A single reading, the three-reading package, or a follow-up?",
+  "New or returning client? A new client starts with the first call and the reading agreement."
+ ],
+ "safety_stop": [
+  "someone says they may hurt themselves or someone else",
+  "danger right now, or a medical emergency",
+  "an overdose, or swallowed medicine or a chemical",
+  "someone says they must pay or act today, or harm will come to them or someone else (a curse, a spirit or a 'bad energy' they must clear)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "firststeps",
+  "packs",
+  "forms",
+  "documents",
+  "groups"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "None by default: a reader needs no state license for readings, which are for reflection and entertainment. Where a state's form names a registration for this work, it is a switch and the owner adds it.",
+ "staff_skills": "[\"Tarot readings\",\"Birth charts\",\"Palm add-ons\",\"Readings by video or phone\",\"Group circles at home\"]",
+ "messages_never": "[\"what the client shares about their topic: a relationship, a loss, health, money, work or a family matter\",\"what was said in a reading\",\"why a booking was declined\",\"crisis words\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/astrologer+psychic+and+tarot+reader",
+  "pexels": "https://www.pexels.com/search/astrologer%2C%20psychic%20and%20tarot%20reader/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

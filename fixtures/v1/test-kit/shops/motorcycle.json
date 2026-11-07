@@ -1,0 +1,195 @@
+{
+ "id": "motorcycle",
+ "name": "Motorcycle repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Motorcycle repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Motorcycle repair",
+   "staff": "Tomas and Nia (mechanics)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Fuel system diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$95",
+     "story": "The main story: a motorcycle that idles rough with its engine light on. Only the $95 diagnosis is promised, OK'd on the drop-off page. The repair waits for Alex's signed estimate, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Chain service",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 chain service from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Fuel system diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$95",
+     "story": "The fuel system repair, with the bill texted once the motorcycle is ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Chain service",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 chain service, dropped off before work. Rosie texts the bill when it's ready.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Motorcycle repair",
+   "staff": "Gabe and Mae (mechanics)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Front brake pad job",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: $179 front brake pads in Alex's garage. A card is saved for the $89 trip fee, and nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Leak repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A fork oil leak, priced at the visit. Only the $89 trip fee is promised, with a card saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Front brake pad job",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "$179 front brake pads. A card is saved, and it's charged when Gabe texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Fairing replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A new fairing, priced from photos at $640. Sam OKs it. A $160 deposit now, and the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the motorcycle is left at the shop and picked up when it's ready\",\"list\":[{\"name\":\"Diagnosis (warning light, won't start, noise, how it rides)\",\"price\":\"one price (the example shop: $95), OK'd in writing on the drop-off page\",\"length\":\"a set time, like 1 hour; more time is new work that needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Repair after a diagnosis\",\"price\":\"quoted at the visit: a written estimate with the most it can cost, signed before any repair\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with the ready text\"},{\"name\":\"Chain clean, lube and adjust; battery test; headlight bulb swap; flat tire repair\",\"price\":\"one price from the shop's board (the example shop: chain service $35)\",\"length\":\"30 to 60 minutes; wait or drop off\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Oil and filter change\",\"price\":\"one price from the shop's board\",\"length\":\"about 45 minutes; wait or drop off\",\"place\":\"at the shop; also mobile\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Tire change (mount and balance), brake pads, brake fluid\",\"price\":\"one price per tire or per axle, from the shop's list\",\"length\":\"about 1 to 2 hours\",\"place\":\"at the shop\"},{\"name\":\"Scheduled service by miles or hours (plugs, filters, fluids, valve check)\",\"price\":\"one price per model, from the shop's list\",\"length\":\"about half a day, or the day\",\"place\":\"at the shop\"},{\"name\":\"Safety inspection, where the state asks for one\",\"price\":\"one price; paid when booking, if the shop sets it\",\"length\":\"about 1 hour\",\"place\":\"at the shop\"},{\"name\":\"Winter storage prep and spring start-up\",\"price\":\"one price, from the shop's list\",\"length\":\"about 1 to 2 hours\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Fairing and body-part replacement\",\"price\":\"quoted from photos; the parts are ordered after the deposit (the example: $640, $160 deposit)\",\"length\":\"a few days, for the parts\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Tow-in\",\"price\":\"the tow's own price, plus the diagnosis\",\"place\":\"the motorcycle comes by tow or trailer at any time, keys in the key box\"},{\"name\":\"Mobile repair (brake pads, battery, chain, a motorcycle that won't start)\",\"price\":\"one price, quoted from photos and the motorcycle's details, or quoted at the visit\",\"place\":\"at the customer's home or work (a garage or a driveway)\",\"before\":\"a card saved for the trip fee; nothing else taken\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Pick-up and delivery by trailer\",\"price\":\"a flat fee, or free within a set distance\",\"place\":\"starts at the customer's door; the work is done at the shop\"},{\"name\":\"Pre-purchase inspection\",\"price\":\"one price\",\"place\":\"at the shop, or where the motorcycle for sale is parked\"}],\"capacity\":\"a daily cap on diagnoses (the example shop: 6 a day); one lift and one mechanic per job; the tire machine is saved like equipment; a weight limit on the lift (the example shop: 1,000 pounds), and trikes and sidecar rigs by appointment\",\"sent_now\":\"a motorcycle that won't start, at a home or a workplace, can be sent now in open hours to the mechanic on call; one stopped on a road or in traffic is not sent: the customer is told to call a roadside service\",\"drop_off_window\":\"drop-off slots by the shop's daily number (the example shop: 6 motorcycles a day), shown as drop-off times with no mechanic named, plus an after-hours key box once the drop-off page is signed\",\"loaners\":\"none: the shop lends no motorcycles\",\"shuttle\":\"a free ride home within a set distance and hours (the example shop: 5 miles, 8am to 5pm)\",\"warranty\":\"on the receipt, in months or miles, parts and labor (the example: 12 months or 12,000 miles)\",\"nobody_home\":\"a mobile job on a parked motorcycle can be done with nobody there: the keys are left as agreed, and DONE comes with a photo\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What is the motorcycle doing, and since when? In the customer's own words",
+  "Any warning lights? Steady or flashing?",
+  "Year, make, model and mileage",
+  "Can it be ridden in, or does it need a trailer?",
+  "For a mobile job: where it's parked, and whether it starts"
+ ],
+ "safety_stop": [
+  "a crash",
+  "a fire, or flames from the engine",
+  "someone hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "sentnow"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: where the state registers repair shops, or certifies mechanics by repair kind (motorcycles count where the state's list says vehicles)",
+ "staff_skills": "[\"diagnosis\",\"brakes\",\"engine\",\"electrical\",\"tires and wheels\",\"suspension\",\"chain and drive\",\"inspections\",\"mobile jobs\",\"trailer driver\"]",
+ "messages_never": "[\"The VIN or the plate\",\"The key-box code\",\"A gate or garage door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/motorcycle+repair",
+  "pexels": "https://www.pexels.com/search/motorcycle%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

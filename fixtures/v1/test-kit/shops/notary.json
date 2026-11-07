@@ -1,0 +1,117 @@
+{
+ "id": "notary",
+ "name": "Notary public",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Notary public",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Notary public",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Office signing",
+     "price": "$30",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: two signatures at the office, $15 each. Nothing is taken: a YES books it. Alex pays $30 at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Office signing",
+     "price": "$30",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A video signing: two signatures at $15. Nothing is taken. There's no front desk online, so Rosie texts the $30 bill when Nadia texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Notary public",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Mobile signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: 6 signatures at $15 and the $89 travel fee, $179. A card is saved when Alex books, and charged when Luis texts DONE. Cash is recorded instead.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a notary meets the signers at a set time, checks each one's ID and notarizes their signatures. At the office, or by video (flow A). At the signer's home, a hospital, a care home or an office (flow B).\",\"price kind\":\"Per notarized signature, set by the customer's answers (how many). The notary fee per signature is never over the cap in the state's form. A travel fee for visits, on its own line, never called a notary fee.\",\"at the business (the example office's own prices)\":[{\"name\":\"Office signing\",\"price\":\"$15 a notarized signature\",\"length\":\"about 15 minutes\",\"where\":\"at the office; walk-ins wait in line for the next free notary\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk, the office's own way\"},{\"name\":\"Video signing\",\"price\":\"$15 a notarized signature, or the state's online cap if it's lower\",\"length\":\"about 20 minutes\",\"where\":\"by video, only where the state's form allows it, with a notary who holds the online authorization\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill when the notary texts DONE\"},{\"name\":\"Witness from the office\",\"price\":\"$25 each\",\"rule\":\"only when the papers need one; an adult on the team who isn't named in the papers\"},{\"name\":\"Signing at the customer's place\",\"price\":\"$15 a signature plus the $89 travel fee\",\"where\":\"offered both places; at home it runs in the other flow\"}],\"at the customer's place (the example business's own prices)\":[{\"name\":\"Home signing\",\"price\":\"$15 a notarized signature, plus the $89 travel fee. Alex's 6 signatures: $179\",\"length\":\"about 45 minutes, plus drive time\",\"before\":\"a card saved on the secure page, not charged\",\"after\":\"the saved card charged when the notary texts DONE; cash or check recorded\"},{\"name\":\"Hospital or care home signing\",\"price\":\"the same prices\",\"rule\":\"Sam's OK first; inside the place's visiting rules; the front desk's sign-in\"},{\"name\":\"Witness\",\"price\":\"$25 each\",\"rule\":\"a second person from the team, free at the same time, when the papers need one\"},{\"name\":\"Fingerprinting (the second kind of work)\",\"price\":\"$25 a card, plus the travel fee\",\"rule\":\"only by a technician with any certificate the state's form requires\"}],\"never booked\":\"Loan signings: a title, escrow or signing company orders them and pays, so they're never booked straight from a borrower (Rosie's rule, a booking choice). Never offered: preparing papers, legal advice, help choosing forms, immigration papers.\",\"travel area\":\"The business's setting (the example: 25 miles from 500 Lake Ave).\",\"capacity\":\"One notary per booking. A witness from the team is a second person, booked at the same time.\",\"online\":\"Video signings count as at the office. They run on a platform the state's form allows, which the business uses; the business gives Rosie the session link. Rosie never runs or records a session.\",\"nobody home\":\"Never: every signer must be there in person, or on video where the state's form allows it.\"}",
+ "questions_before_times": [
+  "How many signers, and how many notarized signatures in all? Not sure: the number of papers.",
+  "Do the papers already have their notary wording? Yes, no or not sure.",
+  "Do the papers need witnesses? How many, from the papers' own instructions.",
+  "At a home, a hospital, a care home or an office? (Visits.) At the office or by video? (The office.)",
+  "By video: which state is each signer in that day, and do they have a phone or computer with a camera?",
+  "Language: a notary must talk with each signer directly."
+ ],
+ "safety_stop": [
+  "a medical emergency, or someone in danger right now (call 911)",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  }
+ },
+ "license": "Always: each notary's own commission from the state, active, with any bond the state's form requires. Video signings: the notary's own online authorization too, only where the state's form allows them. Fingerprinting: a technician's certificate only where the state's form requires one.",
+ "staff_skills": "[\"Notary work in person\",\"Video signings (online authorization)\",\"Hospital and care home signings\",\"Spanish\",\"Fingerprinting (any certificate the state's form requires)\"]",
+ "messages_never": "[\"what the papers are, or what they're about\",\"any ID details\",\"a signer's health\",\"why a signing stopped, beyond 'couldn't be done today'\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/notary+public",
+  "pexels": "https://www.pexels.com/search/notary%20public/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

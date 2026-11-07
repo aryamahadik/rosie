@@ -1,0 +1,148 @@
+{
+ "id": "music",
+ "name": "Music lessons",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Music lessons",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Music lessons",
+   "staff": "Elena and Marcus (teachers)",
+   "customer": "Alex M. (a parent) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Piano lesson, 30 min",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 30-minute piano lesson for Lily with Elena. A card is saved for the studio's $20 late-cancel and no-show fee, and charged $35 when Elena texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial lesson",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$25",
+     "fee": "$25",
+     "story": "A $25 trial violin lesson with Elena, 30 minutes, paid in full when booking. A late cancel or a no-show: the $25 may be kept, with Sam's OK.",
+     "due_now_at_booking": 25,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Piano lesson, 30 min",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 piano lesson on a day with someone at the front desk. A card is saved for the $20 fee, and Alex pays at the desk after the lesson.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Music lessons",
+   "staff": "Daniel and Felix (teachers who come to the home)",
+   "customer": "Alex M. (a parent) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Piano lesson at home, 45 min",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $75 45-minute piano lesson at home for Noah with Daniel. A card is saved for the $40 late-cancel and no-show fee, and charged $75 when Daniel texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trial lesson at home",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$45",
+     "fee": "$45",
+     "story": "A $45 trial lesson at home, 30 minutes, paid in full when booking. A late cancel or nobody home: the $45 may be kept, with Sam's OK.",
+     "due_now_at_booking": 45,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "private lessons with a chosen teacher; the instrument picks who can teach it, and the length (30 or 45 minutes, 60 for audition prep) sets the price",
+ "questions_before_times": [
+  "new or returning",
+  "the instrument (or voice), and the length: 30 or 45 minutes (60 for audition prep)",
+  "the level: never played, beginner, or plays already",
+  "at the studio, at home or online",
+  "a trial lesson, a single lesson, or weekly lessons"
+ ],
+ "safety_stop": [
+  "a student hurt or very unwell at a lesson: hard to breathe, a fall, an allergy reaction"
+ ],
+ "first_steps": [
+  "none: a trial lesson is booked as its own lesson, never as a step before another"
+ ],
+ "facts": [
+  "children",
+  "plans",
+  "packs",
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none found for private music lessons or piano tuning: identity is checked, the business gives its registration, and a person on Rosie's team checks the state's site within 1 business day",
+ "staff_skills": "each teacher's instruments and the ages they teach; only teachers of an instrument are offered for it (only Elena teaches violin at the example studio)",
+ "messages_never": "a student's age, school, learning, health or hearing notes never go in a text or through the AI: only the secure page; texts name a student by first name only",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/music+lessons",
+  "pexels": "https://www.pexels.com/search/music%20lessons/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

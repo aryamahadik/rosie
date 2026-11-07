@@ -1,0 +1,216 @@
+{
+ "id": "hearing",
+ "name": "Audiologist & hearing aids",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "optometrist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Audiologist & hearing aids",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Hearing Center",
+   "staff": "Maya (audiologist) and Lucy (hearing aid specialist)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Hearing test",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a $120 hearing test. Nothing is taken. The desk checks Alex's health plan, and Alex pays the share at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Hearing aid repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A hearing aid that stopped working: Maya prices the repair at the visit, with Alex's yes first. Alex pays at the front desk. Only the clean and check is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Hearing aids (a pair)",
+     "price": "$2,800",
+     "deposit": "$500",
+     "rest": "$2,300",
+     "paid_now": null,
+     "fee": "free",
+     "story": "Hearing aids ordered at the visit: $2,800 a pair. A $500 deposit is paid at the front desk when ordered, and the $2,300 rest at the fitting.",
+     "due_now_at_booking": 500,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Hearing",
+   "staff": "Victor (audiologist) and Noah (hearing aid specialist), who travel with a portable hearing test kit",
+   "customer": "Alex M. (patient, lives at Pine Hill care home) · other patients",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Hearing test at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a $179 hearing test at Pine Hill care home. Nothing is taken. The clinic bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Hearing test at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same hearing test, paid privately: nothing is taken, and Rosie texts the $179 bill when Victor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Hearing aid repair at home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A hearing aid that stopped working, at the care home. Only the $89 home check is promised. Victor prices the repair at the visit, with Alex's yes first, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Hearing aids fitted at home (a pair)",
+     "price": "$2,800",
+     "deposit": "$500",
+     "rest": "$2,300",
+     "paid_now": null,
+     "fee": "free",
+     "story": "Hearing aids fitted at Pine Hill: $2,800 a pair, a $500 deposit when booked on the secure page, and Rosie texts the bill for the $2,300 rest when Victor texts DONE.",
+     "due_now_at_booking": 500,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types with a person, each with a set length; a hearing test needs the clinic's one sound booth, so two tests never overlap; hearing aids are chosen after a test, ordered, then fitted at a second visit about 2 weeks later, with follow-up adjustments during the trial",
+ "questions_before_times": [
+  "for you, your child, or someone you help (a care home resident)",
+  "new or returning patient",
+  "which visit: a hearing test, a free screening, a hearing aid check or repair, or earwax removal (the clinic's own visit types; never symptoms typed into the AI)",
+  "do you wear hearing aids now",
+  "a health plan (its name only), or paying yourself",
+  "the best way to reach you: texts, email, or a relay or captioned call"
+ ],
+ "safety_stop": [
+  "hearing that dropped suddenly, in one or both ears, over a few days or less (with or without new ringing or fullness)",
+  "ear pain with fluid, pus or blood coming from the ear, or ear pain with a high fever",
+  "dizziness or spinning that started suddenly, or ringing in one ear that started suddenly",
+  "a face that droops, weakness on one side, trouble speaking, or a hard blow to the head"
+ ],
+ "first_steps": [
+  "Health history, consent and the plan's papers",
+  "The plan check",
+  "A doctor's order, where the plan asks for one",
+  "A written price estimate for self-pay patients",
+  "A doctor's OK before hearing aids, where the rules require one",
+  "The care home's OK"
+ ],
+ "facts": [
+  "aftercare",
+  "children",
+  "documents",
+  "dropoff",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "incare",
+  "planbill",
+  "results",
+  "spaces"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  },
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "always: each audiologist holds their own active license from the state's board; anyone who fits and sells prescription hearing aids holds the state's hearing aid license or registration (a switch from the state form)",
+ "staff_skills": "audiologists: full hearing tests, children's tests, earwax removal, fittings, adjustments, repairs and results; hearing aid specialists: fittings, adjustments, cleanings and repairs, and the tests the state's rules let them run to fit aids (a switch); only people cleared for visits away go to care homes and homes",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, results or medicines; at the clinic, not the audiologist's name either; when the audiologist or hearing aid specialist comes to a care home or home, their name stays, for the door check; a READY text says only that the order is in",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/audiologist+hearing+aids",
+  "pexels": "https://www.pexels.com/search/audiologist%20%26%20hearing%20aids/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

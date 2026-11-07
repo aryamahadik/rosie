@@ -1,0 +1,211 @@
+{
+ "id": "repair-shop",
+ "name": "Electronics and device repair shop",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Electronics and device repair shop",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Electronics and device repair shop",
+   "staff": "Tyler and Nina (technicians)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Laptop repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a laptop that won't hold a charge. Only the $49 diagnosis is promised. Tyler's written estimate is OK'd before any work, the battery is ordered, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Computer tune-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $35 computer tune-up from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Laptop repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The laptop repair, with the bill texted once it's ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Computer tune-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $35 computer tune-up. Rosie texts the bill with READY.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Chromebook screen",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 Chromebook screen whose part is ordered in. A $40 deposit orders it, and the $100 rest is paid at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Electronics and device repair shop",
+   "staff": "Ethan and Priya (technicians)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Phone screen repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 phone screen at Alex's home. A card is saved for the $89 on-site fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Computer repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A computer that freezes, priced at the visit. A card is saved for the $89 on-site fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Phone screen repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The $179 phone screen. A card is saved, and charged when Ethan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Laptop screen replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A cracked laptop screen, priced from photos at $640. Sam OKs it. A $160 deposit orders the part, and the rest is on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the device is left at the shop and picked up when it's READY; a mail-in box; or an on-site visit at a home or office\",\"list\":[{\"name\":\"Diagnosis for a laptop or computer\",\"price\":\"one price (the example shop: $49), counted toward the repair if the customer says yes; a phone's quick check at drop-off is free\",\"length\":\"about 1 hour; more time needs a new yes\",\"place\":\"at the shop, or on-site\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Repair after a diagnosis (battery, charging port, board repair, data)\",\"price\":\"quoted at the visit: a written estimate with parts and labor lines, OK'd before any work\",\"place\":\"at the shop, or on-site\",\"before\":\"nothing taken at the shop; a card saved for the on-site fee, on-site\",\"after\":\"at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Phone, tablet and laptop screens, batteries and charging ports\",\"price\":\"one price per model, from the shop's list\",\"length\":\"about 1 hour while you wait, when the part is in stock\",\"place\":\"at the shop, by mail-in, or on-site\",\"before\":\"nothing taken; a deposit only when the part must be ordered in\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Tune-ups, virus removal, software restore, data transfer\",\"price\":\"one price\",\"length\":\"1 to 2 hours\",\"place\":\"at the shop or on-site\"},{\"name\":\"Water damage cleaning\",\"price\":\"one price for the cleaning; repairs quoted after\",\"length\":\"1 to 3 days\",\"place\":\"at the shop\"},{\"name\":\"Data recovery\",\"price\":\"quoted after a check; the results come later, by a set date\",\"place\":\"at the shop\"},{\"name\":\"Mail-in repair\",\"price\":\"the same prices; an insured prepaid box both ways, 3 to 5 days each way\",\"place\":\"by mail, only from states where the shop may take repairs\"},{\"name\":\"Laptop screen at a home or office\",\"price\":\"priced from photos of the screen and its model label, since panels differ by model; over the owner's amount it needs his OK and a written estimate\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit orders the panel\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Check-up plans\",\"price\":\"an office IT check-up every 3 months, or a yearly virus check (the example: $179 and $150 a visit), each visit booked and paid like a single one\",\"place\":\"at the customer's place (Lee Tech Help only)\"},{\"name\":\"On-site visit at a home or office\",\"price\":\"the on-site fee (the example: $89), counted toward the repair\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the on-site fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"}],\"capacity\":\"drop-off slots every 30 minutes in open hours; one technician per device; the shop's one soldering station is saved like equipment\",\"parts\":\"a part in stock is set aside for each booking; a part not in stock is ordered once the customer says yes, 1 to 3 business days\",\"warranty\":\"on the receipt (the examples: 12 months on parts and labor); never for new drops, cracks or liquid damage\",\"nobody_home\":\"no: someone must be there to hand over, unlock and test the device\",\"online\":\"no: a device is fixed in hand\"}",
+ "questions_before_times": [
+  "The device: what kind, make and model, picked from a list",
+  "What's wrong: screen, battery, charging, water, won't turn on, data, or something else",
+  "Has it been wet or dropped?",
+  "For an on-site visit: a home or an office, and the address"
+ ],
+ "safety_stop": [
+  "fire",
+  "smoke from a device",
+  "sparks",
+  "someone burned or hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork",
+  "documents"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: where the state or city registers electronics repair dealers; a low-voltage license for running network cable, where the state's rules require one",
+ "staff_skills": "[\"phone and tablet repair\",\"laptop and computer repair\",\"board repair (soldering)\",\"data recovery\",\"water damage\",\"on-site visits\",\"network setup\"]",
+ "messages_never": "[\"A passcode or login\",\"What's on the device: photos, messages, files\",\"The serial number or IMEI\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/electronics+and+device+repair+shop",
+  "pexels": "https://www.pexels.com/search/electronics%20and%20device%20repair%20shop/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

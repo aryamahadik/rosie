@@ -1,0 +1,159 @@
+{
+ "id": "psychiatrist",
+ "name": "Psychiatrist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Psychiatrist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Medical Group",
+   "staff": "Maya and Iris (psychiatrist and nurse practitioner)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First visit",
+     "price": "$275",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The main story: Alex's first visit with Maya, Sat Oct 24 at 11:00am, after a free intro call. A card is saved, nothing taken. The desk checks Alex's plan by hand, and what's owed goes on the saved card when Maya texts DONE: nobody is at the desk on Saturdays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "First visit",
+     "price": "$275",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The same first visit when the front desk is open: Alex pays at the desk. The saved card is only for the $75 late-cancel fee, with Sam's yes.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First visit",
+     "price": "$275",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The same visit for a fee-free patient, whose plan bars missed-visit fees: nothing is taken and no card is saved. Anything owed is paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Medical",
+   "staff": "David (psychiatrist) and Elena (nurse practitioner)",
+   "customer": "Alex M. (patient, who can't easily leave home for now) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First home visit",
+     "price": "$349",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: Alex, who can't easily leave home, pays for a $349 first home visit with David, Thu Oct 22 at 8:00am, out of pocket. A card is saved for the $89 late-cancel fee, and the $349 is charged at DONE. The receipt has what Alex's plan needs to pay Alex back.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "First home visit",
+     "price": "$349",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same first home visit when Alex's plan pays in network and bars late fees: nothing is taken, no card is saved, and the office bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one patient with one clinician at a time, each visit a set length; a new patient starts with a free intro call, then a first visit; follow-up medicine visits are set as a repeat time the patient says yes to; a teen visit has a parent or guardian",
+ "questions_before_times": [
+  "for you (18 or older), or for your teen (a parent or guardian books)",
+  "which state you'll be in during your visit",
+  "a health plan (its name only), or paying yourself",
+  "new or returning",
+  "what you'd like in a clinician, in your own words: like a woman or a man, a language, Saturdays or evenings, the office, video or your home",
+  "for a home visit: the town, and the kind of place"
+ ],
+ "safety_stop": [
+  "thoughts of suicide or self-harm",
+  "harming someone else, or anyone in danger right now"
+ ],
+ "first_steps": [
+  "Intro call",
+  "Intake forms and consent",
+  "The plan check",
+  "A written good-faith estimate",
+  "The plan's OK for visits ahead",
+  "Past records"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "children",
+  "firststeps"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "the business's own word, optional: each prescriber (a psychiatrist, physician assistant or nurse practitioner) holds the state's license for the patients they see, video included; the practice may add a registration. Rosie never looks a license up and never says one is checked",
+ "staff_skills": "who sees adults, teens and families; who offers video and home visits; who speaks which language; how each lists themselves (like a woman or a man) for patients who ask",
+ "messages_never": "patient texts carry only the display name, the date, the time, the place and a secure link: never 'psychiatry', 'medicine', 'therapy', the kind of visit, a diagnosis, a medicine name or a child's details; at the office, never the clinician's name (it's on the secure page); at home, the clinician's name and photo stay, for the door check; the video link stays on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/psychiatrist",
+  "pexels": "https://www.pexels.com/search/psychiatrist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,161 @@
+{
+ "id": "massage",
+ "name": "Massage therapy",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Massage therapy",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Massage therapy",
+   "staff": "Luis and Nina (massage therapists)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "30-min massage",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 30-min massage with Luis. A card is saved for the studio's $20 fee. Alex pays at the front desk, with any tip.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "30-min massage",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same massage on a day with nobody at the front desk. A card is saved for the $20 fee, and Rosie texts the bill, with a tip line, when Luis texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Massage therapy",
+   "staff": "Ethan and Leah (massage therapists who travel)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "90-min massage at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 90-min massage at Alex's home. A card is saved for the $89 late-cancel and no-show fee. Rosie texts the bill, with a tip line, when Ethan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "90-min massage at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same massage at home. A card is saved, and it's charged $179 when Ethan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "60-min massage at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 60-min massage at Alex's home, paid in full when booking. A hotel visit is always paid this way.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set sessions by length, with a therapist the client picks or any free one; add-ons; packs of sessions, memberships and gift cards",
+ "questions_before_times": [
+  "the length and kind of massage (relaxing, deep tissue, prenatal, hot stones)",
+  "a therapist by name, or a woman or a man, only if the client asks",
+  "for a teen: the age (13 to 17); a parent or guardian books",
+  "away from the studio: what kind of place (a home, a hotel, an office) and the town, before any times"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, sudden numbness or weakness in the legs, loss of bladder or bowel control",
+  "a calf that is red, swollen and painful (it can be a blood clot)"
+ ],
+ "first_steps": [
+  "Health form",
+  "Therapist's read of a flag",
+  "A teen's consent"
+ ],
+ "facts": [
+  "plans",
+  "packs",
+  "forms",
+  "children",
+  "aftercare",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "8pm the day before"
+  }
+ },
+ "license": "always: massage therapy is licensed where the state's rules require it; many states license each therapist, and some cities or states also license the place",
+ "staff_skills": "Swedish, deep tissue, sports, prenatal, hot stones, chair massage, couples lessons; only therapists trained in prenatal massage are offered for it",
+ "messages_never": "health answers, pregnancy, injuries, medicines, a doctor's note and the therapist's notes never go in a text or through the AI: only the secure page and the client's private record; a hotel room number only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/massage+therapy",
+  "pexels": "https://www.pexels.com/search/massage%20therapy/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

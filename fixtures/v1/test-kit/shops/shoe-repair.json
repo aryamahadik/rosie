@@ -1,0 +1,154 @@
+{
+ "id": "shoe-repair",
+ "name": "Shoe repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "tailor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Shoe repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Shoe repair",
+   "staff": "Gianni and Mei (cobblers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Heel replacement",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: new heels for a pair of dress shoes, $35 from the shop's board. Nothing is taken: a YES books the drop-off. Gianni texts READY, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Shoe restoration",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A pair of boots that need restoring, priced at the counter after a look. Nothing is taken. Gianni's written price is OK'd before any work, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Boot resole",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A stitched boot resole, $140. A $40 deposit orders the soles, and the $100 rest is paid at the counter at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Shoe repair",
+   "staff": "Hector and Dani (cobblers who make home visits)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Shoe repair at home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$15",
+     "story": "The main story: a home visit for a pair of boots and a pair of dress shoes. Only the $15 pickup fee is promised, with a card saved for it. Hector prices each item at the visit. The shoes come back Tue Oct 27, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Heel replacement",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$15",
+     "story": "New heels, $35 from the list, by a home visit. A card is saved for the $15 pickup fee. The shoes come back Tue Oct 27, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: a pair left at the counter, then READY and a pick-up; at a home visit the cobbler looks at the shoes, takes them to the shop and brings them back\",\"examples\":\"the example shop's own prices, not a standard\",\"list\":[{\"name\":\"Heel replacement (pair)\",\"price\":\"one price, $35\",\"length\":\"ready in 3 days\",\"place\":\"at the shop; or by a home visit, taken to the shop and brought back\",\"before\":\"nothing taken at the shop\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Zipper replaced (boot)\",\"price\":\"one price, $40\",\"length\":\"ready in 5 days\",\"place\":\"at the shop\"},{\"name\":\"Shoe stretch (pair)\",\"price\":\"one price, $20\",\"length\":\"ready in 2 days\",\"place\":\"at the shop\"},{\"name\":\"Strap or buckle repair\",\"price\":\"one price, $25\",\"length\":\"ready in 3 days\",\"place\":\"at the shop\"},{\"name\":\"Half sole (pair)\",\"price\":\"one price, $55\",\"length\":\"ready in 5 days\",\"place\":\"at the shop\"},{\"name\":\"Boot resole, stitched\",\"price\":\"one price, $140\",\"length\":\"ready in 2 weeks; only with the master cobbler\",\"place\":\"at the shop\",\"before\":\"a $40 deposit orders the soles\",\"after\":\"the $100 rest at pick-up\"},{\"name\":\"Leather and bag repair\",\"price\":\"priced from the customer's photos first, or at the counter\",\"place\":\"at the shop\"},{\"name\":\"Shoe restoration\",\"price\":\"priced at the counter after a look: scuffs, dye, refinishing; written, item by item\",\"place\":\"at the shop, or by a home visit\",\"before\":\"nothing taken at the shop\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Fit check\",\"price\":\"free, ten minutes at the counter\",\"place\":\"at the shop\"},{\"name\":\"Home visit (Lee Mobile Cobbler)\",\"price\":\"a $15 pickup fee, credited to the work\",\"place\":\"at the customer's home or office\",\"before\":\"a card saved for the $15 fee\",\"after\":\"Rosie texts the bill after the shoes come back\"}],\"turnaround\":\"days until ready, per service: heels 3 days, half soles 5, a stitched resole 2 weeks; a home visit's shoes come back in about 5 days\",\"included\":\"a free fix within 30 days if a sole or a stitch comes loose (not wear and not new damage)\",\"capacity\":\"one cobbler at the bench; the stitching machine is used by the master cobbler only\",\"nobody_home\":\"no: a home visit needs the customer there to look at the shoes and OK the price; the returned pair is handed to an adult the customer named\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What needs fixing: heels, soles, a zipper, a strap, stretching, or other",
+  "The kind of shoe or boot and what it is made of",
+  "How many pairs",
+  "The date they are needed by",
+  "For a home visit: the town and the kind of place"
+ ],
+ "safety_stop": [],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "none for shoe or leather repair in most places; the business registration, where the state asks for one",
+ "staff_skills": "[\"heels and soles\",\"stitched resoles\",\"zippers and straps\",\"stretching\",\"leather and bag repair\",\"home visits\"]",
+ "messages_never": "[\"A card number\",\"A gate or door code\",\"The reason for orthopedic or medical shoes\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/shoe+repair",
+  "pexels": "https://www.pexels.com/search/shoe%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

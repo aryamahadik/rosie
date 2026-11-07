@@ -1,0 +1,165 @@
+{
+ "id": "cpa",
+ "name": "CPA and accountant",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] CPA and accountant",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "CPA and accountant",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First meeting",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 first meeting with Nadia Shah, CPA. A card is saved for the $20 late-cancel or no-show fee, and the $35 is charged when Nadia texts DONE. It's credited to the first year's fees if Alex hires the firm. A monthly books review plan is charged the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "First meeting",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same $35 first meeting at a firm that saves no card, or an advice call for a client billed by the half hour: nothing taken, and Rosie texts the bill when Nadia texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Personal tax return",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Alex's personal tax return, priced at a flat $90 once Nadia sees Alex's documents on the secure page. Sam OKs it. A card is saved for the $20 fee, and the $90 is charged when the return is reviewed and signed.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "CPA and accountant",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Books setup visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 books setup visit at Alex's store, after the engagement letter is signed. Nothing is taken, and Rosie texts the bill when Eli texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Books setup visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same visit, or an inventory count, for a client the firm already bills each month: nothing is taken, and it goes on the firm's own invoice.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Books cleanup",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A books cleanup, priced from Alex's documents at $640, over Sam's $500 limit, so Sam OKs it. A 25% retainer, $160, is taken as the deposit, and the $480 rest is on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a first meeting with a named CPA, at the firm's office or by video (flow A), then the firm's own work. At the client's business: a books setup, an inventory count or a books cleanup day (flow B). A new client waits for the owner's OK and a conflict check before it books.\",\"at the office or by video (the example firm's own prices)\":[{\"name\":\"First meeting (30 minutes, a new client)\",\"price\":\"$35, credited to the first year's fees if the client hires the firm\",\"where\":\"the office, or by video\",\"before\":\"a card saved for the $20 late-cancel or no-show fee\",\"after\":\"the saved card charged when the CPA texts DONE\"},{\"name\":\"Free first meeting (some firms)\",\"price\":\"free\",\"before\":\"nothing\",\"after\":\"nothing\"},{\"name\":\"Advice call (existing clients)\",\"price\":\"$35 a half hour (the firm's $70 hourly rate)\",\"where\":\"by video or phone\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill when the CPA texts DONE\"},{\"name\":\"Tax question meeting\",\"price\":\"$40\",\"before\":\"a card saved\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Quick question call (15 minutes)\",\"price\":\"$25\"},{\"name\":\"Extra document review, added at a meeting\",\"price\":\"$20\",\"rule\":\"priced and OK'd before it's done\"},{\"name\":\"Tax planning session (60 minutes)\",\"price\":\"$55\",\"before\":\"a card saved\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Books catch-up session (2½ hours)\",\"price\":\"$140\",\"before\":\"a card saved for the $40 fee\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Personal tax return\",\"price\":\"a flat fee quoted after the CPA sees the documents (the example: $90)\",\"before\":\"a card saved for the $20 fee\",\"after\":\"the saved card charged when the return is reviewed and signed\",\"rule\":\"never a share of the refund or of tax saved\"},{\"name\":\"Help with a letter from the IRS or the state\",\"price\":\"priced at the meeting, after a $25 review\",\"rule\":\"the owner OKs it first\"},{\"name\":\"Monthly books review plan\",\"price\":\"$35 a month, a 30-minute review call each month\",\"before\":\"a card saved\",\"after\":\"the saved card charged after each call\",\"rule\":\"the plan's terms get their own yes; cancel by one reply or link; a reminder every year\"},{\"name\":\"Monthly bookkeeping and the yearly return (the engagement)\",\"price\":\"fixed fees set in the signed engagement letter after the first meeting (the example: $350 a month, and the return's flat fee quoted after the documents are seen)\",\"rule\":\"billed under the engagement letter's own yes; never a share of a refund\"}],\"at the client's business (the example firm's own prices)\":[{\"name\":\"Books setup visit (about 2 hours)\",\"price\":\"$179\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill, or the firm bills its own way for a monthly client\"},{\"name\":\"Payroll setup visit\",\"price\":\"$150\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Inventory count help (up to 3 hours)\",\"price\":\"$199\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill, or the monthly invoice\"},{\"name\":\"Books cleanup\",\"price\":\"priced from the client's documents (the example: $640, over Sam's $500 OK limit)\",\"before\":\"a 25% retainer, taken as the deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Records check\",\"price\":\"priced at the visit; only the $89 trip fee is promised\"},{\"name\":\"Trip fee\",\"price\":\"$89, credited to the work\"},{\"name\":\"Extra time\",\"price\":\"$120 an hour, 1-hour minimum\"}],\"travel area\":\"The firm's setting (the example: 25 miles).\",\"capacity\":\"One person per booking: a CPA for a first meeting with a new business client; a staff accountant or bookkeeper for work at the client's business.\",\"online\":\"Video and phone meetings count as at the office. Where the state's rules tie CPA work to a license in the client's state, only a CPA licensed there is offered.\",\"booking window\":\"Up to 4 weeks ahead.\",\"busy season\":\"A switch the firm sets by date: in the weeks before the filing deadline, new clients wait for the owner's OK and first meetings are 30 minutes.\"}",
+ "questions_before_times": [
+  "Which firm or CPA? The customer or their AI names one, or Rosie shows firms that fit.",
+  "Is it for you, or for a business? A business: its kind, and how long it has run.",
+  "In the office, or by video?",
+  "A visit at your business: a books setup, an inventory count or a cleanup day?"
+ ],
+ "safety_stop": [
+  "someone in danger right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "firststeps",
+  "documents",
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "A license where the state's rules require one: each CPA's own license to use the title 'CPA' and to sign the work only a CPA may sign; the CPA firm's permit or registration where the state's rules require one. Bookkeeping and payroll work: no license, a business registration only.",
+ "staff_skills": "[\"Business tax returns\",\"Personal tax returns\",\"Bookkeeping\",\"Payroll\",\"Letters from the IRS or the state\",\"Inventory counts\"]",
+ "messages_never": "[\"tax ID numbers (Social Security numbers, employer numbers)\",\"bank or card details, income, what's owed or refunded\",\"what a letter from the IRS or the state says\",\"any tax or accounting advice\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/cpa+and+accountant",
+  "pexels": "https://www.pexels.com/search/cpa%20and%20accountant/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

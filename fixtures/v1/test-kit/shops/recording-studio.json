@@ -1,0 +1,180 @@
+{
+ "id": "recording-studio",
+ "name": "Recording studio",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "music",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Recording studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Recording studio",
+   "staff": "Nico and Priya (engineers at the studio)",
+   "customer": "Alex M. (artist) · other artists",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "3-hour tracking session",
+     "price": "$360",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$360",
+     "fee": "$40",
+     "story": "The main story: a 3-hour tracking session with an engineer, $360, paid in full when booking.",
+     "due_now_at_booking": 360,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "1-hour mixing session",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A 1-hour mixing session, $120. A card is saved for the $40 no-show fee, and Alex pays at the front desk after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "1-hour mastering session",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A 1-hour mastering session, $150. A card is saved, and charged at DONE when the final files are sent.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "album block (10 hours)",
+     "price": "$1,000",
+     "deposit": "$200",
+     "rest": "$800",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The 10-hour album block: a $200 deposit now, and the $800 rest paid at the studio at the last session.",
+     "due_now_at_booking": 200,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Recording studio",
+   "staff": "Theo and Mara (engineers who travel to homes and venues)",
+   "customer": "Alex M. (artist, the booker) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "location recording (3 hours)",
+     "price": "$450",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a 3-hour location recording at Alex's home, $450. The saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "mix check at home",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$120",
+     "fee": "$40",
+     "story": "A $120 mix check at the customer's home, paid in full.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "multi-visit location shoot",
+     "price": "$2,400",
+     "deposit": "$600",
+     "rest": "$1,800",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A multi-visit location shoot: a $600 deposit on the $2,400 estimate, and the $1,800 rest on the bill after the last visit.",
+     "due_now_at_booking": 600,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a room and an engineer for a block of hours (tracking, mixing, mastering); an album block booked as several sessions; location recording at a home or venue with a mobile rig (flow B)",
+ "questions_before_times": [
+  "new or returning, and the kind of session: tracking, mixing, mastering, or an album block",
+  "how many songs and about how long",
+  "how many people play (a band) and the instruments",
+  "for flow B: the place, and whether there is power and room for the rig",
+  "for a minor: the age"
+ ],
+ "safety_stop": [
+  "fire or smoke from the gear or the room right now, or someone burned, shocked or hurt by the equipment"
+ ],
+ "first_steps": [
+  "Session agreement",
+  "Recording release"
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "children",
+  "spaces",
+  "multiday"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: a recording studio needs no state license in most places; the business registration is the owner's own word; a studio's insurance is optional for the booking",
+ "staff_skills": "tracking, mixing, mastering, live recording, location recording, and vocal and drum sessions",
+ "messages_never": "health and hearing answers, minors' details, and performer releases never go in a text: only the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/recording+studio",
+  "pexels": "https://www.pexels.com/search/recording%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,169 @@
+{
+ "id": "dog-walker",
+ "name": "Dog walking",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Dog walking",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Dog walking",
+   "staff": "Sage and Mika (hike leaders)",
+   "customer": "Alex M. (customer, with Biscuit) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Group walk, 1 hour",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 group walk. A card is saved when booking and charged when Sage texts DONE at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trail hike, 2 hours",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 two-hour trail hike, paid in full when booking. Nothing more is owed at pick-up.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Dog walking",
+   "staff": "Devon and Luca (dog walkers)",
+   "customer": "Alex M. (customer, with Biscuit) · other customers",
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Solo walk, 30 min",
+     "price": "$28",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$28",
+     "story": "The main story: a $28 walk, then walks every weekday. A card is saved and charged $28 when Devon texts DONE after each walk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Solo walk, 30 min",
+     "price": "$28",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$28",
+     "story": "A $28 walk. Nothing is taken. Rosie texts the bill after the walk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "One-time walk, 60 min",
+     "price": "$42",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$42",
+     "fee": "$28",
+     "story": "A one-time 60-minute walk, $42, paid in full when booking.",
+     "due_now_at_booking": 42,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: walks at the customer's home while they're out, usually on a weekly plan, after a free meet-and-greet. Group walks and hikes can also start from the business's own meeting spot.\",\"list\":[{\"name\":\"Meet-and-greet\",\"price_kind\":\"free\",\"length\":\"20 minutes\",\"where\":\"at the customer's home, with the customer there\",\"money\":\"nothing taken\",\"note\":\"Required before a new dog's first walk. The walker meets the dog, checks the harness fits, and tries the lockbox or key.\"},{\"name\":\"Solo walk, 30 min\",\"price_kind\":\"one price\",\"example\":\"$28 a walk (the example business's own price)\",\"length\":\"30 minutes, inside a 2-hour window (like 10am–12pm, 11am–1pm or 1–3pm)\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved at booking; charged after each walk, at DONE\"},{\"name\":\"One-time walk, 60 min\",\"price_kind\":\"one price\",\"example\":\"$42, for a customer with no plan\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"paid in full when booked\"},{\"name\":\"Short visit, 20 min\",\"price_kind\":\"one price\",\"example\":\"$22: a potty break and play, for a puppy or an extra midday check\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Extra dog, same home\",\"price_kind\":\"one price, added to a walk\",\"example\":\"$8 a walk\"},{\"name\":\"Holiday walks\",\"price_kind\":\"added to a walk on the business's holidays\",\"example\":\"$10 a walk (the example: Thanksgiving, Dec 24–25, Jan 1), shown before the yes\"},{\"name\":\"Late skip or no way in\",\"price_kind\":\"a fee, never more than the walk's own price\",\"example\":\"the $28 walk, only if the owner confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Pet sitting (the second kind of work)\",\"price_kind\":\"one price each\",\"example\":\"drop-in visit, 30 min $30; cat visit, 20 min $22; overnight stay at the customer's home $95 (the example business's own prices)\",\"where\":\"at the customer's place; nobody needs to be home for a drop-in\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Group walks and hikes (Lee Pack Hikes, the second company)\",\"price_kind\":\"one price each, a spot in a hike\",\"example\":\"group walk, 1 hour $35 from the base, or $75 with a van pick-up at home; group walk, 90 min $40; trail hike, 2 hours $55; puppy walk, 30 min $25; paw rinse after a muddy walk $20; group check for a new dog, free; a private hike for one family's dogs, priced for the group, each price OK'd by the owner\",\"where\":\"dropped off and picked up at the business's base by the trailhead; the group walk can also start with a van pick-up at home\",\"money\":\"a group walk saves a card and is charged at pick-up; a trail hike, or a group walk with a van pick-up, is paid in full when booked\"}],\"capacity\":\"Solo walks: one home at a time. Group walks and hikes: up to 4 dogs per walker, or fewer where the city's rules say so.\",\"nobody_home\":\"Yes, for walks, puppy visits and drop-ins: entry by lockbox, door code or a key the business holds. DONE with the walk report and a photo confirms it. The meet-and-greet needs the customer home.\",\"online\":\"No.\",\"not_offered\":\"Training, grooming and vet care. A dog that has bitten a person is walked only if the owner OKs it after reading the answers.\",\"drop_off_slots\":\"At the meeting spot, hikes are booked as drop-off slots that name no walker, up to 4 dogs a walker. The dog is dropped off at the start and picked up at the end with the check-in code.\"}",
+ "questions_before_times": [
+  "The dog's name, breed, age and weight, and how many dogs",
+  "Has the dog ever bitten or snapped at a person or a dog? (a yes sends the request to the owner first)",
+  "Good with people? With other dogs? (group walks and hikes need both)",
+  "The days, the time window and the walk length: 30 or 60 minutes",
+  "A one-time walk, or a weekly plan",
+  "For pet sitting: which pets, and how many visits a day"
+ ],
+ "safety_stop": [
+  "a dog that is hurt, very sick, struggling to breathe or ate something toxic, right now",
+  "a person bitten and hurt",
+  "a dog that bit someone today",
+  "a dog lost right now",
+  "signs of a catching illness, like kennel cough, for a group walk or hike"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "plans",
+  "firststeps",
+  "groups",
+  "forms",
+  "dropoff"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "8pm the day before"
+  }
+ },
+ "license": "Usually none: most states license neither dog walking nor pet sitting. Some cities ask for a permit to walk dogs for pay, or to walk several dogs at once in a park. Carrying dogs in a van can need a pet transport license where the state's rules require one. The state's or city's form says which.",
+ "staff_skills": "[\"Solo walks and puppy visits\",\"Group walks and hikes: up to 4 dogs\",\"Dogs that pull or are nervous with other dogs\",\"Pet sitting and overnight stays\",\"Driving the van for pick-ups\"]",
+ "messages_never": "[\"Lockbox, door, garage and alarm codes\",\"Where a key is kept\",\"The dog's health conditions, medicines and vet records\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dog+walking",
+  "pexels": "https://www.pexels.com/search/dog%20walking/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,977 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "chimney",
+  "name": "Chimney sweep",
+  "type": "service",
+  "started_from": "plumber"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K07",
+   "field": "Items taken per day (drop-off) and daily caps",
+   "type": "number",
+   "need": "R when the work is a drop-off",
+   "shows": "times card (a full day is not shown)",
+   "source": "S1-03 block 12, A4-14",
+   "google": "no",
+   "turned_on_by": "fact dropoff"
+  },
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "V14",
+   "field": "Waitlist",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "times card",
+   "source": "S1-21, A4-60, fact waitlist",
+   "google": "no",
+   "turned_on_by": "fact waitlist"
+  },
+  {
+   "id": "V16",
+   "field": "Stage payments (each stage billed as it is done)",
+   "type": "stage plan",
+   "need": "P",
+   "shows": "bill",
+   "source": "fact stages, A9-16",
+   "google": "no",
+   "turned_on_by": "fact stages"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "documents",
+  "waitlist",
+  "stages",
+  "extrawork"
+ ],
+ "switches": [
+  "cancelright"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|counter",
+   "paths": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|deposit|counter",
+    "list|full|none",
+    "photos|card|counter",
+    "visit|card|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "2 days before",
+   "main_path": "list|card|bill",
+   "paths": [
+    "list|card|bill",
+    "list|deposit|bill",
+    "list|none|bill",
+    "visit|card|bill",
+    "photos|deposit|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Door gasket refit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a $35 door gasket refit at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Door gasket refit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $35 door gasket refit. Nothing is taken: a YES books it. Alex pays at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|deposit|counter",
+   "name": "Stove door rebuild",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": "$40",
+   "rest": "$100",
+   "paid": null,
+   "fee": "$40",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The $140 stove door rebuild. A $40 deposit now, and $100 at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Cap fitting",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A $55 cap fitting: a stainless cap sized to Alex's flue, paid in full when booking and picked up at the counter."
+  },
+  {
+   "flow": "A",
+   "path": "photos|card|counter",
+   "name": "Custom cap",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A custom cap for an odd-size flue, priced from Alex's photos at $90. Booked once Sam OKs it."
+  },
+  {
+   "flow": "A",
+   "path": "visit|card|counter",
+   "name": "Stove casting repair",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A cracked stove casting, priced at the counter. Only the $25 look is promised."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|bill",
+   "name": "Chimney sweep and inspection",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a $179 chimney sweep and inspection, one flue. A card is saved for the $89 trip fee (a late cancel or nobody home). Rosie texts the bill after the sweep."
+  },
+  {
+   "flow": "B",
+   "path": "list|deposit|bill",
+   "name": "Wood stove sweep",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": "$40",
+   "rest": "$110",
+   "paid": null,
+   "fee": "$40",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "Fall season: a $150 wood stove sweep. A $40 deposit now, and the $110 rest on the bill after."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Chimney sweep and inspection",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "Off-season: a $179 chimney sweep. Nothing is taken. Rosie texts the bill after."
+  },
+  {
+   "flow": "B",
+   "path": "visit|card|bill",
+   "name": "Chimney leak repair",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A chimney leak, priced at the visit. A card is saved for the $89 trip fee."
+  },
+  {
+   "flow": "B",
+   "path": "photos|deposit|bill",
+   "name": "Crown repair",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": "$160",
+   "rest": "$480",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A crown repair, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Door handle",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$20",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Cap fitting",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$55",
+   "paid": "$55",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Yearly door check (plan)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Damper repair",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "bill",
+   "price": "$95",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Wood stove sweep",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$150",
+   "paid": "$150",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Yearly stove sweep (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [],
+ "intake_questions": {
+  "before_times": [
+   "What the chimney serves: a fireplace, a wood stove, an insert or a furnace",
+   "The fuel: wood, gas, pellet or oil",
+   "How many flues",
+   "Any signs of an old chimney fire: puffy black flakes, a warped damper, cracked tiles",
+   "A home sale, a new stove or a new fuel (these make it a Level 2)",
+   "Any animals heard in the chimney",
+   "At the counter: which stove, and its maker if known"
+  ],
+  "after_time": [
+   "Who will be there: the customer, or someone else (their name and mobile go on the secure page)",
+   "Which side the ladder goes on, the roof's height, and how steep it is",
+   "Pets, and where they'll be",
+   "Own or rent: the landlord's OK for repairs",
+   "When the last fire was",
+   "The year the home was built: only for repairs that may disturb paint"
+  ],
+  "secure_page_only": [
+   "The street address",
+   "Gate or lock codes",
+   "The landlord's name and mobile",
+   "Photos inside the home",
+   "The card"
+  ],
+  "who_may_book": "An adult who owns the home, or someone the owner allows. A renter books, and the landlord OKs repairs."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "A chimney fire now: a loud roar, flames or sparks from the top, smoke filling the house",
+    "says": "Get everyone out of the house now, then call 911 from outside. Don't go back in.",
+    "booking": "No booking. A sweep can be booked once the fire department clears it."
+   },
+   {
+    "words": "A carbon monoxide alarm, or a gas smell",
+    "says": "Get everyone outside now, then call 911 and the gas company.",
+    "booking": "No booking until it's safe."
+   }
+  ],
+  "go_on": [
+   {
+    "words": "Signs of an old chimney fire: puffy black flakes, a warped damper, cracked tiles",
+    "says": "Don't light the fireplace until it's inspected. The booking goes on as a Level 2, with the owner's OK."
+   },
+   {
+    "words": "Smoke coming into the room from the fireplace or stove",
+    "says": "Let the fire burn out, open a window, and don't light another. If the chimney roars, get out and call 911."
+   },
+   {
+    "words": "Animals in the chimney",
+    "says": "Keep the damper and the fireplace doors shut, and don't light a fire."
+   }
+  ],
+  "always": "Always on: danger to life, fire, gas, or a medical emergency gets 'call 911' first.",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "No fire for 24 hours before, so the ashes are cold",
+   "Clear about 6 feet in front of the fireplace; the crew brings drop cloths",
+   "Keep the ladder side of the house clear, and pets in another room",
+   "At the counter: bring the stove door with all its parts"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "skills": [
+   "Sweeping and Level 1 inspections",
+   "Level 2 camera inspections",
+   "Caps, crowns and masonry repairs",
+   "Liners and rebuilds (a crew of two)",
+   "Gas stove and insert work (a gas fitter, where the state licenses one)",
+   "Counter work, custom caps and casting repairs"
+  ],
+  "licenses_or_certificates": "Each person's own license only where the state licenses that work (gas fitting). A trade group's sweep certificate shows only as the person gave it, not checked.",
+  "supervision": "Where the state's form asks for it. By default, nobody needs a supervisor.",
+  "who_oks": "The owner OKs fees, a Level 2 booked for a sale, a new stove or fire signs, repairs over the limit and same-day jobs. An office manager may OK prices if the owner sets it.",
+  "stand_in": "Another sweep with the same skill, at the same window and price."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult who owns the home, or someone the owner allows. A renter books, and the landlord OKs repairs."
+ },
+ "visit": {
+  "done": "DONE with the bill's lines and the after photos. The photo report goes with the receipt. A Level 2's camera report comes later, by the date given."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "Sweeping and inspecting a chimney has no state license in most places. Where a state or city licenses chimney or home repair work, its form asks for it. Repairs (caps, crowns, liners, rebuilds) can need a contractor license or registration where the state or city requires one. Gas stove and insert work needs a gas fitter's license where the state licenses gas work. The hearth shop's counter: business registration only.",
+  "who": "The company: its contractor license or registration, where the state's form asks. Each stove installer: a gas fitter's license, where the state licenses people. Sweeps and counter techs need none unless the state's form says so.",
+  "ask": [
+   "The company's contractor license or registration number, where the state asks for one",
+   "Each stove installer's gas fitter's license number, in their invite reply",
+   "Proof of liability insurance, where the state's form asks for it"
+  ],
+  "insurance": "From the state's form.",
+  "background": "Only where the state's form asks."
+ },
+ "never_in_a_text": "Gate or lock codes, card details, and photos from inside the home. The photo report opens on the secure page.",
+ "languages": "English and Spanish.",
+ "unmapped_keys": {
+  "pf.safety": [
+   "at the visit",
+   "at the counter"
+  ],
+  "pf.first_steps": [
+   "before the main visit"
+  ],
+  "pf.license": [
+   "private certificates",
+   "lead-safe work",
+   "local rules"
+  ],
+  "pf.messages": [
+   "danger words"
+  ],
+  "pf.visit": [
+   "check-in at the customer's place",
+   "check-in at the counter",
+   "roof",
+   "what a Level 1 covers",
+   "quotes at the visit",
+   "findings",
+   "a hazard found",
+   "work sold at the home"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

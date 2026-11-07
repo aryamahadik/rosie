@@ -1,0 +1,983 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "vet",
+  "name": "Veterinarian",
+  "type": "clinic",
+  "started_from": "dentist"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K07",
+   "field": "Items taken per day (drop-off) and daily caps",
+   "type": "number",
+   "need": "R when the work is a drop-off",
+   "shows": "times card (a full day is not shown)",
+   "source": "S1-03 block 12, A4-14",
+   "google": "no",
+   "turned_on_by": "fact dropoff"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps; fact forms"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact animals"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact results; fact aftercare"
+  }
+ ],
+ "facts": [
+  "animals",
+  "dropoff",
+  "firststeps",
+  "forms",
+  "results",
+  "video",
+  "aftercare"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "visit|none|counter",
+   "paths": [
+    "visit|none|counter",
+    "list|none|counter",
+    "list|card|counter",
+    "list|deposit|counter",
+    "list|full|none"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "visit|card|bill",
+   "paths": [
+    "visit|card|bill",
+    "list|card|bill",
+    "list|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "visit|none|counter",
+   "name": "Sick or hurt pet exam",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$72",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a sick or hurt pet exam. Only the $72 exam is promised. Marcus gives a written estimate before any tests, and Alex pays at the front desk."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Vaccine visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $35 vaccine visit for a pet seen in the last year. Nothing is taken: a YES books it. Alex pays at the front desk."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Vaccine visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The same vaccine visit where the hospital turns on its $20 no-show fee. A card is saved for it; nothing is charged."
+  },
+  {
+   "flow": "A",
+   "path": "list|deposit|counter",
+   "name": "Cat spay",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": "$40",
+   "rest": "$100",
+   "paid": null,
+   "fee": "$40",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A $140 cat spay, a drop-off day. A $40 deposit when booking, and the $100 rest at pick-up."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Goodbye visit",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$185",
+   "deposit": null,
+   "rest": null,
+   "paid": "$185",
+   "fee": "$0",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A $185 goodbye visit at the hospital, paid in full when booking, so there's no stop at the desk. Nothing is ever kept for a goodbye visit."
+  },
+  {
+   "flow": "B",
+   "path": "visit|card|bill",
+   "name": "Sick pet house call",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a sick cat seen at home. A card is saved; the $89 house call fee is owed even after a no to the estimate. Owen gives a written estimate before any tests, and Rosie texts the bill after."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|bill",
+   "name": "Wellness exam at home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A $179 wellness exam and vaccines at home. A card is saved for the $89 house call fee, owed only for a late cancel or nobody home, and Rosie texts the bill after."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Goodbye visit at home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$385",
+   "deposit": null,
+   "rest": null,
+   "paid": "$385",
+   "fee": "$0",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A $385 goodbye visit at home, in a 2-hour arrival window, paid in full when booking. It's fee-free: a cancel or a move always gets a full refund."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Sick or hurt pet exam",
+   "price": "the $72 exam is promised; tests and treatment get a written estimate in the exam room, OK'd before any work (the example: $461 in all)",
+   "kind": "quoted at the visit",
+   "length": "30 min; 40 min for a new client",
+   "where": "at the hospital, or at home on a house call",
+   "before": "nothing taken; a card saved only where the owner turns on the no-show fee",
+   "after": "at the front desk; at home, the bill Rosie texts"
+  },
+  {
+   "name": "Vaccine visit (a pet seen in the last 12 months)",
+   "price": "$35 at the hospital, one vaccine included; $75 at the customer's home",
+   "kind": "one price",
+   "length": "20 min",
+   "where": "at the hospital, or at home where the state allows it",
+   "before": "at the hospital: nothing taken, or a card saved for the no-show fee; at home: paid in full when booking",
+   "after": "at the hospital: the front desk; at home: nothing more"
+  },
+  {
+   "name": "Puppy shots (a plan)",
+   "price": "$35 a visit, the vaccine visit's price",
+   "kind": "one price, as a plan",
+   "length": "20 min, every 3 to 4 weeks",
+   "where": "at the hospital",
+   "before": "nothing taken",
+   "after": "at the front desk after each visit"
+  },
+  {
+   "name": "Wellness exam (a yearly checkup)",
+   "price": "$68, vaccines priced from the list",
+   "kind": "one price",
+   "length": "30 min; 40 min for a new client",
+   "where": "at the hospital",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Recheck exam",
+   "price": "$40; free within 14 days for the same problem (the example practices' own policy)",
+   "kind": "one price",
+   "length": "20 min",
+   "where": "at the hospital",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Nail trim",
+   "price": "$20",
+   "kind": "one price",
+   "length": "10 min, or added to a visit",
+   "where": "both places",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Video recheck",
+   "price": "$35",
+   "kind": "one price",
+   "length": "15 min",
+   "where": "by video, counted as at the hospital",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Cat spay or neuter",
+   "price": "$140",
+   "kind": "one price",
+   "length": "a drop-off: in at 7:30am, home by 5pm",
+   "where": "at the hospital",
+   "before": "a $40 deposit when booking, refunded in full until 24 hours before drop-off",
+   "after": "the rest at pick-up, at the front desk"
+  },
+  {
+   "name": "Dental cleaning under anesthesia, and other surgery",
+   "price": "from the written estimate given at an exam (a low and a high)",
+   "kind": "one price: the estimate's low end, with the rest priced up to its high end",
+   "length": "a drop-off day",
+   "where": "at the hospital",
+   "before": "a deposit of half the estimate's low end",
+   "after": "the rest at pick-up"
+  },
+  {
+   "name": "Goodbye visit (euthanasia) at the hospital",
+   "price": "$185, sedation included; aftercare priced on the page (a private cremation, a $25 paw print)",
+   "kind": "one price",
+   "length": "45 min, at a quiet time the hospital keeps for it, a private room and the side door",
+   "where": "at the hospital",
+   "before": "paid in full when booking, so there's no stop at the desk",
+   "after": "nothing more"
+  },
+  {
+   "name": "House call fee",
+   "price": "$89",
+   "kind": "one price",
+   "length": null,
+   "where": "at the customer's home",
+   "before": "held when booking (the hold), released at check-in",
+   "after": "on the bill"
+  },
+  {
+   "name": "Wellness exam and vaccines at home",
+   "price": "$179, the house call included",
+   "kind": "one price",
+   "length": "45 min, in a 2-hour arrival window",
+   "where": "at the customer's home",
+   "before": "the $89 house call fee held",
+   "after": "the bill Rosie texts"
+  },
+  {
+   "name": "Sick or hurt pet at home",
+   "price": "the $89 house call and exam is promised; the vet writes an estimate at the visit, OK'd before tests or treatment (the example: $245 in all)",
+   "kind": "quoted at the visit",
+   "length": "45 to 60 min",
+   "where": "at the customer's home",
+   "before": "the $89 held",
+   "after": "the bill Rosie texts"
+  },
+  {
+   "name": "Goodbye visit at home",
+   "price": "$385, sedation included; aftercare priced on the page (a private cremation $150, a $25 paw print)",
+   "kind": "one price",
+   "length": "60 min, in a 2-hour arrival window",
+   "where": "at the customer's home",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Senior bloodwork at home",
+   "price": "$199",
+   "kind": "one price",
+   "length": null,
+   "where": "at the customer's home",
+   "before": "the $89 held",
+   "after": "the bill Rosie texts"
+  },
+  {
+   "name": "Extra time at a house call",
+   "price": "$120 an hour; $140 an hour with Owen (the example practice's own prices)",
+   "kind": "per hour",
+   "length": null,
+   "where": "at the customer's home",
+   "before": "nothing more than the visit's own money",
+   "after": "on the bill Rosie texts"
+  },
+  {
+   "name": "Farm animal care (the second kind of work)",
+   "price": "the $89 farm call fee; a goat or sheep exam $149; a horse wellness exam $189; a herd health plan from a free planning visit, then a quote",
+   "kind": null,
+   "length": null,
+   "where": "at the farm",
+   "before": "the $89 held",
+   "after": "the bill Rosie texts"
+  },
+  {
+   "name": "Emergencies",
+   "price": "never booked",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "Which pet: a dog, a cat or another kind, its name and about how old",
+   "New or returning client (a new client's first exam is longer)",
+   "Which visit: sick or hurt, a checkup or vaccines, surgery or a dental cleaning from an estimate, or saying goodbye (only the hospital's own kinds; Rosie never judges how sick a pet is)",
+   "For a house call: the town or ZIP, inside the travel area"
+  ],
+  "after_time": [
+   "Nervous at the vet, or ever needed a muzzle?",
+   "Records from the last vet: upload them on the page, or the hospital asks for them",
+   "Any other pets to book at the same time?"
+  ],
+  "secure_page_only": [
+   "The pet's species, breed, age, weight, sex, and spayed or neutered",
+   "What's wrong, in the owner's own words, and since when",
+   "Medicines and allergies",
+   "The last vet's name, and the records or the vaccine history (a rabies certificate)",
+   "Pet insurance: its name only (it pays the owner back)",
+   "The street address, for a house call",
+   "'I'm 18 or older and the pet's owner, or the owner named me'",
+   "The consent forms to read ahead: anesthesia, and a goodbye visit",
+   "For a goodbye visit: 'Has the pet bitten anyone in the last 10 days?', and the aftercare choice"
+  ],
+  "never_asked": "no diagnosis, test result or medicine name passes through the AI; the owner's own words about what's wrong are checked for danger, then kept on the secure page",
+  "who_may_book": "an adult: the pet's owner, or someone the owner names (a family member, a pet sitter, a rescue that fosters the pet); a teen sends it to a parent"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "trouble breathing, or blue or pale gums",
+   "a possible poisoning: chocolate, rat bait, antifreeze, lilies for a cat, or someone's medicine",
+   "can't stand or walk, or collapsed",
+   "bloat signs: a swollen, hard belly, or retching with nothing coming up",
+   "a seizure",
+   "bleeding that won't stop, or hit by a car",
+   "a cat straining to pee with nothing coming out",
+   "trouble giving birth"
+  ],
+  "go_on": "a sick or hurt pet with none of the stop words is booked as a sick or hurt exam, soonest times first; the AI adds: 'If it gets worse, or you see any of these signs, go to the emergency animal hospital now'. Simple first steps, the example practices' own: a small cut gets 'press a clean cloth on it'; a limp gets 'keep your pet quiet'; always 'never give a pet human medicine'. Nothing more: no advice on what's wrong or what to give",
+  "stop_action": "No booking, and no wait for one. Rosie says: 'This needs a vet now. Go to the nearest emergency animal hospital. The one Lee Animal Hospital works with is open 24 hours.' It gives that hospital's name, address and number, from the owner's settings. For a possible poisoning, it also gives the pet poison line the owner named at sign-up, and says it may charge a fee. Rosie never judges how sick a pet is, and never says what's wrong.",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Bring any records and medicines",
+   "A dog on a leash, a cat in a carrier",
+   "Surgery or a dental cleaning: no food after midnight, water is OK, unless the vet says otherwise on the page",
+   "House call: the pet inside, in a quiet room"
+  ],
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "exams and vaccines (every vet); surgery and dental cleanings (only the vets who do them; here, Marcus); goodbye visits; house calls (here, Owen and Priya for Lee Mobile Vet, and Marcus for the hospital's vaccine visits at home); farm animals (here, Owen)",
+  "licenses_or_certificates": "each vet's own license, per state; vet techs only where the state's form credentials them; controlled-drug registrations where the state's form asks (a switch)",
+  "supervision": "vet techs and assistants work under a vet, as the state's rules set (a switch: a vet on site or reachable); anesthesia only with a vet on site",
+  "who_oks": "the owner OKs a goodbye visit for a pet the practice hasn't seen, same-day exams, estimates over $300 at the hospital and over $500 on a house call (a partner may OK house call prices), fees and refunds",
+  "stand_in": "another vet may take an exam or a vaccine visit; surgery moves only to another vet who does surgery, or to a new date; a goodbye visit moves to another vet only with the family's yes: with no answer, Sam calls the family, and nothing changes until then"
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": true,
+  "who_may_book": "an adult: the pet's owner, or someone the owner names (a family member, a pet sitter, a rescue that fosters the pet); a teen sends it to a parent",
+  "minors_texts": "a teen's request goes to a parent, who books"
+ },
+ "visit": {
+  "check_in": "at the hospital: the check-in code at the front desk; a surgery or dental drop-off: the code at the desk at drop-off, with a number to reach the owner and a pick-up window; at home: the code at the door",
+  "done": "the check-in code, READY and the pick-up, or DONE; the vet's notes stay in the practice's own records"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "always: each vet holds their own active license from the state's veterinary board",
+  "who": "each vet; each vet tech or assistant only where the state's form licenses, registers or certifies them; the practice too where the state issues a premises or hospital permit, and a mobile practice or unit its own permit where the state's form asks",
+  "ask": "each person's license number in their invite reply (or the owner sends it); the hospital's premises permit and the mobile practice's permit number from the owner, only where the state's form has them",
+  "insurance": "liability insurance as the business says; shown as given by the business, not checked by Rosie"
+ },
+ "never_in_a_text": [
+  "The pet's diagnosis, test results, and medicine names or doses",
+  "What's wrong, in the owner's words",
+  "Why a team member is out",
+  "The emergency contact's number"
+ ],
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "person_danger",
+   "worse_before",
+   "bite_risk"
+  ],
+  "pf.first_steps": [
+   "records",
+   "on_file",
+   "pre_surgery_exam",
+   "consents",
+   "new_pet_goodbye",
+   "video"
+  ],
+  "pf.license": [
+   "controlled_drugs",
+   "boarding",
+   "video",
+   "shown"
+  ],
+  "pf.messages": [
+   "allowed",
+   "goodbye"
+  ],
+  "pf.visit": [
+   "estimate",
+   "found_during_surgery",
+   "drop_off",
+   "surgery_not_safe",
+   "results",
+   "goodbye"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}
