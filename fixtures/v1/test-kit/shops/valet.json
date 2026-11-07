@@ -1,0 +1,173 @@
+{
+ "id": "valet",
+ "name": "Valet parking for events",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Valet parking for events",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Valet parking for events",
+   "staff": "Dana and Lou (the lot office)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Valet plan walk-through",
+     "price": "$50",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$50",
+     "fee": "$20",
+     "story": "The main story: a valet plan walk-through, $50, paid in full when booking.",
+     "due_now_at_booking": 50,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Planning call by video",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 20-minute planning call by video. Nothing is taken.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Valet parking for events",
+   "staff": "Jo and Nico (the attendants)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Valet for 100 cars",
+     "price": "$800",
+     "deposit": "$200",
+     "rest": "$600",
+     "paid_now": null,
+     "fee": "$200",
+     "story": "The main story: valet for a wedding of 100 cars at $8 a car ($800). A $200 deposit now, and the $600 rest charged to the saved card when Jo marks the night done.",
+     "due_now_at_booking": 200,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Two attendants for 4 hours",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$240",
+     "fee": "$75",
+     "story": "Two attendants for a 4-hour dinner, $240, paid in full when booking.",
+     "due_now_at_booking": 240,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Valet by the car",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "Valet by the car for a restaurant night, priced at the event by the cars parked. A card is saved for the $75 late-cancel fee; the bill comes after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Valet for 40 cars",
+     "price": "$320",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "Valet for a club night with 40 cars, $320 ($8 a car). A card is saved, and $320 is charged when Jo marks it done.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (flow B)\":[{\"service\":\"Valet for a wedding or party: $8 a car\",\"price kind\":\"per car\",\"price\":\"$8 a car, 100-car minimum ($800); two attendants and a lot lead included\",\"length\":\"the event's hours, plus 30 minutes to set the stand before the first car\",\"place\":\"at the venue, up to 25 miles\",\"before\":\"a $200 deposit when booking\",\"after\":\"the rest charged to the saved card when the night is done, on the final car count\"},{\"service\":\"Valet by the car, for a restaurant or a club night\",\"price kind\":\"priced at the event by the cars parked\",\"price\":\"$8 a car, the count shown at the end of the night; a card saved for the $75 late-cancel fee\",\"length\":\"the venue's hours\",\"place\":\"at the venue\",\"before\":\"a card saved\",\"after\":\"the bill after the night, from the cars parked\"},{\"service\":\"Two attendants for a 4-hour dinner\",\"price kind\":\"one price\",\"price\":\"$240: $30 an hour each\",\"length\":\"4 hours\",\"place\":\"at the venue\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"}],\"at the business (flow A)\":[{\"service\":\"Valet plan walk-through at the lot\",\"price kind\":\"one price\",\"price\":\"$50\",\"length\":\"30 minutes\",\"place\":\"at Lee Valet Lot, 23 Mesa Rd\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"service\":\"Planning call by video\",\"price kind\":\"free\",\"price\":\"free\",\"length\":\"20 minutes\",\"place\":\"by video or phone\",\"before\":\"nothing taken\",\"after\":\"nothing\"}],\"capacity\":\"One lot per night. Two attendants park up to 100 cars; three park up to 200. Attendants never drive a car on a public road beyond the lot.\",\"nobody needs to be there\":\"Never: a car is handed back to the person who holds the ticket, checked against it.\",\"online\":\"Planning calls by video or phone.\"}",
+ "questions_before_times": [
+  "The event date, and the start and end times",
+  "About how many cars, and how many guests",
+  "The town or ZIP, and the kind of site: a venue, a hotel, a street, a club, a restaurant",
+  "Is there a lot or a drive for the stand, and how many cars fit at once?",
+  "Does the venue or city require a valet permit or a street closure?"
+ ],
+ "safety_stop": [
+  "A crash, a car on fire, or someone hurt at the lot right now",
+  "A gas smell or a fuel spill in the lot now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "The company's own registration and its insurance: garage-keepers liability for the cars, and general liability. Where the city or the venue requires a valet permit or a parking permit for the event, the company files it. Each attendant holds a valid driver's license for the class the lot's cars need, where the rules ask.",
+ "staff_skills": "[\"Valet stands for weddings\",\"Restaurant and club nights\",\"Two-attendant dinners\",\"Lot walk-throughs\"]",
+ "messages_never": "Key-box codes, gate codes, card details, and any name of a guest or a car owner beyond the ticket. Those stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/valet+parking+for+events",
+  "pexels": "https://www.pexels.com/search/valet%20parking%20for%20events/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,204 @@
+{
+ "id": "architect",
+ "name": "Architect",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "interior",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Architect",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Architect",
+   "staff": "Vera and Gia (architect and desk)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Design consult, one room",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a design consult for one room at the studio, $35. A card is saved for the $20 fee; Alex pays the $35 at the front desk after the consult.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video design review, one room",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A video design review of one room, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Schematic design review",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A schematic design review at the studio: a $40 deposit when booking, the $100 rest at the desk when the drawings are picked up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Design quoted from photos",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A design quoted from photos: a $20 deposit once the quote is OK'd; the rest is billed when the drawings are sent.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|none",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Design quote from photos, free",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A quote from photos, free: nothing taken, nothing charged.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Architect",
+   "staff": "Luis and Iris (architects)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home site visit and measure",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a site visit and measure for 5 rooms, $179 with the travel fee. A card is saved for the $89 fee; Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Design phase at home",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A design phase at home: $150, a $40 deposit when booking, the $110 rest charged to the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Permit-drawing review at home",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$40",
+     "story": "A permit-drawing review at home, $75, paid in full when booking.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a design consult and review at the studio (flow A), and site visits and design work at the customer's place (flow B); a video or photo review counts as flow A",
+ "questions_before_times": [
+  "What kind of work: a room, a kitchen, an addition, a whole house, or a permit set?",
+  "Is there a site plan, photos or a survey already? Yes, no or not sure.",
+  "What's the goal: a new room, a sale, a permit, or repairs?",
+  "At the studio, at the customer's place, or by video?"
+ ],
+ "safety_stop": [
+  "someone hurt, or a fire or smoke at the place (call 911)",
+  "a structure that looks unsafe to stand in (call 911 if someone is in it)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "photos",
+  "video",
+  "extrawork",
+  "firststeps"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "An architect's state license, where the state requires one for the drawings. Each architect's own license, and the firm's registration where the state asks: the owner's own papers, shown as given, never checked by Rosie (D96).",
+ "staff_skills": "architect (residential), designer, desk",
+ "messages_never": "",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/architect",
+  "pexels": "https://www.pexels.com/search/architect/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

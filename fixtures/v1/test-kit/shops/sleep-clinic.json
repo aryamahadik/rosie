@@ -1,0 +1,178 @@
+{
+ "id": "sleep-clinic",
+ "name": "Sleep clinic",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Sleep clinic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Sleep Center",
+   "staff": "Owen (sleep doctor) and Tara (sleep technologist)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "New patient sleep consult",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The main story: a new patient sleep consult billed to the patient's plan; nothing is taken; Rosie texts the patient's share once the plan pays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "CPAP mask fitting",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A self-pay CPAP mask fitting ($90), paid at the desk after the fitting.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video follow-up visit",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$0",
+     "story": "A self-pay video follow-up ($85), paid in full when booking; nothing more after the visit.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient sleep consult",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The same consult where the center turns on its $25 late-cancel fee: a card is saved for it, never for a fee-free patient, and the owner confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Sleep",
+   "staff": "Gus and Noor (technologists, with a test kit bag)",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "2 days before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home sleep test set-up",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a home sleep test set-up with a technologist. Nothing is taken; the center bills the patient's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home sleep test set-up",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home visit, paid by the patient: nothing is taken, and Rosie texts the $160 bill when the visit is marked DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "sleep clinic: consults and follow-ups with a named sleep doctor or the next open one; an overnight sleep study at the center (a stay from the evening to the morning, with a technologist); a home sleep test kit picked up at the desk and returned by mail; CPAP mask fittings at the center or at home; a video follow-up counts as at the center",
+ "questions_before_times": [
+  "the kind of visit (new consult, follow-up, overnight study, home test kit, mask fitting, home set-up)",
+  "whether it's a video follow-up (counts as at the center)",
+  "a health plan or self-pay (only the plan's name here)",
+  "for a child's overnight study: the child's age, and a parent who stays overnight",
+  "for a home visit: the town and whether the patient can come to the door"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, or a stroke sign (face drooping, arm weakness, or trouble speaking)"
+ ],
+ "first_steps": [
+  "A sleep history for a new patient",
+  "A parent's OK for a child's overnight study",
+  "The plan check",
+  "The home test kit's pick-up and return"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "multiday",
+  "dropoff"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "2 days before"
+ },
+ "license": "a state license for each sleep doctor and nurse practitioner; a sleep technologist's certificate where the state requires one; the sleep center's registration where the state's rules require it; a technologist who sets up a test or a mask at home only where the state allows it",
+ "staff_skills": "in-lab sleep studies, home sleep tests, CPAP mask fitting, pediatric sleep studies, Spanish",
+ "messages_never": "the sleep history, test names, results, medicines, the child's details, ID numbers and plan details never go in a text: only the secure page; texts say only the center's name, the day, the time and the place",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/sleep+clinic",
+  "pexels": "https://www.pexels.com/search/sleep%20clinic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

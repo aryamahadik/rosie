@@ -1,0 +1,169 @@
+{
+ "id": "biohazard",
+ "name": "Biohazard, trauma and hoarding cleanup",
+ "booking_type": "Urgent",
+ "pattern": "urgent",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Biohazard, trauma and hoarding cleanup",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Biohazard, trauma and hoarding cleanup",
+   "staff": "Dana and the front desk",
+   "customer": "Alex M. (a vehicle owner) · a fleet manager",
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Vehicle cleaning",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A vehicle dropped off for cleaning: priced at the visit and billed after; nothing taken to book.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Video walk-through",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free video walk-through: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Biohazard, trauma and hoarding cleanup",
+   "staff": "Harper and the crew (crew leads who go out)",
+   "customer": "Alex M. (a relative of the person who died) · a landlord or estate",
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Scene cleanup",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A death at home, released: a crew is sent now, prices the cleanup on site, and the bill goes after (the insurer first when the claim is assigned).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Home cleanout",
+     "price": "$4,800",
+     "deposit": "$1,500",
+     "rest": "$3,300",
+     "paid_now": null,
+     "fee": "free",
+     "story": "A hoarding cleanout quoted from photos: $4,800, with a $1,500 deposit when booked and the $3,300 rest on the bill after.",
+     "due_now_at_booking": 1500,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Sharps removal",
+     "price": "$250",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A $250 sharps removal, billed after the work: nothing taken to book.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "[{\"name\":\"Trauma and crime scene cleanup\",\"place\":\"the customer's place\",\"price\":\"priced at the visit (hours per technician, materials, waste disposal)\",\"length\":\"4 to 12 hours\",\"timing\":\"sent now, or booked once the scene is released\",\"money\":\"nothing before; the bill after, or the insurer billed first when the customer assigns the claim\"},{\"name\":\"Unattended death cleanup\",\"place\":\"the customer's place\",\"price\":\"priced at the visit\",\"length\":\"1 to 3 days\",\"timing\":\"sent now, or booked once released\",\"money\":\"nothing before; the bill after (insurance often pays)\"},{\"name\":\"Hoarding cleanup\",\"place\":\"the customer's place\",\"price\":\"quoted from photos or a video walk-through\",\"length\":\"2 to 5 days\",\"timing\":\"booked ahead\",\"money\":\"a deposit to book the crew; the rest on the bill after\"},{\"name\":\"Sharps and needle removal\",\"place\":\"the customer's place\",\"price\":\"the example shop's own list price: $250 a visit\",\"length\":\"1 to 2 hours\",\"money\":\"nothing before; the bill after\"},{\"name\":\"Animal waste or droppings cleanup\",\"place\":\"the customer's place\",\"price\":\"quoted from photos\",\"length\":\"half a day to 2 days\"},{\"name\":\"Vehicle biohazard cleaning (flow A)\",\"place\":\"the shop (the car is brought or towed in)\",\"price\":\"priced at the visit\",\"length\":\"1 to 2 days\",\"money\":\"nothing before; the bill after\"},{\"name\":\"Video walk-through (flow A)\",\"place\":\"by video\",\"price\":\"free\",\"length\":\"20 minutes\"}]",
+ "questions_before_times": [
+  "the address",
+  "what happened, in plain words, asked gently (an injury, a death, a hoarded home, needles)",
+  "for a death or a crime: has the police or the medical examiner released the place",
+  "is anyone who died still there",
+  "who has the right to the property: the owner, the estate or next of kin, or the landlord or manager",
+  "about how big the affected area is (rooms, floors)",
+  "does anyone still live there",
+  "is an insurance claim being filed"
+ ],
+ "safety_stop": [
+  "someone is hurt or not breathing",
+  "the person who died is still there",
+  "the place is still taped off by police",
+  "a strong chemical smell or a drug lab",
+  "a gas smell",
+  "fire or smoke",
+  "someone threatening to hurt themselves"
+ ],
+ "first_steps": [],
+ "facts": [
+  "sentnow",
+  "planbill",
+  "documents",
+  "firststeps",
+  "multiday",
+  "extrawork",
+  "results",
+  "dropoff",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "cancelright": true
+ },
+ "settings": {
+  "arrive": "window",
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "if a trauma or crime scene cleanup registration, a regulated waste hauling permit (or a licensed hauler), or a drug lab cleanup certificate where the state requires it; else a business registration on file; nothing is looked up",
+ "staff_skills": "",
+ "messages_never": "what happened, the service's name (biohazard, trauma, death, hoarding), the cause of death, any illness, the police report or claim number, photos",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/biohazard+trauma+and+hoarding+cleanup",
+  "pexels": "https://www.pexels.com/search/biohazard%2C%20trauma%20and%20hoarding%20cleanup/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

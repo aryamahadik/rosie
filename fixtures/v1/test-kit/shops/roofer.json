@@ -1,0 +1,293 @@
+{
+ "id": "roofer",
+ "name": "Roofer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Roofer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Roofer",
+   "staff": "Hana and Ruby (showroom consultants)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Shingle consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Shingle consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Shingle consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Shingle consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Roof preview session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Roof preview session, $55, paid in full when booking; it counts toward the roof if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full exterior plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Full exterior plan, $140; a $40 deposit now; the $100 rest at the showroom desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Metal roof plan",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Metal roof plan, priced from Alex's photos and measurements at $90 (Sam OKs it); a card saved for the $20 fee; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Tile roof match",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Tile roof match, priced at the showroom once Hana sees the old tile: only the $25 consult is promised; a card saved; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Roofer",
+   "staff": "Diego and Owen (estimators and crew leads)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": null,
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Roof repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Storm-damaged roof: a repair priced at the visit (the $89 inspection fee is owed even after a no), nothing taken; Rosie texts the bill after. A bigger job, like Harper J.'s $2,400 porch roof, becomes its own job: a signed quote and stage payments.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Roof repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same repair priced at the visit, but Sam bills it the business's own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Roof repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same repair priced at the visit, with a card saved for the $89 inspection fee when Alex books.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Shingle repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 shingle repair from the list; a card saved for the $89 fee; Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Skylight",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A skylight priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Shingle repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 shingle repair for a returning customer: nothing taken; Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Moss treatment",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 moss treatment, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Moss treatment",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $150 moss treatment with a $40 deposit; the $110 rest on the bill after the job.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Inspection, then project: a roof is booked only after a written estimate and a signed contract\",\"B\":[{\"name\":\"Roof inspection\",\"price\":\"$89, counted toward the roof work if Alex signs (the example business's own price; a free inspection is a common starting option)\",\"length\":\"45 to 60 minutes\",\"where\":\"at the customer's place\",\"before\":\"nothing taken (or a card saved for the $89 fee)\",\"after\":\"billed only if no contract follows\",\"report\":\"photos by slope, an attic look, squares measured; a written report and estimate the same day, good for 30 days\"},{\"name\":\"New roof (storm damage or an old roof)\",\"price\":\"quoted after the inspection; the example: $575 a square for architectural shingles, plus $650 for the permit and dumpster and $350 for the ridge vent and vent boots\",\"length\":\"1 day per roof up to 30 squares, per crew\",\"where\":\"at the customer's place; nobody needs to be home on install day\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"the balance after the city's final inspection\"},{\"name\":\"Rotted decking\",\"price\":\"$95 a sheet, photos first; up to 10 sheets OK'd in the contract\",\"where\":\"added to a new roof, never booked alone\"},{\"name\":\"Roof repair (flashing, boots, shingles)\",\"price\":\"quoted at the visit (example: $245)\",\"where\":\"at the customer's place\",\"before\":\"nothing, or a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Shingle repair (up to 10 shingles)\",\"price\":\"$179, from the list\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Moss treatment\",\"price\":\"$150, from the list\",\"length\":\"half a day\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"paid in full when booked, or a $40 deposit\",\"after\":\"nothing more, or the rest on the bill\"},{\"name\":\"Skylight replacement\",\"price\":\"priced from photos (example: $640); over $500, Sam OKs it\",\"length\":\"1 day\",\"where\":\"at the customer's place\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Roof certification (for a sale or an insurer)\",\"price\":\"$199, with a written report\",\"where\":\"at the customer's place\"},{\"name\":\"Roof check on a plan\",\"price\":\"the list price each visit; for rentals and other buildings\",\"where\":\"at the customer's place; nobody needs to be home\"},{\"name\":\"Emergency tarp\",\"price\":\"a set price on the list (the example: $395), sent now with Sam's OK; a written price before anyone goes up\",\"where\":\"at the customer's place\",\"after\":\"on the bill\"},{\"name\":\"Tile or metal roofs\",\"price\":\"an inspection first, then a written estimate\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a job, never booked alone\"},{\"name\":\"Solar (the second kind of work)\",\"price\":\"panel cleaning $149, critter guard $189, an install after a free estimate visit\",\"where\":\"at the customer's place\",\"note\":\"waits for its installer's own license, where the state asks\"}],\"A\":[{\"name\":\"Shingle consult\",\"price\":\"$35, 30 minutes\",\"where\":\"at the showroom; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the showroom desk\"},{\"name\":\"Skylight pick\",\"price\":\"$40\",\"where\":\"at the showroom\",\"before\":\"a card saved\",\"after\":\"at the showroom desk\"},{\"name\":\"Sample kit\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the showroom\"},{\"name\":\"Trim match\",\"price\":\"$25\",\"where\":\"at the showroom\"},{\"name\":\"Roof preview session (a picture of the house with its new roof)\",\"price\":\"$55, 60 minutes; counts toward the roof if Alex signs with Lee Roofing\",\"where\":\"at the showroom\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Full exterior plan (roof, skylights, trim, preview)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the showroom\",\"before\":\"a card saved for the $40 fee (over 2 hours), or a $40 deposit\",\"after\":\"at the showroom desk\"},{\"name\":\"Metal roof plan\",\"price\":\"priced from the customer's photos and measurements (example: $90); Sam OKs each one\",\"where\":\"at the showroom\"},{\"name\":\"Tile roof match\",\"price\":\"priced at the showroom after a $25 consult, once the consultant sees the old tile\",\"where\":\"at the showroom\"}],\"capacity\":\"One estimator or consultant per booking; 1 roof per crew per day, up to 30 squares; the showroom's layout table is saved with long sessions\",\"skills\":\"Inspections and estimates: estimators. Installs: crew leads with their crews. Solar: licensed installers. Showroom: consultants.\",\"nobody_home\":\"Roof work outside: nobody needs to be home; a start photo and day-end photos. An adult is needed only for the attic check at the inspection.\",\"online\":\"No video consult: shingle picks use the samples at the showroom\"}",
+ "questions_before_times": [
+  "What's wrong: storm damage, a leak, or an old roof?",
+  "Roof type: shingle, tile, metal or flat",
+  "About how old is the roof?",
+  "How many stories is the house?",
+  "Is anything dripping inside now?"
+ ],
+ "safety_stop": [
+  "a tree through the roof or a wall, power lines down on or near the house",
+  "a ceiling sagging, bulging or falling",
+  "a gas smell, sparking or smoking wires"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "photos",
+  "multiday",
+  "sentnow",
+  "extrawork",
+  "stages",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  }
+ },
+ "license": "if: a roofing license or registration for the company, where the state's form requires one (some states license roofing on its own, some under a contractor or home improvement license, some not at all)",
+ "staff_skills": "",
+ "messages_never": "[\"Insurance claim details\",\"Gate or lockbox codes\",\"Contract, change order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/roofer",
+  "pexels": "https://www.pexels.com/search/roofer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

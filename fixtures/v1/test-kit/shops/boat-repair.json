@@ -1,0 +1,195 @@
+{
+ "id": "boat-repair",
+ "name": "Boat repair and marine mechanic",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Boat repair and marine mechanic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Boat repair and marine mechanic",
+   "staff": "Nate and Colleen (technicians)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Boat engine diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$129",
+     "story": "The main story: an outboard boat that stalls at idle. Only the $129 diagnosis is promised, OK'd on the drop-off page. The repair waits for Alex's signed estimate, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Battery test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 battery test from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Boat engine diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$129",
+     "story": "The boat engine repair, with the bill texted once the boat is ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Battery test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 battery test, dropped off before work. Rosie texts the bill when it's ready.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Boat repair and marine mechanic",
+   "staff": "Ray and Jess (technicians)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "2 days before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Battery replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 battery replacement at Alex's slip. A card is saved for the $89 trip fee, and nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Boat engine repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An engine that runs rough, priced at the visit. Only the $89 trip fee is promised, with a card saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Battery replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 battery replacement. A card is saved, and it's charged when Ray texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Fiberglass repair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A fiberglass hull repair, priced from photos at $640. Sam OKs it. A $160 deposit now for the materials, and the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the boat (on its trailer, or at the yard's dock) is left at the yard and picked up when it's ready\",\"list\":[{\"name\":\"Diagnosis (won't start, overheats, runs rough, an alarm, electrical)\",\"price\":\"one price (the example shop: $129), OK'd in writing on the drop-off page\",\"length\":\"a set time, like 1 hour; more time is new work that needs a new yes\",\"place\":\"at the shop or the yard\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Repair after a diagnosis\",\"price\":\"quoted at the visit: a written estimate with the most it can cost, signed before any repair\",\"place\":\"at the shop or the yard\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with the ready text\"},{\"name\":\"Battery test, bilge pump check, zinc anode swap, trailer bearing check, fuel filter change\",\"price\":\"one price from the shop's board (the example shop: battery test $35)\",\"length\":\"30 to 60 minutes; wait or drop off\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Engine service (oil, lower unit oil, impeller, plugs, filters)\",\"price\":\"one price by engine type and size, from the shop's list\",\"length\":\"about 2 to 4 hours\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Winterizing and spring commissioning\",\"price\":\"one price by boat and engine size, from the shop's list\",\"length\":\"about 2 to 4 hours\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Electrical (batteries, bilge pump, lights, charging)\",\"price\":\"one price from the list, or quoted at the visit\",\"place\":\"at the shop; also mobile\"},{\"name\":\"Fiberglass and gelcoat repair\",\"price\":\"quoted from photos; the materials are ordered after the deposit (the example: $640, $160 deposit)\",\"length\":\"a few days, for the materials and curing\",\"place\":\"at the yard\"},{\"name\":\"Haul-out and launch (only where the yard has a lift)\",\"price\":\"one price by boat length\",\"place\":\"at the yard's lift and dock, at the booked time\"},{\"name\":\"Sea trial or dock test\",\"price\":\"part of the repair; the customer OKs it first\",\"place\":\"on the water, in good weather, or at the dock\"},{\"name\":\"Mobile marine repair (at a slip, a marina, a driveway or a storage lot)\",\"price\":\"one price, quoted from photos and the engine's details, or quoted at the visit\",\"place\":\"at the customer's boat\",\"before\":\"a card saved for the trip fee; nothing else taken\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Pre-purchase engine check\",\"price\":\"one price (not a hull survey)\",\"place\":\"at the shop, or where the boat for sale is\"}],\"capacity\":\"a daily cap on diagnoses (the example shop: 4 a day); one bay or lift slot and one technician per job; the travel lift and the yard's dock are saved like equipment, in the lift's hours; the lift's limits (the example yard: boats up to 30 feet and 10,000 pounds)\",\"drop_off_window\":\"drop-off slots by the shop's daily number (the example shop: 4 boats a day), shown as drop-off times with no technician named; a boat arriving by water docks at the yard's dock at the booked time; plus an after-hours key box once the drop-off page is signed\",\"living_aboard\":\"the yard's rule, set by the owner: nobody lives aboard while the boat is on stands or in the lift\",\"not_offered\":\"hull surveys, towing on the water and rescue: other kinds of work\",\"loaners\":\"none: the yard lends no boats\",\"shuttle\":\"none\",\"warranty\":\"on the receipt: 90 days on labor; parts as the maker covers them\",\"nobody_home\":\"a mobile job on a boat at a slip can be done with nobody aboard: dock access and the keys as agreed, and DONE comes with a photo\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What is the boat doing, and since when? In the customer's own words",
+  "Any alarms, a fuel smell, or water in the bilge?",
+  "Type, length, year, make and model, and the engine make, size and hours",
+  "In the water at a slip, or on a trailer or stands? Which marina and slip",
+  "Does the engine start? Is there fuel in the tank?"
+ ],
+ "safety_stop": [
+  "a fire or smoke aboard",
+  "a boat sinking, or taking on water faster than the pump clears it",
+  "someone hurt, or overboard",
+  "a carbon monoxide alarm sounding"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "2 days before"
+ },
+ "license": "if: where the state registers boat yards or marine contractors, or requires a license for some work, like an electrician's for shore-power and dock wiring",
+ "staff_skills": "[\"diagnosis\",\"outboard and sterndrive engines\",\"inboard engines\",\"marine electrical\",\"fuel systems\",\"steering and controls\",\"fiberglass\",\"trailers\",\"winterizing\",\"mobile jobs\",\"lift operator\"]",
+ "messages_never": "[\"The hull ID or the registration number\",\"The marina's gate or dock code\",\"The key-box code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/boat+repair+and+marine+mechanic",
+  "pexels": "https://www.pexels.com/search/boat%20repair%20and%20marine%20mechanic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

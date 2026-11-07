@@ -1,0 +1,203 @@
+{
+ "id": "vet",
+ "name": "Veterinarian",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Veterinarian",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Animal Hospital",
+   "staff": "Marcus and Nadia (vets)",
+   "customer": "Alex M. (Biscuit's owner) · other pet owners",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Sick or hurt pet exam",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$72",
+     "story": "The main story: a sick or hurt pet exam. Only the $72 exam is promised. Marcus gives a written estimate before any tests, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Vaccine visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 vaccine visit for a pet seen in the last year. Nothing is taken: a YES books it. Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Vaccine visit",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same vaccine visit where the hospital turns on its $20 no-show fee. A card is saved for it; nothing is charged.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Cat spay",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 cat spay, a drop-off day. A $40 deposit when booking, and the $100 rest at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Goodbye visit",
+     "price": "$185",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$185",
+     "fee": "$0",
+     "story": "A $185 goodbye visit at the hospital, paid in full when booking, so there's no stop at the desk. Nothing is ever kept for a goodbye visit.",
+     "due_now_at_booking": 185,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Vet",
+   "staff": "Owen and Priya (vets who make house calls)",
+   "customer": "Alex M. (Pepper's owner, at 17 Linden Ln) · other pet owners",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Sick pet house call",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a sick cat seen at home. A card is saved; the $89 house call fee is owed even after a no to the estimate. Owen gives a written estimate before any tests, and Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Wellness exam at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 wellness exam and vaccines at home. A card is saved for the $89 house call fee, owed only for a late cancel or nobody home, and Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Goodbye visit at home",
+     "price": "$385",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$385",
+     "fee": "$0",
+     "story": "A $385 goodbye visit at home, in a 2-hour arrival window, paid in full when booking. It's fee-free: a cancel or a move always gets a full refund.",
+     "due_now_at_booking": 385,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "exams of a set length booked with a vet by name; a new client's first exam is longer; surgery and dental cleanings are drop-offs, booked from a written estimate or with an exam first; goodbye visits get quiet times; house calls come in a 2-hour arrival window, a goodbye visit at home too, or at a set start time where the owner sets one",
+ "questions_before_times": [
+  "Which pet: a dog, a cat or another kind, its name and about how old",
+  "New or returning client (a new client's first exam is longer)",
+  "Which visit: sick or hurt, a checkup or vaccines, surgery or a dental cleaning from an estimate, or saying goodbye (only the hospital's own kinds; Rosie never judges how sick a pet is)",
+  "For a house call: the town or ZIP, inside the travel area"
+ ],
+ "safety_stop": [
+  "trouble breathing, or blue or pale gums",
+  "a possible poisoning: chocolate, rat bait, antifreeze, lilies for a cat, or someone's medicine",
+  "can't stand or walk, or collapsed",
+  "bloat signs: a swollen, hard belly, or retching with nothing coming up",
+  "a seizure",
+  "bleeding that won't stop, or hit by a car",
+  "a cat straining to pee with nothing coming out",
+  "trouble giving birth"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "dropoff",
+  "firststeps",
+  "forms",
+  "results",
+  "video",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each vet holds their own active license from the state's veterinary board",
+ "staff_skills": "exams and vaccines (every vet); surgery and dental cleanings (only the vets who do them; here, Marcus); goodbye visits; house calls (here, Owen and Priya for Lee Mobile Vet, and Marcus for the hospital's vaccine visits at home); farm animals (here, Owen)",
+ "messages_never": "[\"The pet's diagnosis, test results, and medicine names or doses\",\"What's wrong, in the owner's words\",\"Why a team member is out\",\"The emergency contact's number\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/veterinarian",
+  "pexels": "https://www.pexels.com/search/veterinarian/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

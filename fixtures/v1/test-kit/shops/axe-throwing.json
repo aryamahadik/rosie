@@ -1,0 +1,178 @@
+{
+ "id": "axe-throwing",
+ "name": "Axe throwing and game venues",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "restaurant",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Axe throwing and game venues",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Axe throwing and game venues",
+   "staff": "Rory and Quinn (hosts)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Lane, 1 hour (up to 4 throwers)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$120",
+     "fee": "$20",
+     "story": "The main story: a lane for 4 for 1 hour, $120 paid in full when booking. A late cancel or no-show keeps $20.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birthday party package, 10 throwers",
+     "price": "$200",
+     "deposit": "$40",
+     "rest": "$160",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A birthday party for 10: a $40 deposit when booking, the $160 rest paid at the counter on the day.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Open lane, 1 hour (2 to 4 throwers)",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "An open lane for 2 to 4 throwers: nothing taken, the bill paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Axe throwing and game venues",
+   "staff": "Hal and Dee (crew)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Mobile lanes for a company event",
+     "price": "$400",
+     "deposit": "$100",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a company event with 2 lanes for 2 hours, $400. A $100 deposit now, the $300 rest charged to the saved card when the crew texts DONE.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Backyard party, 10 throwers, 2 hours",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A backyard party for 10: $240, a card saved for the $60 late-cancel fee; the crew sends the bill after the party.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Mobile lane, 1 hour at home",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$120",
+     "fee": "$20",
+     "story": "A 1-hour lane at home for up to 4, paid in full when booking: $120.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "table: a lane is a space for an hour (up to 4 throwers) or for a set party; each lane holds a set number of throwers per start time",
+ "questions_before_times": [
+  "which lane or party, and the date and time",
+  "how many throwers, and each one's age group (adult, 12 to 17, or under 12)",
+  "for a party: the expected number of throwers",
+  "for a mobile lane: the kind of place (a yard, a company site, a school) and the town"
+ ],
+ "safety_stop": [
+  "someone hit by an axe, or bleeding, hurt in the head, face or neck, or not breathing right now"
+ ],
+ "first_steps": [
+  "a waiver for every thrower, signed on the secure page before the visit and good for 12 months; a parent signs for each 12 to 17 year old",
+  "the group's final headcount 3 days before (it sets the rest due on a party)",
+  "a mobile lane: the customer confirms the flat area, any outlet the crew needs, and any permission the place needs, 3 days before"
+ ],
+ "facts": [
+  "groups",
+  "children",
+  "forms",
+  "spaces",
+  "capacitycheck",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "where the state's rules require it: the business's registration, and a permit for the lanes where the state requires one; a mobile lane follows the same rules where they cover it",
+ "staff_skills": "lane host, party host, mobile lane crew",
+ "messages_never": "children's names, ages and health answers, and injury details: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/axe+throwing+and+game+venues",
+  "pexels": "https://www.pexels.com/search/axe%20throwing%20and%20game%20venues/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

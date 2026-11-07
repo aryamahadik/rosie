@@ -1,0 +1,204 @@
+{
+ "id": "instrument-repair",
+ "name": "Musical instrument repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Musical instrument repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Musical instrument repair",
+   "staff": "Mina and Theo (repair repair techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Guitar repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a guitar that buzzes on the low strings. Only the $25 inspection is promised. Mina's written estimate is OK'd before any work, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Restring",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 restring from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Guitar repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same guitar repair, with the bill texted once it's ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Woodwind overhaul",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 woodwind overhaul, a long repair. A $40 deposit books the bench time, and the $100 rest is paid at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Musical instrument repair",
+   "staff": "Owen and Lena (piano tuners and repair repair techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Piano tuning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 piano tuning at Alex's home. A card is saved for the $89 trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Piano repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A piano with sticking keys, priced at the visit. A card is saved for the $89 trip fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Piano tuning",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The $179 piano tuning. A card is saved, and charged when Owen texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Band room repair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A school band room repair, priced from photos and the list of instruments at $640. Sam OKs it. A $160 deposit orders the parts, and the rest is on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the instrument is left at the shop and picked up when it's READY; or a repair tech comes to a home, studio or school (a piano is always tuned where it stands)\",\"list\":[{\"name\":\"Restring and setup check (guitar, bass, violin)\",\"price\":\"one price (the example shop: $35)\",\"length\":\"about 45 minutes while you wait, or left for the day\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Setup, fret polish and nut adjustment\",\"price\":\"one price for each\",\"length\":\"left 1 to 2 days\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Woodwind and brass adjustment (pads, corks, valves, slides)\",\"price\":\"one price for a standard adjustment; an overhaul is a longer job\",\"length\":\"left 2 to 5 days\",\"place\":\"at the shop\",\"before\":\"nothing taken; a deposit for an overhaul or a part ordered in\",\"after\":\"at the counter\"},{\"name\":\"Repair after an inspection (a buzzing neck, a crack, a dent, a bridge)\",\"price\":\"quoted after an inspection (the example: $25, counted toward the repair): a written estimate with parts and labor lines, OK'd before any work\",\"length\":\"the inspection is about 30 minutes; more time needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with READY\"},{\"name\":\"Crack or seam repair\",\"price\":\"priced from photos for a first quote; confirmed at the inspection\",\"place\":\"at the shop\",\"before\":\"a deposit once the quote is OK'd, only for a part or material ordered in\"},{\"name\":\"Bow rehair and bow repair\",\"price\":\"one price\",\"length\":\"left 3 to 5 days\",\"place\":\"at the shop\"},{\"name\":\"Piano tuning\",\"price\":\"one price (the example: $179 at the customer's place)\",\"length\":\"about 2 hours\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Piano repair (sticking keys, pedals, hammers)\",\"price\":\"priced at the visit; a written estimate OK'd before any work\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"School band room repair visit\",\"price\":\"priced from photos and the list of instruments (the example: $640); a deposit orders the parts\",\"place\":\"at the school\",\"before\":\"a deposit of 25% orders the parts\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Trip to a home, studio or school\",\"price\":\"the trip fee (the example: $89), counted toward the repair\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\"}],\"capacity\":\"drop-off slots every 30 minutes in open hours; one repair tech per instrument; the shop's one repair bench for brass is saved like equipment\",\"parts\":\"strings, pads, corks, reeds and common parts are in stock and set aside for each booking; any other is ordered once the customer says yes, 3 to 10 business days\",\"warranty\":\"on the receipt (the example: 90 days on parts and labor); never for new drops, cracks from dry air, or damage after the repair\",\"nobody_home\":\"no: someone must be there to show the instrument and OK the work\",\"online\":\"no: an instrument is fixed in hand\"}",
+ "questions_before_times": [
+  "The instrument: guitar, bass, violin, cello, woodwind, brass, piano or other; make and model, picked from a list",
+  "What's wrong: buzzing, out of tune, a crack, a dent, a sticky key or valve, a broken string, or a setup",
+  "Does it have a case, a bow or a mouthpiece to bring?",
+  "For a visit at the customer's place: a home, a studio or a school, and the address"
+ ],
+ "safety_stop": [
+  "fire",
+  "smoke",
+  "someone hurt or cut",
+  "a piano that fell on someone"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "none for repair itself; the business registration, where the city or state asks for one; a secondhand dealer license only if the shop buys and sells used instruments, where the city or state requires one",
+ "staff_skills": "[\"guitar and bass repair\",\"violin family repair and bow rehair\",\"woodwind repair\",\"brass repair\",\"piano tuning and regulation\",\"on-site visits\"]",
+ "messages_never": "[\"The serial number or the stated value\",\"Photos of the instrument's condition\",\"A door or gate code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/musical+instrument+repair",
+  "pexels": "https://www.pexels.com/search/musical%20instrument%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

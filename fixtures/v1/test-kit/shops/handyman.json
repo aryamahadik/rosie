@@ -1,0 +1,261 @@
+{
+ "id": "handyman",
+ "name": "Handyman",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Handyman",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Handyman",
+   "staff": "Nadia and Luis (handymen at the workshop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Screen repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 screen repair at the counter. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Screen repair",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 screen repair. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Storm window repair",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 storm window repair, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Furniture repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A furniture repair, priced from Alex's photos at $90. A card is saved for the $20 fee. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Cabinet door repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A cabinet door repair, priced at the counter. A card is saved for the $20 fee; only the $25 consult is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Handyman",
+   "staff": "Tomás and Darnell (handymen)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "TV mounting",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 TV mounting. A card is saved for the $89 trip fee. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "TV mounting",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 TV mounting. Nothing is taken before. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "TV mounting",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 TV mounting. A card is saved and charged $179 when Tomás texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Door repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A door repair, priced at the visit. A card is saved for the $89 trip fee; Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Door repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A door repair, priced at the visit. Nothing is taken before. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Fence repair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A fence repair priced from photos at $640. A $160 deposit once the quote is OK'd; the $480 rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Furniture assembly",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Furniture assembly, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Ridgeline Home Repair's own list)\":[{\"service\":\"Trip fee\",\"price kind\":\"one price\",\"price\":\"$89, taken off the job\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the jobs below; not booked alone. It's the late-cancel and nobody-home fee too.\"},{\"service\":\"TV mounting (up to 65 inches, the customer's bracket, cords in a cover on the wall)\",\"price kind\":\"one price\",\"price\":\"$179, the $89 trip fee included\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Cords inside the wall need a new outlet, which is electrical work: not booked\"},{\"service\":\"Door repair (sticks, sags or won't latch)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 trip fee is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Furniture assembly (up to 3 pieces)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"2 hours\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Fence repair (a few sections)\",\"price kind\":\"quoted from photos, or after a free estimate visit\",\"price\":\"the quote (the example: $640)\",\"length\":\"1 to 2 days\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"Only the handymen with the fence skill. A written estimate to sign, where the state's form asks for one above an amount.\"},{\"service\":\"Repair walk-through (a written list of fixes and prices)\",\"price kind\":\"by person\",\"price\":\"with Tomás $199, with Sam $249\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"The list comes by a secure link later\"},{\"service\":\"Gutter cleaning (one-story home)\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Nobody needs to be home. Not in rain or high wind.\"},{\"service\":\"Small drywall patch (up to 6 inches)\",\"price kind\":\"one price\",\"price\":\"$95\",\"place\":\"at the customer's place\",\"note\":\"Often added at the visit\"},{\"service\":\"Re-caulk a tub or shower\",\"price kind\":\"one price\",\"price\":\"$59\",\"length\":\"45 min\",\"place\":\"at the customer's place\",\"note\":\"Never over a soft or wet wall: that's a plumber's job first\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum; $140 with Tomás\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted jobs; not booked alone\"}],\"at the business (the example: Ridgeline Workshop's price list)\":[{\"service\":\"Screen repair (one window screen, new mesh)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Door planing (a sticking door, brought in)\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New latch or handle, fitted\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Drawer fix (sticks, or a loose front)\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Storm window repair (new glass and screen)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Chair set re-glued (up to 4 wooden chairs)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the shop\",\"before\":\"a card saved for the $40 fee (over 2 hours)\",\"after\":\"paid at the counter\"},{\"service\":\"Furniture repair (a broken leg or a split top)\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The owner OKs each quote. Only Nadia does them.\"},{\"service\":\"Cabinet door repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 consult is promised\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a repair (15 min)\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it\"}],\"never booked\":\"Electrical (light fixtures, switches, outlets, ceiling fans, hardwired smoke alarms, cords inside the wall), plumbing, gas, heating and cooling, roofing, structural work, work that needs a permit, and kitchen or bath remodels. The customer is pointed to the licensed trade, at booking or at the visit.\",\"several tasks\":\"Tasks on one visit add up: their times set the visit's length, and their prices the job's total.\",\"capacity\":\"One handyman per booking. A heavy mirror or a fence can need two. The workshop's clamp bench takes one furniture repair at a time.\",\"skills each needs\":\"Fence work needs the fence skill. Lead-safe work needs the lead-safe certificate. Furniture repairs at the shop need the furniture skill.\",\"nobody home\":\"Outdoor work with its own access, like gutters or a fence: nobody needs to be home. DONE comes with a photo. Indoor work needs an adult home the whole visit.\",\"online\":\"A video check only, where the owner offers it. No repair is done by video.\",\"materials\":\"Anchors, screws, cord covers, patch and caulk are included. Other materials at cost with the receipt, agreed before work.\",\"guarantee\":\"The owner's own (the example: 90 days on workmanship), shown on the receipt.\",\"aftercare\":\"Re-caulking: keep the shower dry for about 24 hours. Re-glued chairs: don't sit on them for a day.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "Which tasks, picked from the list",
+  "For a TV: its size, whether they have the bracket, and the wall: drywall, plaster or brick",
+  "Cords in a cover on the wall, or inside it (inside: an electrician first)",
+  "For pictures or shelves: how many, how big and how heavy",
+  "For furniture: how many pieces, and are they still boxed",
+  "At the workshop: which item, and its size"
+ ],
+ "safety_stop": [
+  "Sparks, a burning smell, or a gas smell",
+  "Someone hurt, or a ceiling or wall coming down"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "firststeps",
+  "extrawork"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Set by each state's form, and sometimes the city's: none, a registration, or a home repair license. Many forms ask for one only above a job size they set.",
+ "staff_skills": "[\"TV and wall mounting\",\"Doors and hardware\",\"Furniture assembly\",\"Fence work\",\"Drywall patch and caulking\",\"Gutters and ladder work\",\"Workshop furniture repairs\"]",
+ "messages_never": "Gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/handyman",
+  "pexels": "https://www.pexels.com/search/handyman/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

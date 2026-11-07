@@ -1,0 +1,272 @@
+{
+ "id": "locksmith",
+ "name": "Locksmith",
+ "booking_type": "Urgent",
+ "pattern": "urgent",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Locksmith",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Locksmith",
+   "staff": "Marco and Lena (locksmiths at the counter)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Lock rekey",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 rekey of two locks Alex brings in. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Car key copy",
+     "price": "$40",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $40 car key copy. A card is saved for the shop's $20 fee for a missed bench time. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Master key set",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 master key set (2½ hours). A $40 deposit pays for the key blanks. The $100 rest is paid at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "High-security key copy",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "free",
+     "story": "A $55 high-security key copy, paid in full when booking, since the blank is ordered for Alex.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Antique lock repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An antique lock repair: Alex sends photos, Marco prices it at $90, and it's booked once it's OK'd.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Lock repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A lock repair at the bench: only the $25 bench check is promised, and Marco prices the repair when he sees the lock.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Locksmith",
+   "staff": "Tomás and Andre (locksmiths; one is on call each night)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Whole-home rekey",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 whole-home rekey. A card is saved for the $89 trip fee. Rosie texts the bill after the job. A lockout at night runs the same way: $199, with a card saved for the $89 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Whole-home rekey",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 whole-home rekey. A card is saved and charged $179 when Tomás texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|own",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Whole-home rekey",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A property manager's rekey: a card is saved for the $89 trip fee, and Sam bills the manager the business's own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Smart lock install",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "free",
+     "story": "A $150 smart lock install, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "High-security locks",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "High-security locks priced from photos at $640 (over $500, so Sam OKs it). A $160 deposit now; the rest on the bill after the job.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Lock repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A lock repair priced at the visit. Only the $89 trip fee is promised, and a card is saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Urgent dispatch for lockouts (sent now, to the locksmith on call after hours); 2-hour windows for rekeys and lock changes; a counter at the shop.\",\"at the customer's place\":[{\"name\":\"Home lockout\",\"price\":\"$159 by day (Mon to Sat, 8am to 6pm); $199 after hours and Sundays ($89 trip + $110 opening)\",\"length\":\"about 30 minutes\",\"time\":\"sent now, to the on-call locksmith\",\"before\":\"the a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Car lockout\",\"price\":\"$139 by day; $179 after hours and Sundays\",\"length\":\"about 30 minutes\",\"time\":\"sent now\",\"before\":\"the a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"secure page\":\"the car's VIN or plate\"},{\"name\":\"Whole-home rekey (up to 4 locks)\",\"price\":\"$179\",\"length\":\"1 hour\",\"time\":\"2-hour arrival window\",\"before\":\"the a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Smart lock install (the customer's lock)\",\"price\":\"$150\",\"length\":\"1 hour\",\"time\":\"2-hour arrival window\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"name\":\"Lock repair\",\"price\":\"quoted at the visit; only the $89 trip fee is promised\",\"before\":\"the a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"High-security lock install\",\"price\":\"priced from photos (the example: $640 for two deadbolts)\",\"before\":\"25% deposit, once the written estimate is signed\",\"after\":\"the rest on the bill\"},{\"name\":\"Drilling, only if picking fails\",\"price\":\"$60 more, plus a new lock from $45\",\"rule\":\"quoted at the door, done only after the customer's yes\"},{\"name\":\"Lock audit (a written report on every lock)\",\"price\":\"$199\",\"before\":\"the a card saved for the $89 trip fee\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum\",\"rule\":\"never booked alone\"}],\"at the shop counter\":[{\"name\":\"Rekey (up to 2 locks brought in)\",\"price\":\"$35\",\"length\":\"30 minutes\",\"before\":\"nothing taken\",\"after\":\"paid at the counter\",\"both places\":\"or at the customer's home as a house call, $75, paid in full when booking\"},{\"name\":\"Car key copy\",\"price\":\"$40\",\"length\":\"30 minutes\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"bring\":\"photo ID and the car's registration\"},{\"name\":\"Key set (4 copies)\",\"price\":\"$20\",\"length\":\"15 minutes\"},{\"name\":\"Mailbox lock rekey\",\"price\":\"$25\",\"length\":\"20 minutes\"},{\"name\":\"High-security key copy\",\"price\":\"$55\",\"length\":\"60 minutes\",\"before\":\"paid in full when booking (the blank is ordered)\",\"bring\":\"the key card and a photo ID\"},{\"name\":\"Master key set (up to 6 locks brought in)\",\"price\":\"$140\",\"length\":\"2½ hours\",\"before\":\"$40 deposit for the blanks\",\"after\":\"the rest at the counter\"},{\"name\":\"Antique lock repair\",\"price\":\"priced from photos (the example: $90)\"},{\"name\":\"Lock repair at the bench\",\"price\":\"quoted at the counter; only the $25 bench check is promised\"}],\"fees\":\"The shop's fee for a missed bench time: $20 ($40 for a master key set). At the customer's place: the $89 trip fee.\",\"capacity\":\"One locksmith per booking; a master key set uses the shop's one key machine.\",\"nobody home\":\"Never for a lockout or a rekey: an adult with ID and proof must be there.\",\"online\":\"No: the work needs the lock in hand.\"}",
+ "questions_before_times": [
+  "Home, car or business?",
+  "Is anyone locked inside, like a child, a pet or an at-risk adult, or in danger? (Yes: 911 first, no booking)",
+  "What kind of lock: regular, smart, high-security, or don't know?",
+  "How many locks?",
+  "Do you own or rent? Is your name on the deed, lease or registration?",
+  "Does anyone object to you going in, like an ex, a roommate or a landlord?",
+  "Do you have a photo ID with you?",
+  "Car: make, model and year."
+ ],
+ "safety_stop": [
+  "a child, a pet or an at-risk adult locked inside a car or a home",
+  "a car running in a closed garage",
+  "smoke, gas, or someone hurt",
+  "someone breaking in right now",
+  "someone who objects to the entry: an ex, a roommate or a landlord"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "dropoff",
+  "extrawork",
+  "forms",
+  "photos",
+  "sentnow"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Where the state's rules require it: a locksmith license for the business, and one for each locksmith sent out. Where none is required: identity checked, and 'license: what the business says'.",
+ "staff_skills": "[\"Lockouts: home and car\",\"Rekeys and lock changes\",\"High-security and smart locks\",\"Car keys\",\"Antique locks (the shop)\",\"Alarm work: only people with the alarm license\"]",
+ "messages_never": "[\"key codes and key cuts\",\"door, gate, alarm and smart lock codes\",\"ID numbers or photos of an ID\",\"the opening record\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/locksmith",
+  "pexels": "https://www.pexels.com/search/locksmith/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,244 @@
+{
+ "id": "photographer",
+ "name": "Photographer & videographer",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Photographer & videographer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Photographer & videographer",
+   "staff": "Nina and Theo (studio photographers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Portrait session",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 portrait session (2½ hours). A $40 deposit now, and the $100 rest at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Headshot mini",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 headshot mini. A card is saved for the studio's $20 fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Passport photos",
+     "price": "$20",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 headshot mini for a returning customer. Nothing is taken: a YES books it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Portrait session",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 portrait session. A $40 deposit now, and the $100 rest billed after the session.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Headshot session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 headshot session, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Photo restoration",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A photo restoration, priced from photos of the old print at $90. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Photographer & videographer",
+   "staff": "Leo and Ari (photographers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Elopement coverage, 2 hours",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: an elopement, quoted from Alex's plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit now, and the $480 rest billed after the event.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Elopement coverage, 2 hours",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The same elopement, with the rest on the bill after the event.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Mini session on location",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 mini session on location, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Event coverage, 1 hour",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 hour of event coverage. A card is saved for the $89 travel fee. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Real estate photos",
+     "price": "quoted at the visit",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Real estate photos, priced at the visit by the rooms. Only the $89 travel fee is promised, and a card is saved for it. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Photo & Film's own list)\":[{\"service\":\"Elopement coverage (2 hours, one photographer)\",\"price kind\":\"quoted from the plan first (venue photos and timeline)\",\"price\":\"the quote (the example: $640)\",\"length\":\"2 hours\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill after the event\"},{\"service\":\"Full wedding day (8 hours, two photographers)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"8 hours\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 30% retainer\",\"after\":\"the rest on the bill after the event\",\"note\":\"The owner OKs every wedding. One wedding a day, booked up to 24 months ahead.\"},{\"service\":\"Event coverage (1 hour)\",\"price kind\":\"one price\",\"price\":\"$179, plus any travel fee\",\"length\":\"60 min\",\"place\":\"at the venue\",\"before\":\"a card saved for the $89 travel fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Mini session on location (30 min)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"30 min\",\"place\":\"at a park or the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Real estate photos\",\"price kind\":\"quoted at the visit (by the rooms)\",\"price\":\"only the $89 travel fee is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the listing\",\"before\":\"a card saved for the $89 travel fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Exterior photos need nobody home\"},{\"service\":\"Highlight video (add-on)\",\"price kind\":\"by person\",\"price\":\"$199 with Leo, $249 with Sam\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\",\"note\":\"The video link comes later\"},{\"service\":\"Drone photos and video (Lee Aerial)\",\"price kind\":\"one price, or per hour\",\"price\":\"10 drone photos $149; a 1-minute drone video $189; flight time $120 an hour\",\"length\":\"30 to 60 min\",\"place\":\"outdoors, weather allowing\",\"before\":\"a card saved for the $89 travel fee\",\"after\":\"the way picked for photos\",\"note\":\"Only pilots with a current certificate. Refunded if it can't fly. A big aerial survey: a free site visit, then a quote.\"},{\"service\":\"Second photographer (add-on)\",\"price kind\":\"per hour\",\"price\":\"the owner's rate\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\"},{\"service\":\"Extra hour on the day\",\"price kind\":\"per hour, by person\",\"price\":\"$160 with Leo, $120 with anyone else (the example)\",\"length\":\"1 hour\",\"place\":\"at the event\",\"before\":\"nothing: asked at the event\",\"after\":\"one pay link after\",\"note\":\"Only with the customer's written yes, at the rate shown before booking\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 30 miles; $89 beyond; farther, quoted with lodging\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"held or added to the quote\",\"after\":\"with the rest\"}],\"at the business (the example: Lee Portrait Studio's own list)\":[{\"service\":\"Portrait session (makeup and 2 looks)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours\",\"place\":\"at the studio\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\"},{\"service\":\"Headshot mini\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the studio\"},{\"service\":\"Headshot session\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Pet portrait\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the studio\"},{\"service\":\"Kids' portrait (12 and under)\",\"price kind\":\"one price\",\"price\":\"$25\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\",\"note\":\"A parent books and stays\"},{\"service\":\"Passport photos\",\"price kind\":\"one price\",\"price\":\"$20\",\"length\":\"15 min\",\"place\":\"at the studio\",\"before\":\"nothing\",\"after\":\"paid at the studio\"},{\"service\":\"Photo restoration\",\"price kind\":\"quoted from photos first\",\"price\":\"the quote (the example: $90)\",\"length\":\"a drop-off, ready in about a week\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at pick-up\"},{\"service\":\"Album design\",\"price kind\":\"quoted at the studio\",\"price\":\"only the $25 design consult is promised\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"paid at the studio\"},{\"service\":\"Home session\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same portrait work, booked in flow B\"},{\"service\":\"Linen album cover\",\"price kind\":\"one price\",\"price\":\"$15, an add-on to an album design\",\"length\":\"\",\"place\":\"at the studio\",\"before\":\"with the album design\",\"after\":\"with the album design\"}],\"capacity\":\"One booking per photographer at a time. A wedding books the lead, any second photographer and the drone pilot together.\",\"nobody needs to be home\":\"Exterior real estate photos only.\",\"online\":\"A planning call or a design consult can be a video call.\"}",
+ "questions_before_times": [
+  "What it's for: a wedding, an elopement, an event, portraits or headshots",
+  "The date, and the venue's name and town (for the travel fee)",
+  "Start and end time, and indoors or outdoors",
+  "About how many guests or people in the photos",
+  "Add-ons: a second photographer, drone photos or video",
+  "At the studio: how many people, and any kids or pets"
+ ],
+ "safety_stop": [
+  "Someone hurt, a fire, or danger at the venue right now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "groups",
+  "children",
+  "photos",
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "None for photos or video in most places. A local business license where the city or county asks for one: from the state form.",
+ "staff_skills": "[\"Weddings (leads only)\",\"Events\",\"Studio portraits and headshots\",\"Drone photos and video\",\"Video\",\"Photo restoration\"]",
+ "messages_never": "Access or health notes, family notes, a child's details and gate codes stay on the secure page. Photos of people go only by the gallery link.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/photographer+videographer",
+  "pexels": "https://www.pexels.com/search/photographer%20%26%20videographer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

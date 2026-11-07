@@ -1,0 +1,151 @@
+{
+ "id": "test-mixed-B",
+ "name": "Test Mixed Shop B",
+ "booking_type": "Test",
+ "pattern": "test",
+ "purpose": "Covers every money combo no profession uses (5 in flow B), plus a mixed booking: one booking that adds a card-saved, a deposit and a paid-in-full service together.",
+ "flows": {
+  "B": {
+   "flow": "B",
+   "business": "Test Mixed Shop B",
+   "services": [
+    {
+     "combo": "photos|none|none",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Water heater fix",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A water heater fix checked from photos, free under the warranty. Nothing is taken, and nothing is paid after.",
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "photos|none|own",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Water heater replacement",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": null,
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "photos|card|own",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Water heater replacement",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": null,
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "photos|deposit|own",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Business's own way",
+     "name": "Water heater replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": null,
+     "due_now_at_booking": 160,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "visit|deposit|own",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "Business's own way",
+     "name": "Leak repair",
+     "price": "$245",
+     "deposit": "$89",
+     "rest": "$156",
+     "paid_now": null,
+     "fee": "$89",
+     "story": null,
+     "due_now_at_booking": 89,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Kitchen drain clearing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 drain clearing. A card is saved for the $89 service-call fee. Rosie sends the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Water heater flush",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 water heater flush. A $40 deposit now, and the rest on the bill after the job.",
+     "due_now_at_booking": 40,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Water heater flush",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 water heater flush, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    }
+   ]
+  }
+ },
+ "mixed_booking": {
+  "services": [
+   "list|card|bill",
+   "list|deposit|bill",
+   "list|full|none"
+  ],
+  "expect": "All that's due now is added up and taken in one payment on one card (S13-55); one late-cancel / no-show fee per booking, the largest of the services' fees, never more than what was paid now."
+ }
+}

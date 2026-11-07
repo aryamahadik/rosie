@@ -1,0 +1,175 @@
+{
+ "id": "hunting-guide",
+ "name": "Hunting and outdoor guide",
+ "booking_type": "Table",
+ "pattern": "table",
+ "built_from": "rentals",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Hunting and outdoor guide",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Hunting and outdoor guide",
+   "staff": "Dale and Wren (lodge and range)",
+   "customer": "Alex M. (hunter) · other hunters",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   },
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Guided half-day hunt",
+     "price": "$450",
+     "deposit": "$150",
+     "rest": "$300",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a guided half-day hunt for up to 2: $450, a $150 deposit when booking, the $300 rest paid at the lodge check-in before the hunt.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Sighting-in session, one rifle",
+     "price": "$60",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$60",
+     "fee": "$20",
+     "story": "A sighting-in session at the range: $60, paid in full when booking.",
+     "due_now_at_booking": 60,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Planning meeting",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A planning meeting at the lodge: free, nothing taken.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Hunting and outdoor guide",
+   "staff": "Cal and Jo (guides)",
+   "customer": "Alex M. (hunter) · other hunters",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "72 hours before",
+    "B": "72 hours before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Scouting day on the hunter's land",
+     "price": "$360",
+     "deposit": "$100",
+     "rest": "$260",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a scouting day on the hunter's own land: $360. A $100 deposit when booking; the $260 rest charged to the saved card when the guide texts DONE.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Sighting-in at the hunter's range",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A sighting-in at the hunter's own range: $180 with the travel fee. A card is saved for the $60 fee; the bill is texted after the session.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "One-day rifle check",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "A one-day rifle check at the hunter's place: $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a guided hunt, a sighting-in session and a planning meeting at the lodge (flow A: the hunter comes to the lodge or the range); a scouting day and a sighting-in at the hunter's own land (flow B: the guide goes to the customer)",
+ "questions_before_times": [
+  "What kind of hunt: deer, turkey, elk, birds, or a sighting-in only?",
+  "How many hunters, and the youngest's age (a youth hunt needs an adult)?",
+  "Does each hunter have their own license, tags and a rifle that's been checked?",
+  "Is it on the lodge's land, the hunter's own land, or another land with permission?"
+ ],
+ "safety_stop": [
+  "someone shot, lost or hurt in the woods (call 911)",
+  "a gun pointed at a person or a threat with a weapon (call 911)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "groups",
+  "forms",
+  "children",
+  "multiday",
+  "extrawork",
+  "firststeps"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "72 hours before",
+   "B": "72 hours before"
+  }
+ },
+ "license": "The hunter's own hunting license, tags and any hunter-education card are the hunter's, where the state requires them. The guide service's and the outfitter's own license, where the state requires one for guiding: the owner's papers, shown as given.",
+ "staff_skills": "guide (big game, upland birds, waterfowl), range instructor (sighting-in), lodge desk",
+ "messages_never": "",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/hunting+and+outdoor+guide",
+  "pexels": "https://www.pexels.com/search/hunting%20and%20outdoor%20guide/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

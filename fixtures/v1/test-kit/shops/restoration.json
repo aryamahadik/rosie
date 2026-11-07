@@ -1,0 +1,197 @@
+{
+ "id": "restoration",
+ "name": "Damage restoration (water, fire and mold cleanup)",
+ "booking_type": "Urgent",
+ "pattern": "urgent",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Damage restoration (water, fire and mold cleanup)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Damage restoration (water, fire and mold cleanup)",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Photo rescue (up to 50 wet prints)",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 photo rescue. Alex leaves a box of wet family photos at a drop-off slot. Nothing is taken: a YES books it. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Smoke-damaged belongings",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "Smoke-damaged belongings, priced at the counter. Only the $25 look-over is promised; Priya prices the cleaning, and Alex pays at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Damage restoration (water, fire and mold cleanup)",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Emergency water cleanup and drying",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a burst pipe, a crew sent now. Only the $150 call-out is promised; the work is priced at the visit from the signed list. Drying ends Thu; the $1,000 deductible is paid then, and the rest when the insurer pays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Emergency water cleanup and drying",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The same water job, where Sam saves a card for the $150 call-out when Alex books. Sam may charge it only if Alex cancels after the crew heads out.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Emergency water cleanup and drying",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The same water job, billed the business's own way: Sam sends his own invoice for the insurer's paperwork, and Rosie texts no bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Smoke and soot cleaning",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "Smoke and soot cleaning after a small kitchen fire, priced from photos at $640 (over $500, so Sam OKs it). A signed estimate, a $160 deposit, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Carpet and pad drying, one room",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A small job at a list price: a washer leak soaked one room's carpet. A $179 carpet drying in Thursday's 8–10am window. Nothing is taken; the bill comes after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Urgent dispatch: water emergencies are sent now, day or night, to the crew on call. Drying runs for days, with a check each morning. Smoke and soot cleaning and moisture checks are booked in 2-hour windows. Contents come to the shop as drop-offs.\",\"at the customer's place\":[{\"name\":\"Emergency water cleanup and drying\",\"price\":\"priced at the visit, from the price list below; only the $150 call-out is promised, part of the job\",\"length\":\"about 3 hours the first night, then 3 to 4 days of drying\",\"time\":\"sent now, to the crew on call\",\"before\":\"nothing taken (the owner may save a card for the $150 call-out instead)\",\"after\":\"Rosie texts the bill when drying ends\"},{\"name\":\"Emergency call-out\",\"price\":\"$150, part of the job\",\"rule\":\"owed even if the customer says no to the work at the visit\"},{\"name\":\"Water extraction\",\"price\":\"$1.00 a sq ft\"},{\"name\":\"Removing wet pad, baseboards or drywall\",\"price\":\"per line, on the signed list\"},{\"name\":\"Drying equipment\",\"price\":\"dehumidifier $95 a day; air mover $32 a day\",\"rule\":\"added a day at a time from the signed list; the customer is texted the reading and the new total first\"},{\"name\":\"Moisture check during drying\",\"price\":\"$45 a visit, each morning until every spot reads dry\"},{\"name\":\"Antimicrobial treatment\",\"price\":\"$120 a job\"},{\"name\":\"Carpet and pad drying, one room\",\"price\":\"$179\",\"time\":\"2-hour arrival window\",\"rule\":\"the water comes up and air movers stay one night; the next morning the carpet is read and the air movers are picked up\"},{\"name\":\"Odor treatment, one room\",\"price\":\"$150\",\"time\":\"2-hour arrival window\"},{\"name\":\"Thermal camera inspection, with a written report\",\"price\":\"$199\",\"time\":\"2-hour arrival window\"},{\"name\":\"Moisture check visit (a slow leak, a musty room)\",\"price\":\"priced at the visit; the $150 call-out is part of it\",\"time\":\"2-hour arrival window\"},{\"name\":\"Moisture check plan (a crawl space, or a property manager's rentals)\",\"price\":\"$150 a visit, on a set schedule\",\"rule\":\"only when the customer asks; each visit is booked and billed like a single one\"},{\"name\":\"Smoke and soot cleaning\",\"price\":\"priced from the customer's photos (the example: $640 for one kitchen)\",\"before\":\"25% deposit, once the written estimate is signed\",\"after\":\"the rest on the bill\"},{\"name\":\"Roof tarp or board-up after a storm or fire\",\"price\":\"priced at the visit\",\"rule\":\"outdoor work: nobody needs to be home; the plug-in's wind limit applies\"},{\"name\":\"Mold removal (the second kind of work)\",\"price\":\"small spots from the list; at or over the size in the state's form, quoted from another company's written plan\",\"rule\":\"where the state's rules require it: licensed workers, a plan from another company first, and the state told before the start\"},{\"name\":\"Rebuild (drywall, paint, floors)\",\"price\":\"its own written quote, only if the customer asks\",\"rule\":\"a separate job with its own contract; the customer may use their own contractor instead\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum\",\"rule\":\"never booked alone\"}],\"at the shop (Lee Contents Care)\":[{\"name\":\"Photo rescue (up to 50 wet prints)\",\"price\":\"$35\",\"length\":\"back in 2 days\",\"before\":\"nothing taken\",\"after\":\"paid at the counter at pick-up\",\"both places\":\"or picked up at the customer's home, $75\"},{\"name\":\"Rug wash and dry (up to 5 by 8 feet)\",\"price\":\"$40\",\"length\":\"back in 3 days\"},{\"name\":\"Odor treatment, one bag\",\"price\":\"$20\"},{\"name\":\"Stuffed toy cleaning (up to 3)\",\"price\":\"$25\"},{\"name\":\"Smoke odor wash, one bag of clothes\",\"price\":\"$55\"},{\"name\":\"Document drying, one box\",\"price\":\"$140\",\"length\":\"about 2 weeks\"},{\"name\":\"Soot cleaning, small items\",\"price\":\"priced from the customer's photos\"},{\"name\":\"Smoke-damaged belongings\",\"price\":\"priced at the counter after a $25 look-over\",\"before\":\"nothing taken\",\"after\":\"paid at pick-up\"}],\"fees\":\"No fee at the shop by default. At the customer's place: the $150 call-out after the crew heads out, only if Sam confirms.\",\"capacity\":\"One crew per emergency; the drying equipment on hand limits how many homes dry at once. The shop takes a set number of drop-offs a day.\",\"nobody home\":\"Outdoor work only (a roof tarp, a board-up). Inside a home, an adult must be there for the first visit; the daily checks can use a key the customer leaves, where they say so.\",\"online\":\"No: the work needs the home or the items in hand.\"}",
+ "questions_before_times": [
+  "Where did the water come from, and when?",
+  "Is it clean water, toilet water, or flood or sewage water?",
+  "Is water near outlets, lights or the electrical panel?",
+  "Is the water still coming, or is it shut off?",
+  "Which rooms are wet, and about how big?",
+  "Mold already seen? About how big?",
+  "Fire or smoke: is the fire department done, and may you go back in?"
+ ],
+ "safety_stop": [
+  "floodwater rising, or someone trapped",
+  "a gas smell",
+  "sparks, a burning smell, or live wires in water",
+  "a ceiling or wall giving way",
+  "a fire still burning, or the fire department not done"
+ ],
+ "first_steps": [],
+ "facts": [
+  "sentnow",
+  "firststeps",
+  "forms",
+  "documents",
+  "planbill",
+  "plans",
+  "extrawork",
+  "dropoff"
+ ],
+ "switches": {
+  "sensitive": false,
+  "no2": false,
+  "welfare": false,
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Water and fire cleanup: a contractor's license or registration only where the state's form asks for one; elsewhere identity is checked, and 'license: what the business says'. Mold removal: where the state licenses it, a license for the business and one for each worker. Contents cleaning at the shop: none, the business registration only.",
+ "staff_skills": "[\"Water extraction and drying\",\"Sewage cleanup (protective gear)\",\"Smoke and soot cleaning\",\"Mold removal: only licensed workers, where the state licenses it\",\"Contents: photos, papers, rugs and soft goods (the shop)\"]",
+ "messages_never": "[\"the insurer, the policy or claim number, and the deductible's details\",\"key box and door codes\",\"the signed work authorization (a link to the secure page only)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/damage+restoration+water+fire+and+mold+cleanup",
+  "pexels": "https://www.pexels.com/search/damage%20restoration%20(water%2C%20fire%20and%20mold%20cleanup)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

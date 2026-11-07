@@ -1,0 +1,194 @@
+{
+ "id": "auto-repair",
+ "name": "Auto repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Auto repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Auto repair",
+   "staff": "Andre and Marcus (mechanics)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Check-engine diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$139",
+     "story": "The main story: a check-engine light. Only the $139 diagnosis is promised, OK'd on the drop-off page. The repair waits for Alex's signed estimate, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Oil change",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 oil change from the shop's board. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Check-engine diagnosis and repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$139",
+     "story": "The check-engine repair, with the bill texted once the car is ready, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Oil change",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 oil change, dropped off before work. Rosie texts the bill when it's ready.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Auto repair",
+   "staff": "Luis and Devon (mechanics)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Front brake pads",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: $179 front brake pads in Alex's driveway. A card is saved for the $89 trip fee, and nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Coolant leak repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A coolant leak, priced at the visit. Only the $89 trip fee is promised, with a card saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Front brake pads",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "$179 front brake pads. A card is saved, and it's charged when Luis texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Radiator replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A new radiator, priced from photos at $640. Sam OKs it. A $160 deposit now, and the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the car is left at the shop and picked up when it's ready\",\"list\":[{\"name\":\"Diagnosis (warning light, noise, how it drives)\",\"price\":\"one price, OK'd in writing on the drop-off page\",\"length\":\"a set time, like 1 hour; more time is new work that needs a new yes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Repair after a diagnosis\",\"price\":\"quoted at the visit: a written estimate with the most it can cost, signed before any repair\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts with the ready text\"},{\"name\":\"Oil change, tire rotation, wiper blades, battery test\",\"price\":\"one price from the shop's board\",\"length\":\"30 to 45 minutes; wait or drop off\",\"place\":\"at the shop; an oil change or battery can also be mobile\",\"before\":\"nothing taken\",\"after\":\"at the counter\"},{\"name\":\"Scheduled maintenance by miles\",\"price\":\"one price per car, from the shop's list\",\"length\":\"about 2 to 3 hours, or the day\",\"place\":\"at the shop\"},{\"name\":\"Safety inspection\",\"price\":\"one price; paid when booking, if the shop sets it\",\"length\":\"about 1 hour\",\"place\":\"at the shop\"},{\"name\":\"Tow-in\",\"price\":\"the tow's own price, plus the diagnosis\",\"place\":\"the car comes by tow at any time, keys in the key box\"},{\"name\":\"Mobile repair (brakes, battery, starter, a car that won't start)\",\"price\":\"one price, quoted from photos and the car's details, or quoted at the visit\",\"place\":\"at the customer's home or work\",\"before\":\"the trip fee held\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Pick-up and delivery\",\"price\":\"a flat fee, or free within a set distance\",\"place\":\"starts at the customer's door; the work is done at the shop\"},{\"name\":\"Pre-purchase inspection\",\"price\":\"one price\",\"place\":\"at the shop, or where the car for sale is parked\"}],\"capacity\":\"a daily cap on diagnoses (the example shop: 6 a day); one bay and one mechanic per job; the alignment rack and the loaner cars are saved like equipment\",\"drop_off_window\":\"drop-off slots by the shop's daily number (the example shop: 6 cars a day), shown as drop-off times with no mechanic named, plus an after-hours key box once the drop-off page is signed\",\"loaners\":\"a set number of loaner cars (the example shop: 2); the owner OKs each one; the driver is 21 or older, with license and insurance on the secure page\",\"shuttle\":\"a free ride within a set distance and hours (the example shop: 5 miles, 8am to 5pm)\",\"warranty\":\"on the receipt, in months or miles, parts and labor (the examples: 24 months or 24,000 miles at Lee's Garage; 12 months or 12,000 miles on Lee Mobile Auto's jobs)\",\"nobody_home\":\"a mobile job on a parked car can be done with nobody there: the keys are left as agreed, and DONE comes with a photo\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "What is the car doing, and since when? In the customer's own words",
+  "Any warning lights? Steady or flashing?",
+  "Year, make, model and mileage",
+  "For a mobile job: where the car is parked, and whether it starts"
+ ],
+ "safety_stop": [
+  "a crash",
+  "a fire, or flames from the engine",
+  "someone hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "sentnow"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: where the state registers repair shops, or certifies mechanics by repair kind",
+ "staff_skills": "[\"diagnosis\",\"brakes\",\"engine\",\"car A/C\",\"electrical\",\"alignment\",\"inspections\",\"mobile jobs\",\"tow driver\"]",
+ "messages_never": "[\"The VIN or the plate\",\"The driver's license or insurance\",\"The key-box code\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/auto+repair",
+  "pexels": "https://www.pexels.com/search/auto%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

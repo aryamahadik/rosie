@@ -1,0 +1,180 @@
+{
+ "id": "dog-trainer",
+ "name": "Dog trainer",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Dog trainer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Dog trainer",
+   "staff": "Lauren and Dev (trainers at the center)",
+   "customer": "Alex M. (customer, with Juno) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Private lesson",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The main story: a $120 private lesson for Juno with Lauren. A card is saved for the center's $60 late-cancel and no-show fee. Alex pays at the front desk, and Lauren's homework comes after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Behavior evaluation",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$180",
+     "fee": "$60",
+     "story": "A $180 behavior evaluation with Lauren (90 minutes), paid in full when booking. A 6-week Manners class ($210) is paid the same way.",
+     "due_now_at_booking": 180,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Private lesson",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A $120 private lesson on a Saturday morning, when Lauren works alone: a card is saved for the $60 fee, and Rosie texts the bill after, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Dog trainer",
+   "staff": "Marcus and Darius (trainers who go to homes)",
+   "customer": "Alex M. (customer, with Milo) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "In-home lesson",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 in-home lesson for Milo with Marcus. A card is saved for the $89 late-cancel and no-show fee. Marcus texts DONE, and Rosie texts the bill, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "In-home lesson",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 lesson, with the saved card charged when Marcus texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Puppy start-up visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 puppy start-up visit at home, paid in full when booking. A 4-lesson package ($640) is paid the same way.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set lessons with a chosen trainer, and group classes booked by the spot; the dog is booked under its owner",
+ "questions_before_times": [
+  "the dog's name and age, and one dog or two",
+  "does the dog bark or lunge at other dogs? (then the reactive dog lesson, or a private lesson before any class)",
+  "a puppy under 6 months? (the puppy class or the puppy start-up visit)",
+  "who will handle the dog (a junior handler lesson needs a parent there)"
+ ],
+ "safety_stop": [
+  "a bite or a dog fight happening now; someone badly hurt by a dog",
+  "a dog that is very sick or hurt now (like after eating something)"
+ ],
+ "first_steps": [
+  "Vaccine proof",
+  "Waiver",
+  "A private lesson before a group class",
+  "Behavior evaluation"
+ ],
+ "facts": [
+  "animals",
+  "classes",
+  "packs",
+  "firststeps",
+  "forms",
+  "children",
+  "aftercare",
+  "tips",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "if: training a dog needs no state license of its own; a place where dogs are kept, boarded or trained for pay may need a kennel or facility license where the state's rules require it (a switch from the state form)",
+ "staff_skills": "private lessons, reactive dogs, puppies, classes; behavior evaluations only by Lauren at the center, and by Marcus or Sam at home; home lessons only by trainers cleared for them",
+ "messages_never": "bite history, health notes and incident notes never go in a text or through the AI: only the secure page and the dog's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dog+trainer",
+  "pexels": "https://www.pexels.com/search/dog%20trainer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,135 @@
+{
+ "id": "gymnastics",
+ "name": "Gymnastics and cheer gym",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "martial-arts",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Gymnastics and cheer gym",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Gymnastics and cheer gym",
+   "staff": "Nell and Tara (coaches) and the front desk",
+   "customer": "Alex M. (a parent, for Mia, 8) · other families and students",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Tumble class",
+     "price": "$28",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$28",
+     "fee": "$28",
+     "story": "The main story: Alex's tumble class for Mia, 8, at the gym: a Saturday 10am class, $28, paid in full when booking. A late cancel or no-show: the price may be kept only with the owner's yes.",
+     "due_now_at_booking": 28,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Birthday party at the gym",
+     "price": "$260",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "A birthday party at the gym for up to 12 children: a card is saved for the $60 fee, and the $260 is paid at the desk on the day.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Gymnastics and cheer gym",
+   "staff": "Dario and Hana (coaches who go out)",
+   "customer": "Alex M. (books for a party) · parents",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Cheer class at a home or school",
+     "price": "$350",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$80",
+     "story": "The main story: a cheer class at Alex's home for up to 12 children, $350, a card saved for the $80 fee, and the $350 charged when the coach texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "School PE clinic",
+     "price": "$240",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A school PE clinic: $240 a class, nothing taken to book, and one bill to the school after the class.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: seats in a scheduled class with a set number of places by level and age; a party books the gym or the customer's home for one group; at a school or a home (flow B) a coach goes to the customer",
+ "questions_before_times": [
+  "which class or party, and the date",
+  "the child's age, to pick the level (ages 2 to 4 with a parent on the mat)",
+  "how many children, for a party or a school or home class",
+  "new to gymnastics, or been before"
+ ],
+ "safety_stop": [
+  "a child not breathing, unresponsive, or with a hard fall on the head right now"
+ ],
+ "first_steps": [
+  "Waiver on the secure page",
+  "Health questions on the secure page",
+  "Photo ID at the desk"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "children",
+  "waitlist",
+  "forms"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none from the state for gymnastics or cheer coaching in most places; coaches hold a current coaching or first-aid certificate the business says is current; where the state licenses a gym or a child-care program, the business's own registration or license is shown only once it is on file",
+ "staff_skills": "tumbling, beam, cheer, tumble for toddlers, adult classes; the levels each coach may teach",
+ "messages_never": "health notes, injuries, a child's name and age in texts to anyone but the parent: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/gymnastics+and+cheer+gym",
+  "pexels": "https://www.pexels.com/search/gymnastics%20and%20cheer%20gym/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

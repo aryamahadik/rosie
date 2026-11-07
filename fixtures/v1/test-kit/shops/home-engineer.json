@@ -1,0 +1,199 @@
+{
+ "id": "home-engineer",
+ "name": "Home engineer (structural inspections)",
+ "booking_type": "Service",
+ "pattern": "service",
+ "built_from": "inspector",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Home engineer (structural inspections)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Home engineer (structural inspections)",
+   "staff": "Meera and Joan (engineers at the office)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Quick consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 quick consult. A card is saved for the office's $20 fee. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Quick consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 quick consult. Nothing is taken: a YES books it. Alex pays at the office after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Second opinion on a report",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A second opinion on another engineer's report, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Quick consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 quick consult on a Saturday morning, when Meera works alone with no front desk: the saved card is charged when she texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Home engineer (structural inspections)",
+   "staff": "Daniel and Ravi (structural engineers)",
+   "customer": "Alex M. (buyer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "6pm the day before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Structural evaluation",
+     "price": "$495",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $495 structural evaluation. A card is saved and charged $495 when Daniel texts DONE. The report follows Fri.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Structural evaluation",
+     "price": "$495",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $495 structural evaluation. Nothing is taken. Rosie texts the bill after, and the report goes out once it's paid.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Follow-up visit after repairs",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 follow-up visit after repairs, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "4-unit building evaluation",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 4-unit building, priced from the listing and plans at $640. Sam OKs it. A $160 deposit now, the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: one evaluation at the property, priced by the home's size, with a written report later.\",\"list\":[{\"name\":\"Structural evaluation\",\"price_kind\":\"set by the customer's answers (square feet, house or condo, year built)\",\"example\":\"house up to 3,000 sq ft: $495; 3,001 to 4,500 sq ft: $625; condo or townhouse: $395 (the example business's own prices)\",\"length\":\"about 3 hours on site, the last 30 minutes a walk-through of the main findings\",\"where\":\"at the property; nobody needs to be there at the start\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Foundation crack evaluation\",\"price_kind\":\"one price, for one concern (a crack, a sloping floor, a sticking door)\",\"example\":\"$395, about 1½ hours\",\"where\":\"at the property\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"Deck and balcony inspection (the second kind of work)\",\"price_kind\":\"one price\",\"example\":\"$350, about 1½ hours, with the deck cleared and the space under it reachable\",\"where\":\"at the property\"},{\"name\":\"Large property evaluation\",\"price_kind\":\"set by the engineer at the visit from the property's size; only the $89 trip fee is promised before\",\"example\":\"a lot with several buildings: priced on site; the fee never depends on what is found\",\"where\":\"at the property\"},{\"name\":\"Multi-unit or very large building\",\"price_kind\":\"quoted from the listing, plans and photos first\",\"example\":\"a 4-unit building: $640, with a deposit; Sam OKs any quote over $500\",\"where\":\"at the property\"},{\"name\":\"Follow-up visit after repairs\",\"price_kind\":\"one price\",\"example\":\"$150, about 1 hour: the engineer checks the repair against the findings\",\"where\":\"at the property\",\"money\":\"booked like the first evaluation, with its own agreement; paid in full when booking (the example business's setting)\"},{\"name\":\"Floor elevation survey\",\"price_kind\":\"one price, an add-on\",\"example\":\"$199 (a laser level across the floors, about 45 minutes); $249 when Sam goes himself\",\"where\":\"at the property\"},{\"name\":\"Crack gauges\",\"price_kind\":\"one price, an add-on at the visit\",\"example\":\"$160 for two gauges set on a moving crack; read again on a follow-up visit\",\"where\":\"at the property\"},{\"name\":\"Sealed letter\",\"price_kind\":\"one price, an add-on\",\"example\":\"$150: a signed and sealed letter of findings for a permit, an insurance claim or a sale; only for a building the engineer has seen\",\"where\":\"sent on the secure link\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or no way in that Sam confirms, or a return visit when part of the building could not be reached\",\"where\":\"never booked alone\"},{\"name\":\"Quick consult, plan checks and second opinions (at Lee Engineering Office)\",\"price_kind\":\"one price each\",\"example\":\"20-minute consult $35; photo review $20; second opinion on another engineer's report $55; beam and wall-removal plan check, about 2 hours, $140; at the property $75 (the example office's own prices)\",\"where\":\"at the office, by video, or at the property\",\"money\":\"card saved for the $20 fee; paid at the office after\"}],\"start_times\":\"Set starts, like 8:30am and 1:00pm. The walk-through time is told at booking.\",\"notice\":\"2 days' notice by default, so access can be set up. A sooner time only if Sam says yes.\",\"capacity\":\"One engineer per evaluation. Add-ons only with someone who does them.\",\"nobody_home\":\"Yes: nobody needs to be at the property to start. The engineer gets in with a lockbox code the agents or the owner set up. The client is welcome at the walk-through.\",\"online\":\"Consults, plan checks and second opinions can be done by video.\",\"not_offered\":\"Repairs or construction, soil borings, mold or asbestos testing, code enforcement, appraisals, and an emergency shoring crew.\",\"partner_work\":\"Repairs go to a contractor the customer picks. This business never names or refers one and takes no referral fee.\"}",
+ "questions_before_times": [
+  "The town or ZIP, and what kind of property: a house, a condo or townhouse, or several units",
+  "About how many square feet, and the year built",
+  "What you've noticed: a crack, a floor that slopes or bounces, a door that sticks, a bowed wall, a leaning porch or deck. Photos help",
+  "What it's for: buying, selling, a permit, an insurance claim, or a worry (a sealed letter needs the engineer to see the building first)",
+  "Add-ons: a floor elevation survey, a sealed letter",
+  "Is the home lived in or empty?"
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "sparks or smoke",
+  "a carbon monoxide alarm",
+  "loud cracking or popping from the walls or floor right now",
+  "a floor, ceiling or wall giving way right now",
+  "live wires hanging down",
+  "flooding up to the outlets"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "results",
+  "photos",
+  "video",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "6pm the day before"
+ },
+ "license": "A structural evaluation is engineering work: each engineer holds their own state professional engineer (PE) license, and the firm holds a firm certificate where the state asks for one. Only a licensed engineer evaluates alone, and only a licensed engineer seals a report or letter. An engineer-in-training works under a licensed engineer who reviews and seals.",
+ "staff_skills": "[\"Structural evaluations of houses\",\"Condo and townhouse evaluations\",\"Multi-unit buildings\",\"Foundation crack evaluations\",\"Deck and balcony inspections\",\"Follow-up visits\",\"Sealed letters\",\"Consults and plan checks at the office\"]",
+ "messages_never": "[\"Lockbox, door and alarm codes\",\"The street address in a first text to someone new\",\"Findings, photos of cracks and the report: only the secure link\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/home+engineer+structural+inspections",
+  "pexels": "https://www.pexels.com/search/home%20engineer%20(structural%20inspections)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

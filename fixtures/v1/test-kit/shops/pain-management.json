@@ -1,0 +1,158 @@
+{
+ "id": "pain-management",
+ "name": "Pain management",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "chiropractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pain management",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Pain Care",
+   "staff": "Dr. Okafor and Dr. Patel (physicians) and the front desk",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient evaluation",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: a $180 new patient evaluation with Dr. Okafor. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Procedure visit",
+     "price": "$450",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A procedure visit at the clinic: a card is saved for the $150 missed-visit fee, and Alex pays the $450 at the front desk after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile MD",
+   "staff": "Dr. Ruiz and Dr. Lind (physicians), who visit homes",
+   "customer": "Alex M. (a new patient, at home) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First home visit",
+     "price": "$260",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a $260 first home visit with Dr. Ruiz. A card is saved for the $100 missed-visit fee, and charged $260 when Dr. Ruiz texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "First home visit",
+     "price": "$260",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The same home visit with nothing saved. Rosie texts the $260 bill when Dr. Ruiz texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "First home visit",
+     "price": "$260",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A home visit after a car accident. Nothing is taken, and the office bills the auto claim its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types in the clinic's exam rooms, each with a set length; a first visit is a history, an exam and a plan of care, with no procedure that day; procedures are done only in the clinic's procedure room, on the doctor's order and after the patient's consent; a plan of care's visits are booked as a series only with the patient's own yes, and each is paid when it happens",
+ "questions_before_times": [
+  "for you, or for someone you help (adults only: 18 and over)",
+  "new or returning patient (a new patient gets the 60-minute new patient evaluation)",
+  "which visit: the clinic's own visit types only, never a symptom typed into the AI",
+  "a car accident or a work injury (then it's billed to that claim)",
+  "a health plan (its name only), Medicare, or paying yourself",
+  "mornings, midday or evenings"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, a sudden very bad headache, or sudden weakness, numbness, a drooping face or slurred speech",
+  "a fever, chills, or a hot, swollen or leaking place after a procedure or an injection; numbness in the groin or inner thighs; new trouble controlling the bladder or bowels; or leg weakness that's getting worse",
+  "taking too much medicine or an overdose, or thoughts of ending a life"
+ ],
+ "first_steps": [
+  "Health history and consent",
+  "The plan check",
+  "The approval for a procedure",
+  "The claim for a car accident or a work injury",
+  "A written price estimate for self-pay patients",
+  "A re-exam before more procedures"
+ ],
+ "facts": [
+  "plans",
+  "planbill",
+  "forms",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "each doctor the owner names holds their own state medical license; the clinic where the state's form asks",
+ "staff_skills": "doctors: exams, plans of care, medication checks and procedures in the procedure room; the front desk: check-in, plan checks, approvals, estimates and payment; only people cleared for home visits go to homes",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, the medicines, procedures, results or the doctor's name (at home, the doctor's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pain+management",
+  "pexels": "https://www.pexels.com/search/pain%20management/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

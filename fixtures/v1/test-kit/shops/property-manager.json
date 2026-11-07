@@ -1,0 +1,118 @@
+{
+ "id": "property-manager",
+ "name": "Property manager",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "realtor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Property manager",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Property manager",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Free 30-minute tour",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 30-minute tour of Unit 4B with Nina. Nothing is taken and no card is saved: a YES books it. Nothing is paid after. Self-guided tours, video tours and open house spots work the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Property manager",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Free repair visit",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free repair visit for Alex's fridge, by Marcus. Nothing is taken and no card is saved. Nothing is billed through Rosie: anything the owner charges a resident is billed the business's own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: time with a leasing agent, a self-guided tour window, a spot at an open house, or a maintenance visit by the business's own staff. Every service is free to the person booking. Every booking names one property from the business's own list of the properties and units it manages: a tour, an open house spot or a maintenance visit is booked for a listed property only.\",\"at the property, flow A (the example community's own list)\":[{\"name\":\"Tour with a leasing agent\",\"length\":\"30 minutes\",\"price\":\"free\",\"where\":\"starts at the leasing office, then the home\",\"times\":\"a set start time\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"Self-guided tour\",\"length\":\"a 30-minute window\",\"price\":\"free\",\"where\":\"the home, with no staff there\",\"needs\":\"a photo ID checked on the secure page at least 2 hours before; a one-time door code shown only on the secure page, working only in the booked window\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"Video tour\",\"length\":\"20 minutes\",\"price\":\"free\",\"where\":\"live by video with a leasing agent; it counts as at the business\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"Open house\",\"length\":\"a set time, like 1:00 to 3:00pm\",\"price\":\"free\",\"how\":\"a spot in the open house, up to the business's cap; walk-ins welcome too\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"}],\"at the resident's home, flow B (the example company's own list)\":[{\"name\":\"Repair visit\",\"length\":\"up to 1 hour, in a 2-hour arrival window\",\"price\":\"free to the resident\",\"who\":\"the business's own maintenance staff\",\"examples\":\"a fridge or stove that stopped working, a door or window that won't lock, a light or fan that doesn't work, a smoke alarm that chirps for a new battery\",\"before\":\"nothing taken\",\"after\":\"nothing through Rosie; anything the owner charges a resident is billed the business's own way\"},{\"name\":\"Follow-up visit for the same repair\",\"length\":\"up to 1 hour\",\"price\":\"free to the resident\",\"note\":\"part of the same booking: no second $2\"}],\"questions, not a booking\":\"Questions about available homes are answered only from the business's own listing details: the rent as listed, the date it's free, its size, the pet rules, parking, and how to apply the business's own way. Everyone gets the same answer.\",\"never booked in Rosie\":\"Rental applications, screening, credit or background checks, leases, rent, deposits, fees, resident notices, move-in or move-out paperwork, and sending outside vendors. The business keeps its own tools for all of that.\",\"repairs never booked with staff\":\"Work that needs a licensed trade. Rosie passes it to the office, which arranges it its own way.\",\"capacity\":\"One leasing agent per tour, for the person and up to 3 other adults; children who come along are never counted or asked about. One group per self-guided window. Open house spots up to the business's cap. One maintenance tech per visit.\",\"travel area\":\"Each booking names one property from the business's own list of properties and units it manages (a tour, an open house spot or a maintenance visit). Only listed homes are booked; the portal holds the list.\",\"booking window\":\"Tours up to 30 days ahead, with at least 1 hour's notice. Self-guided tours need 2 hours, for the ID check. Repairs up to 14 days ahead, soonest first. These are the example business's settings.\",\"blocked times\":\"Staff calendars. A home that's leased comes off the list at once. A home's self-guided windows close while staff work in it.\"}",
+ "questions_before_times": [
+  "A tour: which home? It must be on the business's own list. Rosie never suggests, ranks or rules out homes or areas.",
+  "A tour: with a leasing agent, self-guided, by video, or at an open house?",
+  "A tour: when would you like to move in? It only narrows homes that are free by then.",
+  "A repair: which town? Rosie checks the business manages homes there; the street address and unit go only on the secure page, where the home is checked against the business's list.",
+  "A repair: what needs fixing, in your own words? Every answer gets the danger check."
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "fire or smoke",
+  "a smoke or carbon monoxide alarm going off",
+  "someone hurt or in danger",
+  "a lockout with a child or a pet inside (911, then the business's emergency line)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "waitlist",
+  "firststeps",
+  "capacitycheck"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Where the state's form says managing rentals for others needs a license (often a real estate broker's license), the business's own license. Each leasing agent's own license or registration, only where the state's form asks for one.",
+ "staff_skills": "",
+ "messages_never": "[\"door codes, lock codes or alarm codes\",\"entry instructions or where a key is\",\"ID details or the ID check's result\",\"permission-to-enter details\",\"anything about a disability or an accommodation request\",\"health or money details\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/property+manager",
+  "pexels": "https://www.pexels.com/search/property%20manager/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

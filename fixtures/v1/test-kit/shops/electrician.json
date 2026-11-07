@@ -1,0 +1,274 @@
+{
+ "id": "electrician",
+ "name": "Electrician",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Electrician",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Electrician",
+   "staff": "Nina and Hank (lamp techs at the counter)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Lamp rewire",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 lamp rewire at the counter. A card is saved for the shop's $20 fee, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Lamp rewire",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $20 new switch or socket at the counter: nothing is taken before; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Floor lamp rewire",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 floor lamp rewire, paid in full when booked.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Antique lamp restore",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "An antique lamp restore, priced from Alex's photos at $90. A card is saved for the $20 fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Lamp repair bench check",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A lamp repair: only the $25 bench check is promised. A card is saved for the $20 fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Electrician",
+   "staff": "Darnell and Wes (electricians)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Kitchen outlet repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 kitchen outlet repair at Alex's home. A card is saved for the $89 service-call fee, and the bill is texted after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Kitchen outlet repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 yard light repair, nothing taken; the bill is texted after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Kitchen outlet repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 light fixture swap. A card is saved for the $89 fee and charged $179 when Wes texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Breaker repair",
+     "price": "$89",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A breaker that keeps tripping: only the $89 service call is promised, and a card is saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Breaker repair",
+     "price": "$89",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A wiring repair priced at the visit, nothing taken before; the bill is texted after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "EV charger install",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An EV charger install, quoted at $640. A 25% deposit ($160) holds the date once the quote is OK'd; the $480 rest is on the bill after the job.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Generator tune-up",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A generator tune-up, $150, paid in full when booked. A late cancel keeps only the $89 fee.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Highline Electric's own list)\":[{\"service\":\"Service call (find any problem)\",\"price kind\":\"one price\",\"price\":\"$89, taken off the repair\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the jobs below; not booked alone\"},{\"service\":\"Kitchen outlet repair (dead outlets, or a reset outlet that won't reset)\",\"price kind\":\"one price\",\"price\":\"$179, the $89 call included\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Light fixture or ceiling fan swap (on an existing box)\",\"price kind\":\"one price\",\"price\":\"$169, the $89 call included\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Breaker repair (a breaker that keeps tripping)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Wiring repair (flickering lights, a dead circuit)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Yard light repair\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Nobody needs to be home. A new buried line needs a utility locate first.\"},{\"service\":\"Generator tune-up (a standby generator)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Also sold as a yearly plan\"},{\"service\":\"Smoke and CO alarm check\",\"price kind\":\"the owner's own price\",\"place\":\"at the customer's place\",\"note\":\"Often a plan for rentals, every 3 months\"},{\"service\":\"EV charger install\",\"price kind\":\"quoted from photos of the panel and the garage, or after a free estimate visit (a load check)\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"A permit and an inspection where the local rules require them. Only the people the owner names (the example: Darnell).\"},{\"service\":\"Panel replacement or upgrade\",\"price kind\":\"a free estimate visit, then a written quote\",\"price\":\"the quote (the example: $2,400, billed in 3 stages)\",\"length\":\"1 to 2 days\",\"place\":\"at the customer's place\",\"before\":\"the first stage as a deposit, once the contract is signed\",\"after\":\"each stage billed when it's done\",\"note\":\"The owner OKs each booking first. A permit, the power company's shut-off and turn-on, and the inspection.\"},{\"service\":\"New circuit\",\"price kind\":\"a free estimate visit, then a quote\",\"price\":\"the quote\",\"place\":\"at the customer's place\",\"before\":\"set with the quote\",\"after\":\"Rosie texts the bill\",\"note\":\"A permit where the local rules require one\"},{\"service\":\"Electrical safety inspection\",\"price kind\":\"by person\",\"price\":\"journeyman $199, master $249\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call fee\",\"after\":\"Rosie texts the bill\",\"note\":\"The report link comes later\"},{\"service\":\"After-hours emergency call\",\"price kind\":\"one price\",\"price\":\"$149, taken off the repair; flat-price jobs $60 more\",\"length\":\"sent now: an arrival estimate, not a window\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $149 fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Sent now to the electrician on call, then the backup. Free to cancel until they text OMW. Never for fire, smoke or a downed line: that's 911 first.\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted jobs; not booked alone\"}],\"at the business (the example: Highline Lamp Shop's counter list)\":[{\"service\":\"Lamp rewire (bring the lamp)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New cord and plug\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New switch or socket\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Holiday light repair\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Floor lamp rewire\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Chandelier rewire (up to 6 lights)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the shop\",\"before\":\"a card saved for the $40 fee (over 2 hours)\",\"after\":\"paid at the counter\"},{\"service\":\"Antique lamp restore\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The owner OKs each quote. Only Nina does antique lamps.\"},{\"service\":\"Lamp repair (one that won't light or flickers)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 bench check is promised\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a lamp, a fixture or a dead outlet\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it\"}],\"capacity\":\"One electrician per home visit. A panel replacement or a long trench can need a crew of two. The counter: one lamp tech per booking, and its one test bench for antique lamps.\",\"skills each needs\":\"EV chargers and panel work need the skill the owner names. Antique lamps at the counter need the antique skill. Solar work needs its own license where the state asks.\",\"nobody home\":\"Outdoor work with its own access, like a yard light or an outside outlet: nobody needs to be home. DONE comes with a photo.\",\"online\":\"A video check only, where the owner offers it. No repair is done by video.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at cost or at list, the owner's pick. Permit fees shown on the quote. No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "What's wrong: dead outlets, a breaker that trips, flickering lights, no power, a new install, or something else",
+  "Which rooms",
+  "Did a breaker trip? Does the reset button on an outlet reset?",
+  "What was plugged in or running when it went off",
+  "After hours: is power out right now",
+  "For an EV charger or a new circuit: which charger or appliance, and where the panel is",
+  "At the counter: which lamp or fixture, how many sockets, and how old"
+ ],
+ "safety_stop": [
+  "Smoke, sparks, a burning smell, or a hot panel, outlet or switch",
+  "A downed or sparking power line",
+  "Someone got a shock or is hurt",
+  "A gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "firststeps",
+  "dropoff",
+  "extrawork",
+  "stages",
+  "documents",
+  "video"
+ ],
+ "switches": {
+  "sensitive": false,
+  "cancelright": false
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Electrical work in a home needs a license where the state, city or county licenses electricians. Some states license by job size or kind of work, like residential-only or limited licenses.",
+ "staff_skills": "[\"Outlets and switches\",\"Breakers and circuits\",\"Lights and fans\",\"Panels and service changes\",\"EV chargers\",\"Generators\",\"Safety inspections\",\"Solar (its own license where the state asks)\",\"Counter: lamps and fixtures\",\"Counter: antique lamps\"]",
+ "messages_never": "Gate or lock codes, card details, and photos from inside the home or of the panel: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/electrician",
+  "pexels": "https://www.pexels.com/search/electrician/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

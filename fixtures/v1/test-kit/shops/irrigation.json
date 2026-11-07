@@ -1,0 +1,248 @@
+{
+ "id": "irrigation",
+ "name": "Irrigation and sprinkler installer",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "lawn",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Irrigation and sprinkler installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Irrigation and sprinkler installer",
+   "staff": "Noor and Kit (shop consultants)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Irrigation design consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Irrigation design consult, $35 at the shop; a card saved for the $20 missed-consult fee; paid at the shop counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Irrigation design consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Irrigation design consult, $35; nothing taken; a YES books it; paid at the shop counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Watering schedule session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Watering schedule session, $55, paid in full when booking; it counts toward a new system if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Full irrigation plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Full irrigation plan, $140; a $40 deposit now; the $100 rest at the shop counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Photo zone plan",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Photo zone plan, priced from Alex's photos and yard sketch at $90 (Sam OKs it); a card saved for the $20 fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Smart controller match",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Smart controller match, priced at the shop once Noor sees the old controller: only the $25 consult is promised; a card saved; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Irrigation and sprinkler installer",
+   "staff": "Bram and Selin (irrigation techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Fall winterization",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 fall winterization of an 8-zone system. A card is saved for the $89 trip fee and charged $179 when Bram texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Fall winterization",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 winterization for a returning customer. Nothing is taken before. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Spring start-up",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 spring start-up (the yearly plan's visit), paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Extra zone",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "An extra zone, priced from photos and a yard sketch at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Sprinkler repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A sprinkler repair, priced at the visit. A card is saved; the $89 trip fee is owed even after a no to the price, and counts toward the repair. The card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Seasonal service at the home at a set price, a visit to look and then a quote for a repair, and a design visit then a contract for a new system\",\"B\":[{\"service\":\"Fall winterization (blow the water out of the lines before the first hard freeze)\",\"price kind\":\"one price, up to 8 zones\",\"price\":\"$179; each zone over 8 is $15 (the example business's own prices)\",\"length\":\"45 to 60 minutes\",\"place\":\"at the customer's place; nobody needs to be home with a gate code\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"the saved card is charged when the tech texts DONE\"},{\"service\":\"Spring start-up and check (turn the water on, run every zone, adjust heads, set the controller)\",\"price kind\":\"one price, up to 8 zones\",\"price\":\"$150 a visit, a plan customer's price (the yearly plan: a start-up in spring, a winterization in fall, each paid in full when booked)\",\"length\":\"45 to 60 minutes\",\"place\":\"at the customer's place; nobody needs to be home with a gate code\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Sprinkler repair (broken heads, a leaking valve, a pipe leak, wiring)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 trip fee is promised, counted toward the repair (example: $245)\",\"length\":\"60 to 90 minutes\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"the saved card is charged when the tech texts DONE\"},{\"service\":\"Extra zone, drip line or smart controller (priced from photos and a yard sketch)\",\"price kind\":\"priced from photos\",\"price\":\"the quote (the example: $640; over $500, Sam OKs it)\",\"length\":\"half a day to a day\",\"place\":\"at the customer's place\",\"before\":\"the utility locate first if anything is dug; then a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\"},{\"service\":\"New sprinkler system (design visit, then a written quote and a contract)\",\"price kind\":\"quoted after a design visit\",\"price\":\"its own quote (the example: $2,400 for a back lawn, billed in three stages)\",\"length\":\"1 to 3 days\",\"place\":\"at the customer's place\",\"before\":\"a deposit only after the contract is signed; the utility locate and any permit first\",\"after\":\"stage bills, the last after the backflow test and the zone walk-through\"},{\"service\":\"System audit and report (a flow and coverage check, for a water bill or a sale)\",\"price kind\":\"one price\",\"price\":\"$199, with a written report\",\"length\":\"about 90 minutes\",\"place\":\"at the customer's place\",\"before\":\"nothing, or a card saved for the $89 trip fee\",\"after\":\"the bill; the report comes the same day or the next\"},{\"service\":\"Backflow test and certificate (the yearly test of the device that protects the drinking water)\",\"price kind\":\"one price\",\"price\":\"$95, with the certificate filed where the water district asks\",\"length\":\"30 minutes\",\"place\":\"at the customer's place\",\"note\":\"Only a certified tester. A device that fails is repaired or replaced, then retested.\"},{\"service\":\"Photo quote\",\"price kind\":\"free\",\"price\":\"free; a written quote from the photos Alex sends, for small jobs\",\"place\":\"by text or the secure page; nobody comes\",\"before\":\"nothing taken\",\"after\":\"nothing more; Alex can book a visit from the quote\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted repairs; not booked alone\"}],\"A\":[{\"service\":\"Irrigation design consult\",\"price kind\":\"one price\",\"price\":\"$35, 30 minutes\",\"place\":\"at the shop; or at the customer's home for $75, paid in full when booked\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the shop counter\"},{\"service\":\"Quick sprinkler chat\",\"price kind\":\"free\",\"price\":\"free, 15 minutes\",\"place\":\"at the shop\",\"before\":\"nothing taken\",\"after\":\"nothing more\"},{\"service\":\"Controller setup session\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop; the customer brings the controller and stays while it is programmed\",\"before\":\"a card saved\",\"after\":\"at the shop counter\"},{\"service\":\"Zone map print\",\"price kind\":\"one price\",\"price\":\"$20, an add-on\",\"place\":\"at the shop\"},{\"service\":\"Nozzle match\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\",\"note\":\"The customer brings an old head; the tech matches the nozzle and spray pattern\"},{\"service\":\"Watering schedule session (a schedule by zone that follows the water district's rules)\",\"price kind\":\"one price\",\"price\":\"$55, 60 minutes; counts toward a new system if Alex signs with Lee Irrigation\",\"place\":\"at the shop\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Full irrigation plan (design, zone map, parts list)\",\"price kind\":\"one price\",\"price\":\"$140, 2½ hours\",\"place\":\"at the shop\",\"before\":\"a card saved for the $40 fee (over 2 hours), or a $40 deposit\",\"after\":\"at the shop counter\"},{\"service\":\"Photo zone plan\",\"price kind\":\"priced from the customer's photos and a yard sketch\",\"price\":\"the quote (the example: $90); Sam OKs each one\",\"place\":\"at the shop\"},{\"service\":\"Smart controller match\",\"price kind\":\"quoted at the shop\",\"price\":\"only the $25 consult is promised\",\"place\":\"at the shop\",\"note\":\"The consultant sees the old controller and the zone count first\"}],\"capacity\":\"One tech or consultant per booking; one crew per install, up to 3 days; a trench day needs two people. The shop's layout table is saved with long sessions.\",\"skills each needs\":\"Winterization and start-up: any tech. Repairs: a tech cleared for valves and wiring. Design and installs: a licensed irrigator where the state asks. Backflow tests: a certified tester.\",\"nobody home\":\"Winterization and start-up: nobody needs to be home with a gate code; a start photo and an end photo. A repair or a design visit: an adult is home. Never left with a child.\",\"online\":\"No video consult: designs use the yard, the photos and the zone map\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. A system fed by a well pump: the pump and its wiring are an electrician's job, not touched here.\"}",
+ "questions_before_times": [
+  "What is it: a winterization, a start-up, a repair, a backflow test or a new system or zone?",
+  "How many zones does the system have, if you know?",
+  "What feeds it: city water, a well or a rainwater tank?",
+  "When was it last serviced?",
+  "Is anything broken or leaking now?"
+ ],
+ "safety_stop": [
+  "A gas smell, sparks, smoke or a burning smell from the controller or an outlet; a gas or power line hit while digging",
+  "Water reaching the electrical panel, or standing water at outlets with the power on"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "photos",
+  "multiday",
+  "extrawork",
+  "stages",
+  "firststeps",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: an irrigation contractor license or registration for the company, and a license or certificate for each person who designs, installs or tests, where the state's form requires them (some states license irrigation on its own, some under a landscape or plumbing license, some not at all)",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or lock codes\",\"The street address (the secure page has it)\",\"Contract, change-order and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/irrigation+and+sprinkler+installer",
+  "pexels": "https://www.pexels.com/search/irrigation%20and%20sprinkler%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

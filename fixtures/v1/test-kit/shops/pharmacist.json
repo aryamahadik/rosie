@@ -1,0 +1,134 @@
+{
+ "id": "pharmacist",
+ "name": "Pharmacist, vaccines & consults",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pharmacist, vaccines & consults",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Pharmacy",
+   "staff": "Leo and Mei (pharmacists)",
+   "customer": "Alex M. (a patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Flu shot (self-pay price; the plan may pay)",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: Alex's flu shot and first shingles shot with Leo, billed to Alex's health and drug plans, so nothing is due. Nothing is taken when booking. A share a plan leaves, a self-pay price ($45 for the flu shot, $230 a shingles dose) and a medicine review ($45, or nothing when the drug plan includes it) are all paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Pharmacy",
+   "staff": "Priya and Tomas (pharmacists), who visit with a vaccine cooler",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Flu shot at home (self-pay price; the plan may pay)",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: Priya's home visit for Alex's flu shot and COVID-19 shot. Nothing is taken. The pharmacy bills Alex's plan its own way, often with nothing for Alex to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Flu and COVID-19 shots at home",
+     "price": "$245",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home visit, paid by Alex: nothing is taken, and Rosie texts the $245 bill (flu $45, COVID-19 $160, home visit $40) when Priya texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "short shot visits of a set length, booked with a pharmacist by name or with whoever is on, with a 15-minute wait after every shot built into the booking; two or three shots fit in one visit and one wait; a shot is offered only while it's in stock, and its doses are set aside when the visit is booked; walk-ins are welcome when a pharmacist is free; medicine reviews at the pharmacy or by video; Rosie books shots and medicine reviews only, never prescriptions, refills or transfers",
+ "questions_before_times": [
+  "which shots, or a medicine review: the pharmacy's own list only",
+  "for a shot in a series, like shingles: first or second dose",
+  "the patient's age group, since the state's age rules and some shot kinds depend on it",
+  "a health plan, a drug plan (names only), or self-pay",
+  "for a video review: which state the patient will be in",
+  "who the shots are for: the person booking, a child, or another adult"
+ ],
+ "safety_stop": [
+  "signs of a severe allergic reaction: trouble breathing, swelling of the face, lips or throat, hives spreading fast, or fainting after a shot",
+  "chest pain, signs of a stroke (a drooping face, a weak arm, slurred speech, a sudden severe headache), or very heavy bleeding",
+  "an overdose, or swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "The screening questions and the consent",
+  "The pharmacist's review of the answers",
+  "The vaccine count",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "A prescriber's order"
+ ],
+ "facts": [
+  "children",
+  "documents",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "planbill",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each pharmacist holds their own active license from the state where the patient is during the visit; the pharmacy holds the state's pharmacy permit; whether a pharmacist needs extra vaccine training or a certificate, and whether trained technicians or interns may give shots, comes from the state's form (a switch)",
+ "staff_skills": "pharmacists: shots, medicine reviews, home shot visits and shot clinics; only people cleared for home visits go to homes; trained technicians or interns give shots only where the state's form allows it, under a pharmacist (a switch)",
+ "messages_never": "texts carry only the pharmacy's name, the date, the time, the address and a secure link: never a shot's name, a medicine, a screening answer, a reaction or a health detail",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pharmacist+vaccines+consults",
+  "pexels": "https://www.pexels.com/search/pharmacist%2C%20vaccines%20%26%20consults/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

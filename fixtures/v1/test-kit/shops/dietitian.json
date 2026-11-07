@@ -1,0 +1,163 @@
+{
+ "id": "dietitian",
+ "name": "Dietitian",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Dietitian",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Nutrition Clinic",
+   "staff": "Grace and Priya (dietitians)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First nutrition visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: Alex's first nutrition visit with Grace, Sat Oct 24 at 11:00am, with a doctor's referral. Nothing is taken and no card is saved. The desk checks Willow Health and logs the referral, and Alex pays the $35 share at the front desk. Self-pay clients pay $150, then $90 a follow-up, the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "First nutrition visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The same first visit where Sam turns on the clinic's $40 late-cancel fee. A card is saved for it, never for a fee-free client, and Sam confirms any charge. Alex still pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "First nutrition visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The same first visit on a Saturday morning, when nobody is at the front desk (video visits work the same). Nothing is taken, and Rosie texts Alex the bill when Grace texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Nutrition",
+   "staff": "Marcus (dietitian and diabetes educator) and Lucia (nutrition coach)",
+   "customer": "Alex M. (client, who can't easily get out for now) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home nutrition visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: Alex, who can't easily get out for now, has a $179 home nutrition visit with Marcus, Thu Oct 22 at 8:00am, with a look at the kitchen. Alex pays out of pocket: nothing is taken, no card is saved, and Rosie texts the bill when Marcus texts DONE. Grocery store tours ($75) are paid the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home nutrition visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home visit when Alex's health plan pays in network, with a doctor's referral. Nothing is taken, and Lee Home Nutrition bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one client with one dietitian at a time, each visit a set length: a 60-minute first nutrition visit (the assessment), then 30-minute follow-ups agreed at the visit and OK'd by the client by text; a new client may ask for a free 15-minute intro call first; a parent or guardian comes with anyone under 18",
+ "questions_before_times": [
+  "for you (18 or older), or for your child or teen (a parent or guardian books and comes)",
+  "which state you'll be in during the visit (a dietitian must be licensed there, by video too)",
+  "a health plan (its name only), or paying yourself",
+  "has a doctor sent a referral: yes, not yet, or no",
+  "new or returning",
+  "at the clinic, by video, or at your home (the town, for a home visit or a store tour)"
+ ],
+ "safety_stop": [
+  "a medical emergency: fainting, confusion, chest pain, trouble breathing, or very high or very low blood sugar the person can't bring back",
+  "thoughts of suicide or self-harm",
+  "signs of an eating disorder: making yourself throw up, using laxatives to get rid of food, going days without eating, or a strong fear of gaining weight"
+ ],
+ "first_steps": [
+  "Doctor's referral",
+  "Intake on the secure page",
+  "The plan check",
+  "Intro call",
+  "A written good-faith estimate",
+  "Recent lab results"
+ ],
+ "facts": [
+  "planbill",
+  "firststeps",
+  "forms",
+  "video",
+  "children"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always for medical nutrition therapy: a dietitian's own license where the state's form licenses dietitians, or the national dietitian registration (RDN) as the proof where the state's form has no license (a switch)",
+ "staff_skills": "who sees adults, teens and families; who offers video, home visits and grocery store tours; who speaks which language; who is trained for eating-disorder care (booked only by the clinic's team, by phone); a dietitian with a provisional license works under a supervisor",
+ "messages_never": "client texts carry only the business name, the date, the time, the place and a secure link: never the kind of visit, a condition, a weight, lab results, a medicine name, food or eating details, or a child's details; at home and at a store, the dietitian's name and photo stay, for the door check; the video link stays on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dietitian",
+  "pexels": "https://www.pexels.com/search/dietitian/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

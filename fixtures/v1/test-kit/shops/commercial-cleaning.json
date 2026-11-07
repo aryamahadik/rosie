@@ -1,0 +1,245 @@
+{
+ "id": "commercial-cleaning",
+ "name": "Commercial and office cleaning",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Commercial and office cleaning",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Commercial and office cleaning",
+   "staff": "Tomas and Hana (mat washers)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Entrance mat wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 entrance mat wash. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Entrance mat wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 entrance mat wash. A card is saved for the shop's $20 fee. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Cloth bundle wash",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A cloth bundle wash, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Stain treatment",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Stain treatment on a mat, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Custom logo mat wash",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom logo mat, priced at the counter. Only the $25 look is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Commercial and office cleaning",
+   "staff": "Imani and Felix (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Initial clean",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 initial clean first, then a weekly plan. A card is saved for the $89 late-cancel and lockout fee. Rosie texts the bill after each clean.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Initial clean",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 initial clean. Nothing is taken. Rosie texts the bill after the clean.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Floor strip and wax",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 floor strip and wax. A $40 deposit now, and the $110 rest on the bill after.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Post-construction clean",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A post-construction clean, priced from photos at $640. Sam OKs it. A $160 deposit now, the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Large space clean",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A large space clean, priced at the walkthrough before any work. A card is saved for the $89 fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a fixed service at the customer's place, often repeating, priced by the space's size.\",\"list\":[{\"name\":\"Initial clean\",\"price_kind\":\"set by the customer's answers (square feet, restrooms, floors)\",\"example\":\"up to 1,500 sq ft, 2 restrooms: $179 (the example business's own price)\",\"length\":\"set by the space's size: about 3 hours for a crew of two\",\"where\":\"at the customer's place (an office, shop or studio)\",\"money\":\"card saved at booking for the late-cancel and lockout fee, or nothing taken; Rosie texts the bill after the clean\"},{\"name\":\"Office clean (plan visits)\",\"price_kind\":\"a per-visit price for each plan\",\"example\":\"once a week: $135 a visit; twice a week and every 2 weeks are priced by the same answers\",\"length\":\"about 2 hours for a crew of two\",\"where\":\"at the customer's place; nobody needs to be there\",\"money\":\"card saved or nothing taken; the bill is texted after each visit\"},{\"name\":\"Floor strip and wax\",\"price_kind\":\"set by square feet and floor type\",\"example\":\"$150 for a small suite (up to 500 sq ft)\",\"length\":\"about 4 hours; the floor needs hours to dry before foot traffic\",\"where\":\"at the customer's place, a closed area\",\"money\":\"a deposit, where the state's caps allow ($40 in the example); the rest is billed after the work\"},{\"name\":\"Carpet cleaning\",\"price_kind\":\"from the list, per suite\",\"example\":\"$199 for a suite up to 1,000 sq ft (hot-water extraction)\",\"length\":\"about 3 hours; carpet needs hours to dry\",\"where\":\"at the customer's place\",\"money\":\"card saved or nothing taken; billed after\"},{\"name\":\"Post-construction clean\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for a small suite after a remodel\",\"where\":\"at the customer's place, an empty space\",\"money\":\"a deposit where the state's caps allow ($160 in the example); the rest is billed after\"},{\"name\":\"Large space clean\",\"price_kind\":\"quoted at a walkthrough, before any work (over 5,000 sq ft, many restrooms or odd hours)\",\"example\":\"only the $89 fee is promised\",\"where\":\"at the customer's place\",\"money\":\"card saved; billed after\"},{\"name\":\"Walkthrough and quote\",\"price_kind\":\"free\",\"example\":\"about 30 minutes: a lead walks the space with the manager and measures\",\"where\":\"at the customer's place\",\"money\":\"nothing taken, nothing after\"},{\"name\":\"By the hour (extra crew time or a day porter)\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour for a crew of two, 1-hour minimum\",\"where\":\"at the customer's place\"},{\"name\":\"Add-ons\",\"price_kind\":\"one price each, added only when the customer asks\",\"example\":\"carpet cleaning of the front office $160; break room fridge and microwave $60; inside windows $95\"},{\"name\":\"Late-cancel fee\",\"price_kind\":\"one price\",\"example\":\"$89: only for a late cancel or a lockout the owner confirms, or owed when a large space clean isn't done\",\"where\":\"not booked alone\"},{\"name\":\"Mat, mop head and cloth washing at the business (Lee Mat Care)\",\"price_kind\":\"one price by item, from photos, or at the counter\",\"example\":\"entrance mat $35, hallway runner $40, mop head bundle $20, rubber-back mat $25, cloth bundle $55, large logo mat $140, stain treatment from photos, a custom logo mat priced at the counter after a $25 look\",\"where\":\"dropped off at the shop; nothing is washed at the customer's place\",\"money\":\"nothing taken; paid at the counter at pick-up\"}],\"capacity\":\"A clean takes a crew of two: a lead and a helper. A mat drop-off needs one person at the counter.\",\"nobody_home\":\"Yes, for most plan visits: entry by key, fob, door code or lockbox the business holds. DONE with after photos confirms it. The first visit and any floor care have the on-site contact reachable by phone.\",\"online\":\"No.\",\"not_offered\":\"Home cleaning, pest control, mold over the state's size cutoff, sewage, biohazards, window work above the ground floor, cleaning inside server rooms, vaults or cash areas.\",\"drop_off_slots\":\"Mats, mop heads and cloths are booked into drop-off slots by the shop's daily number, with no washer named; the items go to a mat washer with the skill once they're in.\"}",
+ "questions_before_times": [
+  "Kind of space: office, shop, studio, gym, church or other",
+  "About how many square feet, how many floors and how many restrooms",
+  "Once, or a plan: how many times a week",
+  "Floor types: carpet, tile, wood or waxed vinyl",
+  "For floor care: how many square feet and what's on the floor now",
+  "For a mat drop-off: the item's size and what it's made of"
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "smoke or fire",
+  "sewage or a sewage backup",
+  "biohazards: blood, body fluids, needles, a crime or trauma scene",
+  "an unknown chemical spill",
+  "asbestos or lead dust",
+  "a mold patch over the state's size cutoff",
+  "sparking or exposed wiring",
+  "floors, stairs or ladders that aren't safe",
+  "bedbugs or rodents"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "monthlybill"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Usually none for office cleaning and floor care. Where the state's or city's rules require a business license or registration for janitorial work, the form asks for it. Work at height (outside windows above the ground floor), pest control, mold, asbestos and biohazard cleanup are separate licensed or certified trades in some places and are not offered here.",
+ "staff_skills": "[\"Office, restroom and break room cleaning\",\"Floor care: strip, wax and buffing\",\"Carpet cleaning\",\"Post-construction cleans\",\"Mat, mop head and cloth washing, stain treatment, custom logo mats\"]",
+ "messages_never": "[\"Entry, fob, lockbox, door, garage and alarm codes\",\"Where a key is kept\",\"The alarm company's passcode\",\"Health reasons, like an allergy behind a product to avoid\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/commercial+and+office+cleaning",
+  "pexels": "https://www.pexels.com/search/commercial%20and%20office%20cleaning/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

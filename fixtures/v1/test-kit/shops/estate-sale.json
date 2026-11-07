@@ -1,0 +1,164 @@
+{
+ "id": "estate-sale",
+ "name": "Estate sale company and auctioneer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "junk",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Estate sale company and auctioneer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Estate sale company and auctioneer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Consignment drop-off",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A consignment drop-off or a free 15-minute evaluation. Nothing is taken. The gallery keeps 25% of what sells and settles the rest after the auction, its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Written appraisal",
+     "price": "$350",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A written appraisal at the office, 2-hour minimum $350; a card saved for the $50 missed-appointment fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Estate sale company and auctioneer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|none|own",
+   "services": [
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Estate sale",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a free walk-through, then a managed estate sale: 35% of the gross, $1,500 minimum, taken from the proceeds; nothing up front. Lee Estate Sales settles it its own way within 14 days of the last sale day. Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Estate sale",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A cleanout quoted at the walk-through when there's no sale: $900, nothing up front, billed through Rosie after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Written appraisal",
+     "price": "$350",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A written appraisal at the home, $175 an hour with a 2-hour minimum ($350); billed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Project: a free walk-through at the home, then a written proposal, a signed agreement, setup days, sale days and a settlement; the firm is paid a share of what sells, settled from the proceeds in its own tools, not through Rosie",
+ "questions_before_times": [
+  "What is being sold or cleared: the whole home, a few rooms, or single items?",
+  "Who has the right to sell: the owner, an executor or administrator, a trustee, an agent under a power of attorney, or a conservator?",
+  "Any date the home must be empty by: a closing, a lease end or a listing",
+  "Is the home owned, rented or in a building with rules? (a public sale in a rented or condo home needs the building's OK)"
+ ],
+ "safety_stop": [
+  "someone is hurt, has fallen or can't breathe",
+  "a fire, smoke or a gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "results"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "an auctioneer license where the state's rules license auctioneers (each auctioneer, the firm, or both); a bond and a trust account for buyers' money where those rules require them (the business's own bookkeeping); an estate sale firm usually needs only a business registration; a used-goods dealer license, a seller's permit and a per-sale local permit only where the rules require them",
+ "staff_skills": "",
+ "messages_never": "[\"Lockbox and gate codes\",\"Item lists, item values and the settlement amount: the secure page only\",\"That a home stands empty: told only to the staff on the job\",\"A death, health details or the family's situation: owner and staff texts never say why a home is being sold\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/estate+sale+company+and+auctioneer",
+  "pexels": "https://www.pexels.com/search/estate%20sale%20company%20and%20auctioneer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

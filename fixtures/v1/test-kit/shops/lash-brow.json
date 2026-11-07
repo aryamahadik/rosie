@@ -1,0 +1,155 @@
+{
+ "id": "lash-brow",
+ "name": "Lash and brow studio",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Lash and brow studio",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lash and brow studio",
+   "staff": "Kayla and Lina (lash artists)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Lash fill",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $70 lash fill with Kayla, 3 weeks or less after the last set. A card is saved for the studio's $20 fee. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Classic full set",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 Classic full set (2½ hours). A $40 deposit now, and $100 at the desk. A free glue patch test comes 1 to 2 days before a first set.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lash and brow studio",
+   "staff": "Diego and Luis (lash artists who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Classic full set at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 Classic full set at Alex's home with Diego. A card is saved for the $89 trip fee. Rosie texts the bill after, with a tip line.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Wedding party lashes",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Wedding party lashes for Alex and 4 friends, priced from the party's answers and a photo at $640, OK'd by Sam. A contract, a $160 deposit now, and the $480 rest charged to the saved card when Diego texts DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set appointments with a chosen artist; the length is set by the service, and a fill turns into a full set when the plug-in's fill rule isn't met",
+ "questions_before_times": [
+  "new or returning, and for lashes: a first set, or the date of the last set or fill (it decides a fill or a full set, and the patch test)",
+  "which service: a fill, a full set, a lift, brows",
+  "for a full set: the look (natural, wispy or full)",
+  "for a wedding party: how many people, the date, and where everyone gets ready"
+ ],
+ "safety_stop": [
+  "glue or a chemical in the eye now",
+  "a reaction now: eyes or face swelling fast, or trouble breathing",
+  "eye pain or a change in sight after lash or brow work"
+ ],
+ "first_steps": [
+  "Glue patch test (a few test lashes at each outer corner)",
+  "Patch test for a tint, lift or lamination",
+  "Lash consent on the secure page",
+  "Bridal lash trial"
+ ],
+ "facts": [
+  "documents",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "photos"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "always where the state's rules license lash and brow work: lash extensions, lifts, tints, waxing and lamination fall under cosmetology, esthetics or an eyelash license, as the state form says",
+ "staff_skills": "classic, volume, lifts, tints, lamination, waxing, threading, makeup; only artists with the skill and the license are offered",
+ "messages_never": "eye-form answers, allergies, patch-test results and reactions never go in a text or through the AI: only the secure page and the customer's record. Check texts ask nothing personal; the artist asks by phone",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/lash+and+brow+studio",
+  "pexels": "https://www.pexels.com/search/lash%20and%20brow%20studio/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

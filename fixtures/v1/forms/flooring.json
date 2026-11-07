@@ -1,0 +1,1192 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "flooring",
+  "name": "Flooring installer",
+  "type": "project",
+  "started_from": "contractor"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K06",
+   "field": "Stays: a start and an end date, a price per night or day, drop-off and pick-up times",
+   "type": "dates",
+   "need": "R when the work has stays",
+   "shows": "booking page, confirmation",
+   "source": "A4-68, B4-85",
+   "google": "no",
+   "turned_on_by": "fact multiday"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "V12",
+   "field": "Bank transfer for a bill over an amount",
+   "type": "on or off + amount",
+   "need": "O (off)",
+   "shows": "pay link",
+   "source": "S1-21, S11-56, fact banktransfer",
+   "google": "no",
+   "turned_on_by": "fact banktransfer"
+  },
+  {
+   "id": "V16",
+   "field": "Stage payments (each stage billed as it is done)",
+   "type": "stage plan",
+   "need": "P",
+   "shows": "bill",
+   "source": "fact stages, A9-16",
+   "google": "no",
+   "turned_on_by": "fact stages"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "photos",
+  "documents",
+  "firststeps",
+  "extrawork",
+  "stages",
+  "banktransfer",
+  "multiday"
+ ],
+ "switches": [
+  "cancelright"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|card|counter",
+   "paths": [
+    "list|card|counter",
+    "list|none|counter",
+    "list|full|none",
+    "list|deposit|counter",
+    "photos|card|counter",
+    "visit|card|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "visit|none|bill",
+   "paths": [
+    "visit|none|bill",
+    "visit|none|own",
+    "visit|card|bill",
+    "photos|deposit|bill",
+    "list|card|bill",
+    "list|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Floor consult",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Floor consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Floor consult",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$35",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Floor consult, $35; nothing taken; a YES books it; paid at the showroom desk."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Floor preview session",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$55",
+   "deposit": null,
+   "rest": null,
+   "paid": "$55",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "Floor preview session, $55, paid in full when booking; credited to the floor if Alex orders an install."
+  },
+  {
+   "flow": "A",
+   "path": "list|deposit|counter",
+   "name": "Whole-home floor plan",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": "$40",
+   "rest": "$100",
+   "paid": null,
+   "fee": "$20",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Whole-home floor plan, $140; a $40 deposit now; the $100 rest at the showroom desk."
+  },
+  {
+   "flow": "A",
+   "path": "photos|card|counter",
+   "name": "Pattern layout",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$90",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Pattern layout, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the showroom desk."
+  },
+  {
+   "flow": "A",
+   "path": "visit|card|counter",
+   "name": "Floor match",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Floor match, priced at the showroom after a $25 consult; a card saved for the $20 fee; paid at the showroom desk."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|bill",
+   "name": "Wood floor install",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "Wood floors, 594 sq ft: the $89 measure visit, nothing taken; Danny's $9,200 written quote; the contract, a $920 deposit, $3,370 when the wood arrives; the last $4,910 on the bill Rosie texts."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|own",
+   "name": "Wood floor install",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The same floors, but Sam bills the deposit, the wood payment and the last payment his own way; Rosie sends nothing about money."
+  },
+  {
+   "flow": "B",
+   "path": "visit|card|bill",
+   "name": "Wood floor install",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The same floors, with a card saved for the $89 measure visit fee when he books."
+  },
+  {
+   "flow": "B",
+   "path": "photos|deposit|bill",
+   "name": "Laundry room floor",
+   "price_kind": "photos",
+   "price_kind_label": "Quoted from photos first",
+   "price": "$640",
+   "deposit": "$160",
+   "rest": "$480",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A laundry room floor priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|bill",
+   "name": "Board repair",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "Board repair, $179 from the list (or a garage floor sealing); a card saved for the $89 fee; Rosie texts the bill after the job."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Buff and recoat",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": null,
+   "rest": null,
+   "paid": "$150",
+   "fee": "$89",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "Buff and recoat, $150 from the list, paid in full when booking; nothing more after."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Stair and trim picks",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$40",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Floor preview session",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$55",
+   "paid": "$55",
+   "fee": "$20"
+  },
+  {
+   "flow": "B",
+   "name": "Board repair",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "bill",
+   "price": "$179",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Buff and recoat",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$150",
+   "paid": "$150",
+   "fee": "$89"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Measure visit with samples",
+   "price": "$89, credited to the floor if Alex signs within 30 days (the example's own price; a free measure is a starting option)",
+   "kind": null,
+   "length": "60 minutes, plus the drive",
+   "where": "at the customer's place; an adult is home",
+   "before": "nothing taken at booking; a card may be saved for the $89 fee",
+   "after": "billed only if no contract follows"
+  },
+  {
+   "name": "Wood floor install (engineered or solid)",
+   "price": "quoted after the measure visit, by the square foot with material and 10% for waste (the example: about $11 a sq ft); a written quote the next business day, good for 30 days",
+   "kind": null,
+   "length": "one crew lays about 600 sq ft in 3 days, after the wood rests at least 3 days",
+   "where": "at the customer's place",
+   "before": "nothing at booking; a deposit only after the contract is signed",
+   "after": "the wood payment once it's delivered; the last payment after the walk-through"
+  },
+  {
+   "name": "Vinyl plank install",
+   "price": "quoted after the measure visit (the example: about $7 a sq ft); in stock, no resting days",
+   "kind": null,
+   "length": null,
+   "where": "at the customer's place",
+   "before": "the same",
+   "after": "the same"
+  },
+  {
+   "name": "Tile floor (Lee Tile)",
+   "price": "free measure visit, then a quote",
+   "kind": null,
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Laundry room floor",
+   "price": "priced from photos (example: $640); over $500, Sam OKs it",
+   "kind": null,
+   "length": "1 day",
+   "where": "at the customer's place",
+   "before": "a signed contract, then a 25% deposit",
+   "after": "the rest on the bill"
+  },
+  {
+   "name": "Board repair",
+   "price": "$179, from the list (up to 3 boards)",
+   "kind": null,
+   "length": "1 to 2 hours",
+   "where": "at the customer's place",
+   "before": "a card saved for the $89 fee",
+   "after": "Rosie texts the bill"
+  },
+  {
+   "name": "Buff and recoat",
+   "price": "$150, from the list",
+   "kind": null,
+   "length": "half a day",
+   "where": "at the customer's place",
+   "before": "paid in full when booked",
+   "after": "nothing more"
+  },
+  {
+   "name": "Garage floor sealing",
+   "price": "$179, from the list",
+   "kind": null,
+   "length": null,
+   "where": "at the customer's place; nobody needs to be home",
+   "before": "a card saved for the $89 fee",
+   "after": "Rosie texts the bill"
+  },
+  {
+   "name": "Moisture test",
+   "price": "$199, with a written report a few days later",
+   "kind": null,
+   "length": null,
+   "where": "at the customer's place",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Old floor removal",
+   "price": "per sq ft, in the quote; old tile or black glue only after a clear lab test",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Lab test of old tile and glue",
+   "price": "in the quote; done by an outside licensed inspector",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "New baseboards and thresholds",
+   "price": "per foot, in the quote",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Furniture moving",
+   "price": "per room, in the quote; no pianos or safes",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Subfloor repair",
+   "price": "priced by a signed change order when it's found (the example: $190 a sheet)",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Labor",
+   "price": "$120 an hour, 1-hour minimum; added to a job, never booked alone",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Wood sold with no install",
+   "price": "a store sale, the business's own, outside Rosie. Sold at the home, it gets any cancel notice the rules require.",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Floor consult",
+   "price": "$35, 30 minutes, with the showroom samples",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": "a card saved for the $20 missed-consult fee",
+   "after": "paid at the showroom desk"
+  },
+  {
+   "name": "Stair and trim picks",
+   "price": "$40",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": "a card saved",
+   "after": "at the showroom desk"
+  },
+  {
+   "name": "Sample loan",
+   "price": "$20, up to 5 samples to take home for a week",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Finish sample",
+   "price": "$15, an add-on to a floor match",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Stain pick",
+   "price": "$25",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Floor preview session",
+   "price": "$55, 60 minutes: the floors shown in the customer's own room photos; credited to the floor if Alex orders an install",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": "paid in full when booked",
+   "after": "nothing more"
+  },
+  {
+   "name": "Whole-home floor plan (layout, thresholds, materials)",
+   "price": "$140, 2½ hours",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": "a $40 deposit, with the $100 rest at the desk, or a card saved for the $20 fee",
+   "after": "at the showroom desk"
+  },
+  {
+   "name": "Pattern layout",
+   "price": "priced from the customer's photos and measurements (example: $90), like herringbone; Sam OKs each one",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Floor match",
+   "price": "priced at the showroom after a $25 consult, once the old floor is seen (the example: from $110); a 15-minute board check first",
+   "kind": null,
+   "length": null,
+   "where": "at the showroom",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "What's on the floor now? (carpet, tile, vinyl, wood, not sure)",
+   "Which rooms, and about how big?",
+   "What floor would you like? (wood, vinyl plank, tile, carpet)"
+  ],
+  "after_time": [
+   "The year the home was built (old tile or glue may be tested first; painted trim in older homes is taken off the lead-safe way, where the rules require it)",
+   "Furniture to move",
+   "Slab or crawl space?",
+   "Do you own the home or rent? (the owner signs the contract)",
+   "Parking, pets, and how to get in"
+  ],
+  "secure_page_only": [
+   "Photos of the floors (optional)",
+   "Budget range",
+   "Door or lockbox codes"
+  ],
+  "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's install needs the owner to sign."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "part of a floor has caved in or dropped, cracking sounds under foot, a hole someone could fall through",
+    "says": "Leave that room now, and keep everyone out of it. Call 911 if anyone is hurt.",
+    "booking": "no booking until it's safe"
+   },
+   {
+    "words": "a gas smell, sparking wires, a carbon monoxide alarm",
+    "says": "Leave the house now. Then call 911 and the gas or power company.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "a soft spot that may give way",
+    "says": "Keep everyone off the soft spot, and move heavy furniture away from it. If it drops or cracks, leave the room and call 911.",
+    "booking": "goes on, marked urgent, soonest times first"
+   },
+   {
+    "words": "water coming up through the floor, or a leak under it",
+    "says": "Shut off the water, and stay away from wet outlets. Call a plumber first if it's still coming.",
+    "booking": "goes on"
+   },
+   {
+    "words": "worry about old tiles, black glue or old paint",
+    "says": "Please don't sand, scrape or pull them up. They're tested first.",
+    "booking": "goes on; the test becomes a first step"
+   }
+  ],
+  "always": "The danger check runs first on every customer message: the first ask, the answers, and any later text",
+  "business_line": "Questions about old tiles, asbestos or the structure go to the business's own line",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "Leave the furniture in place for the measure visit",
+   "Before the install: empty dressers and closets, and put away anything fragile; the crew moves the big furniture",
+   "Keep the heat or air on while the wood rests",
+   "Put any door or lockbox code on the secure page"
+  ],
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "licenses_or_certificates": "The company holds the license or registration. Where the state's form also licenses each installer or salesperson, each one may add a number (optional, shown as given, not checked by Rosie).",
+  "who_oks": "Sam OKs quotes and change orders over $500; Pat may OK them too, and Sam's answer wins",
+  "stand_in": "Sam or another estimator may take a measure visit; a job keeps its estimator unless Sam moves it; only Elena does specialty work at the showroom",
+  "roles": "Estimator (Danny): measure visits, quotes and running the job. Crew lead (Hugo): installs with the crew, board repairs and recoats; he can measure too. Floor consultants (Elena, Leo) at the showroom."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult who owns the home, or someone with the owner's written OK. A renter's install needs the owner to sign.",
+  "minors_texts": "Never booked by a minor; a child at home is never the one who lets the crew in"
+ },
+ "visit": {
+  "check_in": "Measure visit: the check-in code at the door. Each install day: that day's code, or the lockbox and a start photo when nobody is home. Showroom: the code at the desk.",
+  "done": "The walk-through of every room against the contract, fixes on the spot, then DONE on the last day",
+  "changes_at_visit": "Hidden damage under the old floor, like a soft subfloor, is priced by a written change order with photos, signed by both before the fix. Wood never goes over soft subfloor; the crew works in other rooms meanwhile."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "if: a home improvement or contractor license for the company, where the state's form requires one. Some states license flooring only above a job size, or only for some floor types (hard floors but not carpet). Some license none.",
+  "who": "The business; each installer or salesperson too, where the state's form licenses them (the business's own word)",
+  "ask": [
+   "The company's license or registration number, and its class",
+   "Any job-size or floor-type limit the license has",
+   "General liability insurance; workers' comp where the business has employees",
+   "A bond, where the state's form asks for one"
+  ],
+  "background": "Background checks only where the state's form asks"
+ },
+ "never_in_a_text": [
+  "Door or lockbox codes",
+  "The budget",
+  "Contract, change order and test papers (secure page only, with a copy by email)"
+ ],
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.questions": [
+   "showroom"
+  ],
+  "pf.first_steps": [
+   "before_quote",
+   "after_contract",
+   "lead_safe_pamphlet",
+   "showroom_prep"
+  ],
+  "pf.staff": [
+   "lead_safe",
+   "outside"
+  ],
+  "pf.license": [
+   "no_license",
+   "lead_safe",
+   "asbestos",
+   "showroom"
+  ],
+  "pf.visit": [
+   "at_the_visit",
+   "outside_visits",
+   "moisture",
+   "install",
+   "showroom_done",
+   "before_photos"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

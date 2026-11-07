@@ -1,0 +1,167 @@
+{
+ "id": "occupational-therapist",
+ "name": "Occupational therapy",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "physical-therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Occupational therapy",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee OT Clinic",
+   "staff": "Greta Ward and Hana Ito (OTs) and the front desk",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New assessment",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: a $165 new assessment with Greta. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New assessment",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The same assessment where the clinic turns on its $50 missed-visit fee: a card is saved for it, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home OT",
+   "staff": "Ben Ashby (OT) and Sol Reyes (occupational therapy assistant), who visit homes and workplaces",
+   "customer": "Alex M. (a new patient, at home) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home assessment",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a $190 home assessment with Ben. A card is saved for the $100 missed-visit fee, and charged $190 when Ben texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home safety assessment",
+     "price": "$160",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A home safety assessment with nothing saved. Rosie texts the $160 bill when Ben texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Workplace assessment",
+     "price": "$220",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A workplace assessment. Nothing is taken, and the business bills the employer its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types in the clinic's treatment room, or at a home or a workplace, each with a set length; an assessment is a history, a check of daily tasks, and a plan of care; a plan of care's sessions are booked as a series only with the patient's own yes, and each is paid when it happens; a home visit checks the home and gives a written list, and no work is done on the home by Rosie's team",
+ "questions_before_times": [
+  "for you, or for your child (a parent or guardian books a child, who stays)",
+  "new or returning patient (a new patient gets the 60-minute new assessment)",
+  "which visit: the clinic's own visit types only, never a condition typed into the AI",
+  "a car accident or a work injury (then it's billed to that claim)",
+  "a health plan (its name only), or paying yourself",
+  "mornings, midday or evenings"
+ ],
+ "safety_stop": [
+  "a sudden face droop, arm or leg weakness, trouble speaking, or sudden confusion; or a fall with a hit to the head and trouble waking",
+  "a gas smell, smoke, or a fire at a home or a workplace visit",
+  "a wound that's red, hot and getting worse, or a fever with new swelling",
+  "thoughts of ending a life"
+ ],
+ "first_steps": [
+  "Health history and consent",
+  "The plan check",
+  "The claim for a car accident or a work injury",
+  "A written price estimate for self-pay patients",
+  "The referral, where the plan or the state asks for one",
+  "The employer's OK for a workplace visit"
+ ],
+ "facts": [
+  "plans",
+  "planbill",
+  "forms",
+  "children",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "each OT holds their own state license; the clinic where the state's form asks",
+ "staff_skills": "clinicians: assessments, plans of care, splint fittings, home and workplace assessments, child sessions; the front desk: check-in, plan checks, estimates and payment; only people cleared for home and workplace visits go out",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the condition, the visit type, the reason, the plan, or the clinician's name (at home or at work, the clinician's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/occupational+therapy",
+  "pexels": "https://www.pexels.com/search/occupational%20therapy/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

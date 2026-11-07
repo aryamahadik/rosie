@@ -1,0 +1,163 @@
+{
+ "id": "martial-arts",
+ "name": "Martial arts school",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "gym",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Martial arts school",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Martial arts school",
+   "staff": "Erin and Malik (instructors)",
+   "customer": "Alex M. (a parent) and Mateo, 8 · other families and students",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free trial class",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: Mateo's free trial in Erin's Kids Beginner class, Sat Oct 24 at 11:00am. Nothing is taken and no card is saved: a YES books it, and nothing is owed after. A member's class books the same way (covered by the membership).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson (30 min)",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$55",
+     "story": "A $55 private lesson for Mateo with Erin (30 minutes), paid in full when booking. Single classes ($25), belt tests ($40) and a membership's first month are paid this way too. A late cancel or a no-show: the $55 may be kept, only with Sam's OK.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Martial arts school",
+   "staff": "Diego and Tomas (instructors who go out)",
+   "customer": "Alex M. (books for the office) · coworkers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Office self-defense class",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 self-defense class for up to 12 coworkers at Alex's office with Diego (60 minutes). A card is saved for the $89 late-cancel or no-show fee, and it's charged $179 when Diego texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Office self-defense class",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 class for a company, a school or a community center that pays by bill: nothing is taken to book, and Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 private lesson at home with Diego (60 minutes), paid in full when booking. With a child, a parent stays home for the whole lesson.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a spot in a set class time by age group and belt, with a set number of spots, a set number of trial spots and a waitlist; each student booked is checked in on their own. A private lesson and a belt test are one instructor's time. Away from the school, an instructor teaches one group at the host's workplace, school or community center, booked whole by the host, or a private lesson at a home",
+ "questions_before_times": [
+  "new to the school, or trained here before (sets the free trial and the waiver)",
+  "the age group (Little Tigers 4 to 6, Kids 7 to 12, Teens and Adults 13 and up), from the parent's words; the AI passes only the age group",
+  "trained before: style and belt (sets beginner or sparring)",
+  "a membership to use, if they have one",
+  "away: a workplace, a school, a community center or a home, and how many people (and if children will be there)"
+ ],
+ "safety_stop": [
+  "someone hurt or in danger right now",
+  "a child who talks about hurting themself"
+ ],
+ "first_steps": [
+  "Waiver",
+  "Health notes, emergency contact and pick-up list",
+  "Sparring line"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "packs",
+  "forms",
+  "waitlist",
+  "children",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "from the state form: teaching martial arts and self-defense usually needs no state license; some states register schools or clubs that sell memberships, and may ask for a bond for months paid ahead; personal training needs no license unless the state's form names one",
+ "staff_skills": "kids' classes, sparring, self-defense, private lessons, belt testing; only black belts Sam names run belt tests; only instructors cleared for children teach them",
+ "messages_never": "a child's age, health notes, injuries, incident notes and anything about bullying or behavior never go in a text or through the AI; texts to the owner or staff carry none either, only the first name, the last initial and a link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/martial+arts+school",
+  "pexels": "https://www.pexels.com/search/martial%20arts%20school/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

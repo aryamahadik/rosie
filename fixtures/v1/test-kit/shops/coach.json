@@ -1,0 +1,150 @@
+{
+ "id": "coach",
+ "name": "Career and life coach",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Career and life coach",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Career and life coach",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "3-month coaching package",
+     "price": "$330",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$330",
+     "fee": "$20",
+     "story": "The main story: Renee's 3-month package, 6 coaching sessions of 60 minutes for $330, paid in full when booked, after the free intro call shows it's a fit. Each session uses one of the 6.",
+     "due_now_at_booking": 330,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Follow-up session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 follow-up session by video, or the same in a plan every 2 weeks. A card is saved for the $20 late-cancel fee, and the $35 is charged when Renee texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Career and life coach",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "On-site coaching session",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 on-site coaching session at Alex's company. Nothing is taken. Sam bills the company once a month, its own way, under the company's contract.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "On-site coaching session",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 session for a company with no contract: nothing is taken, and Rosie texts the bill to Alex, who pays with the company's card.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Team coaching half-day",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A team coaching half-day for Alex's team, priced from the company's answers at $640. Sam OKs it. A $160 deposit now, and the $480 rest on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: one-to-one coaching with a named coach. By video, by phone or at the coach's office (flow A). At a company's office, for its staff, paid by the company (flow B). Every new client starts with a free intro call.\",\"at the business (Lee Coaching, the example practice's own prices; the master's numbers are kept)\":[{\"name\":\"Free intro call\",\"length\":\"20 minutes\",\"price\":\"free\",\"where\":\"by video or phone\",\"rule\":\"the first step for every new client, at least the day before the first paid session; nothing is taken for it\"},{\"name\":\"Coaching session\",\"length\":\"60 minutes\",\"price\":\"$55\",\"where\":\"by video, by phone or at the office\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"3-month coaching package\",\"length\":\"6 coaching sessions of 60 minutes, every 2 weeks, same day and time\",\"price\":\"$330 ($55 a session)\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"rule\":\"booked as one series: all 6 times are saved at once, each with its own code and reminder\"},{\"name\":\"Follow-up session\",\"length\":\"30 minutes\",\"price\":\"$35\",\"where\":\"by video, by phone or at the office\",\"before\":\"a card saved for the $20 late-cancel fee\",\"after\":\"the saved card charged when the coach texts DONE\",\"plan\":\"also as a monthly plan: one every 2 weeks, each charged after it, skip, pause or end by text\"},{\"name\":\"Interview practice\",\"length\":\"30 minutes\",\"price\":\"$40\",\"before\":\"a card saved\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Resume review\",\"price\":\"$20\",\"rule\":\"priced and OK'd before it's done; the resume is added on the secure page\",\"length\":\"30 minutes, on its own or added to a session\"},{\"name\":\"Student session (in school, 18 and up)\",\"length\":\"30 minutes\",\"price\":\"$25\"},{\"name\":\"Career intensive\",\"length\":\"2½ hours\",\"price\":\"$140\",\"before\":\"a card saved for the $40 late-cancel fee\",\"after\":\"the saved card charged at DONE\"},{\"name\":\"Resume rewrite\",\"price\":\"priced from the client's resume first ($90 in the example)\",\"rule\":\"the resume is added on the secure page, never in a text\"},{\"name\":\"Career assessment\",\"price\":\"priced at the first session; only the $25 first meeting is promised\"},{\"name\":\"Coaching at the client's workplace\",\"price\":\"$75\",\"where\":\"flow B: the coach goes to the client's office\"}],\"at the company's office (Lee Workplace Coaching, the example practice's own prices)\":[{\"name\":\"On-site coaching session\",\"length\":\"60 minutes\",\"price\":\"$179\",\"before\":\"nothing taken\",\"after\":\"billed to the company: Sam's own invoice under the company's contract, or the bill Rosie texts to the company's contact\",\"rule\":\"a private room at the company's office; the company sees only the date, the length and the bill\"},{\"name\":\"Team check-in\",\"length\":\"1 hour, up to 8 people\",\"price\":\"$150\"},{\"name\":\"Team coaching half-day\",\"price\":\"priced from the company's answers first ($640 in the example; over $500 needs Sam's OK)\",\"before\":\"a 25% deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Team assessment debrief\",\"price\":\"priced at the session; only the $89 visit fee is promised\"},{\"name\":\"Team assessment report\",\"price\":\"$199\"},{\"name\":\"Extra coaching time\",\"price\":\"$120 an hour, added to a session\"},{\"name\":\"Workshops (the second kind of work)\",\"price\":\"lunch-and-learn talk, 1 hour, $149; team workshop, 2 hours, $189; a leadership retreat: a free call first, then a quote\"}],\"late-cancel fee\":\"Flow A: $20 ($40 for the career intensive), for a cancel less than 24 hours before or a no-show, only with Sam's yes. Flow B: up to the $89 visit fee, for a cancel after 6pm the day before or a no-show, only with Sam's yes and where the company's contract allows it.\",\"travel area\":\"Flow B: the practice's setting (the example: 25 miles).\",\"capacity\":\"One coach per session. A team session or workshop: up to the number the company books.\",\"online\":\"Video and phone sessions count as at the business. The confirmation carries the coach's own video link.\",\"booking window\":\"Up to 60 days ahead. A package saves its 6 times at once.\",\"nobody named\":\"The practice's coaches are listed with no ranking and no 'best' label.\",\"visit fee\":\"Flow B: the $89 visit fee is the least a company pays for a coach's visit to its office. It comes off the session price, caps a late-cancel fee, and is the only price promised for a debrief priced at the session.\"}",
+ "questions_before_times": [
+  "Which coach? The customer names one, or sees the practice's coaches listed with no ranking.",
+  "What it's about, in a few words: career, leadership or life goals. No details.",
+  "By video, by phone, at the office, or at your workplace?",
+  "A single session, the 3-month package, or a plan?",
+  "New or returning client? A new client starts with the free intro call."
+ ],
+ "safety_stop": [
+  "someone says they may hurt themselves",
+  "someone says they may hurt someone else",
+  "danger right now, or a medical emergency"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "firststeps",
+  "packs",
+  "plans",
+  "forms",
+  "documents"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "None by default: coaching needs no state license. It's a switch filled from each state's form, and where a state's form names one, it's asked then. The business gives its registration.",
+ "staff_skills": "[\"Career coaching\",\"Life coaching\",\"Leadership and team coaching\",\"Workshops\"]",
+ "messages_never": "[\"anything the client shares about their job, health or money: goals, an employer, pay, a layoff, a diagnosis\",\"what was said in a session\",\"why a booking was declined\",\"crisis words\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/career+and+life+coach",
+  "pexels": "https://www.pexels.com/search/career%20and%20life%20coach/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

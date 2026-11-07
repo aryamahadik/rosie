@@ -1,0 +1,125 @@
+{
+ "id": "magician",
+ "name": "Magician",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "dj",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Magician",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Magician",
+   "staff": "Max and Nia (performers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "14 days before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Virtual magic show",
+     "price": "$300",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$300",
+     "fee": "$40",
+     "story": "A $300 virtual magic show, paid in full when booking.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Private magic lesson",
+     "price": "$80",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "An $80 private lesson at the studio; a card saved for the $40 late-cancel fee; paid at the lesson.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Magician",
+   "staff": "Leo and Rosa (performers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "14 days before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Kids' birthday magic show",
+     "price": "$350",
+     "deposit": "$100",
+     "rest": "$250",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A $350 birthday magic show: $100 deposit when booking, the $250 rest on the bill after the show.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|own",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Business's own way",
+     "name": "Kids' birthday magic show",
+     "price": "$350",
+     "deposit": "$100",
+     "rest": "$250",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The same show, the $250 rest paid in cash on the day, the performer's own way.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "[{\"name\":\"Kids' birthday magic show\",\"price\":\"list\",\"example\":\"$350 for 45 minutes, up to 30 kids (the example performer's own price)\",\"length\":\"45 minutes, plus 30 minutes to set up before\",\"where\":\"B: the customer's home or a venue they book (a park pavilion, a party room)\",\"money\":\"B: a $100 deposit when booking; the $250 rest after the show, on the bill Rosie sends, or cash the performer's own way\"},{\"name\":\"Strolling magic for a company or wedding event\",\"price\":\"list\",\"example\":\"$900 for 2 hours\",\"length\":\"2 hours\",\"where\":\"B: the event venue\",\"money\":\"B: a $450 deposit when booking; the $450 rest on the bill after the event\"},{\"name\":\"Balloon twisting add-on\",\"price\":\"list\",\"example\":\"+$100 for 45 minutes\",\"length\":\"45 minutes after the show\",\"where\":\"B, added at booking or at the party\",\"money\":\"paid with the rest\"},{\"name\":\"Virtual magic show by video\",\"price\":\"list\",\"example\":\"$300 for 40 minutes, for a group online\",\"length\":\"40 minutes\",\"where\":\"A: by video (the performer's studio)\",\"money\":\"A: the full price when booking\"},{\"name\":\"Private magic lesson\",\"price\":\"list\",\"example\":\"$80 for 60 minutes, at the studio\",\"length\":\"60 minutes\",\"where\":\"A: the performer's studio\",\"money\":\"A: a card saved for a $40 late-cancel fee; paid at the lesson\"}]",
+ "questions_before_times": "The date and start time of the event (a need-by date: the show must happen that day); the kind of event (a child's party, a company event, a wedding); about how many guests and the children's age range (sets the show); indoors or outdoors; the town or ZIP (travel area).",
+ "safety_stop": [
+  "A medical emergency at the party; a fire; a threat to the performer or guests."
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "video",
+  "extrawork",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "14 days before"
+ },
+ "license": "optional; never verified by Rosie (D96)",
+ "staff_skills": "Each performer has their own shows. The customer books a named performer for an event; a stand-in only where the booking didn't name one, and never on silence.",
+ "messages_never": "A guest's allergy or health need; a child's details beyond the first name the host gives for the show.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/magician",
+  "pexels": "https://www.pexels.com/search/magician/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

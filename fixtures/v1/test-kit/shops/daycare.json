@@ -1,0 +1,168 @@
+{
+ "id": "daycare",
+ "name": "Daycare center",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "martial-arts",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Daycare center",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Daycare center",
+   "staff": "Tasha and Mei (teachers)",
+   "customer": "Alex M. (a parent) and Mia, 2 · other families",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Full-time place, Twos room",
+     "price": "$1,280",
+     "deposit": "$300",
+     "rest": "$980",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a full-time place for Mia in the Twos room from Mon Nov 2, $1,280 a month. The $100 registration fee and the $300 deposit are paid on the page now; the deposit counts toward the first month.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Drop-in day",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A drop-in day for a child, $85, nothing taken: paid at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Backup-care day",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$85",
+     "story": "A backup-care day, $85, paid in full when booked.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Daycare center",
+   "staff": "Hana and Ruth (teachers who go out)",
+   "customer": "Alex M. (the host) · the other parents",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Kids' room, 2 teachers, 4 hours",
+     "price": "$320",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$80",
+     "story": "The main story: a kids' room at Alex's family party, 2 teachers for 4 hours at $40 an hour each: $320. A card is saved for the $80 late-cancel or no-show fee, and it's charged for the hours given when the party is done.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Kids' room, 2 teachers, 4 hours",
+     "price": "$320",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$80",
+     "story": "A kids' room for a workplace that pays by bill: $320, nothing taken. Rosie texts the bill after the event.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a place in an age room, by age, with a set room size and a child-to-teacher limit for each age, a start date and a schedule (full-time or part-time); a free tour with the director first; a waitlist in date order when a room is full; a drop-in or backup-care day for a child whose forms are on file. Away from the center: a kids' room run by two teachers at a family's event or a workplace, booked whole by the host",
+ "questions_before_times": [
+  "a tour, a place or a drop-in day",
+  "the child's age in months or years (sets the room), from the parent's words; the AI passes only the age",
+  "full-time or part-time, and the start date wanted",
+  "more children to enroll",
+  "away: a family event or a workplace, the date and hours, and how many children with their ages"
+ ],
+ "safety_stop": [
+  "a child hurt, missing or in danger right now",
+  "a report of abuse or neglect of a child, at the center or anywhere"
+ ],
+ "first_steps": [
+  "Tour with the director",
+  "Enrollment forms",
+  "Trial morning (optional, the center's setting)"
+ ],
+ "facts": [
+  "plans",
+  "children",
+  "spaces",
+  "waitlist",
+  "firststeps",
+  "forms",
+  "documents",
+  "extrawork",
+  "classes"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "from the state's form: a child care center license where the state's rules require one (most states license centers that care for children for pay); care away from the center (a kids' room at an event or a workplace) and babysitting need a license only where the state's form says so",
+ "staff_skills": "infant care, toddlers and twos, preschool, event care",
+ "messages_never": "a child's health, allergies, medicines, shot records, custody orders, who may and may not pick up, incidents and behavior never go in a text or through the AI; only the child's age passes through the AI, to set the room; texts to the owner or staff carry none of these and no age, only the parent's first name and last initial, the room and a link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/daycare+center",
+  "pexels": "https://www.pexels.com/search/daycare%20center/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

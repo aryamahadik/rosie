@@ -1,0 +1,149 @@
+{
+ "id": "allergist",
+ "name": "Allergist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Allergist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Allergy Care",
+   "staff": "Anika (allergist) and Lucas (nurse practitioner)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient allergy visit",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Alex's new patient allergy visit with Anika, billed to Alex's plan. Nothing is taken. The desk checks the plan, and Alex pays the $30 copay at the front desk. Self-pay visits ($230 for a new patient) are paid the same way; a balance after the plan pays is the office's own bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient allergy visit",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Sam confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Visits",
+   "staff": "Felipe and Gina (nurse practitioners), who visit with a medical bag",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $179 house call for Alex with Felipe. Nothing is taken. The office bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "House call",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same house call, paid by Alex himself: nothing is taken, and Rosie texts the $179 bill when Felipe texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits of a set length, booked with an allergist or a nurse practitioner by name; a new patient's first visit is longer and the owner OKs it; skin tests are a visit on the allergist's order; allergy shots are given only at the office, in a visit that holds 30 minutes after the shot, never at home or by video, and are never paid up front; follow-ups are booked by the office at checkout; a house call has a 2-hour arrival window; no same-day sick times: a worry goes to the nurse line first",
+ "questions_before_times": [
+  "a new or a current patient",
+  "which visit: the office's own visit types only, never a symptom typed into the AI",
+  "a plan (its name only) or self-pay",
+  "for a video visit: which state the patient will be in",
+  "who the visit is for: the person booking, a child, or another adult"
+ ],
+ "safety_stop": [
+  "trouble breathing, a tight or closing throat, swelling of the lips, tongue or face, hives with dizziness or fainting, vomiting after a bite, sting, food or a shot, or any bad reaction right after an allergy shot",
+  "an overdose, or swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "Health history, medicines, the consent and the privacy notice",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "Records from the last allergist",
+  "The owner's OK for a new patient"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "the business's own word only: Rosie never requires a license or insurance and never checks one (D96); a clinician's license is for the business to add if it wants it shown; a license the owner says the work needs, and that a person doesn't hold, stops that person's bookings for it",
+ "staff_skills": "allergists and nurse practitioners: new patients, follow-up visits, skin tests, video follow-ups and house calls; nurses: allergy shots on the allergist's order, in the office; home blood draws: someone the owner has cleared for them; only people cleared for house calls go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, symptoms, medicines, test results or the clinician's name (at a house call the clinician's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/allergist",
+  "pexels": "https://www.pexels.com/search/allergist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

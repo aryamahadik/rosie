@@ -1,0 +1,137 @@
+{
+ "id": "cpr-training",
+ "name": "CPR and first aid training",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "gym",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] CPR and first aid training",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "CPR and first aid training",
+   "staff": "Teresa and Ivan (instructors) and the front desk",
+   "customer": "Alex M. (a first-timer) · other students · a company's contact",
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Heartsaver CPR and first aid",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$95",
+     "fee": "$95",
+     "story": "The main story: Alex's seat in Saturday's 9am Heartsaver class, $95, paid in full when booking. A student who doesn't pass the skills check gets no card that day and one free retest within 30 days.",
+     "due_now_at_booking": 95,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Company account seat",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$95",
+     "story": "A company account: the company's contact books seats for named staff, nothing is taken, and the company gets one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "CPR and first aid training",
+   "staff": "Teresa and Ruben (instructors who go out)",
+   "customer": "Alex M. (an office manager, books for staff) · staff",
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "On-site class (9 students)",
+     "price": "$765",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$510",
+     "story": "The main story: an on-site class for 9 staff at Alex's office, $85 a student ($765), nothing taken to book; the bill comes after the class for the final count (at least 6 students, $510).",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Family class at home",
+     "price": "$300",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$300",
+     "fee": "$300",
+     "story": "A family or babysitter class at home for up to 4 people, $300, paid in full when booking.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: seats in a scheduled class at the training center, each student with their own seat, their own result and their own completion card; a private class books one instructor for a group, at the center or at the customer's place (flow B)",
+ "questions_before_times": [
+  "which course, and if it's for a job or a board (some accept only certain programs)",
+  "a new card or a renewal (a renewal brings a current card that's still in date)",
+  "how many students, for a group or an on-site class",
+  "for a blended course: is the online part done"
+ ],
+ "safety_stop": [
+  "someone collapsed or not breathing right now, choking, chest pain, a stroke sign"
+ ],
+ "first_steps": [
+  "Blended course: the online part",
+  "Renewal: the current card",
+  "On-site class: the final student list",
+  "Under 18: the parent's OK"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "forms",
+  "waitlist",
+  "children",
+  "results"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "2 days before"
+ },
+ "license": "none from the state for teaching CPR and first aid in most places; each instructor holds a current instructor card from a nationally recognized program (the program's own card, which the business shows as its word); where a state agency approves providers for some uses (child care staff, school staff), the business shows only the approvals it really holds",
+ "staff_skills": "courses each instructor may teach, languages, teaching minors, on-site travel",
+ "messages_never": "test results (passed or not), health or physical limits, dates of birth: only on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/cpr+and+first+aid+training",
+  "pexels": "https://www.pexels.com/search/cpr%20and%20first%20aid%20training/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

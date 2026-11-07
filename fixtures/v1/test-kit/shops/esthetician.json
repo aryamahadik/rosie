@@ -1,0 +1,226 @@
+{
+ "id": "esthetician",
+ "name": "Esthetician / skin care",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Esthetician / skin care",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Esthetician / skin care",
+   "staff": "Jess and Nadia (estheticians)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Express facial",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a new client's $35 express facial with Jess. A card is saved for the studio's $20 fee. Alex fills in the skin form on the secure page and pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Express facial",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 express facial for a returning client. Nothing is taken: a YES books it. Alex pays at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Glow peel",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A first $140 Glow peel. A $40 deposit now and $100 at the desk. A patch test comes 48 hours before, and Jess reads the skin form first.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Intro facial",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 Intro facial for new clients, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Corrective facial",
+     "price": null,
+     "deposit": "$25",
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A corrective facial, from $110, priced after Jess's skin check. The $25 consult is taken as a deposit toward it. A no to the price: the $25 pays for the consult.",
+     "due_now_at_booking": 25,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Esthetician / skin care",
+   "staff": "Mateo and Gwen (estheticians who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home facial",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 home facial at Alex's home. A card is saved for the $89 trip fee, charged only for a late cancel or a missed visit. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home facial",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 home facial. A card is saved and charged $179 when Mateo texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Bridal spa morning for 5",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A bridal spa morning for 5 guests on Thursday, two days before the wedding, priced from the host's answers at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Bridal spa morning for 5",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The $640 spa party. A $160 deposit now. The $480 rest is charged to the saved card when Mateo texts DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services with a chosen esthetician and a treatment room; the length is set by the service, and a corrective facial is priced after the skin check",
+ "questions_before_times": [
+  "new or returning",
+  "the service, and what it should help with: dullness, breakouts, dark spots, texture, or hair removal",
+  "skin type: dry, oily, combination or sensitive",
+  "a first peel here, or not",
+  "who it's for: me, or my child under 18",
+  "for waxing: the area"
+ ],
+ "safety_stop": [
+  "a reaction happening now: face, lips or throat swelling, or trouble breathing",
+  "a burn or blistering from a product"
+ ],
+ "first_steps": [
+  "Patch test (a small dab of the peel on the skin, to check for a reaction)",
+  "Skin form and treatment consent"
+ ],
+ "facts": [
+  "groups",
+  "firststeps",
+  "forms",
+  "children",
+  "tips",
+  "aftercare",
+  "documents"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "always: esthetics (facials, waxing, light peels) is licensed where the state's rules require it",
+ "staff_skills": "facials, waxing, peels, corrective facials; only estheticians trained in peels are offered for peels",
+ "messages_never": "nothing from a skin form (medicines, pregnancy, allergies, skin conditions, patch-test results) goes in a text or through the AI: only the secure page and the customer's record; staff open forms only by a secure link after signing in",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/esthetician+skin+care",
+  "pexels": "https://www.pexels.com/search/esthetician%20%2F%20skin%20care/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

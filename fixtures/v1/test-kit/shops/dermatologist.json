@@ -1,0 +1,149 @@
+{
+ "id": "dermatologist",
+ "name": "Dermatologist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Dermatologist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Dermatology",
+   "staff": "Elena (dermatologist) and Hana (physician assistant)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Skin check",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a yearly skin check with Elena, $179 on the list. Nothing is taken. The desk checks Alex's plan, and Alex pays the share at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Problem visit",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $140 problem visit where the office turns on its $20 no-show fee. A card is saved for it, and the owner confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Botox (10 units)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Botox, 10 units: $140, self-pay. A $40 deposit on the secure page counts toward it, and Alex pays the $100 rest at the front desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Derm",
+   "staff": "Ravi (nurse practitioner) and Marco (physician assistant), who see patients at home or in a care home",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Skin check at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $179 skin check at Alex's home, billed to Alex's plan. Nothing is taken, and the office bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types with set lengths, each with a clinician by name; medical visits are billed to the patient's health plan or paid by the patient; cosmetic visits are paid by the patient; anything added at the visit, like a biopsy, needs the patient's yes first",
+ "questions_before_times": [
+  "new or returning patient",
+  "medical or cosmetic",
+  "which visit: the office's own visit types only, never a symptom or a spot typed into the AI",
+  "a health plan (its name only) or paying yourself",
+  "for a video visit: the state the patient will be in",
+  "join the list for a sooner time"
+ ],
+ "safety_stop": [
+  "swelling of the face, lips, tongue or throat, or trouble breathing (for example after a new medicine or a shot)",
+  "a fast-spreading rash with blisters, peeling skin or a high fever",
+  "bleeding that won't stop after 20 minutes of firm pressure",
+  "swallowed a skin medicine, or too much of one"
+ ],
+ "first_steps": [
+  "Health history, medicines, consent",
+  "The plan check",
+  "A referral from the primary care doctor",
+  "A written price estimate for self-pay and cosmetic patients",
+  "A cosmetic consult before a first filler"
+ ],
+ "facts": [
+  "planbill",
+  "firststeps",
+  "forms",
+  "results",
+  "video",
+  "aftercare",
+  "children",
+  "extrawork",
+  "waitlist",
+  "plans"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each dermatologist (MD or DO), physician assistant and nurse practitioner who sees patients holds their own active license from the state where the patient is during the visit, video included",
+ "staff_skills": "dermatologists: every visit, biopsies, cosmetic injections; physician assistants and nurse practitioners: skin checks, problem visits, biopsies, and cosmetic injections where the state allows and the practice lists them; medical assistants and the front desk: no clinical OKs",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, a referral, the reason, a spot, photos or results; flow A's texts drop the clinician's name; at the patient's home or care home the clinician's name stays, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/dermatologist",
+  "pexels": "https://www.pexels.com/search/dermatologist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

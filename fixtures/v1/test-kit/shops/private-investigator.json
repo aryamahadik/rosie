@@ -1,0 +1,153 @@
+{
+ "id": "private-investigator",
+ "name": "Private investigator",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Private investigator",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Private investigator",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Case consultation",
+     "price": "$100",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a $100 case consultation at the office; nothing taken; paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Case consultation",
+     "price": "$100",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A $100 consultation by video; a card saved; charged when the investigator texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Private investigator",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Home bug sweep",
+     "price": "$650",
+     "deposit": "$325",
+     "rest": "$325",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a $650 home bug sweep; $325 deposit when booking; the rest billed after.",
+     "due_now_at_booking": 325,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Process serving",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$85",
+     "story": "Process serving at one address, $85, paid in full when booking.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Client meeting",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$85",
+     "story": "A $150 client meeting at the customer's office; nothing taken; the bill texted after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Consult: confidential case consultations at the office or by video or phone; at the customer's place, a bug sweep (looking for hidden cameras, recorders and trackers) or a client meeting; and process serving at another person's address. Surveillance, background checks and other case work follow a signed retainer in the agency's own tools, never booked or paid through Rosie.",
+ "questions_before_times": [
+  "What kind of help: a consult about a case, a bug sweep, serving papers, or a phone check. Only the kind, no names or details.",
+  "In the office, by video or phone, or at your place?",
+  "For a bug sweep: a home, an office or a car, and about how big.",
+  "For serving papers: the date they must be served by, and the city and state of the address."
+ ],
+ "safety_stop": [
+  "someone is in danger or being hurt right now",
+  "crisis words",
+  "a wish to harm or confront the person the case is about"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "forms",
+  "documents",
+  "packs",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "window",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "The agency's private investigator license in each state it works in, where the state's rules require one (a few have none, or only a local one). Each investigator: their own license, or a registration under the agency's license, as the state's rules say. An investigator who carries a firearm: the state's firearm permit for the job. A process server: a license or registration where the state's rules require one.",
+ "staff_skills": "consults, sweeps, serving, spyware checks",
+ "messages_never": "[\"the name or address of the person the case is about, or who is served\",\"what the case is about, any finding, any device found, any photo\",\"the word investigator or sweep in a text to the customer\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/private+investigator",
+  "pexels": "https://www.pexels.com/search/private%20investigator/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

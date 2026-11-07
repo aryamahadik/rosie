@@ -1,0 +1,171 @@
+{
+ "id": "upholstery",
+ "name": "Furniture reupholstery and repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "tailor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Furniture reupholstery and repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Furniture reupholstery and repair",
+   "staff": "Walt and Ines (upholsterers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Seat re-cover",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a dining chair seat re-covered with Alex's own fabric, $35 from the shop's board. Nothing is taken: a YES books the drop-off. Walt texts READY, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Armchair re-cover",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A wingback chair, priced at the counter after a look. Nothing is taken. Walt's written price is OK'd before any work, and Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Dining chairs, set of 4",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Four dining chairs re-covered, $140 labor. A $40 deposit orders the fabric, and the $100 rest is paid at the counter at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Furniture reupholstery and repair",
+   "staff": "Abel and Rhea (upholsterers who make house calls)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Armchair re-cover",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a house call for an armchair and a footstool. Only the $89 estimate visit is promised, with a card saved for it. Abel prices each item at the visit. The pieces come back Thu Nov 12, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Dining chair seats, set of 4",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Four dining chair seats, $179, picked up, re-covered at the shop and delivered back. A card is saved for the $89 fee. Rosie texts the bill after delivery.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Sofa reupholstery",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A sofa reupholstery, priced from photos at $640. Sam OKs it. A $160 deposit orders the fabric, and the $480 rest is on the bill after delivery.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: small pieces left at the counter, then READY and a pick-up; a house call looks at the furniture, the truck takes it to the shop, and it comes back on a booked delivery\",\"examples\":\"the example shop's own prices, not a standard; fabric is extra, at cost, shown in the written price\",\"list\":[{\"name\":\"Dining chair seat re-cover (per seat)\",\"price\":\"one price, $35, with the customer's fabric\",\"length\":\"ready in 5 days\",\"place\":\"at the shop\",\"before\":\"nothing taken at the shop\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Seat cushion cover (one)\",\"price\":\"one price, $40, fabric extra\",\"length\":\"ready in 7 days\",\"place\":\"at the shop\"},{\"name\":\"Cushion zipper replaced\",\"price\":\"one price, $20\",\"length\":\"ready in 3 days\",\"place\":\"at the shop\"},{\"name\":\"Seat repair (new webbing)\",\"price\":\"one price, $25\",\"length\":\"ready in 3 days\",\"place\":\"at the shop\"},{\"name\":\"Ottoman re-cover\",\"price\":\"one price, $55, fabric extra\",\"length\":\"ready in 10 days\",\"place\":\"at the shop\"},{\"name\":\"Dining chairs, set of 4 (labor)\",\"price\":\"one price, $140, fabric extra\",\"length\":\"ready in 3 weeks; a $40 deposit orders the fabric\",\"place\":\"at the shop\",\"before\":\"a $40 deposit orders the fabric\",\"after\":\"the $100 rest at pick-up\"},{\"name\":\"Armchair or wingback re-cover\",\"price\":\"priced at the counter after a look: labor, fabric, foam and springs, written, item by item\",\"place\":\"at the shop, or by a house call\",\"before\":\"nothing taken at the shop\",\"after\":\"at the counter at pick-up\"},{\"name\":\"Sofa reupholstery\",\"price\":\"priced from the customer's photos first (front, back and underneath), then confirmed at the shop; $640 in the example\",\"length\":\"about 3 weeks after the fabric arrives\",\"place\":\"picked up from the customer's place and delivered back\",\"before\":\"a $160 deposit orders the fabric once the owner OKs the price\",\"after\":\"the $480 rest on the bill after delivery\"},{\"name\":\"Free estimate\",\"price\":\"free, from photos or at the counter\",\"place\":\"at the shop or by photos\"},{\"name\":\"House call (Lee Mobile Upholstery)\",\"price\":\"an $89 estimate visit, credited to the work\",\"place\":\"at the customer's home\",\"before\":\"a card saved for the $89 visit\",\"after\":\"Rosie texts the bill after the furniture comes back\"},{\"name\":\"Dining chair seats, set of 4, picked up and returned\",\"price\":\"one price, $179, fabric extra\",\"place\":\"picked up, re-covered at the shop, and delivered back\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill after delivery\"}],\"turnaround\":\"days until ready, per service: seat re-covers 5 days, cushions 7, an ottoman 10, a set of 4 chairs 3 weeks; a sofa about 3 weeks after the fabric arrives\",\"included\":\"a free fix of a seam, a stitch or a spring that fails within 1 year (the shop's labor); the fabric itself is the maker's\",\"capacity\":\"one upholsterer at the bench; sofas, springs and frames are the master upholsterer's work; the truck carries two people and one large piece per trip\",\"nobody_home\":\"no: a house call needs the customer there to show the pieces and OK the price; the delivery is handed to an adult the customer named\",\"online\":\"photos only, for a first price; the price is confirmed when the piece is seen\"}",
+ "questions_before_times": [
+  "What needs doing: new fabric, new foam, springs, a frame repair, or other",
+  "The piece: a dining chair, an armchair, a sofa, a cushion, an ottoman",
+  "How many pieces",
+  "The date it is needed by, like a holiday dinner",
+  "Fabric: the customer's own, or one from the shop's books",
+  "For a sofa or large piece: photos from the front, the back and underneath"
+ ],
+ "safety_stop": [],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "none for upholstery or furniture repair in most places; the business registration; some states ask a separate registration to make, repair or renovate stuffed or upholstered goods (a generic switch, filled from the state form)",
+ "staff_skills": "[\"re-cover\",\"foam and springs\",\"frame repair\",\"pattern and sewing\",\"house calls\",\"delivery\"]",
+ "messages_never": "[\"A card number\",\"A gate or door code\",\"Photos of the inside of the home\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/furniture+reupholstery+and+repair",
+  "pexels": "https://www.pexels.com/search/furniture%20reupholstery%20and%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

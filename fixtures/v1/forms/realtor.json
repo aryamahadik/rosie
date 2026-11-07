@@ -1,0 +1,760 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "realtor",
+  "name": "Real estate agent",
+  "type": "consult",
+  "started_from": "lawyer"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K04",
+   "field": "Places and things (room, table, court, lane, bay, boat, van, vehicle, kennel, suite, property or unit): name, photos, how many it fits, which services use it, hours, how many Rosie can book, private access notes on the secure page only (never in a text). The fields of each kind are in the table below",
+   "type": "list",
+   "need": "R when the work books spaces",
+   "shows": "booking page (space and size, never a person)",
+   "source": "S1-80, S1-81, A4-62, S13-05",
+   "google": "no",
+   "turned_on_by": "an item-based business (FRONTEND-SPEC section 2b)"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "M02",
+   "field": "No money through Rosie (every service takes nothing up front and is paid the business's own way; Stripe is not asked)",
+   "type": "answer or fact",
+   "need": "O",
+   "shows": "sign-up money card",
+   "source": "S1-13, S1-27, fact nomoney",
+   "google": "no",
+   "turned_on_by": "fact nomoney; switch nomoney"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps; fact forms"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  }
+ ],
+ "facts": [
+  "nomoney",
+  "documents",
+  "firststeps",
+  "forms",
+  "video"
+ ],
+ "switches": [
+  "nomoney"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": null,
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": null,
+   "main_path": "list|none|own",
+   "paths": [
+    "list|none|own"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "First buyer meeting",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "free",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a free 45-minute first buyer meeting with Elena at the office, or by video. Nothing is taken and no card is saved: a YES books it. Nothing is paid after: the agent is paid at closing, outside Rosie, as a signed agreement says."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|own",
+   "name": "Home tour",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "free",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The main story: a free 30-minute tour of 17 Birch Ln with Omar. Nothing is taken and no card is saved. Nothing is paid through Rosie: the agent is paid at closing, the brokerage's own way, as the signed buyer agreement says."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "First buyer meeting",
+   "price": "free",
+   "kind": null,
+   "length": "45 minutes",
+   "where": "the office, or by video",
+   "before": "nothing taken",
+   "after": "nothing paid"
+  },
+  {
+   "name": "First seller meeting",
+   "price": "free",
+   "kind": null,
+   "length": "45 minutes",
+   "where": "the office, or by video",
+   "before": "nothing taken",
+   "after": "nothing paid"
+  },
+  {
+   "name": "Follow-up meeting",
+   "price": "free",
+   "kind": null,
+   "length": "30 minutes",
+   "where": null,
+   "before": "nothing taken",
+   "after": "nothing paid"
+  },
+  {
+   "name": "Live video tour of a listed home",
+   "price": "free",
+   "kind": null,
+   "length": "30 minutes",
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Tour of a listed home",
+   "price": "free",
+   "kind": null,
+   "length": "30 minutes",
+   "where": null,
+   "before": "nothing taken; a signed buyer agreement first where the rules require it",
+   "after": "nothing paid"
+  },
+  {
+   "name": "Tour of several listed homes in one trip",
+   "price": "free",
+   "kind": null,
+   "length": "30 minutes a home, plus drive time",
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Listing consultation at the seller's home",
+   "price": "free",
+   "kind": null,
+   "length": "60 minutes",
+   "where": null,
+   "before": null,
+   "after": "any listing agreement is the brokerage's own, signed in its own tools"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "A tour: which home? An address or a listing number. Rosie never searches, suggests or ranks homes or areas.",
+   "Buying or selling: a tour, a first meeting, or a listing consultation?",
+   "In person, or by video?",
+   "A named agent, or the brokerage's soonest free agent? Agents are listed by soonest time, never ranked."
+  ],
+  "after_time": [
+   "Have you signed a buyer agreement with another agent? Yes or no.",
+   "Is anyone coming with you? First names, for the agent's safety.",
+   "Anything that helps the tour, like a step-free way in."
+  ],
+  "secure_page_only": [
+   "Full name",
+   "A photo ID before a first in-person tour, where the brokerage's safety rule asks for one. Only the agent showing the home sees it, and it's deleted after.",
+   "Pre-approved, paying cash, or not yet, and any budget or pre-approval amount: optional, only here, and only for the agent",
+   "The buyer agreement, signed before the first tour where the state's rules or the brokerage require it",
+   "Is it safe to text you?",
+   "A tick: Rosie isn't a real estate brokerage, and gives no opinion on homes, prices, offers or areas"
+  ],
+  "who_may_book": "An adult books for themselves. Another adult may book for a buyer or seller, who then gives their own name and yes on the secure page. A listing consultation: the home's owner, or someone the owner authorizes in writing."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   "someone is in danger right now",
+   "a medical emergency",
+   "crisis words (the 988 line first)"
+  ],
+  "go_on": [
+   "a question about schools, crime, safety, or 'good areas': pointed to public sources, never an opinion; the booking goes on",
+   "a request to find, suggest or rule out homes or areas by who lives there, or by any trait the fair housing rules protect: that part is declined; the rest books"
+  ],
+  "what_rosie_says": {
+   "in danger right now": "Call 911 now. Nothing is booked.",
+   "schools, crime or areas": "Rosie doesn't describe areas or schools. For crime data, see the local police department's public reports. For schools, see the school district's own site. The agent can share facts about the home itself.",
+   "who lives there": "Rosie can't search for, suggest or rule out homes or areas by who lives there. It can book a tour of any home you name."
+  },
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": [
+   "A tour: bring your photo ID, and meet the agent at the front door. Please don't go in before the agent.",
+   "A listing consultation: have your questions and any list of recent repairs ready."
+  ],
+  "required": [
+   "A written buyer agreement, signed on the secure page before the first tour, where the state's rules or the brokerage require it (a switch from the state form). It's the brokerage's own paper: Rosie never writes, explains or changes it, and never sets the agent's pay.",
+   "The listing side's OK for each tour time. The agent asks for it in their own showing tool. Rosie books only the agent's own time, and never contacts the listing agent or the seller.",
+   "A photo ID on the secure page before a first in-person tour, where the brokerage turns on its safety rule.",
+   "A listing consultation: the owner, or someone the owner authorizes, is there."
+  ],
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "skills": [
+   "Buyer tours",
+   "Listing consultations",
+   "First buyer and seller meetings",
+   "Leasing homes for rent: its own plug-in"
+  ],
+  "licenses_or_certificates": "Each agent's active license in the state where the home is, held with this brokerage. Only a licensed agent shows a home, holds a meeting, or talks prices and terms.",
+  "supervision": "Every agent works under the brokerage's supervising broker, here Sam. What an assistant without a license may do comes from the state's form (a switch). The safe default: set times and send papers, but never show a home, open a lockbox, or talk prices or terms.",
+  "who_oks": "Sam, the broker, or Pat, the office manager, OK the brokerage's settings. The listing side OKs each tour time, through the agent's own tool. Sam's answer wins.",
+  "stand_in": "Only another licensed agent at the same brokerage, where the buyer agreement allows it, offered by name. The customer picks. Someone who named an agent is never moved to another on silence: Sam calls instead."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult books for themselves. Another adult may book for a buyer or seller, who then gives their own name and yes on the secure page. A listing consultation: the home's owner, or someone the owner authorizes in writing.",
+  "minors_texts": "Only adults book. A minor never books a tour or a meeting."
+ },
+ "visit": {
+  "check_in": "A tour: the agent comes first, opens the home with the listing side's access, and meets the buyer at the front door, where the buyer gives the code. At the office: the code at the front desk. By video: the agent asks for the code at the start. A listing consultation: the code at the door.",
+  "done": "The code at the door, or DONE. Then a safety check-in text to the agent.",
+  "changes_at_visit": "Another home added on the spot needs its own OK from the listing side, in the agent's showing tool. Nothing is ever priced."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "Always: each agent's own real estate license, active, in the state where the home is, and held with this brokerage. The brokerage's own license and its supervising broker, where the state's rules require them.",
+  "who": "Each agent; the brokerage; its supervising broker.",
+  "ask": "Each agent's license number, at sign-up or in their invite reply. The brokerage's license number and the name of its supervising broker.",
+  "insurance": "Errors and omissions insurance on file where the state's rules require it; the amount comes from the state form.",
+  "background": "None beyond the license check."
+ },
+ "never_in_a_text": [
+  "the budget, a pre-approval amount, or any finances",
+  "the photo ID",
+  "lockbox or alarm codes, and the listing side's showing instructions",
+  "any opinion about a home, a price, an offer or an area"
+ ],
+ "languages": "English and Spanish.",
+ "unmapped_keys": {
+  "pf.safety": [
+   "the agent's safety",
+   "advice"
+  ],
+  "pf.license": [
+   "shown to customers"
+  ],
+  "pf.messages": [
+   "fair housing",
+   "no nudges"
+  ],
+  "pf.visit": [
+   "at check-in",
+   "during the tour",
+   "after the tour"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

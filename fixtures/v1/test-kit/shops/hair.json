@@ -1,0 +1,277 @@
+{
+ "id": "hair",
+ "name": "Hair salon",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Hair salon",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Hair salon",
+   "staff": "Priya and Mia (stylists)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Haircut",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 haircut with Priya. A card is saved for the salon's $20 fee. Alex pays at the chair.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Haircut",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 haircut for a returning customer. Nothing is taken: a YES books it. Alex pays at the chair.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Highlights package",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 Highlights package. A $40 deposit now, and $100 at the chair. A patch test comes first for new color clients.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Color and cut",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Color and cut, priced from Alex's photos at $90. A card is saved for the $20 fee. Sam OKs every color quote; booked once it's OK'd.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Color and cut",
+     "price": "$90",
+     "deposit": "$20",
+     "rest": "$70",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Color and cut, priced from photos at $90 and OK'd by Sam. A $20 deposit now, the rest at the chair.",
+     "due_now_at_booking": 20,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Color correction",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Color correction, priced at the chair. A card is saved for the $20 fee. Only the $25 consult is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Color correction",
+     "price": null,
+     "deposit": "$25",
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "Color correction, from $110, set at the chair. The $25 consult is taken as a deposit when booking, toward the price. A no to the price: the $25 pays for the consult.",
+     "due_now_at_booking": 25,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Hair salon",
+   "staff": "Marco and Sofia (stylists who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Cut and style at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 cut and style at Alex's home. A card is saved for the $89 visit fee. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Cut and style at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 cut and style at home. A card is saved and charged $179 when Marco texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Bridal party hair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Bridal party hair, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Bridal party hair",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The $640 bridal party hair. A $160 deposit now. The $480 rest is charged to the saved card when Marco texts DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Bridal hair trial",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 bridal hair trial, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Extensions styling",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Extensions styling, priced at the visit. Only the $89 visit fee is promised, and a card is saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services with a chosen stylist; length set by the service, and by answers for color",
+ "questions_before_times": [
+  "new or returning",
+  "the service, and for color: the natural color and length now",
+  "any color, box dye, henna or bleach in the last 2 years",
+  "for a big change (2 or more levels lighter, a first balayage or highlights): a consult first",
+  "for a bridal party: how many people, and the date"
+ ],
+ "safety_stop": [
+  "a dye reaction happening now: face, lips or throat swelling, hard to breathe",
+  "a burn or blisters on the scalp after a chemical service"
+ ],
+ "first_steps": [
+  "Patch test (a small skin test for a reaction to hair dye)",
+  "Consult and patch test",
+  "Consult for color correction",
+  "Bridal hair trial"
+ ],
+ "facts": [
+  "photos",
+  "firststeps",
+  "forms",
+  "extrawork",
+  "groups",
+  "children"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: hair work (cosmetology or hairstyling) is licensed where the state's rules require it",
+ "staff_skills": "cut, color, extensions, bridal and updos, makeup; only stylists who do color are offered for color",
+ "messages_never": "allergy, dye-reaction, patch-test and scalp answers never go in a text or through the AI: only the secure page and the customer's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/hair+salon",
+  "pexels": "https://www.pexels.com/search/hair%20salon/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

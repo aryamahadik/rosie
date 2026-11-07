@@ -1,0 +1,209 @@
+{
+ "id": "pressure",
+ "name": "Pressure washer",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pressure washer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pressure washer",
+   "staff": "Parker and Hayden (wash techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Patio set wash",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 patio set wash (a table and 4 chairs). Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Teak set restore",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A teak set restore, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Riding mower degrease",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A riding mower degrease, priced at the counter. Only the $25 inspection is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pressure washer",
+   "staff": "Dakota and Logan (crew leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Driveway wash",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a 2-car driveway and the front walk, $179. A card is saved for the $89 trip fee. Dakota texts DONE with the lines, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Driveway wash",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same $179 driveway. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Driveway wash",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 driveway. A card is saved and charged $179 when Dakota texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "House soft wash",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A 2-story house soft wash, priced from photos at $640. Sam OKs it, and Alex signs the estimate. A $160 deposit now; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Stain treatment",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Oil and rust stains, priced at the visit after a test spot. Only the $89 trip fee is promised, and a card is saved for it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a crew at the customer's place, priced by the surface and its size, often outside with nobody home.\",\"list\":[{\"name\":\"Driveway wash\",\"price_kind\":\"set by the customer's answers (the surface and its size)\",\"example\":\"a 2-car driveway and the front walk: $179; bigger concrete is $0.25 a sq ft (the example business's own prices)\",\"length\":\"about 2 hours, one person\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"a card saved for the $89 trip fee; Rosie texts the bill at DONE\"},{\"name\":\"Patio wash\",\"price_kind\":\"set by the customer's answers\",\"example\":\"a back patio and walk, up to 700 sq ft: $179\",\"length\":\"about 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"as the driveway\"},{\"name\":\"Deck or fence wash\",\"price_kind\":\"set by the customer's answers\",\"example\":\"a deck up to 200 sq ft: $150; bigger decks $0.75 a sq ft\",\"length\":\"about 2 hours\",\"where\":\"at the customer's place\",\"money\":\"as the driveway\"},{\"name\":\"House soft wash\",\"price_kind\":\"from the list for 1 story; quoted from the customer's photos for 2 stories or more\",\"example\":\"1 story from $375; a 2-story home from photos, like $640\",\"length\":\"about 4 hours for a crew of two, for 2 stories\",\"where\":\"at the customer's place; low pressure with a cleaning mix\",\"money\":\"over $500: Sam OKs the price; a 25% deposit where the state's caps allow; the rest on the bill\"},{\"name\":\"Stain treatment (oil, rust)\",\"price_kind\":\"quoted at the visit, after a test spot\",\"example\":\"only the $89 trip fee is promised; like $165 for oil stains and $80 for rust\",\"where\":\"at the customer's place\",\"money\":\"a card saved for the $89 trip fee; the rest on the bill\"},{\"name\":\"Gutter brightening (outside face)\",\"price_kind\":\"one price, added when the customer asks\",\"example\":\"$199\"},{\"name\":\"Roof moss treatment (the second kind of work)\",\"price_kind\":\"from the list, by roof size; steep or tile roofs get a free estimate visit\",\"example\":\"garage or shed roof $149; house roof $189; hand moss removal $120 an hour, 1-hour minimum\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"a card saved for the $89 trip fee; the bill after\",\"who\":\"only a licensed applicator sprays\",\"weather\":\"a dry day before and after, and no gusty wind, as the product's label says\"},{\"name\":\"Lead-safe setup\",\"price_kind\":\"one price, added to any wash of painted surfaces on a home built before 1978\",\"example\":\"+$150: sheeting, signs, and the water and paint chips collected\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: a card saved for it; charged only for a late cancel or a wasted trip Sam confirms, like no water or no way in\",\"where\":\"not booked alone\"},{\"name\":\"Drop-off washing at the wash bay (the second company)\",\"price_kind\":\"one price per item, from photos, or at the counter\",\"example\":\"the example wash bay's own board (the old flowchart has no wash bay; this side is the example's own): patio set (a table and 4 chairs) $35, trailer $40, trash bin $20, kayak $25, grill deep clean $55, boat up to 20 ft $140 (2½ hours), teak set restore from photos, equipment degrease priced at the counter after a $25 inspection\",\"where\":\"dropped off at the wash bay; a patio set can also be washed at the customer's home ($75, billed after)\",\"money\":\"nothing taken and no card saved, so no fee; paid at the counter at pick-up\"}],\"capacity\":\"One person for a driveway, patio or deck. A crew of two (a lead and a helper) for a house wash or a roof. A drop-off needs one person at the counter.\",\"minimum\":\"The business's own minimum job (the example: $150).\",\"nobody_home\":\"Yes, for outside work: the crew needs the side gate (or its code) and a working outside spigot. DONE with after photos confirms it. Someone must be home for a painted home built before 1978 (windows closed, the lead pamphlet's receipt signed).\",\"water\":\"A working outside spigot, or the crew's own water tank where Sam set one.\",\"online\":\"No.\",\"not_offered\":\"Pressure-blasting a roof, paint stripping, and any roof that may not hold weight.\",\"drop_off_slots\":\"Items are booked into drop-off slots by the wash bay's daily number, with no wash tech named; the item goes to a tech with the skill once it's in.\"}",
+ "questions_before_times": [
+  "Which surfaces: driveway, patio, deck, fence, house siding, roof",
+  "About how big: square feet, or how many cars and stories",
+  "The year the home was built, and whether the siding or trim is painted (before 1978 adds the lead-safe setup)",
+  "Roof: what it's made of (composition, cedar, metal, tile) and how steep",
+  "Plants, a pond or pets near the work",
+  "For a drop-off: what the item is, and its size"
+ ],
+ "safety_stop": [
+  "a roof that sags, leaks or may not hold weight",
+  "a cleaning mix or moss treatment swallowed, or in someone's eyes",
+  "power lines near the work",
+  "a gas smell",
+  "a leaking propane tank (a grill brought to the wash bay)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "dropoff",
+  "photos",
+  "tips",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "Depends on the state. Many states license nobody to pressure wash. Some ask for a contractor registration or license, some only above a job-size amount, and some counties license it. The state's form says which.",
+ "staff_skills": "[\"Flat surfaces: driveways, patios, walks\",\"Soft washing: siding and roofs\",\"Decks and fences\",\"Moss treatment (a licensed applicator only)\",\"Lead-safe setup (a certified renovator on the crew)\",\"Wash bay: patio sets, trailers, boats, teak, equipment\"]",
+ "messages_never": "[\"Gate and alarm codes\",\"Where a key or a spigot handle is kept\",\"A health reason behind a question about a mix\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pressure+washer",
+  "pexels": "https://www.pexels.com/search/pressure%20washer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

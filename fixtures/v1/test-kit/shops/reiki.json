@@ -1,0 +1,162 @@
+{
+ "id": "reiki",
+ "name": "Reiki and energy healer",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "massage",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Reiki and energy healer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Reiki and energy healer",
+   "staff": "Mira and Jun (reiki practitioners)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "60-min reiki session",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a 60-minute reiki session at Lee Reiki Studio with Mira, $85. A card is saved for the studio's $40 fee, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "60-min reiki session (5-session pack)",
+     "price": "$340",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$340",
+     "fee": "$40",
+     "story": "A 5-session pack, $340, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 340,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "distance reiki (45 min)",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$35",
+     "story": "A distance session by video or phone, $70. A card is saved, and charged when Mira texts DONE after the call.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Reiki and energy healer",
+   "staff": "Owen and Tess (practitioners who travel)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "8pm the day before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "60-min reiki at home",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$70",
+     "story": "The main story: a 60-minute reiki session at Alex's home with Owen, $140. A card is saved for the $70 fee, and Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "60-min reiki at home (3-session pack)",
+     "price": "$330",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$330",
+     "fee": "$70",
+     "story": "A 3-session pack at home, $330, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 330,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one-to-one sessions of 60 minutes, with a practitioner the client picks or any free one; distance sessions by video or phone; packs of sessions; a home visit",
+ "questions_before_times": [
+  "the kind of session (at the studio, at home, or by video or phone)",
+  "a practitioner by name, or a woman or a man, only if the client asks",
+  "for a teen (16 or 17): the age; a parent or guardian books",
+  "at home: what kind of place (a home or an office) and the town, before any times"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, fainting, sudden weakness or numbness, or a seizure",
+  "a new lump, bleeding that won't stop, or a symptom a doctor hasn't checked"
+ ],
+ "first_steps": [
+  "Wellness form",
+  "Practitioner's read of a flag",
+  "A teen's consent"
+ ],
+ "facts": [
+  "packs",
+  "firststeps",
+  "forms",
+  "video",
+  "aftercare",
+  "children",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "8pm the day before"
+  }
+ },
+ "license": "none checked by Rosie: reiki has no state license in most places; a certificate or training is the practitioner's own word, optional, and never checked (D96)",
+ "staff_skills": "reiki levels I and II, hands-on and distance sessions, crystal add-ons; only practitioners with the level a booking names are offered",
+ "messages_never": "health answers, pregnancy, medicines, a doctor's note and the practitioner's notes never go in a text or through the AI: only the secure page and the client's private record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/reiki+and+energy+healer",
+  "pexels": "https://www.pexels.com/search/reiki%20and%20energy%20healer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

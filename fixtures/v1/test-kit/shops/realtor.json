@@ -1,0 +1,107 @@
+{
+ "id": "realtor",
+ "name": "Real estate agent",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Real estate agent",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Real estate agent",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First buyer meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 45-minute first buyer meeting with Elena at the office, or by video. Nothing is taken and no card is saved: a YES books it. Nothing is paid after: the agent is paid at closing, outside Rosie, as a signed agreement says.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Real estate agent",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home tour",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 30-minute tour of 17 Birch Ln with Omar. Nothing is taken and no card is saved. Nothing is paid through Rosie: the agent is paid at closing, the brokerage's own way, as the signed buyer agreement says.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: time with a licensed agent. Every service is free to the customer: the agent is paid at closing, outside Rosie, as the signed agreement says.\",\"at the office or by video (the example brokerage's own list)\":[{\"name\":\"First buyer meeting\",\"length\":\"45 minutes\",\"price\":\"free\",\"where\":\"the office, or by video\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"First seller meeting\",\"length\":\"45 minutes\",\"price\":\"free\",\"where\":\"the office, or by video\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"Follow-up meeting\",\"length\":\"30 minutes\",\"price\":\"free\",\"before\":\"nothing taken\",\"after\":\"nothing paid\"},{\"name\":\"Live video tour of a listed home\",\"length\":\"30 minutes\",\"price\":\"free\",\"rule\":\"the same buyer agreement rule as a tour in person, where the state's rules count it as a tour, and the listing side's OK first\"}],\"at a home (the example brokerage's own list)\":[{\"name\":\"Tour of a listed home\",\"length\":\"30 minutes\",\"price\":\"free\",\"times\":\"set start times, never an arrival window\",\"before\":\"nothing taken; a signed buyer agreement first where the rules require it\",\"after\":\"nothing paid\",\"needs\":\"the listing side's OK for the time, asked by the agent in their own showing tool\"},{\"name\":\"Tour of several listed homes in one trip\",\"length\":\"30 minutes a home, plus drive time\",\"price\":\"free\",\"needs\":\"each home's own OK from the listing side\"},{\"name\":\"Listing consultation at the seller's home\",\"length\":\"60 minutes\",\"price\":\"free\",\"who\":\"the owner, or someone the owner authorizes in writing\",\"after\":\"any listing agreement is the brokerage's own, signed in its own tools\"}],\"never booked or priced in Rosie\":\"Open houses (no booking needed). Offers, contracts, negotiation, earnest money, escrow and closing: the agent and the brokerage use their own tools.\",\"the agent's pay\":\"Set in the signed buyer or listing agreement and paid at closing, outside Rosie. Rosie never states, sets or negotiates it.\",\"travel area\":\"The brokerage's setting (the example: 25 miles).\",\"capacity\":\"One agent per booking. A tour takes the buyer and up to 3 guests named on the secure page.\",\"online\":\"Video meetings and live video tours count as at the office, only with an agent licensed in the state where the home is.\",\"booking window\":\"Up to 60 days ahead. A tour needs at least 2 hours' notice, so the listing side can answer (the brokerage's settings).\",\"blocked times\":\"Closings, inspections the agent attends and the agent's other appointments block times. Drive time between homes is added.\"}",
+ "questions_before_times": [
+  "A tour: which home? An address or a listing number. Rosie never searches, suggests or ranks homes or areas.",
+  "Buying or selling: a tour, a first meeting, or a listing consultation?",
+  "In person, or by video?",
+  "A named agent, or the brokerage's soonest free agent? Agents are listed by soonest time, never ranked."
+ ],
+ "safety_stop": [
+  "someone is in danger right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "nomoney",
+  "documents",
+  "firststeps",
+  "forms",
+  "video"
+ ],
+ "switches": {
+  "nomoney": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  }
+ },
+ "license": "Always: each agent's own real estate license, active, in the state where the home is, and held with this brokerage. The brokerage's own license and its supervising broker, where the state's rules require them.",
+ "staff_skills": "[\"Buyer tours\",\"Listing consultations\",\"First buyer and seller meetings\",\"Leasing homes for rent: its own plug-in\"]",
+ "messages_never": "[\"the budget, a pre-approval amount, or any finances\",\"the photo ID\",\"lockbox or alarm codes, and the listing side's showing instructions\",\"any opinion about a home, a price, an offer or an area\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/real+estate+agent",
+  "pexels": "https://www.pexels.com/search/real%20estate%20agent/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

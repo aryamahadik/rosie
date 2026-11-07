@@ -1,0 +1,159 @@
+{
+ "id": "therapist",
+ "name": "Mental health therapist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "physical-therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Mental health therapist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Associates",
+   "staff": "Maya and Iris (therapists)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First session",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The main story: Alex's $190 first session with Maya, Sat Oct 24 at 11:00am, after a free fit check call. A card is saved, nothing taken. The desk checks Alex's plan by hand, and what's owed goes on the saved card when Maya texts DONE: nobody is at the desk on Saturdays.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "First session",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The same first session when the front desk is open: Alex pays at the desk. The saved card is only for the $75 late-cancel fee, with Sam's yes.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First session",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The same session for a fee-free client, whose plan bars missed-session fees: nothing is taken and no card is saved. Anything owed is paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Family Services",
+   "staff": "David (therapist and family therapist) and Elena (associate therapist)",
+   "customer": "Alex M. (client, who can't easily leave home for now) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "First in-home session",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: Alex, who can't easily leave home, pays for a $179 first in-home session with David, Thu Oct 22 at 8:00am. A card is saved for the $89 late-cancel fee, and the $179 is charged at DONE. The receipt has what Alex's plan needs to pay Alex back.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "First in-home session",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same session when Alex's plan pays in network and bars late fees: nothing is taken, no card is saved, and the office bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one client with one therapist at a time, each session a set length; a new client starts with a free fit check call, then a longer first session; ongoing sessions are weekly, with a weekly time the client says yes to; in a couples or family session, each adult confirms on their own page",
+ "questions_before_times": [
+  "for you (18 or older), or for your teen (a parent or guardian books)",
+  "which state you'll be in during your sessions",
+  "a health plan (its name only), or paying yourself",
+  "new or returning",
+  "what you'd like in a therapist, in your own words: like a woman or a man, a language, Saturdays or evenings, the office, video or your home",
+  "for a session at home: the town, and the kind of place"
+ ],
+ "safety_stop": [
+  "thoughts of suicide or self-harm",
+  "harming someone else, or anyone in danger right now"
+ ],
+ "first_steps": [
+  "Fit check call",
+  "Intake forms and consent",
+  "The plan check",
+  "A written good-faith estimate",
+  "The plan's OK for sessions ahead",
+  "Past records"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "children",
+  "firststeps"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each therapist holds their own active license from the state's board for their kind of license (like a counselor, a social worker, a marriage and family therapist or a psychologist); the state's form says which licenses may give therapy",
+ "staff_skills": "who sees adults, teens, couples and families; who offers video and home sessions; who speaks which language; how each lists themselves (like a woman or a man) for clients who ask",
+ "messages_never": "client texts carry only the display name, the date, the time, the place and a secure link: never 'therapy', 'counseling', the kind of session, a reason, a diagnosis, a medicine name or a child's details; at the office, never the therapist's name (it's on the secure page); at home, the therapist's name and photo stay, for the door check; the video link stays on the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/mental+health+therapist",
+  "pexels": "https://www.pexels.com/search/mental%20health%20therapist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

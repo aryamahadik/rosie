@@ -1,0 +1,203 @@
+{
+ "id": "band",
+ "name": "Live band and musicians",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "dj",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Live band and musicians",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Live band and musicians",
+   "staff": "Nina and Owen (music coaches)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Vocal coaching session",
+     "price": "$90",
+     "deposit": "$30",
+     "rest": "$60",
+     "paid_now": null,
+     "fee": "$30",
+     "story": "The main story: a $90 vocal coaching session (one hour, one to one). A $30 deposit now, and the $60 rest at the studio.",
+     "due_now_at_booking": 30,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Instrument lesson",
+     "price": "$40",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $40 instrument lesson (30 minutes). A card is saved for the studio's $20 fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Instrument lesson",
+     "price": "$40",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $40 instrument lesson for a returning student. Nothing is taken: a YES books it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private coaching",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$20",
+     "story": "A $75 private coaching session (one hour), paid in full when booking.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom arrangement",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom arrangement priced from the song list at $90. A card is saved for the $20 fee. Booked once the studio OKs it, and paid at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Live band and musicians",
+   "staff": "Tess and Ray (band)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Party band",
+     "price": "$1500",
+     "deposit": "$375",
+     "rest": "$1125",
+     "paid_now": null,
+     "fee": "$375",
+     "story": "The main story: a 3-hour birthday party, quoted from Alex's plan at $1,500 (over Sam's $500, so Sam OKs it). Both sign the contract. A $375 deposit holds the date, and the $1,125 rest goes on the saved card at DONE.",
+     "due_now_at_booking": 375,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Party band",
+     "price": "$1500",
+     "deposit": "$375",
+     "rest": "$1125",
+     "paid_now": null,
+     "fee": "$375",
+     "story": "A company event, quoted from the plan at $1,500 (over $500, so Sam OKs it). Both sign the contract, a $375 deposit holds the date, and the rest, with any overtime, goes on the bill after.",
+     "due_now_at_booking": 375,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Small event duo",
+     "price": "$450",
+     "deposit": "$100",
+     "rest": "$350",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "A $450 small event duo (2 hours). A $100 deposit now, and the $350 rest on the saved card at DONE.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Small event duo",
+     "price": "$450",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$450",
+     "fee": "$100",
+     "story": "The $450 small event duo, paid in full when booking.",
+     "due_now_at_booking": 450,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Live Music's own list)\":[{\"service\":\"Party band (4 players: singer, drums, bass and keys or guitar; 3 hours of music)\",\"price kind\":\"quoted from the plan first (the date, hours, venue, guests and rooms)\",\"price\":\"the quote (the example: $1,500 for a 3-hour party)\",\"length\":\"the party's hours, plus 2 hours to set up and load out\",\"place\":\"at the venue or a home\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"The bandleader is the lead on the night and runs the set. Power and stage space are the venue's to name.\"},{\"service\":\"Wedding band (ceremony music optional, cocktail hour and reception, 5 hours)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"5 hours, plus setup\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"The owner OKs every wedding. One wedding a day per band, booked up to 18 months ahead.\"},{\"service\":\"Company event (a 3-hour set for a work party)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"the event's hours\",\"place\":\"at the venue or the office\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"Rosie texts the bill after, with any overtime on it\"},{\"service\":\"Small event duo (2 players, 2 hours, acoustic or pop set; a birthday, a party or a bar)\",\"price kind\":\"one price\",\"price\":\"$450\",\"length\":\"2 hours\",\"place\":\"at a home, a hall or a bar\",\"before\":\"the full price, or a $100 deposit\",\"after\":\"nothing more, or the $350 rest on the saved card at DONE\",\"note\":\"A parent or the host books a kids' party. Clean songs only while children are there. A late cancel or no-show keeps at most $100, only if the owner confirms; the rest is refunded.\"},{\"service\":\"Ceremony music (a solo acoustic set for vows and the processional, 45 minutes)\",\"price kind\":\"one price\",\"price\":\"$220\",\"length\":\"45 minutes, plus setup (2 hours held)\",\"place\":\"at the venue\",\"before\":\"booked alone: a $50 deposit; with a wedding: in the wedding's quote\",\"after\":\"booked alone: the rest on the saved card at DONE; with a wedding: with the wedding\",\"note\":\"Booked alone for a small ceremony, or added to a wedding\"},{\"service\":\"Extra player (a horn, strings or a second singer, added to the band)\",\"price kind\":\"per player, in the quote\",\"price\":\"$125 each (the example)\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\"},{\"service\":\"Sound hire with an engineer (Lee Sound: a PA, two mics and a sound engineer)\",\"price kind\":\"one price, or per hour\",\"price\":\"$280 for up to 4 hours (the example), engineer included\",\"length\":\"the event's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\",\"note\":\"Set up on the circuits the venue names. Sound hire is always with its engineer.\"},{\"service\":\"Overtime on the night\",\"price kind\":\"per hour, by the half hour\",\"price\":\"$200 an hour (the example)\",\"length\":\"30 or 60 minutes\",\"place\":\"at the event\",\"before\":\"nothing: asked on the night\",\"after\":\"one pay link after, or on the bill\",\"note\":\"Only with the customer's written yes, at the rate shown before booking, and never past the venue's music curfew\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 15 miles; $89 from 15 to 25 miles (the travel area)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"added to the quote or the deposit\",\"after\":\"with the rest\"},{\"service\":\"Monthly residency (a band night at a bar or restaurant, 3 hours)\",\"price kind\":\"one price, on a plan\",\"price\":\"$350 a night (the example)\",\"length\":\"3 hours\",\"place\":\"at the bar\",\"before\":\"a card saved\",\"after\":\"one bill after each month's nights, paid by the saved card\",\"note\":\"Skip, pause or end by text; a price change gets 30 days' notice\"}],\"at the business (the example: Lee Music Studio's own list)\":[{\"service\":\"Vocal coaching (one to one, 1 hour, at the studio)\",\"price kind\":\"one price\",\"price\":\"$90\",\"length\":\"1 hour\",\"place\":\"at the studio\",\"before\":\"a $30 deposit\",\"after\":\"the $60 rest at the studio\"},{\"service\":\"Instrument lesson (30 minutes: guitar, bass, drums or keys)\",\"price kind\":\"one price\",\"price\":\"$40\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for a $20 fee\",\"after\":\"the $40 paid at the studio after the lesson\"},{\"service\":\"Group coaching (up to 4 players, 1 hour, at the studio)\",\"price kind\":\"one price\",\"price\":\"$120\",\"length\":\"1 hour\",\"place\":\"at the studio\",\"before\":\"a $30 deposit\",\"after\":\"the $90 rest at the studio\"},{\"service\":\"Private coaching (60 minutes, one to one, paid in full)\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price when booking\",\"after\":\"nothing more\"},{\"service\":\"Custom arrangement (one song arranged for your group, priced from the song list)\",\"price kind\":\"quoted from the song list first\",\"price\":\"$90 (the example: a 4-part arrangement of one song)\",\"length\":\"about a week\",\"place\":\"at the studio, then handed over there\",\"before\":\"a card saved for the $20 fee; booked once the studio OKs it\",\"after\":\"paid at the studio when it's handed over\",\"note\":\"Handed over as a printed or a file copy at the studio; nothing is shipped\"}],\"capacity\":\"One booking per band at a time. A wedding books the bandleader, the players and the sound engineer together. The studio's teaching room holds one lesson at a time.\",\"nobody needs to be home\":\"Never: someone from the event is there. Gear is set up early only with the venue's OK and a venue contact there.\",\"online\":\"A planning call can be a video call. Lessons are in person.\",\"plans\":[\"Vocal coaching every 4 weeks (the studio): the same day and time, $90 a visit, a $30 deposit and the $60 rest at the studio, each visit booked and paid like a single one\",\"Yearly kids' party (band work): $450 a visit, each booked and paid like a single one\",\"Monthly residency (band work): one bill after each month's nights, paid by the saved card\",\"Every plan: skip, pause or end by text; a price change gets 30 days' notice\"]}",
+ "questions_before_times": [
+  "The kind of event: a party, a wedding, a company event, a bar night or a small event",
+  "The date, and the start and end time",
+  "The venue's name and town (for the travel fee), and indoors, outdoors or both",
+  "About how many guests (it sets the sound and the set length)",
+  "The players wanted: a full band, a duo, or a solo singer",
+  "Add-ons: a second set, extra players, sound hire, ceremony music",
+  "At the studio: the lesson, the instrument and the level, or the custom arrangement's song"
+ ],
+ "safety_stop": [
+  "Someone hurt, a fire, or a fight at the venue right now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "None for band work or music lessons in most places. A local business license where the city or county asks for one: from the state form.",
+ "staff_skills": "[\"Weddings and ceremony music (leads only)\",\"Parties and company events\",\"Kids' parties\",\"Sound hire\",\"Lessons\",\"Custom arrangements\"]",
+ "messages_never": "Gate codes, access notes, a child's details and family notes stay on the secure page. The do-not-play list and the set list stay on the set list form. Texts to the band carry none of them either.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/live+band+and+musicians",
+  "pexels": "https://www.pexels.com/search/live%20band%20and%20musicians/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

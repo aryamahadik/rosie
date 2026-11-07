@@ -1,0 +1,168 @@
+{
+ "id": "mediator",
+ "name": "Mediator",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Mediator",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Mediator",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Mediation session (2 hours)",
+     "price": "$300",
+     "deposit": "$100",
+     "rest": "$200",
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: a 2-hour mediation session, $300. Alex pays a $100 deposit to book, and the other person says yes on their own link. The $200 rest is paid at the front desk after the session.",
+     "due_now_at_booking": 100,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Half-day mediation (4 hours)",
+     "price": "$550",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$550",
+     "fee": "$100",
+     "story": "A half-day mediation (4 hours), $550, paid in full when booked. Nothing more to pay.",
+     "due_now_at_booking": 550,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Intake meeting",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "An intake meeting by video, $75 for one person. Nothing is taken; Rosie texts the bill when Dana texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Mediator",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Mediation at your location (2 hours)",
+     "price": "$360",
+     "deposit": "$120",
+     "rest": "$240",
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The main story: a 2-hour mediation at a place the parties pick, $360 ($300 plus the $60 travel fee). Alex pays a $120 deposit to book; Rosie texts the $240 rest after.",
+     "due_now_at_booking": 120,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Mediation at your location (2 hours)",
+     "price": "$360",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$60",
+     "story": "The same mediation with a card saved for the $60 fee the business sets for a late cancel or a no-show. The $360 is charged when Noor texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Half-day mediation at a workplace",
+     "price": "$660",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$660",
+     "fee": "$60",
+     "story": "A half-day mediation at a workplace, $660 ($600 plus the $60 travel fee), paid in full when booked. Nothing more to pay.",
+     "due_now_at_booking": 660,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a neutral meeting for two or more people. At the mediator's office, or by video (flow A). At a place the parties pick (flow B): a library or community room, a workplace, or a home when both agree and it is safe. One person books; every other person says yes on their own link.\",\"at the business (the example business's own prices, not standards)\":[{\"name\":\"Free intro call\",\"length\":\"15 minutes\",\"price\":\"free\",\"before\":\"nothing\",\"after\":\"nothing\",\"note\":\"no details of the dispute; one person at a time\"},{\"name\":\"Intake meeting\",\"length\":\"45 minutes, one person\",\"price\":\"$75 a person\",\"where\":\"the office, or by video\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk; by video, the bill is texted\",\"note\":\"each person meets the mediator alone first\"},{\"name\":\"Mediation session\",\"length\":\"2 hours\",\"price\":\"$300 for the session\",\"where\":\"the office, or by video\",\"before\":\"a $100 deposit when booked\",\"after\":\"the $200 rest at the front desk after the session\",\"note\":\"how the parties share the cost is their own agreement\"},{\"name\":\"Half-day mediation\",\"length\":\"4 hours\",\"price\":\"$550\",\"where\":\"the office, or by video\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Extra hour, added at a session\",\"price\":\"$120\",\"rule\":\"priced and OK'd by every party before it starts; paid at the front desk with the rest\"},{\"name\":\"Follow-up session\",\"length\":\"1 hour\",\"price\":\"$150\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk\"},{\"name\":\"Separate-room mediation\",\"price\":\"$300 a session\",\"note\":\"the mediator moves between two rooms; offered when a party prefers not to meet the other\"},{\"name\":\"Agreement write-up\",\"price\":\"set after the session; the parties OK it first\",\"note\":\"a plain summary of what the parties agreed; not legal advice, and each should have a lawyer read it if they want\"}],\"at a place the parties pick (flow B)\":[{\"name\":\"Mediation at your location\",\"length\":\"2 hours\",\"price\":\"$360: the $300 session plus a $60 travel fee\",\"where\":\"a library or community room, a workplace, or a home when both agree and it is safe\",\"before\":\"a $120 deposit when booked, or a card saved for the $60 fee\",\"after\":\"the $240 rest on the bill texted after, or the saved card charged at DONE\"},{\"name\":\"Half-day mediation at a workplace\",\"length\":\"4 hours\",\"price\":\"$660: $600 plus the $60 travel fee\",\"where\":\"a workplace, with its OK\",\"before\":\"paid in full when booked (often by the employer)\",\"after\":\"nothing more\"},{\"name\":\"Extra hour, added at the visit\",\"price\":\"$120\",\"rule\":\"priced and OK'd by every party first; on the bill with the rest\"}],\"the dispute itself\":\"Never decided, judged or advised on by Rosie or its AI. The agreement belongs to the parties.\",\"travel area\":\"The business's setting (the example: 25 miles).\",\"capacity\":\"One mediator per session; a co-mediator only by name. A joint session is booked after each party's intake meeting.\",\"online\":\"Intake meetings and sessions by video count as at the office (flow A).\",\"booking window\":\"Up to 6 weeks ahead; no same-day sessions.\"}",
+ "questions_before_times": [
+  "What kind of dispute: family or divorce, a neighbor, a landlord and tenant, a workplace, a business, or something else. Only the kind, no details.",
+  "How many people will take part? Only the number.",
+  "In the office, by video, or at a place you pick?",
+  "Is there a court date the session must come before? The date only."
+ ],
+ "safety_stop": [
+  "someone is hurting or threatening a person right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "firststeps",
+  "documents",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "2 days before"
+ },
+ "license": "Many places set no license for mediators. Where the state's rules require training or a roster listing for court-connected or family mediation, the mediator holds that certificate. A mediator who is also a lawyer holds their own bar license.",
+ "staff_skills": "[\"Family and divorce mediation\",\"Workplace mediation\",\"Neighbor and landlord-tenant disputes\",\"Languages spoken\"]",
+ "messages_never": "[\"what the dispute is about, beyond the kind picked\",\"the other people's names\",\"what anyone said in a session\",\"why a conflict check didn't clear\",\"any legal advice\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/mediator",
+  "pexels": "https://www.pexels.com/search/mediator/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

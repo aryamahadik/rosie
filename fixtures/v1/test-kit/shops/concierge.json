@@ -1,0 +1,142 @@
+{
+ "id": "concierge",
+ "name": "Concierge and errand service",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "home-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Concierge and errand service",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Concierge and errand service",
+   "staff": "Ravi and Mei (desk staff)",
+   "customer": "Alex M. (customer, drops off returns and a package) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Desk drop-off",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: two returns and a package dropped at the desk, up to 3 items for $35, plus shipping at cost. A card is saved, and it's charged when the desk is done with them.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Holiday gift wrap and send",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Holiday gift wrap and send, up to 5 gifts for $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Concierge and errand service",
+   "staff": "Bea and Tariq (concierges)",
+   "customer": "Alex M. (customer, books errands for a mother) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Errand run",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$45",
+     "story": "The main story: groceries and dry cleaning for Ana, Thu Oct 22, starting at 8:00am, 2 hours at $45 an hour: $90, plus miles and purchases at cost with receipts. A card is saved, and it's charged when Bea texts DONE. Standing errands use the same card.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Errand run",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$45",
+     "story": "Office errands for a business at $45 an hour. Nothing is taken at booking, and Rosie texts the business one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: errands and home checks for the customer, often with nobody home, by the hour. Purchases are made for the customer at cost. Flow A is the errand desk, where the customer drops off returns, packages to ship and dry cleaning.\",\"list\":[{\"name\":\"Errand run (groceries, pharmacy pick-up, dry cleaning, returns, post office)\",\"price_kind\":\"per hour, 1-hour minimum\",\"example\":\"$45 an hour (the example business's own price) plus 70 cents a mile; a 2-hour run is $90. Purchases are paid back at cost, with the receipt, up to the limit the customer sets\",\"where\":\"out and about, starting and ending at the customer's home\",\"money\":\"a card saved; the saved card is charged at DONE for the hours, miles and purchases\"},{\"name\":\"Waiting at the home\",\"price_kind\":\"per hour, 2-hour minimum\",\"example\":\"$40 an hour: the concierge lets in only the company the customer named, and stays until it leaves\",\"where\":\"at the customer's home\",\"money\":\"a card saved; charged at DONE\"},{\"name\":\"Home check while you're away\",\"price_kind\":\"one price a visit\",\"example\":\"$35 a visit: a walk-through, mail and packages in, lights and thermostat, a photo report of the home. Nobody is home\",\"where\":\"at the customer's home\",\"money\":\"a card saved; charged at DONE\"},{\"name\":\"Standing errands\",\"price_kind\":\"each run at its list price\",\"example\":\"the same run on set days, like groceries every Tuesday\",\"money\":\"a repeat plan with its own yes and a reminder before the first run; each run charged at its own DONE. A prepaid bundle of hours is not offered in this example\"},{\"name\":\"Office errands for a business\",\"price_kind\":\"per hour\",\"example\":\"$45 an hour; nothing taken; one bill a month\",\"money\":\"nothing taken at booking; the business gets one bill a month\"},{\"name\":\"Desk drop-off (flow A)\",\"price_kind\":\"one price\",\"example\":\"returns, packages to ship and dry cleaning, up to 3 items for $35 (single return $20; dry cleaning drop-off $25; package to ship $40), plus shipping at cost; handled within 2 business days\",\"where\":\"at the errand desk\",\"money\":\"a card saved; the saved card is charged when it's done\"},{\"name\":\"Holiday gift wrap and send (flow A)\",\"price_kind\":\"one price\",\"example\":\"up to 5 gifts for $55, shipping included up to 5 lb each; ready in 3 business days\",\"money\":\"paid in full when booking\"}],\"capacity\":\"One person per errand. Same-day errands only when someone is free; nothing is sent now.\",\"nobody_home\":\"Most errands, deliveries and home checks are done with nobody home, with a photo at DONE. Alcohol, a prescription that needs a signature, and waiting at the home need the customer or their named adult.\",\"online\":\"No. Errands are in person.\",\"not_offered\":\"Carrying people for pay; handling more cash than the customer's limit; pet care; repairs.\"}",
+ "questions_before_times": [
+  "What the errand is: groceries, a pick-up, a return, a drop-off, waiting at the home or a home check",
+  "Where it starts and ends (the town or ZIP), and how many stops",
+  "Any time it must be done by (a store closing, a return deadline, a delivery window)",
+  "How long to book, and for a purchase, the most the customer will OK without a text"
+ ],
+ "safety_stop": [
+  "someone hurt or ill right now",
+  "a fire or smoke",
+  "a gas smell",
+  "a break-in in progress",
+  "someone at home not answering who may need help",
+  "words about suicide or self-harm"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "forms",
+  "extrawork",
+  "monthlybill",
+  "dropoff"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "No state license for errands in most places: a business registration, and any local business license. Carrying people for pay is not offered (it needs a for-hire permit). Buying and delivering alcohol only where the state's rules let a third party do it.",
+ "staff_skills": "[\"Errands in a car, with an insured vehicle and a checked driver's license\",\"Waiting at a home for a repair or delivery\",\"Home checks with a photo report\",\"Handling keys (key release and coded storage)\"]",
+ "messages_never": "[\"Medicine names and health details\",\"Door, lockbox, garage and alarm codes, and where the key is kept\",\"Card details\",\"What is bought for a pharmacy pick-up\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/concierge+and+errand+service",
+  "pexels": "https://www.pexels.com/search/concierge%20and%20errand%20service/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,152 @@
+{
+ "id": "pest",
+ "name": "Pest control",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pest control",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pest control",
+   "staff": "Nina and Mei (counter techs, licensed applicators)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Bug ID",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $35 bug ID at the counter. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pest control",
+   "staff": "Kevin and Marco (licensed applicators)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "6pm the day before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "General pest service",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 first service, then a plan every 3 months. A card is saved and charged $179 when Kevin texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "General pest service",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same $179 first service. Nothing is taken. Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Mouse control",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Mouse control, priced at the visit. A card is saved for the $89 trip charge. Kevin quotes sealing and traps, $245, charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a visit at the customer's home, often on a plan that repeats every 3 months.\",\"list\":[{\"name\":\"General pest, first service (with the plan)\",\"price_kind\":\"one price\",\"example\":\"$179 (the example business's own price)\",\"length\":\"about 90 minutes, inside and out\",\"where\":\"at the customer's place\",\"money\":\"card saved at booking; charged at DONE\"},{\"name\":\"General pest, one time\",\"price_kind\":\"one price\",\"example\":\"$249, with free re-service for 30 days\",\"length\":\"about 90 minutes\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Plan visit\",\"price_kind\":\"a price per visit\",\"example\":\"every 3 months, $129 a visit, with free re-service between visits\",\"length\":\"about 45 minutes\",\"where\":\"at the customer's place; an outside-only visit needs nobody home\",\"money\":\"card saved; each visit charged at its own DONE\"},{\"name\":\"Wasp or hornet nest removal\",\"price_kind\":\"one price\",\"example\":\"$150\",\"length\":\"about 45 minutes\",\"where\":\"at the customer's place; a nest outside needs nobody home\",\"money\":\"the $89 trip charge held at booking (Rosie's starting answer); charged at DONE\"},{\"name\":\"Outside spray (spiders, ants around the house)\",\"price_kind\":\"one price\",\"example\":\"$99\",\"where\":\"outside only; nobody needs to be home\",\"money\":\"card saved or the trip charge held; charged at DONE\"},{\"name\":\"Mouse control\",\"price_kind\":\"priced at the visit: only the trip charge is promised\",\"example\":\"sealing entry points $165, traps $80; a 90-day promise on the sealing\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE for what the customer OKs\"},{\"name\":\"Rodent-proofing (the whole home)\",\"price_kind\":\"quoted at a visit (a mouse visit or an inspection), from the applicator's own photos, with a written contract\",\"example\":\"$640, over Sam's $500 limit, so Sam OKs it\",\"where\":\"at the customer's place\",\"money\":\"a signed contract first (over the plug-in's amount), then a 25% deposit within the state's caps (the example: $160)\"},{\"name\":\"Bed bug inspection, then treatment\",\"price_kind\":\"inspection one price; treatment quoted from it\",\"example\":\"inspection $89, credited to the treatment; treatment is 2 visits, about 14 days apart\",\"where\":\"at the customer's place\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Termite inspection, then treatment\",\"price_kind\":\"inspection free; treatment quoted with a written report\",\"example\":\"a $2,400 treatment in 3 stages\",\"where\":\"at the customer's place\",\"money\":\"a signed contract first; a deposit only after it's signed, within the state's caps\"},{\"name\":\"Tent fumigation\",\"price_kind\":\"quoted after an inspection; Sam OKs each one\",\"where\":\"at the customer's place; everyone, pets and plants out until it's cleared\",\"money\":\"a signed contract first\"},{\"name\":\"Mosquito yard spray\",\"price_kind\":\"one price\",\"example\":\"$199 ($249 when Sam goes)\",\"where\":\"outside only\"},{\"name\":\"Hourly work\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour, 1-hour minimum ($140 with Kevin)\",\"where\":\"added to a visit, never booked alone\"},{\"name\":\"Trip charge\",\"price_kind\":\"one price\",\"example\":\"$89: a late cancel or nobody home, only if Sam confirms; owed on work priced at the visit if the customer says no; credited to the work\",\"where\":\"never booked alone\"},{\"name\":\"Lawn care (the second kind of work)\",\"price_kind\":\"from the list, per visit\",\"example\":\"weed control $149 a visit, grub control $189; a full lawn program gets a free lawn check, then a quote\",\"where\":\"outside; nobody needs to be home\"},{\"name\":\"Lee Pest Supply (Sam's own shop company)\",\"price_kind\":\"the shop's board\",\"example\":\"the example shop's own board (the old flowchart has no shop; this side is the example's own): bug ID and advice $35 (30 minutes); termite sample check $40; quick photo ID $20; tick ID $25; DIY plan with a tech $55 (60 minutes); belongings heat treatment for bed bugs $140 (2½ hours); furniture heat treatment priced from photos; wood beetle check priced at the counter after a $25 look\",\"where\":\"at the shop's counter; a bug ID can also be done at the customer's home ($75, billed after)\",\"money\":\"nothing taken; paid at the counter\"}],\"windows\":\"2-hour arrival windows, Mon to Sat (the example business's own).\",\"capacity\":\"One applicator per visit. About 8 visits per applicator a day. At the shop, one counter tech per bug ID.\",\"nobody_home\":\"Outside-only work (an outside plan visit, a nest outside, an outside spray, a lawn spray): nobody needs to be home, and DONE with a photo confirms it. Inside work needs an adult home.\",\"online\":\"No. A bug is named from the sample itself.\",\"not_offered\":\"Wildlife removal, and honey bee swarms (a beekeeper is suggested first).\"}",
+ "questions_before_times": [
+  "Which pests, and where: inside, outside or both",
+  "Since when, and about how many",
+  "A plan every 3 months, or just once ($179 first service on the plan, $249 once)",
+  "Termites, bed bugs or mice: an inspection first, or priced at the visit",
+  "At the shop: a sealed sample, or a photo only"
+ ],
+ "safety_stop": [
+  "a sting with swelling of the face or throat, trouble breathing, or feeling faint",
+  "bait, pesticide or spray swallowed by a person",
+  "someone sick after a spray, or a pesticide spill",
+  "a pet that ate bait",
+  "a wasp nest or a swarm by a door, or inside the home"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "firststeps",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "6pm the day before"
+  }
+ },
+ "license": "Yes, where the state's form says so (nearly every state): a pest control license or registration for the company, and an applicator license for each person who applies pesticides.",
+ "staff_skills": "[\"General pest, wasps and mice: Kevin and Marco\",\"Rodent-proofing, termites and lawn spraying: Kevin only\",\"Bug IDs at the shop: Nina and Mei; heat treatments: Nina only\"]",
+ "messages_never": "[\"Health reasons to avoid a spray, like asthma, allergies or a pregnancy\",\"Gate and door codes\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pest+control",
+  "pexels": "https://www.pexels.com/search/pest%20control/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

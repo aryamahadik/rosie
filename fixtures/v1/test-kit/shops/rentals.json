@@ -1,0 +1,170 @@
+{
+ "id": "rentals",
+ "name": "Party rentals",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "photographer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Party rentals",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Party rentals",
+   "staff": "Wes and Zoe (counter staff)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "5pm the day before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Party table package",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 party table package (6 tables, 40 chairs) picked up at Lee Party Supply. A $40 deposit when booking, the $100 rest at the counter at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Popcorn machine",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 popcorn machine for the weekend. A card is saved for the store's $20 late-cancel or no-show fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Chocolate fountain",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 chocolate fountain, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Party rentals",
+   "staff": "Derek and Tasha (crew leads)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": "5pm the day before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Backyard party order",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a backyard party order from the list: a castle bounce house, a 20x20 tent, 5 tables and 40 chairs, with $60 delivery: $640. A $160 deposit when booking; the $480 rest is charged to the saved card when Derek marks the job done.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Small table and chair order",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$60",
+     "story": "A small order under $200: 5 tables and 12 chairs, delivered, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Large tent event",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A large tent on a sloped yard, quoted from Alex's yard photos at $640 (over $500, so Sam OKs it). Alex signs the quote; a $160 deposit when booking, and the $480 rest on the saved card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"delivered and set up (the example: Lee Party Rentals' own list)\":[{\"service\":\"Backyard party order: items picked from the list\",\"price kind\":\"per item, from the list\",\"price\":\"the items, plus delivery (the example: castle bounce house $195, 20x20 tent $225, 5 tables $60, 40 chairs $100, delivery $60: $640)\",\"length\":\"setup about 1½ hours; pickup the next morning\",\"place\":\"at the customer's place\",\"before\":\"orders of $200 or more: a 25% deposit\",\"after\":\"the rest on the saved card at DONE\"},{\"service\":\"Small order (under $200), like tables and chairs\",\"price kind\":\"per item, from the list\",\"price\":\"the example: 5 tables and 12 chairs with delivery, $150\",\"length\":\"setup about 20 minutes\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Castle bounce house (13x13)\",\"price kind\":\"one price, per day\",\"price\":\"$195 (the example)\",\"length\":\"setup about 30 minutes\",\"place\":\"at the customer's place: grass, or hard ground with weights\",\"before\":\"with the order\",\"after\":\"with the order\",\"note\":\"Needs a flat space about 20 by 20 feet and an outlet within 100 feet, or the business's generator\"},{\"service\":\"Pumpkin bounce house (smaller)\",\"price kind\":\"one price, per day\",\"price\":\"$179 (the example)\",\"length\":\"setup about 30 minutes\",\"place\":\"at the customer's place\",\"before\":\"with the order: with delivery it's $239, so a 25% deposit\",\"after\":\"the rest on the saved card at DONE\"},{\"service\":\"Water slide (inflatable)\",\"price kind\":\"one price, per day\",\"price\":\"$199 (the example)\",\"length\":\"setup about 45 minutes\",\"place\":\"at the customer's place, on grass\",\"before\":\"with the order\",\"after\":\"with the order\",\"note\":\"Needs a garden hose; never used in lightning\"},{\"service\":\"Frame tents\",\"price kind\":\"per tent\",\"price\":\"20x20 $225, 20x30 $325 (the example)\",\"length\":\"setup about 45 to 90 minutes\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\",\"note\":\"Staked on grass after the utility locate, or weighted on hard ground\"},{\"service\":\"Large tent event (big tents, a slope, a deck, or tight space)\",\"price kind\":\"quoted from the customer's yard photos first\",\"price\":\"the quote (the example: $640, over the owner's $500, so the owner OKs it)\",\"length\":\"setup half a day\",\"place\":\"at the customer's place\",\"before\":\"a signed quote, then a 25% deposit\",\"after\":\"the rest on the saved card at DONE\"},{\"service\":\"Tables and chairs\",\"price kind\":\"per item\",\"price\":\"6-ft table $12, folding chair $2.50 (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\"},{\"service\":\"Tent permit service\",\"price kind\":\"one price, only where the city requires a permit\",\"price\":\"the city's own fee, plus the example's $100 to file it\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\",\"note\":\"Added only when the city's rules require a permit for the tent's size or distance from a building\"},{\"service\":\"Delivery, setup and pickup\",\"price kind\":\"travel fee, by distance\",\"price\":\"$60 within 10 miles, then $3 a mile, up to 25 miles (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"in the first price, always\",\"after\":\"\"},{\"service\":\"Tent lighting (Lee Event Lighting)\",\"price kind\":\"one price, by person\",\"price\":\"string lights for a 20x20 tent $199; $249 when Tasha designs them (the example)\",\"length\":\"about 30 minutes\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\"},{\"service\":\"Setup labor beyond the usual (a deck, stairs, a long carry)\",\"price kind\":\"per hour, by person\",\"price\":\"$120 an hour; $140 with Derek, the lead for big tents (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\"},{\"service\":\"Uplights, set of 8 (Lee Event Lighting)\",\"price kind\":\"one price\",\"price\":\"$149 (the example)\",\"length\":\"about 20 minutes\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\"},{\"service\":\"Quiet generator, for a day\",\"price kind\":\"one price, per day\",\"price\":\"$150 a day (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"with the order\",\"after\":\"with the order\",\"note\":\"For a yard with no outlet within 100 feet; the crew sets it up and runs the cords\"}],\"picked up at the store (the example: Lee Party Supply's own list)\":[{\"service\":\"Party table package (6 tables, 40 chairs)\",\"price kind\":\"one price, for the weekend\",\"price\":\"$140 (the example)\",\"length\":\"pick-up about 15 minutes; back by Monday 10am\",\"place\":\"at the store's counter\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the counter, at pick-up\"},{\"service\":\"Popcorn machine\",\"price kind\":\"one price, for the weekend\",\"price\":\"$35 (the example)\",\"length\":\"pick-up about 15 minutes\",\"place\":\"at the store's counter\",\"before\":\"a card saved for the $20 late-cancel or no-show fee\",\"after\":\"paid at the counter\"},{\"service\":\"Cotton candy machine\",\"price kind\":\"one price\",\"price\":\"$40 (the example)\",\"length\":\"\",\"place\":\"at the store's counter\",\"before\":\"a card saved\",\"after\":\"paid at the counter\"},{\"service\":\"Chocolate fountain\",\"price kind\":\"one price\",\"price\":\"$55 (the example)\",\"length\":\"\",\"place\":\"at the store's counter\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Linen pack (4 tablecloths)\",\"price kind\":\"one price\",\"price\":\"$20 (the example)\",\"length\":\"\",\"place\":\"at the store's counter\",\"before\":\"a card saved\",\"after\":\"paid at the counter\"},{\"service\":\"Kids' table and 6 chairs\",\"price kind\":\"one price\",\"price\":\"$25 (the example)\",\"length\":\"\",\"place\":\"at the store's counter\",\"before\":\"a card saved\",\"after\":\"paid at the counter\"},{\"service\":\"Table package delivered\",\"price kind\":\"one price\",\"price\":\"$75 more to deliver it (the example)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The same package, booked in flow B\"}],\"stock\":\"Each item is counted by date: how many the business owns, minus every order that overlaps that day, minus cleaning time after a return. Two bookings never take the same item on the same date. Saved for 10 minutes while the customer books.\",\"capacity\":\"Delivery windows follow the crews and trucks free that day. A big tent needs a two-person crew.\",\"nobody needs to be home\":\"Never for inflatables and tents: an adult signs the safety rules at setup. Tables and chairs only: may be left with a photo, where the owner allows it.\",\"online\":\"None.\"}",
+ "questions_before_times": [
+  "The party's date and hours, and the town or ZIP (for the delivery fee)",
+  "The items and how many, picked from the list",
+  "The ground: grass, concrete, a deck or other",
+  "A flat space for each item, and its size",
+  "An outdoor outlet within 100 feet, or the generator",
+  "For a tent: how far from the house, open or closed sides"
+ ],
+ "safety_stop": [
+  "Someone hurt or not breathing, or an inflatable lifting or blowing over right now",
+  "A downed power line, or a tent touching a power line"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "documents",
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": "5pm the day before"
+ },
+ "license": "No state license for renting party equipment in most places. The business registration where the state asks for one: from the state form.",
+ "staff_skills": "[\"Inflatables\",\"Frame tents\",\"Big tents (two-person crew)\",\"Tables and chairs\",\"Tent lighting\",\"Store counter\"]",
+ "messages_never": "Gate codes, the street address in texts to others, and access notes stay on the secure page. An injury report goes to the owner only.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/party+rentals",
+  "pexels": "https://www.pexels.com/search/party%20rentals/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,241 @@
+{
+ "id": "lawyer",
+ "name": "Lawyer",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": null,
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Lawyer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lawyer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 consult with Ethan. Nothing is taken, and a YES books it once the conflict check clears. Alex pays at the front desk after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 consult at a firm that set a $20 missed-consult fee. A card is saved for it, and nothing is taken. Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 video consult. There's no front desk, so Rosie texts the bill when Ethan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 phone consult. A card is saved, and the $35 is charged when Ethan texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Case review",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A case review, priced at the consult. Only the $25 consult fee is promised, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lawyer",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home will signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 home will signing. A card is saved for the $89 travel fee, kept only for a late cancel or a no-show. Rosie texts the bill after the signing.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home will signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 home will signing with nothing taken. Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home will signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 hospital signing. A card is saved, and $179 is charged when Marcus texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|own",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Home will signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A signing that's part of an estate plan: a card is saved for the $89 travel fee, and Sam bills it with the plan, the firm's own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home will signing",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A signing for a client the firm already bills: nothing is taken, and it goes on the firm's own invoice.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Paperwork review at home",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A paperwork review at home, priced at the visit. Only the $89 travel fee is promised; a card is saved for it. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a meeting with a licensed lawyer. In the office, or by video or phone (flow A). At the customer's home, a hospital or a care home (flow B). Every new matter waits for the firm's conflict check before it books.\",\"at the business (the example firm's own prices)\":[{\"name\":\"Consult\",\"length\":\"30 minutes\",\"price\":\"$35\",\"where\":\"the office, or by video or phone\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk; video or phone: Rosie texts the bill, or the saved card is charged at DONE\"},{\"name\":\"Follow-up consult (same matter)\",\"length\":\"30 minutes\",\"price\":\"$40\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk\",\"note\":\"the conflict check carries over\"},{\"name\":\"Full consult\",\"length\":\"60 minutes\",\"price\":\"$55\",\"before\":\"nothing taken\",\"after\":\"paid at the front desk\"},{\"name\":\"Teen consult (13 to 17)\",\"length\":\"30 minutes\",\"price\":\"$25\",\"who books\":\"a parent\"},{\"name\":\"Document review, added at a consult\",\"price\":\"$20\",\"rule\":\"priced and OK'd before it's done\"},{\"name\":\"Will planning session\",\"length\":\"2½ hours\",\"price\":\"$140\",\"before\":\"nothing taken, a card saved, or the $40 missed-session fee held (it runs over 2 hours), for a fee the firm sets\",\"after\":\"paid at the front desk\"},{\"name\":\"Contract review\",\"price\":\"$90 from the list\",\"rule\":\"no papers or photos before the conflict check clears\"},{\"name\":\"Case review\",\"price\":\"quoted at the consult; only the $25 consult fee is promised\"},{\"name\":\"Free first consult (some firms)\",\"price\":\"free\",\"before\":\"nothing\",\"after\":\"nothing\"}],\"at the customer's place (the example firm's own prices)\":[{\"name\":\"Home will signing\",\"length\":\"about 1 hour\",\"price\":\"$179\",\"before\":\"the $89 travel fee held\",\"after\":\"Rosie texts the bill, or the firm bills its own way\",\"needs\":\"the lawyer, two witnesses, and a notary where the state's rules require one\"},{\"name\":\"Hospital or care home signing\",\"price\":\"$179\",\"before\":\"the $89 travel fee held, or a card saved\",\"after\":\"the saved card charged at DONE, or the bill\",\"rule\":\"inside the place's visiting hours and rules\"},{\"name\":\"Power of attorney signing\",\"price\":\"$150\",\"before\":\"nothing, or the travel fee held\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Living trust\",\"price\":\"$640, set in the firm's engagement letter\",\"after\":\"billed the firm's own way\"},{\"name\":\"Paperwork review at home\",\"price\":\"quoted at the visit; only the $89 travel fee is promised\"}],\"the case itself\":\"Never booked or priced in Rosie. Hourly rates, flat fees and retainers go in the firm's own engagement letter.\",\"travel area\":\"The firm's setting (the example: 25 miles).\",\"capacity\":\"One lawyer per booking. A signing also needs two witnesses from the firm's staff, and a notary where the state's rules require one.\",\"online\":\"Video and phone consults count as at the office, only with a lawyer licensed in the state the customer is in that day. Signing or notarizing by video only where the state's rules allow it.\",\"booking window\":\"Up to 3 weeks ahead; no same-day consults unless the firm allows them (the firm's settings).\",\"blocked times\":\"Court days and hearings block consult times, from the lawyer's calendar or a BLOCK text.\"}",
+ "questions_before_times": [
+  "Which lawyer or firm? The customer or their AI names one. Rosie never searches or suggests.",
+  "What kind of matter: family, a will or trust, a contract, papers you were served, or something else. Only the kind, no details.",
+  "In the office, by video or by phone? For video or phone: which state will you be in?",
+  "A visit at your place: a home, a hospital or a care home?"
+ ],
+ "safety_stop": [
+  "someone is hurting or threatening the customer right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "firststeps",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Always: each lawyer's own license to practice, active and in good standing, in the state of the customer's matter. The firm: a registration where the state's rules require one. Each notary: their own commission.",
+ "staff_skills": "[\"Family law\",\"Wills, trusts and estates\",\"Contracts\",\"Notary work: a notary's own commission\"]",
+ "messages_never": "[\"what the matter is about, beyond the kind picked\",\"the other people's names\",\"why a conflict check didn't clear\",\"any legal advice\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/lawyer",
+  "pexels": "https://www.pexels.com/search/lawyer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

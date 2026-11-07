@@ -1,0 +1,166 @@
+{
+ "id": "barber",
+ "name": "Barber",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "hair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Barber",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Barber",
+   "staff": "Riley and Avery (barbers)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Haircut",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 haircut with Riley. A card is saved for the shop's $20 fee. Alex pays at the chair, tip included.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Haircut",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $35 haircut. Nothing is taken: a YES books it. Alex pays at the chair.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Groom's package",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 Groom's package (2½ hours). Sam takes a $40 deposit now, and the $100 rest is paid at the chair.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Barber",
+   "staff": "Andre and Malik (barbers who travel)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Home grooming visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 home grooming visit (cut, beard trim, hot towel). A card is saved for the $89 fee. Rosie texts the bill, with a tip line, after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Groom's cut at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 groom's cut at home, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Wedding party grooming (4 people)",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "Grooming for a wedding party of 4 at Alex's home, quoted at $640 from photos and OK'd by Sam. A $160 deposit now, the $480 rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "set services with a chosen barber, booked in 15-minute steps; quick services fill the short gaps they fit",
+ "questions_before_times": [
+  "new or returning",
+  "the service, and which barber (or the first free)",
+  "anyone else in the group, and how many (a group of 3 or more at the shop asks Sam first)",
+  "for a kids cut: the child's age",
+  "for a house call or event: the kind of place, and the town or ZIP",
+  "for a wedding party: how many people, what each wants, the date and the start time"
+ ],
+ "safety_stop": [
+  "a dye reaction happening now: face, lips or throat swelling, trouble breathing",
+  "a deep cut that won't stop bleeding"
+ ],
+ "first_steps": [
+  "Skin test for beard color (a small test for a reaction to hair dye)"
+ ],
+ "facts": [
+  "children",
+  "documents",
+  "extrawork",
+  "groups",
+  "photos"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "always: barbering is licensed where the state's rules require it",
+ "staff_skills": "cuts, fades, beard work, razor shaves, kids cuts, beard color, house calls and events; only barbers who do color are offered for beard color",
+ "messages_never": "dye-reaction, skin-test and skin or scalp answers never go in a text or through the AI: only the secure page and the customer's record; the customer never hears why a barber is out",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/barber",
+  "pexels": "https://www.pexels.com/search/barber/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

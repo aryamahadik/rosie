@@ -1,0 +1,218 @@
+{
+ "id": "organizer",
+ "name": "Professional organizer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "interior",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Professional organizer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Professional organizer",
+   "staff": "Hana and Rafael (studio organizers)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Planning session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Planning session, $35 at the studio; a card saved for the $20 missed-session fee; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Virtual organizing session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Virtual organizing session, $55, paid in full when booking; credited toward a project if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Room plan from photos",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Room plan priced from Alex's photos at $90, OK'd by Sam; a card saved; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom storage plan",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Custom storage plan, priced at the studio after a $25 consult; a card saved; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Professional organizer",
+   "staff": "Sanjay and Marcus (organizers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "In-home organizing consult",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Kitchen and pantry: the $89 in-home organizing consult, a card saved for the late-cancel fee; Sanjay's written plan; the agreement, a $600 deposit, a $360 change order; the last $960 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "In-home organizing consult",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same project, but Sam bills the deposit and the last payment the business's own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Closet or pantry reset",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Closet or pantry reset, $179 from the list; a card saved for the $89 fee; Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Paper filing setup",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Paper filing setup, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Garage organizing from photos",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "Garage organizing priced from photos at $640 (over $500, so Sam OKs it); a signed agreement; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult, then project: an organizing project is booked only after a written plan with a price and a signed agreement. Small fixed jobs book straight from the list.\",\"B\":[{\"name\":\"In-home organizing consult\",\"price\":\"$89 (the example business's own price), counted toward the project price if Alex signs; a free first consult is a starting option\",\"length\":\"about 90 minutes\",\"where\":\"at the customer's home; an adult 18 or older must be there\",\"before\":\"a card saved, for the late-cancel or no-show fee\",\"after\":\"billed only if no agreement follows; the owner may have the saved card charged at DONE instead\"},{\"name\":\"Home organizing project (kitchen, pantry, closets, garage, home office, move-in unpacking)\",\"price\":\"quoted after the consult: a written plan with a flat price within 1 business day, good for 14 days (the example: a $1,200 kitchen and pantry project, two 5-hour sessions at $120 an hour)\",\"length\":\"sessions of about 4 to 6 hours, on days the plan sets\",\"where\":\"at the customer's home\",\"before\":\"nothing more at booking; half the project price as a deposit once the agreement is signed\",\"after\":\"the rest after the last session, on the bill Rosie texts (or the business's own way)\"},{\"name\":\"Closet or pantry reset\",\"price\":\"$179, from the list: one closet or pantry, up to 2 hours\",\"length\":\"about 2 hours\",\"where\":\"at the customer's home; an adult must be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Paper filing setup\",\"price\":\"$150, from the list: one filing system, about 90 minutes; the papers are never read aloud or photographed\",\"where\":\"at the customer's home; an adult must be home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Garage organizing, priced from photos\",\"price\":\"priced from the customer's photos (the example: $640, about 6 hours); over $500, Sam OKs it\",\"length\":\"one session\",\"where\":\"at the customer's home\",\"before\":\"a signed agreement, then a 25% deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Written organizing plan\",\"price\":\"$199, ready in 3 business days: a room-by-room plan and shopping list for the customer to follow\",\"where\":\"after the consult; the plan goes on the secure page\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Donation drop-off run\",\"price\":\"$60 a run, an add-on when the customer asks: only the items the customer marked; the charity's receipt goes to the customer\",\"where\":\"added at a session, paid at the visit or on the bill with the rest\"},{\"name\":\"Extra organizing time\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a project for work beyond the agreement, only by a signed change order, never booked alone\"},{\"name\":\"Change order\",\"price\":\"an added room or more hours: priced, written and signed before the work; added to the final bill\"},{\"name\":\"Bins, labels and shelving\",\"price\":\"bought by the customer from the organizer's shopping list; Rosfield takes no product money\"},{\"name\":\"Yearly refresh visit\",\"price\":\"$150 a visit (the example), booked each year; each visit is booked and paid like a single one\",\"where\":\"at the customer's home; an adult must be home\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"}],\"A\":[{\"name\":\"Planning session\",\"price\":\"$35, 45 minutes\",\"where\":\"at the organizing studio, with a studio organizer\",\"before\":\"a card saved for the $20 missed-session fee\",\"after\":\"paid at the studio desk\"},{\"name\":\"Storage and label review\",\"price\":\"$40, 30 minutes\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Shopping list\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Room checklist\",\"price\":\"$15, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Kids' room session\",\"price\":\"$25\",\"where\":\"at the studio\",\"who\":\"booked by the parent, who stays; the child is never the one served\"},{\"name\":\"Virtual organizing session\",\"price\":\"$55, 45 minutes, by video (counts as at the studio); credited toward a project if Alex signs\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Whole-room plan package (layout, labels, shopping list)\",\"price\":\"$140, 2 hours\",\"where\":\"at the studio\",\"before\":\"a card saved for its $40 fee\",\"after\":\"at the studio desk\"},{\"name\":\"Room plan from photos\",\"price\":\"priced from the customer's photos (the example: $90); Sam OKs each one\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Planning session at home\",\"price\":\"$75, paid in full when booked: a studio organizer comes to the home\",\"where\":\"at the customer's home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Custom storage plan\",\"price\":\"priced at the studio after a $25 consult (the example: $110)\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Intro call\",\"price\":\"15 minutes, free, by phone: a call with a studio organizer before booking; nothing taken and nothing owed\"}],\"capacity\":\"One organizer per consult or session; big sessions take a lead organizer and a helper, and a time shows only when both are free. The studio's planning table is saved for each studio booking.\",\"skills\":\"Consults and projects: the lead organizers. Studio sessions: the studio organizers. Heavy lifting and high shelves: two people.\",\"nobody_home\":\"No. An adult 18 or older who owns the things must be home at each session, to decide what stays, goes or is donated. A child at home is never the one who lets the organizer in.\",\"online\":\"A virtual organizing session by video counts as at the studio; consults and sessions are in person\",\"smallest_job\":\"A switch the owner sets: the smallest project taken. Smaller requests are offered a closet or pantry reset or a paper filing setup instead.\"}",
+ "questions_before_times": [
+  "Which rooms or areas do you want organized?",
+  "A house, an apartment or an office?",
+  "About how full is the space: a little, a lot, or hard to walk through?",
+  "When would you like it done?"
+ ],
+ "safety_stop": [
+  "a gas smell, sparking or smoking wires, a carbon monoxide alarm",
+  "a blocked exit or stairway, or piles that are tipping or could fall on someone",
+  "animal or human waste, rodents, needles or other sharps, or mold across a room"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "video",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: most states license no home organizing. Only the business registration and insurance are kept. Where the state's form asks for more (a business license, or a certificate for a specific task), it comes from the state's form.",
+ "staff_skills": "",
+ "messages_never": "[\"Entry or key codes\",\"The budget\",\"What is stored, and anything found: papers, medicines, valuables or IDs\",\"Plans, agreements and change orders (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/professional+organizer",
+  "pexels": "https://www.pexels.com/search/professional%20organizer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,139 @@
+{
+ "id": "vehicle-inspection",
+ "name": "Emissions and vehicle inspection",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "tires",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Emissions and vehicle inspection",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Emissions and vehicle inspection",
+   "staff": "Cal and Joy (inspectors)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Combined inspection",
+     "price": "$50",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a combined inspection, $50 from the station's board. Nothing is taken: a YES books the lane, and Alex pays at the counter. The result is on the secure page.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Combined inspection",
+     "price": "$50",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same $50 inspection with the car left at the station. Rosie texts the bill with READY, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Emissions and vehicle inspection",
+   "staff": "Gil and Ana (inspectors)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": "24 hours before",
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Pre-purchase inspection",
+     "price": "$229",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a pre-purchase inspection of a used car at the seller's place, $229 with the $89 trip fee in it. A card is saved for the trip fee, charged only for a late cancel or a no-show, and only on Sam's yes. Rosie texts the bill after Gil texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Fleet inspection",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A fleet inspection at a business lot, priced at the visit after counting the vehicles. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"a lane booked by time slot at the station: the customer waits about 30 to 45 minutes, or leaves the car and picks it up when it is READY; the van comes to a home, a lot or a seller's address for a pre-purchase check or a fleet visit\",\"list\":[{\"name\":\"Combined inspection (emissions and safety)\",\"price\":\"one price; the example station's own: $50, with the state's certificate or sticker fee in it where the state has one\",\"length\":\"about 45 minutes\",\"place\":\"at the station\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill Rosie texts when the car is ready\"},{\"name\":\"Smog check\",\"price\":\"the emissions test alone: $40 in the example\",\"length\":\"about 30 minutes\",\"place\":\"at the station\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Safety inspection only\",\"price\":\"$25 in the example\",\"length\":\"about 30 minutes\",\"place\":\"at the station\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Commercial vehicle inspection\",\"price\":\"$55 in the example\",\"length\":\"about 45 minutes\",\"place\":\"at the station\",\"before\":\"nothing taken\",\"after\":\"at the counter, or the bill\"},{\"name\":\"Safety inspection, at the car\",\"price\":\"by the van: $114 in the example (the $89 trip fee is in it)\",\"length\":\"about 30 minutes\",\"place\":\"by the van\",\"before\":\"a card saved for the trip fee\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Salvage or rebuilt vehicle inspection\",\"price\":\"priced at the visit, after a look at the car; only the trip fee is promised by the van\",\"place\":\"at the station, or by the van\"},{\"name\":\"Extra vehicles at a fleet visit\",\"price\":\"$30 a vehicle in the example, added to the counted fleet price\",\"place\":\"the van at a business's lot\"},{\"name\":\"Headlight aim check\",\"price\":\"$20 in the example at the station, $109 by the van (the $89 trip fee is in it); can be added to any inspection\",\"length\":\"10 minutes\",\"place\":\"at the station; by the van\"},{\"name\":\"Pre-purchase inspection (no state certificate)\",\"price\":\"a full check of a used car with a written report on the secure page: $140 in the example at the station, $229 by the van (the $89 trip fee is in it)\",\"length\":\"about 90 minutes\",\"place\":\"at the station, or by the van at the seller's address; the seller must agree and be there\",\"before\":\"nothing taken at the station; a card saved for the trip fee for the van\",\"after\":\"at the counter, or the bill Rosie texts after DONE\"},{\"name\":\"Fleet inspection at a business lot\",\"price\":\"priced at the visit, per vehicle, after counting the vehicles; only the trip fee is promised; only where the state's rules allow a test away from the station\",\"place\":\"the van at a business's lot\",\"before\":\"a card saved for the trip fee\",\"after\":\"the bill Rosie texts after DONE\"},{\"name\":\"Re-test\",\"price\":\"free within 30 days of a first test at this station, for the same tests (the example station's rule; the state's form decides the days and what is free)\",\"length\":\"about 30 minutes\",\"place\":\"at the station\"},{\"name\":\"Trip fee for the van\",\"price\":\"one fee, part of each mobile job's price (the example: $89)\",\"place\":\"at a home, a lot or a seller's address\"}],\"never\":\"a certificate, sticker or passing result sold without the test, a changed result, and a test skipped are never booked: they are refused\",\"capacity\":\"the station's 2 lanes book by time; one car per booking; the van does one car at a time and needs a flat, safe place to run the car\",\"booked_as\":\"a lane's time at the station, not a person: the station names the inspector; the van books a person\",\"wait_or_leave\":\"the customer waits at the station, or leaves the car and picks it up when READY\",\"van\":\"a pre-purchase check at a home or a seller's address; a fleet visit at a business lot (an arrival window of 2 hours)\",\"nobody_home\":\"no: the owner or an adult hands over the keys and the papers at the car\",\"online\":\"no: the car is inspected in person\"}",
+ "questions_before_times": [
+  "Year, make, model and fuel (gas, diesel or electric)",
+  "What kind of inspection: emissions, safety, both, a commercial vehicle, or a pre-purchase check",
+  "Is the check-engine light on? Was the battery unplugged or a code cleared lately?",
+  "Wait at the station, or leave the car?",
+  "For the van: a home, a lot or a seller's address, and the town"
+ ],
+ "safety_stop": [
+  "someone hurt, or a crash that just happened",
+  "a fire, or smoke from the car",
+  "someone dizzy or sick from fumes in the car"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "spaces",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: a state license for the inspection station where the state's rules require one (for the emissions test, the safety inspection or both); a certificate for each person who runs and signs a result, where the state's rules require one; the business registration. Rosie books the visit only; the result is the inspector's.",
+ "staff_skills": "[\"emissions testing\",\"safety inspection\",\"commercial vehicle inspection\",\"pre-purchase inspection\",\"mobile work in the van\"]",
+ "messages_never": "[\"The result of an inspection (pass or fail), its readings and any certificate number\",\"The VIN or the plate\",\"The registration or the insurance papers\",\"A lot or gate code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/emissions+and+vehicle+inspection",
+  "pexels": "https://www.pexels.com/search/emissions%20and%20vehicle%20inspection/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

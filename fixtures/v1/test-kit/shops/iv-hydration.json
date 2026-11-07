@@ -1,0 +1,178 @@
+{
+ "id": "iv-hydration",
+ "name": "IV hydration clinic",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "medspa",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] IV hydration clinic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Hydration",
+   "staff": "Tessa (registered nurse) and Owen (nurse practitioner, who does the screening calls)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Hydration IV",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $175 hydration IV at the clinic. A card is saved for the $20 missed-visit fee, which the owner confirms before any charge, and Alex pays at the front desk after the IV.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Screening call",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free screening call before a first IV. Nothing is taken, and there's nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Vitamin IV",
+     "price": "$225",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $225 vitamin IV, paid at the front desk after the visit. Nothing is taken at booking.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "5-IV pack",
+     "price": "$850",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$850",
+     "fee": "$20",
+     "story": "A 5-IV pack, $850, paid in full when booked. Nothing more is owed.",
+     "due_now_at_booking": 850,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile IV",
+   "staff": "Jade (registered nurse) and Kai (nurse practitioner, who does the video screening)",
+   "customer": "Alex M. (client, at home at 12 Juniper Ln) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Mobile IV at home",
+     "price": "$275",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $275 hydration IV at Alex's home. A card is saved for the $89 missed-visit fee, and the card is charged when Jade texts DONE, after Alex says yes to the price.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Mobile IV at home",
+     "price": "$275",
+     "deposit": "$89",
+     "rest": "$186",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same visit with an $89 house-call deposit now, counted toward the $275 price; the $186 rest is charged to the saved card when Jade texts DONE, after Alex's yes.",
+     "due_now_at_booking": 89,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "self-pay visits, each with a nurse by name and a set length; a first IV starts with a screening call; add-ins are added at the visit only with the client's yes; a pack is paid in full; a membership is charged monthly only after the member's yes",
+ "questions_before_times": [
+  "new or returning client",
+  "a hydration IV, a vitamin IV, an add-in or a pack",
+  "which visit: the clinic's own list only, never a symptom typed into the AI",
+  "paying yourself (every visit is self-pay; no health plan pays)",
+  "for a video screening: the state the client will be in",
+  "join the list for a sooner time"
+ ],
+ "safety_stop": [
+  "chest pain, a racing or irregular heartbeat, fainting, or trouble breathing",
+  "swelling of the face, lips, tongue or throat, hives with wheezing, or a seizure",
+  "a fever of 100.4 or more, or vomiting today",
+  "a swallowed medicine, or too much of one"
+ ],
+ "first_steps": [
+  "Screening questionnaire and call",
+  "Consent for IV therapy",
+  "Standing order check"
+ ],
+ "facts": [
+  "packs",
+  "plans",
+  "firststeps",
+  "forms",
+  "video",
+  "extrawork",
+  "waitlist"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "the owner's word: each nurse, nurse practitioner and the medical director holds their own license, and the clinic its registration, where the state's form asks; Rosie never looks a license up",
+ "staff_skills": "Tessa (registered nurse): IV starts and drips at the clinic; Owen (nurse practitioner): screening calls and first-visit checks; Jade (registered nurse) and Kai (nurse practitioner): mobile IVs at home under the medical director's standing order; the front desk: no clinical OKs",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the treatment, the blend, a symptom, a medicine or a condition; flow A's texts drop the nurse's name; at a home visit the nurse's name stays, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/iv+hydration+clinic",
+  "pexels": "https://www.pexels.com/search/iv%20hydration%20clinic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

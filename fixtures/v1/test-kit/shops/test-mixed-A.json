@@ -1,0 +1,151 @@
+{
+ "id": "test-mixed-A",
+ "name": "Test Mixed Shop A",
+ "booking_type": "Test",
+ "pattern": "test",
+ "purpose": "Covers every money combo no profession uses (5 in flow A), plus a mixed booking: one booking that adds a card-saved, a deposit and a paid-in-full service together.",
+ "flows": {
+  "A": {
+   "flow": "A",
+   "business": "Test Mixed Shop A",
+   "services": [
+    {
+     "combo": "photos|card|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Color and cut",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": null,
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Color correction",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": null,
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Color correction",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": null,
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "visit|deposit|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Color correction",
+     "price": null,
+     "deposit": "$25",
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": null,
+     "due_now_at_booking": 25,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "visit|deposit|card",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Color correction",
+     "price": null,
+     "deposit": "$25",
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": null,
+     "due_now_at_booking": 25,
+     "money_flags": [],
+     "uncovered_by_professions": true
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Haircut",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 haircut. A card is saved for the shop's $20 fee. Alex pays at the chair.",
+     "due_now_at_booking": 0,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Groom's package",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 Groom's package. A $40 deposit now, and $100 at the chair.",
+     "due_now_at_booking": 40,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Signature cut and hot towel shave",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 signature cut and shave, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": [],
+     "uncovered_by_professions": false
+    }
+   ]
+  }
+ },
+ "mixed_booking": {
+  "services": [
+   "list|card|counter",
+   "list|deposit|counter",
+   "list|full|none"
+  ],
+  "expect": "All that's due now is added up and taken in one payment on one card (S13-55); one late-cancel / no-show fee per booking, the largest of the services' fees, never more than what was paid now."
+ }
+}

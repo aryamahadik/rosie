@@ -1,0 +1,1016 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "daycare",
+  "name": "Daycare center",
+  "type": "class",
+  "started_from": "martial-arts"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K01",
+   "field": "Class timetable: day, time, teacher, room (sent as a photo or typed)",
+   "type": "schedule",
+   "need": "R for class work",
+   "shows": "booking page (sessions with seats left)",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K02",
+   "field": "Seats Rosie can book per session, the fewest to run, the cutoff",
+   "type": "numbers",
+   "need": "R for class work",
+   "shows": "seats left; owner decides at the cutoff",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K03",
+   "field": "Trial seats per class (one trial each)",
+   "type": "number",
+   "need": "P",
+   "shows": "booking page",
+   "source": "A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K04",
+   "field": "Places and things (room, table, court, lane, bay, boat, van, vehicle, kennel, suite, property or unit): name, photos, how many it fits, which services use it, hours, how many Rosie can book, private access notes on the secure page only (never in a text). The fields of each kind are in the table below",
+   "type": "list",
+   "need": "R when the work books spaces",
+   "shows": "booking page (space and size, never a person)",
+   "source": "S1-80, S1-81, A4-62, S13-05",
+   "google": "no",
+   "turned_on_by": "fact spaces"
+  },
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps; fact forms"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children"
+  },
+  {
+   "id": "V14",
+   "field": "Waitlist",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "times card",
+   "source": "S1-21, A4-60, fact waitlist",
+   "google": "no",
+   "turned_on_by": "fact waitlist"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  }
+ ],
+ "facts": [
+  "plans",
+  "children",
+  "spaces",
+  "waitlist",
+  "firststeps",
+  "forms",
+  "documents",
+  "extrawork",
+  "classes"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|deposit|card",
+   "paths": [
+    "list|deposit|card",
+    "list|none|counter",
+    "list|full|none"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|card|card",
+   "paths": [
+    "list|card|card",
+    "list|none|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|deposit|card",
+   "name": "Full-time place, Twos room",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$1,280",
+   "deposit": "$300",
+   "rest": "$980",
+   "paid": null,
+   "fee": "$100",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a full-time place for Mia in the Twos room from Mon Nov 2, $1,280 a month. The $100 registration fee and the $300 deposit are paid on the page now; the deposit counts toward the first month."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Drop-in day",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$85",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$100",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A drop-in day for a child, $85, nothing taken: paid at the counter at pick-up."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Backup-care day",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$85",
+   "deposit": null,
+   "rest": null,
+   "paid": "$85",
+   "fee": "$85",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A backup-care day, $85, paid in full when booked."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Kids' room, 2 teachers, 4 hours",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$320",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$80",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The main story: a kids' room at Alex's family party, 2 teachers for 4 hours at $40 an hour each: $320. A card is saved for the $80 late-cancel or no-show fee, and it's charged for the hours given when the party is done."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Kids' room, 2 teachers, 4 hours",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$320",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$80",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A kids' room for a workplace that pays by bill: $320, nothing taken. Rosie texts the bill after the event."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Drop-in day",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$85",
+   "fee": "$85"
+  },
+  {
+   "flow": "A",
+   "name": "Backup-care day",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$85",
+   "paid": "$85",
+   "fee": "$85"
+  },
+  {
+   "flow": "A",
+   "name": "Full-time place (plan)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Extra hour for each teacher",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "card",
+   "price": "$80",
+   "fee": "$80"
+  },
+  {
+   "flow": "B",
+   "name": "Kids' room, paid in full",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$320",
+   "paid": "$320",
+   "fee": "$80"
+  },
+  {
+   "flow": "B",
+   "name": "Babysitting (plan)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Tour with the director",
+   "price": "free",
+   "kind": "one price",
+   "length": "30 min",
+   "where": "at the center",
+   "before": "nothing taken, no card",
+   "after": "nothing owed"
+  },
+  {
+   "name": "Infant room, full-time",
+   "price": "$1,480 a month",
+   "kind": "a monthly plan",
+   "length": "Mon to Fri, up to 10 hours a day",
+   "where": "at the center",
+   "before": "the $100 registration fee and a $300 deposit when the place is booked; the deposit counts toward the first month",
+   "after": "nothing more: the rest of the first month is billed on the monthly bill once the place starts; later months are the plan"
+  },
+  {
+   "name": "Toddler room, full-time",
+   "price": "$1,360 a month",
+   "kind": "a monthly plan",
+   "length": "Mon to Fri",
+   "where": "at the center",
+   "before": "the $100 registration fee and a $300 deposit",
+   "after": "the rest on the monthly bill; then the plan"
+  },
+  {
+   "name": "Twos room, full-time",
+   "price": "$1,280 a month",
+   "kind": "a monthly plan",
+   "length": "Mon to Fri",
+   "where": "at the center",
+   "before": "the $100 registration fee and a $300 deposit",
+   "after": "the rest on the monthly bill; then the plan"
+  },
+  {
+   "name": "Twos room, 3 days a week",
+   "price": "$860 a month",
+   "kind": "a monthly plan",
+   "length": "Mon, Wed and Fri",
+   "where": "at the center",
+   "before": "the $100 registration fee and a $300 deposit",
+   "after": "the rest on the monthly bill; then the plan"
+  },
+  {
+   "name": "Preschool room, full-time",
+   "price": "$1,120 a month",
+   "kind": "a monthly plan",
+   "length": "Mon to Fri",
+   "where": "at the center",
+   "before": "the $100 registration fee and a $300 deposit",
+   "after": "the rest on the monthly bill; then the plan"
+  },
+  {
+   "name": "Registration fee",
+   "price": "$100 a year",
+   "kind": "a fee",
+   "length": "once a year",
+   "where": "at the center",
+   "before": "paid with the deposit",
+   "after": "refunded with the deposit until the free withdraw time ends; after that it may be kept, only with Sam's OK"
+  },
+  {
+   "name": "Enrollment deposit",
+   "price": "$300",
+   "kind": "a deposit",
+   "length": "holds the place",
+   "where": "at the center",
+   "before": "paid when the place is booked",
+   "after": "counts toward the first month's tuition"
+  },
+  {
+   "name": "Drop-in or backup-care day",
+   "price": "$85 a day",
+   "kind": "one price",
+   "length": "7:30am to 5:30pm (up to 6:00pm)",
+   "where": "at the center",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Late pick-up fee",
+   "price": "$1 a minute after 6:00pm",
+   "kind": "a fee",
+   "length": "only with Sam's OK",
+   "where": "at the center",
+   "before": "on the card saved on the page, only if the parent ticked it",
+   "after": "no answer in 24 hours: no fee"
+  },
+  {
+   "name": "Kids' room at a family event or a workplace (Lee Kids Events)",
+   "price": "$40 an hour for each teacher, 3 hours or more",
+   "kind": "per hour",
+   "length": "set by the host",
+   "where": "at the host's home, office or venue",
+   "before": "a card saved for the $80 late-cancel or no-show fee",
+   "after": "the saved card charged at DONE for the hours given"
+  },
+  {
+   "name": "Kids' room for a workplace or a group that pays by bill",
+   "price": "$40 an hour for each teacher",
+   "kind": "per hour",
+   "length": "set by the host",
+   "where": "at the host's place",
+   "before": "nothing taken",
+   "after": "Rosie texts the bill"
+  },
+  {
+   "name": "Late-cancel or no-show fee for a kids' room",
+   "price": "$80",
+   "kind": "a fee",
+   "length": "only with Sam's yes",
+   "where": "at the host's place",
+   "before": "on the saved card",
+   "after": "never more than the booking"
+  },
+  {
+   "name": "Extra time at an event",
+   "price": "$40 an hour for each teacher, by the half hour",
+   "kind": "per hour",
+   "length": "added on the day, with the host's yes first",
+   "where": "at the host's place",
+   "before": "added to the booking",
+   "after": "paid with the booking"
+  },
+  {
+   "name": "Babysitting (Lee Kids Events' second kind of work)",
+   "price": "$24 an hour, 3 hours or more",
+   "kind": "per hour",
+   "length": "set by the family",
+   "where": "at the family's home",
+   "before": "a card saved for the $48 fee",
+   "after": "the saved card charged at DONE"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "a tour, a place or a drop-in day",
+   "the child's age in months or years (sets the room), from the parent's words; the AI passes only the age",
+   "full-time or part-time, and the start date wanted",
+   "more children to enroll",
+   "away: a family event or a workplace, the date and hours, and how many children with their ages"
+  ],
+  "after_time": [
+   "will the child come to the tour",
+   "away: the room for the kids, the way in, and who from the family stays on site"
+  ],
+  "secure_page_only": [
+   "the parent's or guardian's yes that they may enroll and sign for the child",
+   "the child's first name and birth date",
+   "the center's admission form, signed",
+   "health and shot records, or the state's exemption form, where the state's rules require them",
+   "allergies, medicines and health needs, with the doctor's plan where one is needed, and the medicine permission form",
+   "emergency contacts",
+   "the pick-up list: the adults who may take the child home, and anyone who may not, with any court order uploaded",
+   "photo consent (optional, No unless ticked)"
+  ],
+  "who_may_book": "a parent or legal guardian, 18 or older, books and signs for the child; a teen can't book alone; away, the host books, and each child's own parent fills that child's form"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "a child hurt, missing or in danger right now",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   },
+   {
+    "words": "a report of abuse or neglect of a child, at the center or anywhere",
+    "say": "If a child is in danger now, call 911. A person on Rosie's team follows up, and you can call the state's child abuse hotline.",
+    "booking": "no booking in that chat; a person on Rosie's team follows the state's reporting steps where they apply"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "an allergy, asthma, a medicine or a health need",
+    "what": "the answer goes only on the secure page; the booking goes on, and Sam reads anything the plug-in marks before a place is offered; Rosie gives no health advice"
+   },
+   {
+    "words": "a custody order, or someone who may not pick up",
+    "what": "only on the secure page, with the order uploaded; never in a text; the booking goes on"
+   },
+   {
+    "words": "asks if a child is too sick to come",
+    "what": "no advice from Rosie: the center's own sick-child rules, shown on the page, and the director answers by phone"
+   }
+  ],
+  "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "Tour with the director",
+    "when": "before a place is offered; good for 3 months",
+    "who": "the parent, with the child welcome",
+    "result": "on file: a place can be booked; not yet: the tour is booked first and saved with the place"
+   },
+   {
+    "name": "Enrollment forms",
+    "when": "on the secure page; due by 6pm the business day before the first day (a drop-in day: before booking)",
+    "who": "the parent or guardian",
+    "words": "the center's admission form, health and shot records or the state's exemption where the state's rules require them, allergies and medicine permission, emergency contacts, the pick-up list",
+    "result": "done: the child can start; not done by the due time: Sam decides to keep, move or cancel with no fee; the child never starts without them"
+   },
+   {
+    "name": "Trial morning (optional, the center's setting)",
+    "when": "after a place is booked and before the first full day; free with the place, 9:00am to 1:00pm, the parent stays the first 30 minutes",
+    "who": "the child, with the parent at the start",
+    "result": "the family keeps the place, asks for a change, or withdraws by the end of that day with everything paid back, as the master's 'not the right fit' does (A7-34, A7-36); no answer by 6pm keeps the place; keeping a nonrefundable fee is a gap for the master; a center that runs no trial morning skips it"
+   }
+  ],
+  "prep": "for the reminder: a labeled bag with 2 changes of clothes, diapers and wipes if used, a labeled cup, a crib sheet and a small blanket for nap; meals and snacks are the center's; away, a room for the kids' corner, away from the pool, the kitchen and the stairs",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "skills": "infant care, toddlers and twos, preschool, event care",
+  "licenses_or_certificates": "no person license unless the state's form names one; the director's and teachers' training and credentials where the state's rules require them, as switches",
+  "who_oks": "Sam, the owner and director, OKs every place (Rosie never picks who gets one), every fee, and any event over 6 hours; Pat answers Lee Kids Events requests and its prices over $500, and the center's requests only while Sam is away (AWAY); a new adult on a pick-up list is added only by the parent on the secure page, never by Sam, by phone or by text",
+  "stand_in": "a teacher out: another teacher cleared for that age covers the room; families are told only if their child's lead teacher changes for more than a day",
+  "ratio": "each room's child-to-teacher limit by age, a switch from the state's form; a helper under 18 never counts toward it"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "a parent or legal guardian, 18 or older, books and signs for the child; a teen can't book alone; away, the host books, and each child's own parent fills that child's form",
+  "minors_texts": "every text about a child goes to the parent or guardian who booked, never to the child"
+ },
+ "visit": {
+  "check_in": "at the center: the parent gives the child's check-in code at the front desk at drop-off, and the teacher ticks the child in on the room's list; a tour: the code at the front desk; away: the host's code at the door when the teachers arrive",
+  "done": "the drop-off code and the check-out at pick-up; a tour: the code at the desk; away, the code at the start, and DONE from the lead teacher"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "from the state's form: a child care center license where the state's rules require one (most states license centers that care for children for pay); care away from the center (a kids' room at an event or a workplace) and babysitting need a license only where the state's form says so",
+  "who": "the center holds its license; the event company gives its business registration, and a license only where the state's form names one",
+  "ask": "the center's license number and the agency that issued it, in the state's own words; the event company's registration number",
+  "insurance": "liability insurance where the state's form asks; the amount shown only as the center's word; a workplace or a venue may ask for proof before a kids' room there",
+  "background": "a switch from the state's form: where the state requires background checks for adults who work with children, each teacher's check is asked for (who ran it, and the date) and shown as the center's word, never as checked by Rosie"
+ },
+ "never_in_a_text": "a child's health, allergies, medicines, shot records, custody orders, who may and may not pick up, incidents and behavior never go in a text or through the AI; only the child's age passes through the AI, to set the room; texts to the owner or staff carry none of these and no age, only the parent's first name and last initial, the room and a link to the secure page",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "sick"
+  ],
+  "pf.staff": [
+   "background"
+  ],
+  "pf.license": [
+   "show"
+  ],
+  "pf.messages": [
+   "sales",
+   "waitlist"
+  ],
+  "pf.visit": [
+   "dropOff",
+   "pickUp",
+   "late",
+   "ratios",
+   "notes",
+   "incident"
+  ]
+ },
+ "duplicate_spellings_dropped": [
+  "pf.staff.certificates"
+ ]
+}

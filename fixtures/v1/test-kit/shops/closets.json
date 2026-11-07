@@ -1,0 +1,218 @@
+{
+ "id": "closets",
+ "name": "Cabinet and closet installer (finish carpentry)",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "interior",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Cabinet and closet installer (finish carpentry)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Cabinet and closet installer (finish carpentry)",
+   "staff": "Ines and Kofi (design advisors)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Design session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Design session, $35 at the studio; a card saved for the $20 missed-session fee; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Virtual design session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Virtual design session, $55, paid in full when booking; credited toward a project if Alex signs.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Door and drawer front refresh",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Door and drawer front refresh priced from Alex's photos at $90, OK'd by Sam; a card saved; paid at the studio desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom wall unit design",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Custom wall unit design, priced at the studio after a $25 consult; a card saved; paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Cabinet and closet installer (finish carpentry)",
+   "staff": "Gabe and Tomas (installers)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Design and measure visit",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Walk-in closet: the $89 design and measure visit, a card saved for the late-cancel fee; Gabe's written quote; the agreement, a $1,600 deposit, a $400 change order; the last $2,000 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Design and measure visit",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same closet, but Sam bills the deposit and the last payment the business's own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Closet shelf and rod install",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Closet shelf and rod install, $179 from the list; a card saved for the $89 fee; Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Cabinet hardware swap",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Cabinet hardware swap, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Pantry shelving build",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "Pantry shelving priced from photos at $640 (over $500, so Sam OKs it); a signed agreement; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Visit, then project: a closet or cabinet project is booked only after a written quote with a drawing and a signed agreement. Small fixed jobs book straight from the list.\",\"B\":[{\"name\":\"In-home design and measure visit\",\"price\":\"$89 (the example business's own price), counted toward the project price if Alex signs; a free first visit is a starting option\",\"length\":\"about 90 minutes to 2 hours\",\"where\":\"at the customer's home or business space; an adult 18 or older must be there\",\"before\":\"a card saved, for the late-cancel or no-show fee\",\"after\":\"billed only if no agreement follows; the owner may have the saved card charged at DONE instead\"},{\"name\":\"Custom closet or cabinet project (walk-in or reach-in closet, built-ins, kitchen or bath cabinets)\",\"price\":\"quoted after the visit: a written quote with a drawing within 1 business day, good for 14 days (the example: a $3,200 walk-in closet)\",\"length\":\"install usually 1 to 2 days, about 2 to 3 weeks after the order, because the panels are made to order\",\"where\":\"at the customer's place\",\"before\":\"nothing more at booking; half the project price as a deposit once the agreement is signed and the cancel window has begun\",\"after\":\"the rest at the walk-through, on the bill Rosie texts (or the business's own way)\"},{\"name\":\"Closet shelf and rod install\",\"price\":\"$179, from the list: one closet, up to 4 shelves and 2 rods from a kit\",\"length\":\"about 2 hours\",\"where\":\"at the customer's place; an adult must be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Cabinet hardware swap\",\"price\":\"$150, from the list: up to 20 knobs, pulls or hinges\",\"length\":\"about 1 hour\",\"where\":\"at the customer's place; an adult must be home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Pantry or garage shelving build\",\"price\":\"priced from the customer's photos and wall sizes (the example: $640); over $500, Sam OKs it\",\"length\":\"one install day\",\"where\":\"at the customer's place\",\"before\":\"a signed agreement, then a 25% deposit\",\"after\":\"the rest on the bill Rosie texts\"},{\"name\":\"Measured drawing with a materials list\",\"price\":\"$199, ready in 3 business days\",\"where\":\"at the customer's place for the measuring; the drawing goes on the secure page\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Anchor a tall dresser, bookcase or shelf to the wall\",\"price\":\"$60 each, an add-on when the customer asks; a tall piece next to children is anchored first\",\"where\":\"added at a visit, paid at the visit or on the bill with the rest\"},{\"name\":\"Extra install time\",\"price\":\"$120 an hour, 1-hour minimum\",\"where\":\"added to a project for work beyond the agreement, never booked alone\"},{\"name\":\"Change order\",\"price\":\"an added shelf, drawer or tower: priced, written and signed before the work; added to the final bill\"},{\"name\":\"Yearly tune-up visit\",\"price\":\"$150 a visit (the example), booked each year; each visit is booked and paid like a single one\",\"where\":\"at the customer's place; an adult must be home\",\"before\":\"a card saved\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Panels, rods, drawers and hardware\",\"price\":\"included in the quoted project price; Rosfield takes nothing for materials beyond the signed quote\"}],\"A\":[{\"name\":\"Design session\",\"price\":\"$35, 45 minutes\",\"where\":\"at the closet studio, with a design advisor\",\"before\":\"a card saved for the $20 missed-session fee\",\"after\":\"paid at the studio desk\"},{\"name\":\"Hardware and finish review\",\"price\":\"$40, 30 minutes\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Finish sample board\",\"price\":\"$20, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Hardware sample set\",\"price\":\"$15, an add-on to take home\",\"where\":\"at the studio\"},{\"name\":\"Kids' closet session\",\"price\":\"$25\",\"where\":\"at the studio\",\"who\":\"booked by the parent, who stays; the child is never the one served\"},{\"name\":\"Virtual design session\",\"price\":\"$55, 45 minutes, by video (counts as at the studio); credited toward a project if Alex signs\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Full closet design package (3D drawing, finishes, hardware picks)\",\"price\":\"$140, 2 hours\",\"where\":\"at the studio\",\"before\":\"a card saved for its $40 fee\",\"after\":\"at the studio desk\"},{\"name\":\"Door and drawer front refresh\",\"price\":\"priced from the customer's photos and sizes (the example: $90); Sam OKs each one\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Design session at home\",\"price\":\"$75, paid in full when booked: a design advisor brings finish samples to the home\",\"where\":\"at the customer's home\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Custom wall unit design\",\"price\":\"priced at the studio after a $25 consult (the example: $110)\",\"where\":\"at the studio\",\"before\":\"a card saved\",\"after\":\"at the studio desk\"},{\"name\":\"Intro call\",\"price\":\"15 minutes, free, by phone: a call with a design advisor before booking; nothing taken and nothing owed\"}],\"capacity\":\"One installer per visit; an install day takes a lead installer and a helper, and a time shows only when both are free. The studio's design table is saved for each session.\",\"skills\":\"Visits and projects: the lead installers. Studio sessions: the design advisors. Big or heavy pieces: two people.\",\"nobody_home\":\"No. An adult 18 or older must be home on the visit and on install day to let the crew in and OK the layout. A child at home is never the one who lets the crew in.\",\"online\":\"A virtual design session by video counts as at the studio; measuring, ordering and install are in person\",\"smallest_job\":\"A switch the owner sets: the smallest project taken. Smaller requests are offered a shelf and rod install or a hardware swap instead.\"}",
+ "questions_before_times": [
+  "What do you want: a closet system, cabinets, shelving or a small fix?",
+  "Which room, and about how big is the space?",
+  "A house, an apartment or a business space?",
+  "When would you like it done?"
+ ],
+ "safety_stop": [
+  "a gas smell, sparking or smoking wires, a carbon monoxide alarm",
+  "water running inside a wall, or a ceiling sagging",
+  "a shelf, cabinet or tall piece that has tipped or fallen on someone"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "video",
+  "banktransfer"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: finish carpentry (cabinets, closets, shelving) needs a contractor license above the state's job-size limit; below it, only a business registration. All of it comes from the state's form.",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or door codes\",\"The budget\",\"Agreements, change orders and drawings (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/cabinet+and+closet+installer+finish+carpentry",
+  "pexels": "https://www.pexels.com/search/cabinet%20and%20closet%20installer%20(finish%20carpentry)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

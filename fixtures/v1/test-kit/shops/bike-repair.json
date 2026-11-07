@@ -1,0 +1,162 @@
+{
+ "id": "bike-repair",
+ "name": "Bike repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Bike repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Bike repair",
+   "staff": "Mike and Jo (mechanics)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Basic tune-up",
+     "price": "$89",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A $89 tune-up dropped off. Nothing is taken; Alex pays at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Brake and gear repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A brake and gear repair, priced after the mechanic looks at drop-off. Nothing taken; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Wheel build",
+     "price": "$380",
+     "deposit": "$180",
+     "rest": "$200",
+     "paid_now": null,
+     "fee": "$180",
+     "story": "A $380 wheel build: the $180 parts cost now, $200 at pick-up.",
+     "due_now_at_booking": 180,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Bike fit",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A $175 bike fit with the named fitter; a card saved for the $50 late-cancel fee; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Bike repair",
+   "staff": "Dan and Kim (van techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Tune-up by the van",
+     "price": "$119",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$35",
+     "story": "A $119 tune-up by the van at Alex's home; the card is saved and charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Brake repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$35",
+     "story": "A brake repair priced on the spot by the van tech; the card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "[{\"name\":\"Flat fix\",\"price\":\"list\",\"example\":\"$20 plus the tube (the example shop's own price)\",\"length\":\"30 minutes; drop-off ready the same day\",\"where\":\"A: drop-off at the shop, or wait at the counter. B: at the customer's place\",\"money\":\"A: nothing up front, paid at pick-up. B: card saved, charged at DONE\"},{\"name\":\"Basic tune-up\",\"price\":\"list\",\"example\":\"$89 at the shop, $119 by the van\",\"length\":\"A: drop-off, ready in 2 to 3 days. B: about 1 hour at the van\",\"where\":\"A or B\",\"money\":\"A: nothing up front, paid at pick-up. B: card saved, charged at DONE\"},{\"name\":\"Repair priced after a look (brakes, gears, wheel true, e-bike check)\",\"price\":\"visit\",\"example\":\"labor and parts quoted after the mechanic looks; nothing done before the customer's yes\",\"length\":\"A: drop-off, ready date given with the quote. B: on the spot when the van carries the parts\",\"where\":\"A or B\",\"money\":\"A: nothing up front, paid at pick-up. B: card saved, charged at DONE\"},{\"name\":\"Wheel build or special-order part\",\"price\":\"list\",\"example\":\"$380, with the $180 parts cost paid up front as the deposit and $200 at pick-up\",\"length\":\"drop-off, ready about 7 to 10 days after the part comes\",\"where\":\"A only\",\"money\":\"A: deposit when booking (the parts cost), the rest at pick-up\"},{\"name\":\"Bike fit\",\"price\":\"list\",\"example\":\"$175, 90 minutes with the named fitter, the rider stays\",\"length\":\"90 minutes\",\"where\":\"A only (the fit studio)\",\"money\":\"A: card saved for a $50 late-cancel fee inside 24 hours, paid at the counter\"},{\"name\":\"New bike assembly\",\"price\":\"list\",\"example\":\"$120\",\"length\":\"drop-off, ready in 2 to 3 days\",\"where\":\"A only\",\"money\":\"A: nothing up front, paid at pick-up\"}]",
+ "questions_before_times": "The kind of bike (road, mountain, kids', e-bike, cargo); what's wrong, in a few words (picks the service and the time); for an e-bike, the motor's maker (who may work on it). Flow B: where the bike will be (a driveway, garage or office lot) and where the van can park.",
+ "safety_stop": [
+  "An e-bike battery that is swollen, hot, smoking, hissing, smells of burning, or was in water or a fire. Brakes that don't work, or a cracked frame or fork. A crash with someone hurt."
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "optional; never verified by Rosie (D96)",
+ "staff_skills": "Any mechanic does standard work; e-bike motor and battery work only by trained staff; fits only by the named fitter; the van tech works alone (an emergency contact is required).",
+ "messages_never": "Nothing beyond the master's rules (no health or money details).",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/bike+repair",
+  "pexels": "https://www.pexels.com/search/bike%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

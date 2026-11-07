@@ -1,0 +1,170 @@
+{
+ "id": "gunsmith",
+ "name": "Gunsmith",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "repair-shop",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Gunsmith",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Gunsmith",
+   "staff": "Gene and Carla (gunsmiths)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "visit|none|counter",
+   "services": [
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trigger and action work",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a pistol that jams. Only the $40 diagnosis is promised. Gene's written estimate is OK'd before any work, the part is ordered, and Alex pays at the counter at pick-up, with the same photo ID.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pistol cleaning",
+     "price": "$50",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A $50 pistol cleaning from the shop's board. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Trigger and action work",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same repair, with the bill texted when it is ready, so Alex can pay before pick-up. The firearm is still handed back only to Alex, with the ID.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Refinish",
+     "price": "$250",
+     "deposit": "$125",
+     "rest": "$125",
+     "paid_now": null,
+     "fee": "$125",
+     "story": "A $250 refinish: a $125 deposit at booking, credited to the bill, and the $125 rest at the counter at pick-up.",
+     "due_now_at_booking": 125,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Gunsmith",
+   "staff": "Walt and Beth (appraisers)",
+   "customer": null,
+   "arrive": {
+    "window": 2
+   },
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Collection appraisal",
+     "price": "$244",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a collection appraisal at Alex's home, up to 2 hours, $244 with the $89 trip fee in it. A card is saved for the trip fee, charged at DONE for the appraisal, and for the fee only on Sam's yes after a late cancel or a no-show. No firearm leaves the home.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Estate appraisal",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "An estate collection, priced at the visit after counting the firearms. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE. The executor is there with the papers.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "drop-off: a firearm left at the counter unloaded and cased, checked in with a photo ID and logged, worked on, then READY and picked up only by the person who left it, with the same ID; small jobs while the owner waits; collection appraisals at the owner's home (the firearms never leave the home)",
+ "questions_before_times": [
+  "the kind of firearm (pistol, revolver, rifle, shotgun) and what it needs (cleaning, a repair, a scope, a refinish, an appraisal)",
+  "whether it's an item regulated under the National Firearms Act (a suppressor, a short barrel, fully automatic): it decides whether the shop can take it",
+  "for an appraisal: how many firearms, and the town"
+ ],
+ "safety_stop": [
+  "someone threatening to hurt themselves or others, or someone hurt by a firearm right now"
+ ],
+ "first_steps": [
+  "Firearm details form",
+  "Photo ID",
+  "Registration paper for a regulated (NFA) item",
+  "Signed written estimate"
+ ],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "documents"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": {
+    "window": 2
+   }
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "a federal firearms license that covers gunsmithing wherever the shop takes firearms in to work on them (a generic federal switch; work that federal rules count as manufacturing needs the matching license); any state or local dealer or gunsmith license where the state's rules require one; work on items regulated under the federal National Firearms Act (suppressors, short-barreled rifles and shotguns, machine guns) only where the shop's federal license and its special tax status allow it; a business registration",
+ "staff_skills": "cleaning, general repair, action and trigger work, optics, barrel work, refinish, appraisal, regulated (NFA) work only with the status",
+ "messages_never": "a firearm's make, model and serial number, the customer's ID details, registration papers and anything about who may lawfully have a firearm never go in a text: only on the secure page; READY and pick-up texts say 'your item'; the owner may pick a plain display name",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/gunsmith",
+  "pexels": "https://www.pexels.com/search/gunsmith/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

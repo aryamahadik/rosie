@@ -1,0 +1,159 @@
+{
+ "id": "teeth-whitening",
+ "name": "Teeth whitening (non-dental studio)",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "esthetician",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Teeth whitening (non-dental studio)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Teeth whitening (non-dental studio)",
+   "staff": "Gina and Lou (whitening techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "in-studio whitening, 60 min",
+     "price": "$199",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$100",
+     "story": "The main story: an in-studio whitening, 60 minutes, with Gina, $199. A card is saved for the studio's $100 fee, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "in-studio whitening (3-session package)",
+     "price": "$480",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$480",
+     "fee": "$100",
+     "story": "A 3-session package, $480, paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 480,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Teeth whitening (non-dental studio)",
+   "staff": "Ray and Sue (techs who visit)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "at-home whitening, 60 min",
+     "price": "$349",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$150",
+     "story": "The main story: an at-home whitening at Alex's home with Ray, $349. A card is saved for the $150 fee, and Rosie texts the bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "wedding party for 3, at a venue",
+     "price": "$900",
+     "deposit": "$300",
+     "rest": "$600",
+     "paid_now": null,
+     "fee": "$300",
+     "story": "A wedding party for 3 at a venue, $900: a $300 deposit when booked, and the rest billed after the whitening.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "touch-up at home, 30 min, paid in full",
+     "price": "$129",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$129",
+     "fee": "$65",
+     "story": "A touch-up at home, 30 minutes, $129, paid in full when booking.",
+     "due_now_at_booking": 129,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one whitening session per visit, with a tech the client picks or any free one; a shade check; packages of sessions; a home or venue visit for a party",
+ "questions_before_times": [
+  "the service wanted (in-studio, a touch-up, a package, or a party) and the shade wanted",
+  "a tech by name, or a woman or a man, only if the client asks",
+  "at home or at a venue: the town, the place, and how many people",
+  "for a party: the date and the time of the event"
+ ],
+ "safety_stop": [
+  "tooth pain, a swollen face or gums, pus, a broken or loose tooth, or bleeding gums",
+  "trouble breathing, chest pain, or fainting"
+ ],
+ "first_steps": [
+  "Dental and health form",
+  "Tech's read of a flag"
+ ],
+ "facts": [
+  "packs",
+  "firststeps",
+  "forms",
+  "groups",
+  "aftercare"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "none checked by Rosie: a non-dental studio whitens teeth as a cosmetic service; it never cleans, fills, diagnoses or treats teeth. Where a state's dental rules limit whitening outside a dental office, the owner must not book it (the owner's own decision; Rosie checks nothing)",
+ "staff_skills": "in-studio and at-home whitening with a gel and a light; touch-ups; shade checks; no cleaning, polishing, fillings, extractions or diagnosis",
+ "messages_never": "dental answers, health answers, pregnancy, medicines and the tech's notes never go in a text or through the AI: only the secure page and the client's private record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/teeth+whitening+non+dental+studio",
+  "pexels": "https://www.pexels.com/search/teeth%20whitening%20(non-dental%20studio)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

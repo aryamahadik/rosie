@@ -1,0 +1,240 @@
+{
+ "id": "carpet",
+ "name": "Carpet & upholstery cleaner",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Carpet & upholstery cleaner",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Carpet & upholstery cleaner",
+   "staff": "Nico and Remy (rug techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Small rug cleaning",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 small rug cleaning. Nothing is taken: a YES books the drop-off. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Small rug cleaning",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 small rug cleaning. A card is saved for the plant's $20 fee. Alex pays at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Small rug with stain protector",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 small rug with stain protector, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pet stain treatment",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A pet stain treatment, priced from Alex's photos at $90. Booked once it's OK'd; paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Hand-knotted rug cleaning",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A hand-knotted rug, priced at the counter after a look. Only the $25 inspection is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Carpet & upholstery cleaner",
+   "staff": "Kyle and Devon (carpet techs)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Carpet cleaning, 3 rooms",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 carpet cleaning for 3 rooms. A card is saved for the $89 late-cancel fee. Rosie texts the bill at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Carpet cleaning, 3 rooms",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 carpet cleaning. A card is saved for the $89 fee and charged $179 when Kyle texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Carpet cleaning, 3 rooms",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 carpet cleaning. Nothing is taken. Rosie texts the bill after the clean.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Pet odor treatment, whole home",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A whole-home pet odor treatment, priced from photos at $640. Sam OKs it. The card saved for the $89 fee is charged the rest at the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Carpet by the square foot",
+     "price": "$245",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A basement, priced by the square foot at the visit. A card is saved for the $89 late-cancel fee.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: carpet cleaning at the customer's place, priced by the room or the square foot, with stains noted before work. Rugs can also be dropped off at the plant.\",\"unit\":\"A room is up to 250 sq ft; a bigger room counts as 2. The AI asks the rooms and rough sizes before any times, and the price shows with that rule. At the visit the count changes only for what the tech measures, with the customer's yes first.\",\"list\":[{\"name\":\"Carpet cleaning, 3 rooms\",\"price_kind\":\"one price, set by the number of rooms\",\"example\":\"$179 for up to 3 rooms; each extra room $55; a hall or walk-in closet $25; stairs $4 a step (the example business's own prices)\",\"length\":\"about 30 minutes a room, plus the walk-through before work\",\"where\":\"at the customer's place\",\"money\":\"the $89 trip fee held at booking; Rosie texts the bill at DONE\"},{\"name\":\"Carpet cleaning, 2 rooms (the smallest job)\",\"price_kind\":\"one price\",\"example\":\"$150\",\"where\":\"at the customer's place\",\"money\":\"as the 3-room cleaning\"},{\"name\":\"Carpet by the square foot\",\"price_kind\":\"quoted at the visit, after the tech measures (a basement, an open floor or an office)\",\"example\":\"only the $89 trip fee is promised; the example: a 600 sq ft basement $165, 20 stairs $80\",\"where\":\"at the customer's place\",\"money\":\"the $89 trip fee held; the price OK'd at the visit goes on the bill\"},{\"name\":\"Pet odor treatment, whole home\",\"price_kind\":\"quoted from the customer's photos first\",\"example\":\"$640 for 5 rooms and the stairs with old pet urine; over Sam's $500 limit, so Sam OKs it\",\"length\":\"a long day, often two techs\",\"where\":\"at the customer's place\",\"money\":\"the $89 trip fee held; the rest on the bill\"},{\"name\":\"Pet urine treatment (add-on)\",\"price_kind\":\"one price, only when the customer asks\",\"example\":\"$199 for up to 3 rooms; a UV light finds the spots\"},{\"name\":\"Found at the visit (add-ons)\",\"price_kind\":\"quoted before it's done, the customer's yes first\",\"example\":\"re-stretching a rippled room $160; rust stain treatment $95; stain protector $20 a room\"},{\"name\":\"Upholstery cleaning (the second kind of work)\",\"price_kind\":\"one price per piece, by the fabric tag (W, S, W/S, X)\",\"example\":\"loveseat $149, sofa up to 3 seats $189, by the hour $120 (1-hour minimum); a sectional gets a free estimate visit, then a quote\",\"where\":\"at the customer's place\",\"money\":\"as carpet\"},{\"name\":\"Area rug cleaning\",\"price_kind\":\"one price by size, from photos (pet stains), or at the counter (hand-knotted rugs)\",\"example\":\"small rug up to 4 by 6 ft $35, runner $40, doormat $25, fringe cleaning $20, small rug with stain protector $55, large wool rug up to 8 by 10 ft $140, pet stain treatment from photos ($90 in the example), hand-knotted rugs priced at the counter after a $25 inspection\",\"where\":\"dropped off at the plant; a rug can also be cleaned at the customer's home ($75), or taken to the plant by the tech\",\"money\":\"nothing taken; paid at the counter at pick-up\"},{\"name\":\"Trip fee\",\"price_kind\":\"one price\",\"example\":\"$89: owed only for a late cancel or nobody home, when the owner confirms it; or when a job priced at the visit isn't done; credited to the job\",\"where\":\"not booked alone\"}],\"capacity\":\"One carpet tech per home job, with the van's truck-mounted unit. A whole-home pet odor job or an empty rental can take two. The plant takes a set number of rugs a day.\",\"nobody_home\":\"Only for an empty home, like a rental between tenants, with the owner's or manager's OK and a lockbox. Otherwise an adult is home from the window's start until done.\",\"online\":\"No.\",\"not_offered\":\"Water-damage drying, flood or sewage cleanup, mold removal, flea or bedbug treatment. The rest of the home can still be booked with that part left out.\",\"drop_off_slots\":\"Rugs are booked into drop-off slots by the plant's daily rug count, with no rug tech named. A rug goes to a rug tech with the skill once it's in.\",\"owner_looks_first\":\"Pet urine and water-stain jobs can go to Sam first: the time stays saved while Sam looks at the photos.\"}",
+ "questions_before_times": [
+  "How many rooms, and about how big is each (any bigger than about 15 by 16 ft)?",
+  "Halls, closets or stairs, and how many steps",
+  "Any pet stains: which rooms, fresh or old",
+  "Any sofa or chair, and what its fabric tag says (W, S, W/S or X)",
+  "For a rug at the plant: its size and what it's made of, if known"
+ ],
+ "safety_stop": [
+  "flooding, or water still coming in",
+  "a soaked carpet or pad",
+  "sewage or a sewage backup",
+  "water near outlets, cords or the electrical panel; sparks",
+  "mold under or behind a carpet",
+  "fleas or bedbugs",
+  "moths or carpet beetles in a rug"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Usually none for carpet, rug or upholstery cleaning. Where a state's or city's rules ask for a license or a business registration, its form asks for it.",
+ "staff_skills": "[\"Carpet cleaning by the room or the square foot\",\"Pet odor and pet urine treatment\",\"Spot and rust stain removal, re-stretching\",\"Upholstery, by fabric tag\",\"Rug cleaning at the plant, hand-knotted rugs\"]",
+ "messages_never": "[\"Lockbox, door and alarm codes\",\"Where a key is kept\",\"Health reasons, like an allergy behind a product to avoid\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/carpet+upholstery+cleaner",
+  "pexels": "https://www.pexels.com/search/carpet%20%26%20upholstery%20cleaner/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

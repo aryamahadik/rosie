@@ -1,0 +1,150 @@
+{
+ "id": "fence",
+ "name": "Fence installer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Fence installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Fence installer",
+   "staff": "Dana and the showroom",
+   "customer": "Alex M. (a homeowner) · neighbors and family",
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Design consult",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free design consult at the showroom or by video: nothing taken, nothing after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Fence installer",
+   "staff": "Owen and the crew (estimators who go out)",
+   "customer": "Alex M. (a homeowner) · a family member",
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Free estimate",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free estimate visit; the install is priced after the estimate and billed after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Cedar privacy fence, 120 feet",
+     "price": "$5,400",
+     "deposit": "$1,800",
+     "rest": "$3,600",
+     "paid_now": null,
+     "fee": "$1,800",
+     "story": "A cedar fence quoted from photos: $5,400, with a $1,800 deposit when the signed estimate is in, and the $3,600 rest on the bill after.",
+     "due_now_at_booking": 1800,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Gate repair",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A $175 gate repair, billed after the work: nothing taken to book.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "[{\"name\":\"Free on-site estimate\",\"place\":\"the customer's place\",\"price\":\"free (nothing before, nothing after)\",\"length\":\"45 to 60 minutes\",\"note\":\"measures the line, looks at slope, gates and old fence; the install is priced at it as a written estimate\"},{\"name\":\"New fence install (wood, vinyl, chain link, aluminum)\",\"place\":\"the customer's place\",\"price\":\"per foot, quoted at the estimate visit (written estimate), or from photos and the customer's measurements\",\"length\":\"1 to 3 days with a crew of 2 or 3\",\"money\":\"a deposit when the written estimate is signed (materials are ordered with it); the rest on the bill when it's done\"},{\"name\":\"Gate install or gate repair\",\"place\":\"the customer's place\",\"price\":\"the example shop's own list: gate repair $175, a new walk gate from $450\",\"length\":\"1 to 3 hours\",\"money\":\"nothing before; the bill after\"},{\"name\":\"Fence repair (posts, panels, boards)\",\"place\":\"the customer's place\",\"price\":\"quoted from photos first, or at the visit\",\"length\":\"2 to 4 hours\",\"money\":\"nothing before; the bill after\"},{\"name\":\"Old fence removal and haul-away\",\"place\":\"the customer's place\",\"price\":\"per foot, added to an install\",\"length\":\"part of the install\"},{\"name\":\"Stain and seal a wood fence\",\"place\":\"the customer's place\",\"price\":\"per foot, quoted from photos or at the visit\",\"length\":\"1 day; needs dry weather\"},{\"name\":\"Design consult (flow A)\",\"place\":\"the showroom, or by video\",\"price\":\"free\",\"length\":\"30 minutes\",\"note\":\"picks a style, material and height from samples; nothing is measured; the estimate visit follows at the customer's place\"}]",
+ "questions_before_times": [
+  "the property's address",
+  "what's needed: a new fence, a repair, a gate, or stain",
+  "about how many feet, and the height and material wanted",
+  "is there an old fence to take out",
+  "is it around a pool (a pool fence has its own barrier rules)",
+  "does the customer own the property, or have the owner's OK"
+ ],
+ "safety_stop": [
+  "a gas smell",
+  "a hit gas line",
+  "a downed power line",
+  "sparks or a live wire",
+  "someone hurt by a tool or a falling post"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "banktransfer",
+  "video"
+ ],
+ "switches": {
+  "cancelright": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "if a contractor or home improvement license where the state or local rules require one (some only above a job size), else a business registration on file; nothing is looked up",
+ "staff_skills": "",
+ "messages_never": "gate or lockbox codes, money details",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/fence+installer",
+  "pexels": "https://www.pexels.com/search/fence%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

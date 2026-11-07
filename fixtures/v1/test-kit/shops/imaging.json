@@ -1,0 +1,144 @@
+{
+ "id": "imaging",
+ "name": "Medical imaging center (X-ray, CT, MRI, ultrasound)",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "urgent-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Medical imaging center (X-ray, CT, MRI, ultrasound)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Imaging Center",
+   "staff": "Dana (radiologic technologist), Omar (MRI technologist), with the front desk",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "MRI, lower back, without contrast",
+     "price": "$450",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A walk-in X-ray with a copay paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Ultrasound, abdomen",
+     "price": "$250",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$250",
+     "fee": "$0",
+     "story": "A self-pay ultrasound at $250, paid in full when booking, after the good-faith estimate.",
+     "due_now_at_booking": 250,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Mobile Imaging",
+   "staff": "Priya (sonographer, on call) and Ben (radiologic technologist, the backup), who drive out with a portable X-ray unit",
+   "customer": "Alex M. (patient, at home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Mobile X-ray at home",
+     "price": "$225",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a mobile chest X-ray at home on the doctor's order; nothing taken; the plan billed by the center and the share billed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Mobile X-ray at home",
+     "price": "$225",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A self-pay mobile X-ray at home, $225 with the trip fee; nothing taken, and Rosie texts the bill when the technologist texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Imaging center: exams on a doctor's order, each booked as a room and its machine with a qualified technologist; a walk-in X-ray on an order; mobile X-ray and ultrasound at homes and care facilities; a mammography coach day on set days at a workplace or community site with the host's standing OK.",
+ "questions_before_times": [
+  "Which exam, as your doctor's order says it? Do you have the order, or is your doctor sending it?",
+  "Will a plan pay? Just its name here.",
+  "For MRI: do you have a pacemaker, defibrillator, nerve stimulator, cochlear implant, pump, aneurysm clip, or metal in your body or eyes? Yes or no here; details on the secure page.",
+  "Weight over 350 pounds? (the table's limit; a wider machine elsewhere)",
+  "For CT or MRI with contrast: have you had a reaction to contrast before? Yes or no here; details on the secure page.",
+  "Is it for a child?"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, a stroke sign, a bad fall or injury now",
+  "crisis words"
+ ],
+ "first_steps": [],
+ "facts": [
+  "planbill",
+  "firststeps",
+  "forms",
+  "results",
+  "children",
+  "sentnow"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Optional, and nothing is required by Rosie. The center may list its own records on its page: each machine's state registration, the federal mammography certificate, accreditations, and each technologist's credential and the supervising radiologist. Rosie shows what the center enters, as given.",
+ "staff_skills": "each technologist's kinds of exam, as the center lists them",
+ "messages_never": "The exam, the body part, the order's reason, pregnancy, implants, contrast, results. Texts name only the center, the date, the time and the place; staff and owner texts use initials and a secure link.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/medical+imaging+center+x+ray+ct+mri+ultrasound",
+  "pexels": "https://www.pexels.com/search/medical%20imaging%20center%20(x-ray%2C%20ct%2C%20mri%2C%20ultrasound)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

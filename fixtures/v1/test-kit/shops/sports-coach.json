@@ -1,0 +1,141 @@
+{
+ "id": "sports-coach",
+ "name": "Private sports coach",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "trainer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Private sports coach",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Private sports coach",
+   "staff": "Tyler and Nina (coaches at the gym)",
+   "customer": "Alex M. (parent or athlete) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "private session (5-session pack)",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: Alex buys a 5-session pack, $275 ($55 a session), and the first 60-minute session with Tyler uses one. A no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "private session",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A single 30-minute session, $35. A card is saved for the gym's $20 fee, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Private sports coach",
+   "staff": "Gabe and Nadia (coaches who travel)",
+   "customer": "Alex M. (parent or athlete) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "60-minute session at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 60-minute session at Alex's home with Gabe. A card is saved and charged $179 when Gabe texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Session at home (3-session pack)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A 3-session pack at home, $450 ($150 a session), paid in full when booking. Each session uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one athlete's time: a session with a named coach, booked by the coach's free hours, at the gym, at the client's home or yard, or on a field the business lists; a partner session adds a second athlete",
+ "questions_before_times": [
+  "new or returning (a new athlete gets the skills check first, and the waiver)",
+  "the sport and the skill: hitting, throwing, shooting, dribbling or footwork",
+  "where: the gym, at home or the yard, or a field",
+  "a single session, a pack or a weekly plan",
+  "for a child: the age, and a parent or guardian to book",
+  "one athlete or two (a partner session)"
+ ],
+ "safety_stop": [
+  "a child who isn't breathing or won't wake up right now",
+  "a head hit with confusion, a seizure, heatstroke, or a broken bone right now",
+  "someone unwell right now: chest pain, trouble breathing, fainting, or sudden weakness",
+  "a child who says someone is hurting them, or is in danger right now"
+ ],
+ "first_steps": [
+  "Free skills check",
+  "Health questions",
+  "Waiver",
+  "Doctor's OK"
+ ],
+ "facts": [
+  "packs",
+  "firststeps",
+  "forms"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: private coaching needs no state license here; a license, certificate or insurance is optional and the business's own word (D96)",
+ "staff_skills": "baseball, soccer and basketball skills; youth (ages 8 to 17) only with coaches the owner clears for them",
+ "messages_never": "health answers, injuries, a doctor's note, a child's details beyond the first name and the time, and incident notes never go in a text or through the AI: only the secure page and the athlete's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/private+sports+coach",
+  "pexels": "https://www.pexels.com/search/private%20sports%20coach/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

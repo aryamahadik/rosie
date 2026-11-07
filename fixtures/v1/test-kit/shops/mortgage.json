@@ -1,0 +1,103 @@
+{
+ "id": "mortgage",
+ "name": "Mortgage loan officer",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Mortgage loan officer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Mortgage loan officer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pre-approval call",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 30-minute pre-approval call by phone with Tyler. Nothing is taken, a YES books it, and nothing is paid through Rosie. If Alex applies later, any fees are the lender's own, in its own tools.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Mortgage loan officer",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 60-minute home meeting about refinancing with Victor. Nothing is taken, and Rosie sends no bill. Any loan fees are the lender's own, outside Rosie.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a free first call with a named loan officer who is licensed for the state the home is in. Flow A: by phone, by video, or a meeting at the branch. Flow B: at the customer's home, or on set days at a host's place, like a home-buying class or an open house.\",\"at the business (the example company's own list)\":[{\"name\":\"Pre-approval call\",\"length\":\"30 minutes\",\"price\":\"free\",\"where\":\"by phone or video, or at the branch\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\"},{\"name\":\"Refinance call\",\"length\":\"30 minutes\",\"price\":\"free\",\"before\":\"nothing taken\",\"after\":\"nothing to pay\"},{\"name\":\"Follow-up call\",\"length\":\"15 minutes\",\"price\":\"free\",\"note\":\"booked by the customer or by the loan officer, with the customer's yes\"},{\"name\":\"Branch meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"rule\":\"the loan officer's or Sam's OK first\"},{\"name\":\"First-home planning session\",\"length\":\"2 hours\",\"price\":\"free\",\"rule\":\"the loan officer's or Sam's OK first\"},{\"name\":\"Down payment help, added to a call\",\"length\":\"15 more minutes\",\"price\":\"free\",\"rule\":\"only if the customer says yes\"}],\"at the customer's place (the example company's own list)\":[{\"name\":\"Home meeting\",\"length\":\"60 minutes\",\"price\":\"free\",\"where\":\"the customer's home\",\"before\":\"nothing taken\",\"after\":\"nothing to pay through Rosie\",\"rule\":\"a set start time, never a window\"},{\"name\":\"Home-buying class seat\",\"length\":\"2 hours\",\"price\":\"free\",\"where\":\"a host's place, like a library, on set days\"},{\"name\":\"Open house table\",\"length\":\"20 minutes\",\"price\":\"free\",\"where\":\"a host's place, like a real estate office's open house, with its OK\"}],\"the loan itself\":\"Never booked, priced or applied for in Rosie. The application, the credit check, documents, the Loan Estimate, the appraisal and closing all happen in the lender's own tools, after the call. Any fees there are the lender's own, outside Rosie.\",\"travel area\":\"The business's setting (the example: 25 miles).\",\"capacity\":\"One loan officer per booking. A co-buyer may join the same call.\",\"online\":\"Phone and video calls count as at the business. The loan officer must be licensed for the state the home is in, wherever the customer is that day.\",\"booking window\":\"Up to 60 days ahead, with at least 2 hours' notice (the business's settings).\",\"blocked times\":\"Closings and other meetings block times, from the loan officer's calendar or a BLOCK text.\"}",
+ "questions_before_times": [
+  "Buying or refinancing?",
+  "Which state is the home in? The state only.",
+  "By phone, by video or at the branch? Or at your home?",
+  "A loan officer by name, or the soonest one? Rosie never ranks or suggests one."
+ ],
+ "safety_stop": [
+  "someone is in danger right now",
+  "a medical emergency",
+  "crisis words (the 988 line first)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "video",
+  "classes"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Always. Each loan officer: their own loan officer license for the state the home is in (a bank's loan officer: their federal registration, where the state's rules allow it). The company: its own lender or broker license for that state.",
+ "staff_skills": "Buying, refinancing, first-time buyer programs, home-buying classes, Spanish.",
+ "messages_never": "[\"income, prices, loan amounts, credit scores, account or ID numbers\",\"documents of any kind\",\"health or family details\",\"anything about a protected trait\",\"rates or what someone can afford\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/mortgage+loan+officer",
+  "pexels": "https://www.pexels.com/search/mortgage%20loan%20officer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

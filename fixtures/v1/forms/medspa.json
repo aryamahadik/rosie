@@ -1,0 +1,986 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "medspa",
+  "name": "Med spa",
+  "type": "clinic",
+  "started_from": "dermatologist"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "P01",
+   "field": "Packs (credits for a service): name, price, count",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page (use or buy)",
+   "source": "A5-01, A5-03, A5-22, fact packs",
+   "google": "no",
+   "turned_on_by": "fact packs"
+  },
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact packs; fact plans"
+  },
+  {
+   "id": "P03",
+   "field": "Intro offers (once per person)",
+   "type": "offer",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A5-22",
+   "google": "no",
+   "turned_on_by": "fact packs"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps; fact forms"
+  },
+  {
+   "id": "Q06",
+   "field": "Sensitive work switch (texts never name the service; initials; no rating, nothing sold; gentle words)",
+   "type": "switch",
+   "need": "S",
+   "shows": "every text and pay page",
+   "source": "S13-22, switch sensitive",
+   "google": "no",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact aftercare"
+  },
+  {
+   "id": "V14",
+   "field": "Waitlist",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "times card",
+   "source": "S1-21, A4-60, fact waitlist",
+   "google": "no",
+   "turned_on_by": "fact waitlist"
+  }
+ ],
+ "facts": [
+  "firststeps",
+  "forms",
+  "packs",
+  "plans",
+  "video",
+  "aftercare",
+  "waitlist"
+ ],
+ "switches": [
+  "sensitive"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "visit|deposit|counter",
+   "paths": [
+    "visit|deposit|counter",
+    "list|card|counter",
+    "list|none|none"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "visit|deposit|bill",
+   "paths": [
+    "visit|deposit|bill",
+    "visit|deposit|card"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "visit|deposit|counter",
+   "name": "Botox",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": "$25",
+   "rest": null,
+   "paid": null,
+   "fee": "$25",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: a first Botox visit. $14 a unit, set by Nora at the visit after Dev's exam. A $25 exam fee now, counted toward it, and the rest at the front desk. A no to the price: the $25 pays for the exam. Not cleared by the prescriber: it goes back."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Laser hair removal",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "Laser hair removal, a small area: $150 a session. A card is saved for the $20 late-cancel or no-show fee, and Alex pays at the front desk."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|none",
+   "name": "Consult",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "free",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A free 15-minute consult with Dev about filler. Nothing is taken, and there's nothing to pay."
+  },
+  {
+   "flow": "B",
+   "path": "visit|deposit|bill",
+   "name": "Botox at home",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": "$245",
+   "deposit": "$89",
+   "rest": "$156",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: Botox at Alex's home, after Leo's video exam and Sam's OK. Priced by Ethan at the visit, by area and units: $245 in the example. The $89 house call is paid now as the deposit and counts toward the price; Rosie texts the bill for the $156 rest when Ethan texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "visit|deposit|card",
+   "name": "Botox at home",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": "$245",
+   "deposit": "$89",
+   "rest": "$156",
+   "paid": null,
+   "fee": "$89",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The same home visit, where the saved card is charged for the rest when Ethan texts DONE, after Alex's yes to the price."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Microneedling",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$300",
+   "fee": "$50"
+  },
+  {
+   "flow": "A",
+   "name": "Laser package, 6 sessions",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$750",
+   "paid": "$750",
+   "fee": "$50"
+  },
+  {
+   "flow": "A",
+   "name": "Laser session (package)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Lip touch-up at home",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "bill",
+   "price": "$120",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Botox at home, 3-visit plan",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$540",
+   "paid": "$540",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Botox at home (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Consult with a prescriber",
+   "price": "free",
+   "kind": "one price ($0)",
+   "length": "15 min",
+   "where": "at the med spa, or by video",
+   "before": "nothing taken",
+   "after": "nothing to pay"
+  },
+  {
+   "name": "Botox and other wrinkle relaxers",
+   "price": "$14 a unit; forehead lines often take 10 to 20 units ($140 to $280)",
+   "kind": "per unit, set at the visit by the injector within the prescriber's order",
+   "length": "30 min (45 for a new client, with the exam)",
+   "where": "at the med spa; at the client's home through Lee Mobile Aesthetics",
+   "before": "a $25 exam fee taken as the deposit, counted toward the price; at home, the $89 house-call fee paid as the deposit",
+   "after": "the rest at the front desk; at home, Rosie texts the bill, or the saved card is charged"
+  },
+  {
+   "name": "Filler",
+   "price": "$750 a syringe; often 1 or 2",
+   "kind": "per syringe, set at the visit",
+   "length": "45 min",
+   "where": "at the med spa",
+   "before": "a $25 exam fee taken as the deposit, counted toward the price",
+   "after": "the rest at the front desk"
+  },
+  {
+   "name": "Laser hair removal, small area (lip, chin or underarms)",
+   "price": "$150 a session",
+   "kind": "one price",
+   "length": "20 min",
+   "where": "at the med spa",
+   "before": "a card saved for the $20 fee",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Laser hair removal, large area (legs or back)",
+   "price": "$300 a session",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the med spa",
+   "before": "a card saved for the $20 fee",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Laser package: 6 sessions, small area",
+   "price": "$750",
+   "kind": "one price, paid in full when booking the first session",
+   "length": "20 min a session",
+   "where": "at the med spa",
+   "before": "the full price",
+   "after": "nothing more"
+  },
+  {
+   "name": "Microneedling",
+   "price": "$300",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the med spa",
+   "before": "a card saved for the $20 fee",
+   "after": "at the front desk"
+  },
+  {
+   "name": "2-week check after injections",
+   "price": "free",
+   "kind": "one price ($0)",
+   "length": "15 min",
+   "where": "at the med spa",
+   "before": "nothing taken",
+   "after": "nothing to pay"
+  },
+  {
+   "name": "Monthly membership",
+   "price": "$99 a month: one small-area laser session a month, and 10% off injections",
+   "kind": "a monthly plan",
+   "length": null,
+   "where": "at the med spa",
+   "before": "a card saved; each month's charge needs the membership's own yes",
+   "after": "charged to the saved card each month"
+  },
+  {
+   "name": "IV hydration at home (Lee Mobile Aesthetics)",
+   "price": "$175",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the client's home",
+   "before": "the full price",
+   "after": "nothing more"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "new or returning client (a new client's first injection or laser visit adds the 15-minute exam)",
+   "which treatment, by its general name only",
+   "for laser: which area, since it sets the length",
+   "for a video exam: the state the client will be in"
+  ],
+  "after_time": [
+   "anything that helps at the visit, like a step-free door or an interpreter",
+   "at home: a private room with a table, a clean surface and good light"
+  ],
+  "secure_page_only": [
+   "birth date (18 or older)",
+   "health history, medicines and allergies",
+   "pregnant or nursing",
+   "the screening the medical director set: like blood thinners, a nerve or muscle condition, an infection at the area, a past bad reaction to the product, a recent tan or acne medicine before laser",
+   "a recent treatment: a wrinkle relaxer in the last 3 months, or filler or laser on the same area in the last 2 weeks",
+   "consent to the treatment",
+   "photo consent: for the chart only, or for ads too (a separate yes)"
+  ],
+  "never_asked": "health details, medicine names and photos are never asked or typed in the AI chat or a text",
+  "who_may_book": "an adult 18 or older, for themselves; another adult may book and pay for them, but the client fills in and signs their own forms; nobody under 18 is booked for injections or laser through Rosie"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "vision changes or loss, or skin turning white, gray or blue, after a filler",
+    "say": "Call 911 now, or the medical director's line right away: (555) 010-0190. Don't wait.",
+    "booking": "no booking; the medical director is told at once"
+   },
+   {
+    "words": "trouble breathing or swallowing, or swelling of the face, lips, tongue or throat",
+    "say": "Call 911 now.",
+    "booking": "no booking; the medical director is told at once"
+   },
+   {
+    "words": "weakness that spreads, a drooping face, or trouble speaking after a wrinkle relaxer",
+    "say": "Call 911 now, or the medical director's line right away: (555) 010-0190.",
+    "booking": "no booking; the medical director is told at once"
+   },
+   {
+    "words": "chest pain, fainting, or a burn after laser that is large, blistering or spreading",
+    "say": "Call 911 now. Then call the medical director's line.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "a heavy eyelid, a lump, or more bruising or swelling than expected, days after a treatment",
+    "what": "the 911 words first; then a nurse calls the client today on the medical director's line; Rosie gives no advice"
+   },
+   {
+    "words": "pregnant, nursing, a medicine or a condition, said while asking to book",
+    "what": "not typed in the chat: the AI says the screening is on the secure page, and the prescriber reads it before anything is booked"
+   }
+  ],
+  "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "The good-faith exam by a prescriber",
+    "when": "before a client's first injection or prescription treatment: right before it, in person, or by video the day before where the state allows",
+    "who": "a physician, nurse practitioner or physician assistant licensed where the client is",
+    "goodFor": "12 months, or until health or medicines change (the example med spa's rule; the state's form may set less)",
+    "result": "cleared, with an order the injector follows; or not today: no treatment, the deposit refunded in full, and the reason given in person, never by text"
+   },
+   {
+    "name": "Health history, screening and consent",
+    "when": "on the secure page only, before the booking is written; updated at each visit",
+    "who": "every client",
+    "result": "any yes to the screening: the prescriber reads it first (OK, no, or one question)"
+   },
+   {
+    "name": "Before photos",
+    "when": "at the visit, before any treatment, with the client's consent",
+    "who": "every injection and laser client",
+    "result": "kept in the med spa's chart only, never in a text or the AI chat"
+   },
+   {
+    "name": "A written price estimate for self-pay clients",
+    "when": "told while booking, where the rules require it; sent within 1 business day (the example med spa's rule)",
+    "who": "every client: all treatments are self-pay",
+    "result": "a to-do for the front desk, with its due date"
+   },
+   {
+    "name": "The medical director's OK for a home visit",
+    "when": "before any treatment at a client's home",
+    "who": "Sam, as medical director, for each request",
+    "result": "OK, another time, or no; a home visit is never booked without it"
+   }
+  ],
+  "prep": "the med spa's own prep notes, on the secure page (like arriving with a clean face, or a shaved area for laser); bring a photo ID; new clients arrive 10 minutes early",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "the medical director (a physician): exams, orders, every treatment; nurse practitioners: exams, orders and injections where the state allows; nurse injectors: injections and laser on a prescriber's order, where the state allows; estheticians: skin care only, and microneedling only where the state's form allows; medical assistants and the front desk: no clinical work or OKs",
+  "licenses_or_certificates": "each prescriber's and injector's own license, per state; the medical director's license on file",
+  "supervision": "a nurse injects only on a prescriber's order, with the medical director or a supervising prescriber on site or reachable, as the state's form sets (a switch); a physician assistant works with a supervising physician as the state sets",
+  "who_oks": "the owner, as medical director, OKs fees and each home visit; prices come from the list or are set at the visit within the order, so no quote waits for him",
+  "stand_in": "another listed injector who may do that treatment, only with the client's yes; with no yes, nobody is moved: the time stays, and the desk calls"
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "an adult 18 or older, for themselves; another adult may book and pay for them, but the client fills in and signs their own forms; nobody under 18 is booked for injections or laser through Rosie",
+  "minors_texts": "nobody under 18 is booked, so no treatment texts go to a minor"
+ },
+ "visit": {
+  "check_in": "at the med spa: the check-in code at the front desk; a video exam: the code read out at the start; at home: the code given at the door to the injector",
+  "done": "the check-in code or DONE; the treatment record (the product, its lot number, the units, the areas, the injector) goes in the med spa's chart, never in a text",
+  "changes_at_visit": "units or syringes are set at the visit within the prescriber's order; the client sees the price on the secure page and says yes before any injection; more later only with a new yes",
+  "before_work": "a new client's exam by the prescriber; the consent and screening checked; before photos for the chart, with consent"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "always: each prescriber (a physician, nurse practitioner or physician assistant) and each nurse injector holds their own active license from the state where the client is during the visit, video exams included",
+  "who": "each person; the med spa too, where the state's form registers medical spas or asks for a medical director on file",
+  "ask": "each person's license number in their invite reply (or the owner sends it); the medical director's name and license; any laser or facility registration the state's form names",
+  "insurance": "malpractice insurance for each prescriber and injector, where the state's form asks for it"
+ },
+ "never_in_a_text": "texts carry only the med spa's name, the date, the time, the address, the provider's first name and a secure link: never the treatment, units, the reason, health details, medicine names, photos or results",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.questions": [
+   "screening"
+  ],
+  "pf.safety": [
+   "medicalDirector"
+  ],
+  "pf.staff": [
+   "never"
+  ],
+  "pf.license": [
+   "scope",
+   "video"
+  ],
+  "pf.messages": [
+   "channels"
+  ],
+  "pf.visit": [
+   "aftercare",
+   "followUp"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

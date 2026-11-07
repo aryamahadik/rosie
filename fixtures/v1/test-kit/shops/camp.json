@@ -1,0 +1,156 @@
+{
+ "id": "camp",
+ "name": "Summer camp",
+ "booking_type": "Class",
+ "pattern": "class",
+ "built_from": "swim",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Summer camp",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Summer camp",
+   "staff": "Jess and Kai (head counselors) · Hannah (camp nurse)",
+   "customer": "Alex M. (a parent, for Ava, 11, and Max, 7) · other families",
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Overnight Week 2",
+     "price": "$1,150",
+     "deposit": "$250",
+     "rest": "$900",
+     "paid_now": null,
+     "fee": "$250",
+     "story": "The main story: Ava's Overnight Week 2, Sat Oct 24 to Fri Oct 30 (fall break), $1,150. A $250 deposit is paid on the secure page when registering, and the $900 rest is charged to the saved card when the week is done (Rosie never charges the rest on a date by itself). Day camp weeks ($325, $75 deposit) and the two-week session ($2,150, $400 deposit) are paid this way too. The camp's dated refund schedule is its own signed terms, shown before paying.",
+     "due_now_at_booking": 250,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Overnight Week 2",
+     "price": "$1,150",
+     "deposit": "$250",
+     "rest": "$900",
+     "paid_now": "$1,150",
+     "fee": "$250",
+     "story": "The same Overnight Week 2, paid in full when registering: $1,150. The same signed refund schedule applies.",
+     "due_now_at_booking": 1150,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Camp tour (45 min)",
+     "price": "free",
+     "deposit": "$0",
+     "rest": "$0",
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 45-minute camp tour with Sam, the director, Sat Oct 24 at 11:00am, for Alex and Ava. Nothing is taken and no card is saved: a YES books it, and nothing is owed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Summer camp",
+   "staff": "Tyler and Nadia (backyard camp counselors)",
+   "customer": "Alex M. (the host parent, for Ella, 8) · the other children's parents",
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Backyard camp week",
+     "price": "$900",
+     "deposit": "$225",
+     "rest": "$675",
+     "paid_now": null,
+     "fee": "$225",
+     "story": "The main story: a backyard camp at Alex's home, four mornings from Thu Oct 22, 8:00am to noon, for up to 6 children: $900. A $225 deposit when booking, and the $675 rest charged to the saved card when the week is done. The refund schedule is the company's own signed terms, shown before paying.",
+     "due_now_at_booking": 225,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Backyard camp week",
+     "price": "$900",
+     "deposit": "$225",
+     "rest": "$675",
+     "paid_now": "$900",
+     "fee": "$225",
+     "story": "The same backyard camp week, paid in full when booking: $900. A backyard camp day ($250) and a camp-style birthday party ($250) are paid this way too.",
+     "due_now_at_booking": 900,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "class: a place in a set session (a day camp week or an overnight week) by age group, with a cap for each cabin or group and a free waitlist; each camper is one booking with their own check-in code, checked in at drop-off and handed back only to an approved adult at pick-up. A backyard camp week books two counselors for a group of children at the host family's home. A free camp tour books the director's time.",
+ "questions_before_times": [
+  "each camper's age on the first day of the session, and the grade they finish in June (they set the session and the cabin group)",
+  "day camp or overnight, and which week",
+  "for an overnight week: girls' or boys' cabins",
+  "for a backyard camp: the home's town (the travel area; the street address goes on the secure page), and how many children and their ages",
+  "for a camp tour: who is coming, and the child's age"
+ ],
+ "safety_stop": [
+  "a child hurt, very sick or in danger right now; a child who is missing",
+  "a report of abuse or neglect at a camp"
+ ],
+ "first_steps": [
+  "The camp's agreement and risk notice",
+  "The pick-up list and the photo yes or no",
+  "Health form, shot record and medicine forms",
+  "Backyard camp: each child's forms and the yard check",
+  "Camp tour"
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "children",
+  "incare",
+  "forms",
+  "multiday",
+  "waitlist"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "2 days before"
+ },
+ "license": "from the state form: a youth camp license or permit for the camp's own grounds where the state's rules require one (a switch), renewed on the state's schedule; health inspections of the grounds, kitchen, water, cabins and swim area where the state's or county's rules require them (a switch); a backyard camp at a family's home may need none, or the host site's own OK (a switch)",
+ "staff_skills": "head counselor (a cabin group or a day camp group), counselor, camp nurse, waterfront staff, backyard camp counselor, party leader",
+ "messages_never": "a child's last name, birth date, allergies, medicines, health needs, custody orders, the pick-up list (and who may not pick up) and photos never go in a text; texts to the parent may use the child's first name; texts to Sam or the staff carry none of it: they name the parent and the session, and link to the secure page",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/summer+camp",
+  "pexels": "https://www.pexels.com/search/summer%20camp/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

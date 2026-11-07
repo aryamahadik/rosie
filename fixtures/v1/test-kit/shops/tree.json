@@ -1,0 +1,237 @@
+{
+ "id": "tree",
+ "name": "Tree service",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tree service",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tree service",
+   "staff": null,
+   "customer": null,
+   "arrive": null,
+   "cutoff": "2 days before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Wood chip load",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A pickup load of wood chips, $35; a card saved for the $20 missed-loading fee; paid at the yard office.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Wood chip load",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A pickup load of wood chips, $35; nothing taken; a YES books it; paid at the yard office.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Firewood, half face cord",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$0",
+     "story": "Half a face cord of firewood, $55, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Log milling",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "Log milling on the yard's sawmill, $140; a $40 deposit now; the $100 rest at the yard office.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Log splitting",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Log splitting, priced from photos of the logs at $90 (Sam OKs it); a card saved for the $20 fee; paid at the yard office.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Tree removal",
+     "price": "set at the visit",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Stump or tree removal, quoted at the visit; a card saved for the $20 fee; paid at the yard office.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tree service",
+   "staff": null,
+   "customer": null,
+   "arrive": null,
+   "cutoff": "2 days before",
+   "main": "photos|deposit|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Ash removal",
+     "price": "set at the visit",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "Ash removal: the $89 arborist visit, nothing taken; Eli's written quote of $2,100; the contract and a $210 deposit; the job day; the last $1,890 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Ash removal",
+     "price": "set at the visit",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same ash removal, but Sam bills the deposit and the rest his own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Stump grinding",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A stump grinding from the list, $179; a card saved for the $89 visit fee, kept only for a late cancel or no-show; Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Crabapple removal",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A small crabapple priced from photos at $640 (over $500, so Sam OKs it); a signed estimate; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Small tree pruning",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$0",
+     "story": "Small tree pruning, $150 paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Arborist visit, then project: a tree removal is booked as the arborist's visit, then a written quote, a signed contract and a job day\",\"B\":[{\"name\":\"Arborist visit (the estimate)\",\"price\":\"$89, credited to the job if Alex signs (the example business's own price; a free estimate is the plug-in's starting answer)\",\"length\":\"30 to 60 minutes\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"nothing taken\",\"after\":\"billed only if no contract follows\"},{\"name\":\"Tree removal\",\"price\":\"quoted after the arborist visit, in writing, good for 30 days\",\"length\":\"one job day, 8am to 3pm; a crane job may take two\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; a deposit once the contract is signed\",\"after\":\"the rest on the bill after the walk-through\"},{\"name\":\"Pruning\",\"price\":\"quoted after the arborist visit, or from the list for a small tree\",\"where\":\"at the customer's place\",\"season\":\"no oak pruning April to July (the example business's own oak wilt practice)\"},{\"name\":\"Small tree removal\",\"price\":\"priced from photos for a small tree with nothing near it (example: $640); over $500, Sam OKs it\",\"length\":\"half a day\",\"before\":\"a signed estimate, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Stump grinding\",\"price\":\"$179 a stump up to 2 feet across, from the list; bigger ones quoted\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Small tree pruning\",\"price\":\"$150, from the list\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Tree risk check\",\"price\":\"$199, with a written report\",\"where\":\"at the customer's place\"},{\"name\":\"Storm work\",\"price\":\"sent now, with an arrival estimate; priced before anyone climbs\",\"where\":\"at the customer's place\",\"on_call\":\"an arborist on call nights and weekends\"},{\"name\":\"Brush pile pickup\",\"price\":\"from the list\",\"where\":\"outside; nobody needs to be home\"},{\"name\":\"Lift or crane\",\"price\":\"a tracked lift is part of the job when it fits the gate; a crane is quoted on its own line\"},{\"name\":\"Wood\",\"price\":\"hauled away (included), or left in rounds at no charge\"},{\"name\":\"Tree spraying (Lee Plant Health)\",\"price\":\"ash tree injection $149, deep root feeding $189; orchard spraying quoted\",\"staff\":\"a licensed sprayer only\"},{\"name\":\"Work near power lines\",\"price\":\"not offered: the utility or a line-clearance crew\"}],\"A\":[{\"name\":\"Wood chip pickup (a pickup load)\",\"price\":\"$35, 30 minutes\",\"where\":\"at the yard; or delivered to the customer's home for $75 (the other flow)\",\"before\":\"a card saved for the $20 missed-loading fee\",\"after\":\"paid at the yard office\"},{\"name\":\"Mulch pickup (a pickup load of shredded hardwood)\",\"price\":\"$40\",\"where\":\"at the yard\"},{\"name\":\"Brush drop-off (a pickup load)\",\"price\":\"$20, an add-on to a pickup or on its own\",\"where\":\"at the yard\"},{\"name\":\"Kindling crate\",\"price\":\"$25\",\"where\":\"at the yard\"},{\"name\":\"Firewood, half a face cord (a face cord is a stack 4 feet high and 8 feet long)\",\"price\":\"$55, 60 minutes, hand-stacked in the truck\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Log milling (your log sawn into boards)\",\"price\":\"$140, 2½ hours on the yard's sawmill\",\"before\":\"\",\"after\":\"the rest at the yard office\"},{\"name\":\"Log splitting\",\"price\":\"priced from photos of the logs (example: $90); Sam OKs each one\"},{\"name\":\"Slab cutting\",\"price\":\"priced at the yard once Nell sees the log, after a $25 log check\"}],\"capacity\":\"One arborist per arborist visit; one big job per crew a day, with the lift, the chipper and the grinder booked with it; one loader and one sawmill at the yard\",\"skills\":\"Arborist visits and quotes: the arborist (Eli). Climbing and removals: a crew with a crew lead. Stumps: anyone trained on the grinder. Spraying: licensed sprayers only. The yard: Nell and Wes; the sawmill and the log splitter: Nell only.\",\"nobody_home\":\"Arborist visits, stump grinding and brush pickups: nobody needs to be home (DONE with a photo). A removal: an adult walks the job with the crew at the start, where possible.\",\"online\":\"No video service\",\"months\":\"Each service can carry the months it's offered (the example: no oak pruning April to July)\"}",
+ "questions_before_times": [
+  "What should be done? (take down, prune, grind a stump, storm damage)",
+  "Is any part of the tree within 10 feet of a power line? (no; only the line to the house; street lines)",
+  "About how tall is the tree, and how wide is the trunk?",
+  "Is it leaning, cracked or dead?"
+ ],
+ "safety_stop": [
+  "a limb or tree on a power line, wires down, sparks, a tree touching the street lines",
+  "someone hurt or trapped, a gas smell after a tree fell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "extrawork",
+  "multiday",
+  "dropoff",
+  "banktransfer"
+ ],
+ "switches": {},
+ "settings": {
+  "cutoff": "2 days before"
+ },
+ "license": "if: a tree care license, a tree expert license or a tree care registration for the company, where the state's form or the city requires one; a pesticide applicator license for any spraying or trunk injection, in every state",
+ "staff_skills": "",
+ "messages_never": "[\"Gate or lockbox codes\",\"Contract and permit papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tree+service",
+  "pexels": "https://www.pexels.com/search/tree%20service/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

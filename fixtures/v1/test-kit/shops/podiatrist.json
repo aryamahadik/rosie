@@ -1,0 +1,167 @@
+{
+ "id": "podiatrist",
+ "name": "Podiatrist",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Podiatrist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Podiatrist",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient visit",
+     "price": "$175",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $175 new patient visit. Nothing is taken; the copay is paid at the desk, and the plan is billed first.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Follow-up visit",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A self-pay follow-up visit, $95. A card is saved for the practice's $40 no-show fee. Paid at the desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Video follow-up",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A self-pay $75 video follow-up. The card saved is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Podiatrist",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home visit",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 home visit for nail and callus care. Nothing is taken; Rosie texts the share bill after the plan answers.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home visit",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A self-pay home visit, $140. A card is saved and charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the practice (the example practice's own self-pay prices; insured patients pay their plan's share)\":[{\"service\":\"New patient visit (exam and plan)\",\"price kind\":\"one price\",\"price\":\"$175\",\"length\":\"45 min\",\"before\":\"nothing taken\",\"after\":\"copay or self-pay price at the desk; the plan is billed first\",\"note\":\"intake form first\"},{\"service\":\"Follow-up visit\",\"price kind\":\"one price\",\"price\":\"$95\",\"length\":\"20 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\"},{\"service\":\"Ingrown toenail removal (numbed, in the office)\",\"price kind\":\"one price\",\"price\":\"$325\",\"length\":\"45 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\",\"note\":\"consent form signed first; aftercare link after\"},{\"service\":\"Routine nail and callus care (diabetic foot care)\",\"price kind\":\"one price\",\"price\":\"$85\",\"length\":\"30 min\",\"before\":\"nothing taken\",\"after\":\"at the desk; covered by some plans when the practice confirms the patient qualifies\"},{\"service\":\"Diabetic foot exam\",\"price kind\":\"one price\",\"price\":\"$120\",\"length\":\"30 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\"},{\"service\":\"Heel pain visit (with an injection if the podiatrist advises it)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"30 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\",\"note\":\"consent form for an injection\"},{\"service\":\"Custom orthotics (casting or scan; fitting visit later)\",\"price kind\":\"one price\",\"price\":\"$450 the pair\",\"length\":\"30 min, then a 20 min fitting 2 to 4 weeks later\",\"before\":\"nothing taken\",\"after\":\"at the desk at the casting visit\",\"note\":\"often not covered: the price shows before the yes\"},{\"service\":\"Wart treatment\",\"price kind\":\"one price\",\"price\":\"$120\",\"length\":\"20 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\"},{\"service\":\"Child's foot visit (a parent comes)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"30 min\",\"before\":\"nothing taken\",\"after\":\"at the desk\"},{\"service\":\"Video follow-up\",\"price kind\":\"one price\",\"price\":\"$75\",\"length\":\"15 min\",\"place\":\"video\",\"before\":\"a card saved (self-pay)\",\"after\":\"self-pay: the saved card charged at DONE; insured: the share billed after the plan answers\"}],\"at the patient's place (flow B: homebound patients, at home or in assisted living)\":[{\"service\":\"Home visit: nail and callus care\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"45 min\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the patient's share bill after the plan answers\"},{\"service\":\"Home visit: diabetic foot check\",\"price kind\":\"one price\",\"price\":\"$160\",\"length\":\"45 min\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the share bill after the plan answers\"}],\"never booked\":\"Surgery (set up in the practice's own tools after a visit), emergency care, and anything above the ankle.\",\"capacity\":\"One podiatrist per visit; assistants help in the room.\",\"online\":\"Video follow-ups only, for established patients.\"}",
+ "questions_before_times": [
+  "New or returning patient",
+  "What it's about, in a few words: heel pain, an ingrown nail, nail and callus care, a sore or wound, a child's foot, orthotics",
+  "The insurance plan's name, or self-pay",
+  "Who the visit is for: themselves, their child, or an adult they care for",
+  "For a home visit: is the patient homebound, and the town or area"
+ ],
+ "safety_stop": [
+  "A foot or toe suddenly cold, pale, blue or numb, with pain",
+  "A wound with fever, chills, spreading redness or red streaks, or a black or foul-smelling wound (above all with diabetes)",
+  "A bone through the skin, or a foot that looks broken after a fall",
+  "Chest pain, trouble breathing, or fainting"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "planbill",
+  "results",
+  "aftercare",
+  "children",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "Each podiatrist's state license (DPM) is the practice's own word, given when the practice sets up. Where the state's rules require the practice to register (a professional corporation or a clinic registration), that registration is the practice's own word too.",
+ "staff_skills": "[\"Nail and callus care\",\"Ingrown nails\",\"Wound care\",\"Orthotics\",\"Injections\",\"Children\",\"Home visits\"]",
+ "messages_never": "The reason for the visit, the service's name, any condition (diabetes, a wound, an infection), medicines, foot photos, results, and insurance numbers. Texts say 'your visit' with the practice's display name.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/podiatrist",
+  "pexels": "https://www.pexels.com/search/podiatrist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,263 @@
+{
+ "id": "well-pump",
+ "name": "Well drilling and well pump service",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Well drilling and well pump service",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Well drilling and well pump service",
+   "staff": "Lucia and Joel (counter techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Pressure switch test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 pressure switch test at the counter. A card is saved for the counter's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Pressure switch test",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 pressure switch test. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Jet pump rebuild",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The $140 jet pump rebuild. A $40 deposit now, and $100 at the counter.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Water sample test",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 water sample test, paid in full when booking. The result goes on the secure page.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Control box repair",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A control box repair, priced from Alex's photos at $90. Booked once Sam OKs it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Pump repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A pump repair, priced at the counter. Only the $25 check is promised.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Well drilling and well pump service",
+   "staff": "Colm and Felix (technicians)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": null,
+   "main": "list|card|bill",
+   "services": [
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Pressure switch replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 pressure switch replacement. A card is saved for the $89 fee, only for a late cancel or nobody home, and only if Sam confirms. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Pressure switch replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 pressure switch replacement. Nothing is taken. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Pressure switch replacement",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 pressure switch replacement. A card is saved and charged $179 when Colm texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Well pump repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A well pump repair, priced at the visit. Only a card is saved. Colm quotes it, and Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Pressure tank replacement",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A pressure tank replacement, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Well water test",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 well water test, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Stonecreek Well's own list)\":[{\"service\":\"Service call (find any problem)\",\"price kind\":\"one price\",\"price\":\"$89, taken off the repair\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the jobs below; not booked alone\"},{\"service\":\"Pressure switch replacement\",\"price kind\":\"one price\",\"price\":\"$179, the $89 call included\",\"length\":\"60 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Pressure tank air check and gauge\",\"price kind\":\"one price\",\"price\":\"$169, the $89 call included\",\"length\":\"45 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Well pump repair (pump, wiring, control box)\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"60 to 120 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Well pump replacement\",\"price kind\":\"quoted at the visit; a written estimate over the owner's amount\",\"price\":\"the quote (the example: $2,400, a 25% deposit of $600 once the contract is signed)\",\"length\":\"half a day to a day, then the well is disinfected where the rules require it\",\"place\":\"at the customer's place\",\"before\":\"a signed contract, then the deposit\",\"after\":\"the rest on the final bill, after the pump is in and tested\",\"note\":\"The business pulls the permit and the owner OKs it. Only a technician with the pump installer license.\"},{\"service\":\"Well water test (bacteria and nitrates)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"30 min to collect the sample\",\"place\":\"at the customer's place\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"A certified lab does the test. The result goes on the secure page, never in a text.\"},{\"service\":\"Pressure tank replacement\",\"price kind\":\"quoted from photos, or after the service call\",\"price\":\"the quote (the example: $640, a small tank)\",\"length\":\"half a day\",\"place\":\"at the customer's place\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\",\"note\":\"Over the owner's amount, a written estimate is signed first\"},{\"service\":\"Well inspection and flow test\",\"price kind\":\"one price\",\"price\":\"$249, with a written report\",\"length\":\"90 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 service call\",\"after\":\"Rosie texts the bill\",\"note\":\"The report link comes later; the report is on the secure page\"},{\"service\":\"New well drilling\",\"price kind\":\"quoted after a site visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"set by the owner (days)\",\"place\":\"at the customer's place\",\"before\":\"a signed contract, then a deposit (cap from the state form)\",\"after\":\"the rest on the bill, after the pump is in and the water is tested\",\"note\":\"The owner OKs each booking first. A state well permit and a utility locate come first. Only a driller with the driller license.\"},{\"service\":\"After-hours no-water call\",\"price kind\":\"one price\",\"price\":\"$149, taken off the repair; flat-price jobs $60 more\",\"length\":\"sent now: an arrival estimate, not a window\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $149\",\"after\":\"Rosie texts the bill\",\"note\":\"Sent now to the technician on call, then the backup. Free to cancel until the technician texts OMW.\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's place\",\"note\":\"Goes on quoted jobs; not booked alone\"}],\"at the business (the example: Stonecreek Pump's counter board)\":[{\"service\":\"Pressure switch test (bring the switch)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the counter, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Fitting job\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Hose fitting\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Pressure gauge swap\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Water sample test (bacteria and nitrates)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"10 min to drop off the sample\",\"place\":\"at the counter\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"The result goes on the secure page, never in a text. Bring the sample in the counter's bottle, as the counter says.\"},{\"service\":\"Jet pump rebuild\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the counter\",\"before\":\"a $40 deposit (over 2 hours)\",\"after\":\"paid at the counter\"},{\"service\":\"Control box repair (a box with a bad part)\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"The owner OKs each quote\"},{\"service\":\"Pump repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $25 check is promised\",\"place\":\"at the counter\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Video check of a pump house or a part\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it\"}],\"capacity\":\"One technician per booking. Bigger jobs, like a pump pulled from a deep well, can need a crew of two; the counter's rebuilds need its one test bench.\",\"skills each needs\":\"New well drilling needs the driller license and the rig. Pump replacement needs the pump installer license and the pulling rig. Wiring needs an electrician or a license that covers it. Counter rebuilds need the rebuild skill.\",\"nobody home\":\"A pump house or well cap outside with its own access: nobody needs to be home. DONE comes with a photo.\",\"online\":\"A video check only, where the owner offers it. No repair is done by video.\",\"extras\":\"Travel inside the service area only (the example: 40 miles). Parts at cost or at list, the owner's pick. No tax line unless the owner sets a rate.\",\"smallest_job\":\"A switch the owner sets: the smallest job taken, with smaller requests pointed elsewhere (the example takes any list job and any quote over $500).\"}",
+ "questions_before_times": [
+  "What's wrong: no water, weak pressure, a pump that clicks or runs, odd water, or something else",
+  "Is the pump running? Is the power on? Where are the pump and the pressure tank",
+  "Does the water look, smell or taste wrong",
+  "After hours: is there no water at all right now",
+  "At the counter: which part, and its brand if known"
+ ],
+ "safety_stop": [
+  "A gas smell, hissing, or a carbon monoxide alarm",
+  "Someone hurt, sparks, a shock from a tap or pipe, or water on the pump's wiring or the control box"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "sentnow",
+  "dropoff",
+  "extrawork",
+  "photos",
+  "results",
+  "video"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  }
+ },
+ "license": "Pump and well work in a home needs a license where the state or county licenses well drillers and pump installers. New well drilling can need its own driller license. Water line and electrical work can need a plumbing or electrical license too.",
+ "staff_skills": "[\"Pressure switches and tanks\",\"Pump repair and replacement\",\"Wiring and control boxes\",\"Well water sampling\",\"New well drilling\",\"Counter rebuilds\"]",
+ "messages_never": "Water test results, gate or lock codes, card details, and photos from inside the home: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/well+drilling+and+well+pump+service",
+  "pexels": "https://www.pexels.com/search/well%20drilling%20and%20well%20pump%20service/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

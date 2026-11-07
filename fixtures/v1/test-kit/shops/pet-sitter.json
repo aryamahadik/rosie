@@ -1,0 +1,197 @@
+{
+ "id": "pet-sitter",
+ "name": "Pet sitter",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet sitter",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet sitter",
+   "staff": "Hayden and Logan (lodge sitters)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Boarding at the Lodge, a night",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: one night of dog boarding, $35. A card is saved for the Lodge's $20 late-cancel fee. Alex pays at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Boarding at the Lodge, 4 nights",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A long weekend, 4 nights, $140. A $40 deposit when booking; the $100 rest at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Boarding at the Lodge, 4 nights",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$140",
+     "fee": "$40",
+     "story": "One night with a bath before going home, $55, paid in full when booking.",
+     "due_now_at_booking": 140,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet sitter",
+   "staff": "Ellis and Shea (pet sitters)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Drop-in visit, 30 minutes",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: 6 drop-in visits, $150. A card is saved, and charged $150 when Ellis texts DONE after the last visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Drop-in visit, 30 minutes",
+     "price": "$25",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same 6 visits, $150. Nothing is taken. Rosie texts the bill after the last visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Trip of 6 visits",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The same 6 visits, $150. A $40 deposit when booking; the $110 rest charged to the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Trip of 6 visits",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "The same 6 visits, $150, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: care visits or stays while the owner is away, priced per visit or per night. Boarding is a stay at the business.\",\"list\":[{\"name\":\"Meet-and-greet\",\"price_kind\":\"free\",\"length\":\"30 minutes\",\"where\":\"at the customer's home for pet sitting; at the Lodge for boarding\",\"money\":\"nothing taken\",\"note\":\"the first step for new clients\"},{\"name\":\"Drop-in visits\",\"price_kind\":\"per visit\",\"example\":\"30 minutes, $25 a visit; a trip of 6 visits, twice a day Thu to Sat: $150 (the example business's own prices)\",\"length\":\"30 minutes, in arrival windows (8–10am, 6–8pm)\",\"where\":\"at the customer's home; nobody needs to be home\",\"money\":\"a card saved at booking; the trip charged when the sitter texts DONE after the last visit\"},{\"name\":\"Overnight stay at the customer's home\",\"price_kind\":\"per night\",\"example\":\"$89 a night, 7pm to 8am, up to 3 pets\",\"where\":\"at the customer's home\",\"money\":\"a card saved; charged at DONE. Holiday stays can take a deposit or the full price.\"},{\"name\":\"Medicine\",\"price_kind\":\"included\",\"example\":\"pills and insulin shots given at the visit, no extra charge in the example\",\"note\":\"only sitters with the skill give shots\"},{\"name\":\"Holiday dates\",\"price_kind\":\"an extra price a night or visit\",\"example\":\"+$20 a night on the holiday dates the owner sets; a minimum number of nights\"},{\"name\":\"Vet trip\",\"price_kind\":\"one price\",\"example\":\"$65, there and back, waiting included\",\"note\":\"added only when the customer asks; the vet's bill is the customer's\"},{\"name\":\"Late-cancel fee\",\"price_kind\":\"one price\",\"example\":\"$89 after 7am the day care starts: only if the owner confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Dog walking (the second kind of work)\",\"price_kind\":\"per walk\",\"example\":\"30-minute walk $25; 60-minute walk $40; a weekday plan\",\"where\":\"from the customer's home; nobody needs to be home\"},{\"name\":\"Special-care visits (rare)\",\"price_kind\":\"a price made for one pet, from the answers; the owner OKs any over the price-OK limit\",\"example\":\"3 weeks of longer visits for a senior dog: $640, over the $500 limit, so Sam OKs it (the example business)\",\"where\":\"at the customer's home\",\"money\":\"a 25% deposit when booking; the rest after the last visit\",\"note\":\"most pet sitting is on the list; this is for a pet whose care doesn't fit a list price\"},{\"name\":\"Boarding at the Lodge (Lee's Pet Lodge, its own company)\",\"price_kind\":\"per night\",\"example\":\"dog $35 a night, puppy $40, cat $25, a bath before going home $20, a night with a bath $55, a long weekend of 4 nights $140\",\"where\":\"at the business: dropped off and picked up at set times\",\"money\":\"a card saved for the $20 late-cancel fee ($40 for 4 nights or more); paid at pick-up. A deposit or the full price where the owner sets it.\"},{\"name\":\"Special-care stay at the Lodge (rare)\",\"price_kind\":\"a price made for one pet, from the answers; Sam OKs every one\",\"example\":\"a senior dog who needs medicine: $90 a night (the example Lodge)\",\"where\":\"at the Lodge\",\"money\":\"like other stays: a card saved for the fee, paid at pick-up\"},{\"name\":\"Overnight care at the customer's home, from the Lodge\",\"price_kind\":\"per night\",\"example\":\"$89 a night\",\"where\":\"at the customer's home (the place the customer picks when both are offered)\"}],\"capacity\":\"One sitter per booking. Boarding: the Lodge's spaces a night (the example: 4 dogs and 2 cats), as the owner sets and the state's rules allow.\",\"nobody_home\":\"Yes: pet sitting is done while the owner is away. The sitter gets in with the key from the meet-and-greet, a lockbox or a door code. Each visit ends with a photo; DONE after the last visit.\",\"stays\":\"A booking of several visits or nights is one booking: its first and last day, each visit inside it, one price, one $2.\",\"online\":\"No.\",\"not_offered\":\"Vet care and grooming. A pet with a bite history only if the owner OKs it after a meet-and-greet.\"}",
+ "questions_before_times": [
+  "The first and last day away",
+  "Drop-in visits (how many a day), overnight stays at home, or boarding at the Lodge",
+  "The pets: kind, how many, age and size",
+  "Any medicine or shots? Yes or no; the details go on the secure page",
+  "For boarding: spayed or neutered, and does the dog get along with other dogs?"
+ ],
+ "safety_stop": [
+  "a pet hurt, not breathing, bleeding, having a seizure, or that ate something toxic, right now",
+  "a pet that has bitten someone or is aggressive",
+  "a gas smell or a fire at the home",
+  "a lost pet"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "dropoff",
+  "firststeps",
+  "incare",
+  "multiday",
+  "photos",
+  "plans",
+  "photos",
+  "spaces",
+  "tips"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "Usually none to visit or stay with pets at the owner's home. Boarding pets at the sitter's own home or a kennel is licensed in some states: where the state's rules require it, the form asks for the boarding license. Some cities ask for a business license.",
+ "staff_skills": "[\"Drop-in visits\",\"Overnight stays\",\"Insulin shots and other medicine\",\"Dog walking\",\"Boarding care at the Lodge\",\"Puppies, senior pets and pets with special needs\"]",
+ "messages_never": "[\"Door, lockbox and alarm codes, and where a key is kept\",\"That the home will be empty, and the travel dates, to anyone outside the business\",\"Medicine names, doses and health details beyond 'medicine given'\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+sitter",
+  "pexels": "https://www.pexels.com/search/pet%20sitter/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

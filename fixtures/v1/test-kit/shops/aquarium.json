@@ -1,0 +1,197 @@
+{
+ "id": "aquarium",
+ "name": "Aquarium Care",
+ "booking_type": "Service",
+ "pattern": "service",
+ "built_from": "pool",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Aquarium Care",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Aquarium Care",
+   "staff": null,
+   "customer": null,
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Water test and fish check",
+     "price": "$15",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The main story: a $15 water test and fish check at the shop, paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Basic water test",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free basic water test at the shop.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Fish holding, up to a week",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "Fish held at the shop for a week during a tank move, $35, a card saved for the no-pick-up fee, paid at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Aquarium Care",
+   "staff": null,
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Reef tank care visit",
+     "price": "$125",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$45",
+     "story": "The main story: a $125 reef tank care visit; a card is saved; it's charged when the tech texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|card",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Tank trouble visit",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$85",
+     "story": "A tank trouble visit: the $85 trip and check is promised; the fix is priced at the tank; the saved card is charged at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Tank move and setup",
+     "price": "$1,200",
+     "deposit": "$600",
+     "rest": "$600",
+     "paid_now": null,
+     "fee": "$150",
+     "story": "A 90-gallon reef tank moved and set up, quoted at $1,200 from photos: $600 now, $600 on the bill when it's set up.",
+     "due_now_at_booking": 600,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Reef tank care visit",
+     "price": "$125",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$45",
+     "story": "An office lobby tank on the office's account: each visit goes on one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits to homes and offices to care for aquariums (a water change, glass and decor cleaning, filter care, a water test, a livestock check), one time or on a repeat plan; trouble visits priced at the visit; tank moves and new setups quoted from photos first; at the shop: water tests and fish holding",
+ "questions_before_times": [
+  "at the shop or at your place",
+  "the tank size in gallons",
+  "freshwater, saltwater or reef",
+  "how many tanks",
+  "one visit or a repeat plan",
+  "for trouble: what's wrong (cloudy water, a leak, equipment stopped, fish dying)",
+  "the town"
+ ],
+ "safety_stop": [
+  "water leaking near outlets, a power strip or cords",
+  "a shock from the tank water or equipment",
+  "sparks, smoke or a burning smell from a heater, light or pump",
+  "the glass cracked or the tank burst and water spreading",
+  "a sting from a lionfish or another venomous animal",
+  "coral toxin in the eyes or mouth, or trouble breathing after handling coral rock"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "monthlybill",
+  "sentnow",
+  "animals",
+  "extrawork",
+  "photos",
+  "forms",
+  "dropoff"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "None for aquarium care in most places: a business registration, the business's own word. Where the state's rules require a pet or animal dealer license to sell live fish, corals or other animals, the business says it holds one (a generic switch) before livestock is sold at a visit.",
+ "staff_skills": "[\"freshwater\",\"saltwater and reef\",\"big or custom systems over 150 gallons\",\"moves and setups\"]",
+ "messages_never": "[\"door, alarm, gate or lockbox codes\",\"where a key is kept\",\"the card\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/aquarium+care",
+  "pexels": "https://www.pexels.com/search/aquarium%20care/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

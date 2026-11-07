@@ -1,0 +1,116 @@
+{
+ "id": "auto-glass",
+ "name": "Auto glass",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Auto glass",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Auto glass",
+   "staff": "Nina and Leo (glass techs at the shop)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Windshield with calibration",
+     "price": "$588",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $588 windshield with calibration at the shop. Nothing is taken to book, and Alex pays at the counter at pick-up. On an insurance job the shop bills the insurer, and Alex pays any share at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Auto glass",
+   "staff": "Tyler and Mateo (mobile glass techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|own",
+   "services": [
+    {
+     "combo": "list|card|own",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Business's own way",
+     "name": "Windshield with calibration, in the driveway",
+     "price": "$588",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $588 windshield with calibration in Alex's driveway. A card is saved for the $89 trip fee. Alex's insurer pays, and Sam bills it himself, so Rosie sends no bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Windshield with calibration, in the driveway",
+     "price": "$588",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same windshield paid by Alex, or the share an insurer leaves to Alex. A card is saved for the $89 trip fee, and Rosie texts the bill after DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"set service: mobile jobs at set start times (the example shop: 8am and 1pm), or a drop-off slot at the shop\",\"list\":[{\"name\":\"Chip repair\",\"price\":\"one price by the number of chips (the example shop: $79 for the first, $20 each extra)\",\"length\":\"about 30 minutes; the car can be driven right after\",\"place\":\"at the shop while the customer waits, or at the customer's home or work\",\"before\":\"mobile: a card saved for the trip fee; at the shop: nothing taken\",\"after\":\"billed to the customer's insurer, or the bill Rosie texts, or at the counter\"},{\"name\":\"Windshield, aftermarket glass\",\"price\":\"set by the car's year, make and model, from the shop's list (the example: a 2021 RAV4, $389)\",\"length\":\"about 75 minutes to fit, then the glue maker's safe drive-away time before the car moves (the example: 60 minutes)\",\"place\":\"at the shop as a drop-off, or at the customer's home or work\",\"before\":\"mobile: a card saved for the trip fee; at the shop: nothing taken\",\"after\":\"billed to the customer's insurer, or the bill Rosie texts, or at the counter\"},{\"name\":\"Windshield, the carmaker's own glass (OEM)\",\"price\":\"set by the car, from the shop's list (the example: $300 more than aftermarket)\",\"length\":\"as above; a special order, so the earliest time is 3 business days out\",\"place\":\"as above\"},{\"name\":\"Camera calibration (lane-keeping, auto-braking)\",\"price\":\"one price, always its own line on a windshield for a car with a camera (the example: $199)\",\"length\":\"about 45 minutes, after the safe drive-away time, on a level spot\",\"place\":\"on site where the spot is level; otherwise finished in the shop's bay at no extra charge\",\"not_sure\":\"checked on site, and the line comes off if it isn't needed\"},{\"name\":\"Side or back glass\",\"price\":\"set by the car; the owner OKs each one first\",\"length\":\"about 60 minutes\",\"place\":\"at the shop, or at the customer's home or work\"},{\"name\":\"Mobile service\",\"price\":\"no extra fee inside the travel area (the example: 25 miles)\",\"place\":\"the customer's home or work\"}],\"capacity\":\"one windshield per glass tech per start time; the shop's level calibration bay and the target kit are saved like equipment\",\"glass_lead_time\":\"no time is offered before the glass can arrive: aftermarket glass the next business day by 11am, the carmaker's own in 3 business days (the example shop's supplier)\",\"nobody_home\":\"a car parked at home or work can be done with nobody at it: the keys are left as agreed, like at a front desk, and DONE comes with a photo\",\"warranty\":\"on the receipt: workmanship against leaks and wind noise for as long as the customer owns the car (the example shop's own term)\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "How big is the damage, and where: a chip smaller than a quarter, a crack under 6 inches, or bigger? Is it in the driver's view?",
+  "Year, make and model",
+  "Does the car have lane-keeping or auto-braking? Yes, no or not sure",
+  "Insurance or paying yourself? Only the insurer's name goes through the AI",
+  "Which glass: aftermarket, or the carmaker's own (each with its price and earliest day)",
+  "For a mobile job: home or work, and the town"
+ ],
+ "safety_stop": [
+  "a crash with someone hurt"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "planbill"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "if: where the state registers repair shops that do glass work, or licenses auto glass workers",
+ "staff_skills": "[\"chip repair\",\"windshields\",\"side and back glass\",\"camera calibration\",\"mobile jobs\"]",
+ "messages_never": "[\"The VIN or the plate\",\"The insurance claim number or policy\",\"The street address and parking spot, except to the glass tech on the job\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/auto+glass",
+  "pexels": "https://www.pexels.com/search/auto%20glass/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

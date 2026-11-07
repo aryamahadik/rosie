@@ -1,0 +1,197 @@
+{
+ "id": "midwife",
+ "name": "Midwife",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "pediatrician",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Midwife",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Birth Center",
+   "staff": "Nadia (midwife) and Greta (birth assistant)",
+   "customer": "Alex M. (client) · other clients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birth center care package",
+     "price": "$4,500",
+     "deposit": "$1,000",
+     "rest": "$3,500",
+     "paid_now": null,
+     "fee": "$1,000",
+     "story": "The main story: the birth center care package. A $1,000 deposit when the care agreement is signed; the rest is paid at the visits, never charged on its own on a set day.",
+     "due_now_at_booking": 1000,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Meet the midwife (free consult)",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The free meet-the-midwife consult: nothing is taken and nothing is to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Well-person visit",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A well-person visit: nothing taken when booking; the plan is billed, and any share is paid at the front desk. Self-pay: $180 at the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Childbirth class series",
+     "price": "$200",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$200",
+     "fee": "$0",
+     "story": "The childbirth class series, paid in full when booking.",
+     "due_now_at_booking": 200,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Births",
+   "staff": "Priya (midwife) and Ruth (birth assistant), who visit with a scale and the birth supplies",
+   "customer": "Alex M. (client) · other families",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Home birth care package",
+     "price": "$5,500",
+     "deposit": "$1,000",
+     "rest": "$4,500",
+     "paid_now": null,
+     "fee": "$1,000",
+     "story": "The main story: the home birth care package. A $1,000 deposit when the care agreement is signed; the rest is on the bill after the birth, paid by a link.",
+     "due_now_at_booking": 1000,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Postpartum visit at home",
+     "price": "$180",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A postpartum visit at home billed to the family's plan: nothing taken at booking; the midwife bills the plan her own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Lactation visit at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$0",
+     "story": "A self-pay lactation visit at home, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "clinic, with one long package of care: a client is cared for by one lead midwife (with a backup midwife she has met) from early pregnancy to about 6 weeks after the birth; prenatal visits run as a set series by the weeks, booked one at a time at checkout; the birth itself has no set time: from about 37 weeks the client's midwife and a birth assistant are on call for her at any hour; postpartum and newborn visits start from the day of the birth",
+ "questions_before_times": [
+  "the client's first name",
+  "a new client or a current one",
+  "which visit: the practice's own visit types only, never a symptom typed into the AI",
+  "where the visit is: at the birth center, or at home (home visits only inside the practice's area)",
+  "a plan (its name only) or self-pay",
+  "for a video visit: which state the client will be in"
+ ],
+ "safety_stop": [
+  "heavy bleeding, a seizure, a bad headache with blurred vision, trouble breathing, chest pain, a fall or a car crash, or a newborn who isn't breathing",
+  "labor, your water breaking, or less baby movement",
+  "thoughts of harming yourself or the baby, or a crisis after the birth",
+  "swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "Health history, risk screen, the consents and the care agreement",
+  "The plan check",
+  "A written price estimate for self-pay clients",
+  "A client's records from the last care provider",
+  "The owner's OK for a new client"
+ ],
+ "facts": [
+  "children",
+  "classes",
+  "documents",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "groups",
+  "planbill",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "optional, and never verified by Rosie: a midwife, a birth assistant or the practice may add a license, certificate or registration it holds; Rosie looks nothing up and never says anything is checked",
+ "staff_skills": "midwives: prenatal visits, the birth at the birth center or at home (where the state's rules allow), postpartum and newborn visits, and well-person visits (nurse-midwives); birth assistants: births and postpartum visits with a midwife; the lactation consultant: breastfeeding help; only people the owner clears go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the pregnancy, symptoms, tests, results, the birth or the midwife's name at the birth center (at a home visit the midwife's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/midwife",
+  "pexels": "https://www.pexels.com/search/midwife/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

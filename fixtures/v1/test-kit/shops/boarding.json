@@ -1,0 +1,135 @@
+{
+ "id": "boarding",
+ "name": "Pet boarding and doggy daycare",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet boarding and doggy daycare",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet boarding and doggy daycare",
+   "staff": "Marisol and Kenji (kennel staff)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Stay in a standard run (2 nights)",
+     "price": "$96",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Juniper's 2 nights in a standard run, $96. A card is saved for the inn's $20 fee (a no-show, or a cancel within 24 hours). Alex pays at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Stay in a suite (2 nights)",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "2 nights in a suite, $140. Suites and holiday stays take a $40 deposit when booking; the $100 rest is paid at pick-up.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet boarding and doggy daycare",
+   "staff": "Nico and Eli (drivers and kennel staff)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Stay with van rides (2 nights)",
+     "price": "$170",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The main story: 2 nights in a standard run with van rides both ways, $170. A card is saved, and charged $170 when Nico brings Juniper home and texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Suite stay with van rides (2 nights)",
+     "price": "$220",
+     "deposit": "$40",
+     "rest": "$180",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "2 nights in a suite with van rides, $220. A $40 deposit when booking; the $180 rest is charged to the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the pet is left for a stay (nights) or a daycare day, and picked up by its owner or a named adult\",\"list\":[{\"name\":\"Stay in a standard run (dog)\",\"price\":\"per night, from the owner's list (the example inn: $48; the example resort: $55)\",\"length\":\"a start date and an end date, in drop-off and pick-up hours\",\"place\":\"at the business; with van rides at the customer's place, where the business has a van\",\"before\":\"a card saved for the late-cancel or no-show fee\",\"after\":\"at the counter at pick-up; with van rides, the saved card charged when the pet is home\"},{\"name\":\"Stay in a suite\",\"price\":\"per night (the examples: $70 and $80)\",\"place\":\"the same\",\"before\":\"a deposit (the examples: $40)\",\"after\":\"the rest at pick-up, or charged when the pet is home\"},{\"name\":\"Cat condo\",\"price\":\"per night (the example inn: $25)\",\"place\":\"at the business\"},{\"name\":\"Second pet in the same run or condo\",\"price\":\"per night (the example inn: $30)\"},{\"name\":\"Daycare day\",\"price\":\"one price a day (the examples: $40 and $36), drop-off 7 to 11am, pick-up by 6pm\",\"before\":\"a card saved for the fee\",\"after\":\"at pick-up\"},{\"name\":\"Daycare pack\",\"price\":\"paid in full when bought (the example: 10 days for $320); each day comes off the pack\"},{\"name\":\"Daycare plan\",\"price\":\"set days each week, at the plan's price a day, with its own yes to the terms\"},{\"name\":\"Trial day (temperament check)\",\"price\":\"one price (the example: $25), 9am to 1pm, before a dog's first stay or daycare day\"},{\"name\":\"Bath before going home\",\"price\":\"one price (the example: $20), only with the owner's yes\"},{\"name\":\"Solo play\",\"price\":\"a nightly add-on (the example: +$10) for a dog that doesn't join group play\"},{\"name\":\"Van rides\",\"price\":\"each way (the example resort: $30), inside the van area (15 miles)\",\"place\":\"starts and ends at the customer's door; the stay is at the business\"},{\"name\":\"Holiday and peak nights\",\"price\":\"a surcharge a night on dates the owner marks (the example: +$10), with the deposit and cancel terms the owner sets\"}],\"capacity\":\"runs, suites and cat condos are spaces, counted night by night, with a nightly headcount cap; daycare has a daily cap; van rides by driver and seats\",\"times\":\"a stay shows a start and an end; a daycare day shows a drop-off day; van rides show a pick-up window and a drop-off window\",\"nobody_home\":\"never: an adult hands the pet over and takes it back\",\"online\":\"no\"}",
+ "questions_before_times": [
+  "Which pets: dog or cat, how many, and the dates",
+  "A run or a suite",
+  "Breed and size, and spayed or neutered",
+  "Has the dog stayed or played off leash with other dogs before?",
+  "Any extras, like a bath before going home"
+ ],
+ "safety_stop": [
+  "a pet that's hurt, bleeding, or very sick now",
+  "a pet that ate something poisonous",
+  "a person hurt, or in danger"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "dropoff",
+  "extrawork",
+  "forms",
+  "multiday",
+  "spaces"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "window",
+  "cutoff": "24 hours before"
+ },
+ "license": "if: where the state licenses or registers boarding kennels or dog daycares; elsewhere the business registration only. Decided state by state from the state's form",
+ "staff_skills": "giving medicine and insulin shots (only staff trained for it); leading daycare play groups; driving the van; assessing a trial day",
+ "messages_never": "medicine, health details, vaccine details and the vet-care amount: only on the secure page. An emergency contact is never texted by Rosie",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+boarding+and+doggy+daycare",
+  "pexels": "https://www.pexels.com/search/pet%20boarding%20and%20doggy%20daycare/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

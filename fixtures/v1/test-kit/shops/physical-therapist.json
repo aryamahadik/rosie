@@ -1,0 +1,177 @@
+{
+ "id": "physical-therapist",
+ "name": "Physical Therapy",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Physical Therapy",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Physical Therapy",
+   "staff": "Nina and Mia (physical therapists)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Evaluation",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Alex's $140 evaluation with Nina. Nothing is taken. The desk checks Alex's plan, and Alex pays the plan's share (a $35 copay) at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Evaluation",
+     "price": "$140",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same evaluation where the clinic turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Follow-up visit",
+     "price": "$110",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $110 Saturday follow-up, when the front desk is closed: a card is saved, and it's charged when Nina texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Rehab",
+   "staff": "Noah (physical therapist and athletic trainer) and Jess (physical therapist assistant)",
+   "customer": "Alex M. (patient, at home after hip surgery) · other patients",
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "7am the day of"
+   },
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home evaluation",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 home evaluation with Noah. Nothing is taken. The office bills Alex's health plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home evaluation",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same visit, paid by Alex: a card is saved for the $89 missed-visit fee, and the $179 is charged to it when Noah texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one patient with one therapist at a time, each visit with a set length; every new problem starts with an evaluation by a physical therapist; the evaluation sets the plan of care (how many visits a week, for how many weeks), and those visits are booked as a series with the patient's own yes, or one at a time",
+ "questions_before_times": [
+  "for you, or for your child (a parent or guardian books)",
+  "a new problem or after surgery (an evaluation), or a visit from your plan of care",
+  "a doctor's referral or prescription for therapy: yes (from whom) or no",
+  "a health plan (its name only), Medicare, Medicaid, or paying yourself",
+  "from a work injury or a car accident: no, a work injury, or a car accident",
+  "days and times that suit you"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, or stroke signs (sudden weakness, a drooping face, slurred speech)",
+  "after surgery: a hot or swollen calf, a fever, or a red or leaking wound",
+  "a fall with a new injury, or a sudden loss of feeling or control"
+ ],
+ "first_steps": [
+  "The referral",
+  "Health history, consent and the plan's papers",
+  "The surgeon's protocol and surgery notes",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "The plan's OK for the visits after the evaluation"
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "children",
+  "extrawork",
+  "aftercare"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "7am the day of"
+  }
+ },
+ "license": "always: each physical therapist and each physical therapist assistant holds their own active license from the state's physical therapy board",
+ "staff_skills": "physical therapists: evaluations, progress re-checks, the plan of care, and every visit; assistants: follow-up visits only, under a therapist's plan of care; dry needling only by a therapist trained for it; only people cleared for home visits go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the surgery, the plan, the reason, the results or the therapist's name at the clinic (at home, the therapist's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/physical+therapy",
+  "pexels": "https://www.pexels.com/search/physical%20therapy/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,187 @@
+{
+ "id": "hair-restoration",
+ "name": "Hair restoration clinic",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dermatologist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Hair restoration clinic",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Hair Clinic",
+   "staff": "Sofia (physician) and Noah (physician assistant)",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "2 days before",
+    "B": "24 hours before"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free hair consult",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a free 30-minute consult with Sofia. Nothing is taken, and there's nothing to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Follow-up visit",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $150 follow-up visit. A card is saved for the $20 missed-visit fee, which the owner confirms before any charge, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Transplant day (example)",
+     "price": "$6800",
+     "deposit": "$1500",
+     "rest": "$5300",
+     "paid_now": null,
+     "fee": "$1500",
+     "story": "A transplant day quoted at $6,800. A $1,500 deposit now counts toward it, and the $5,300 rest is paid at the clinic's front desk before the day starts.",
+     "due_now_at_booking": 1500,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "PRP, 3-session pack",
+     "price": "$1200",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$1200",
+     "fee": "$20",
+     "story": "A 3-session PRP pack, $1,200, paid in full when booked. Nothing more is owed.",
+     "due_now_at_booking": 1200,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Scalp Care",
+   "staff": "Ivy (nurse practitioner) and Leo (registered nurse), who see patients at home under Sofia's orders",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "2 days before",
+    "B": "24 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "PRP session at home",
+     "price": "$350",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $350 PRP session at Alex's home. A card is saved for the $89 missed-visit fee, and the card is charged when Ivy texts DONE, after Alex says yes to the price.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "PRP pack at home (3 sessions)",
+     "price": "$1000",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$1000",
+     "fee": "$89",
+     "story": "A 3-session PRP pack at home, $1,000, paid in full when booked.",
+     "due_now_at_booking": 1000,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "a free consult, then set visits: follow-ups and PRP sessions are paid by the patient; a transplant day is quoted in writing first, with a deposit toward it; anything added at the visit needs the patient's yes first",
+ "questions_before_times": [
+  "new or returning patient",
+  "consult, follow-up, PRP or a transplant day",
+  "which visit: the clinic's own visit types only, never a scalp symptom or a photo typed into the AI",
+  "paying yourself, or a health plan (its name only)",
+  "for a video visit: the state the patient will be in",
+  "join the list for a sooner time"
+ ],
+ "safety_stop": [
+  "swelling of the face, lips, tongue or throat, or trouble breathing (for example after a new medicine or a numbing shot)",
+  "bleeding that won't stop after 20 minutes of firm pressure",
+  "a fast-spreading red scalp with pus or a fever after a procedure",
+  "a swallowed medicine, or too much of one"
+ ],
+ "first_steps": [
+  "Consent and health history",
+  "The plan check",
+  "A written quote for a transplant day and self-pay work",
+  "A consult before a transplant day"
+ ],
+ "facts": [
+  "planbill",
+  "firststeps",
+  "forms",
+  "results",
+  "video",
+  "aftercare",
+  "extrawork",
+  "waitlist",
+  "plans",
+  "packs"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "A": "2 days before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "the owner's word: each physician and physician assistant holds their own license, and the clinic its registration, where the state's form asks; Rosie never looks a license up",
+ "staff_skills": "Sofia (physician): consults, transplant days, PRP; Noah (physician assistant): follow-ups, PRP where the state allows; Ivy (nurse practitioner) and Leo (registered nurse): scalp care visits at home under Sofia's orders; the clinic's technicians: graft work only under the physician's direct supervision, never a consult or a price; the front desk: no clinical OKs",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the procedure, the plan, the reason, a scalp detail, photos or results; flow A's texts drop the physician's name; at a home visit the clinician's name stays, for the door check",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/hair+restoration+clinic",
+  "pexels": "https://www.pexels.com/search/hair%20restoration%20clinic/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

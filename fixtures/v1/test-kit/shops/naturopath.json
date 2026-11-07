@@ -1,0 +1,140 @@
+{
+ "id": "naturopath",
+ "name": "Naturopathic practice",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "acupuncturist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Naturopathic practice",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Natural Health",
+   "staff": "Dana (naturopathic doctor) and Omar (wellness coach), with the front desk",
+   "customer": "Alex M. (patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "First naturopathic consult",
+     "price": "$185",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a first naturopathic consult; nothing taken when booked; paid at the front desk after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Follow-up visit",
+     "price": "$110",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A follow-up with a card saved for the $40 no-show fee, charged only if the owner says yes after a missed visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Wellness",
+   "staff": "Priya (naturopathic doctor, home visits) and Ben (wellness coach, the backup)",
+   "customer": "Alex M. (patient, at home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home naturopathic consult (trip included)",
+     "price": "$245",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a home consult; nothing taken when booked; Rosie sends the one bill after the visit, trip included.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home naturopathic consult, plan visit",
+     "price": "$245",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A home consult with a plan that pays; the practice bills the plan and any share its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Naturopathic practice: a first consult for a health plan built on food, sleep, movement and natural remedies; follow-up visits; a wellness coach visit; in person at the practice, by video where the practitioner is licensed where the patient is during the visit, and at home in a few places.",
+ "questions_before_times": [
+  "Which visit: a first consult, a follow-up, or a coach visit?",
+  "Will a plan pay? Just its name here.",
+  "Is it for a child? (yes or no here; a parent or guardian books and stays)"
+ ],
+ "safety_stop": [
+  "chest pain, trouble breathing, a stroke sign, or a fainting spell now",
+  "crisis words, or thoughts of harming yourself"
+ ],
+ "first_steps": [],
+ "facts": [
+  "planbill",
+  "forms",
+  "firststeps",
+  "children",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Optional, and Rosie checks nothing. The practice may list each practitioner's license or credential, where the state licenses the work, and any insurance it carries; Rosie shows what the practice enters, as given.",
+ "staff_skills": "each person's visit kinds, as the practice lists them",
+ "messages_never": "The concern, the remedy, the medicine, the test, the reason for the visit, and any health history. Texts name only the practice, the date, the time, the place and a secure link; staff and owner texts use initials.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/naturopathic+practice",
+  "pexels": "https://www.pexels.com/search/naturopathic%20practice/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

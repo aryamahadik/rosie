@@ -1,0 +1,178 @@
+{
+ "id": "medical-transport",
+ "name": "Non-emergency medical transport",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "home-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Non-emergency medical transport",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Non-emergency medical transport",
+   "staff": "Marcus and Ines (shuttle drivers)",
+   "customer": "Alex M. (customer, rides for a father) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Shuttle seat",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$35",
+     "fee": "$20",
+     "story": "The main story: a $35 round-trip seat on Lee Care Shuttle's Saturday run, out at 11:00am and back at 3:00pm, paid in full when booking. An accessible seat (a wheelchair space) is $55.",
+     "due_now_at_booking": 35,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Shuttle seat",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A senior living community books $35 seats for its residents. Nothing is taken when it books, and Rosie texts the community one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Non-emergency medical transport",
+   "staff": "Dev and Maya (drivers)",
+   "customer": "Alex M. (customer, books for a father) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Door-to-door ride",
+     "price": "$107",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The main story: Frank's door-to-door ride (a wheelchair van) out to an appointment, Thu Oct 22, pickup at 8:00am. $65 base + $3.50 a mile for 12 miles: $107. A card is saved, and it's charged when Dev texts DONE at the drop-off. The ride home is a second booking.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Door-to-door ride",
+     "price": "$107",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A nursing home books a resident's ride on its facility account. Nothing is taken at booking, and Rosie texts the facility one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Door-to-door ride",
+     "price": "$107",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A rider who pays the company by cash, check or invoice. Nothing is taken at booking, and Lee Medical Rides bills its own way. Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Door-through-door ride",
+     "price": "$275",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A stretcher ride: $175 base + $5 a mile for 20 miles, $275. Sam reads the rider's needs, prices it and OKs it. A card is saved, and it's charged when the crew texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a ride from the rider's place to a destination, at a set pickup time worked back from the appointment, in a vehicle and with the help the rider needs. Flow A is a seat on the company's scheduled shuttle from its own stop.\",\"list\":[{\"name\":\"Curb-to-curb ride (sedan or van)\",\"price_kind\":\"base fare plus miles, one way\",\"example\":\"$35 base + $3 a mile (the example company's own price): a 12-mile ride is $71\",\"where\":\"pickup at the rider's home or a facility\",\"money\":\"a card saved; the saved card is charged at the drop-off\"},{\"name\":\"Door-to-door ride (wheelchair van)\",\"price_kind\":\"base fare plus miles, one way\",\"example\":\"$65 base + $3.50 a mile: a 12-mile ride is $107\",\"where\":\"at the rider's place; the driver helps from the door to the van, ramp or lift, with 4-point securement\",\"money\":\"a card saved; the saved card is charged at the drop-off\"},{\"name\":\"Door-through-door ride (stretcher van, two crew)\",\"price_kind\":\"base fare plus miles, one way; priced after the owner reads the rider's needs, and the owner OKs it\",\"example\":\"$175 base + $5 a mile: a 20-mile ride is $275\",\"where\":\"at the rider's place, with two crew, only where the state's rules allow it\",\"money\":\"a card saved, or a facility account; charged at the drop-off or billed to the facility\"},{\"name\":\"Round trip\",\"price_kind\":\"two rides booked together: out, then back\",\"example\":\"the return at a set time. Each ride is its own booking, with its own code, and is charged at its own drop-off\",\"note\":\"A return at an open time ('will call') isn't offered. If the appointment ends at another time, the rider or the clinic texts and the return moves to the soonest open time, with no fee.\"},{\"name\":\"Wait and return\",\"price_kind\":\"the driver waits at the destination and drives the rider back\",\"example\":\"the first 15 minutes free, then $12 per 15 minutes (example); only when the rider asks the driver to wait; priced first and the payer says yes\",\"money\":\"added at the visit: nothing taken before; paid at the drop-off with the ride\"},{\"name\":\"Extra help\",\"price_kind\":\"added to the ride\",\"example\":\"stair chair for a flight of stairs $40; bariatric chair $50; an extra stop on the way, like a pharmacy, $10 + miles; after hours (before 6am, after 7pm, weekends) $25\",\"money\":\"added at the visit with a yes first; paid at the drop-off with the ride\"},{\"name\":\"Standing order\",\"price_kind\":\"each ride at its list price\",\"example\":\"the same ride on set days, like every Mon, Wed and Fri\",\"money\":\"a repeat plan with its own yes; each ride charged at its own drop-off\"},{\"name\":\"Facility account\",\"price_kind\":\"list prices, billed to the facility once a month\",\"example\":\"a hospital, nursing home or clinic books a ride for a patient; the rider sees no prices\",\"money\":\"nothing taken at booking; one bill a month to the facility\"},{\"name\":\"Pay the company directly\",\"price_kind\":\"list prices\",\"example\":\"a rider who pays by cash, check or invoice\",\"money\":\"nothing taken at booking; the company bills its own way, outside Rosie\"},{\"name\":\"Medical-center shuttle seats (flow A)\",\"price_kind\":\"one price per seat, out and back on the company's own shuttle\",\"example\":\"round-trip seat $35; round-trip accessible seat (a wheelchair space) $55; extra-wide seat $40; companion seat $20; one-way seat $25; four seats booked together $140 (the example company's own prices). The example timetable: Tue and Thu, out 8:00am, back 1:00pm; Sat, out 11:00am, back 3:00pm. 12 seats a run, 2 of them wheelchair spaces\",\"money\":\"paid in full when booking; a senior living community or a facility can be billed one bill a month instead\"}],\"capacity\":\"One vehicle and one driver per ride; a stretcher ride has two crew. A wheelchair van holds up to 2 wheelchairs and 3 seats. One rider per booking, and one companion may ride along. No shared rides in flow B. A shuttle run has 12 seats, 2 of them wheelchair spaces, and a companion books their own seat.\",\"nobody_home\":\"No: the rider must be there at pickup. A rider who can't be left alone is handed to a named adult at each end.\",\"online\":\"No. Rides are in person.\",\"same_day\":\"Same-day rides only when a vehicle and a driver are free, soonest first. Nothing is sent now and nobody is on call.\",\"not_offered\":\"Ambulance service; rides with medical care on the way; a secured behavioral health transport; rides ordered through a health plan or a public program, which go to the company's own line.\"}",
+ "questions_before_times": [
+  "Where the pickup is (a home or a facility) and the town",
+  "Where the ride goes: the town only. The place's name goes on the secure page",
+  "The appointment time (it sets the pickup time)",
+  "One way or round trip, and the time for the return",
+  "What help the ride needs: curb to curb, door to door, or a stretcher",
+  "Stairs at either end",
+  "A companion riding along"
+ ],
+ "safety_stop": [
+  "chest pain",
+  "trouble breathing",
+  "signs of a stroke",
+  "heavy bleeding",
+  "a fall with a possible broken bone",
+  "passing out",
+  "anyone who needs medical care right now",
+  "words about suicide or self-harm"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "forms",
+  "monthlybill",
+  "extrawork",
+  "incare",
+  "classes"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "Where the state's rules or the local for-hire authority require it: a non-emergency medical transport permit or certificate for the company, with each vehicle inspected and listed. Stretcher rides only where the state's rules allow them outside an ambulance license. Elsewhere, the business registration.",
+ "staff_skills": "[\"Ambulatory and wheelchair rides (securement training)\",\"Stretcher rides (two-crew lift training)\",\"Stair chair and bariatric help\",\"CPR and first aid (the company's rule, and where the state's rules require it)\"]",
+ "messages_never": "[\"The destination's name, the kind of appointment, a diagnosis, medicines\",\"How the rider gets around, weight, oxygen and memory notes\",\"Gate and building codes\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/non+emergency+medical+transport",
+  "pexels": "https://www.pexels.com/search/non-emergency%20medical%20transport/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,151 @@
+{
+ "id": "ent",
+ "name": "Ear, nose and throat (ENT)",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "primary-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Ear, nose and throat (ENT)",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee ENT Clinic",
+   "staff": "Mara (ENT surgeon) and Ivan (audiologist)",
+   "customer": "Alex M. (a new patient) · other patients",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New patient consult",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Alex's new patient consult with Mara, billed to Alex's plan. Nothing is taken. The desk checks the plan, and Alex pays the $35 copay at the front desk. Self-pay is $230, the price shown before any yes.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New patient consult",
+     "price": "$230",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same consult where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free patient, and Sam confirms any charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee House Calls",
+   "staff": "Tomas (audiologist) and Lia (nurse), who visit with a bag",
+   "customer": "Alex M. (a patient who can't easily leave home) · other patients",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home hearing check",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a home hearing check for Alex with Tomas. Nothing is taken. The office bills Alex's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home hearing check",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same home hearing check, paid by Alex: nothing is taken, and Rosie texts the $165 bill when Tomas texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits of a set length, booked with an ENT surgeon or an audiologist by name; a new patient's consult is longer and the owner OKs it; follow-ups are booked by text for current patients; a hearing test is its own visit; an office procedure is added at a visit only with the patient's yes; same-day sick visits open each morning for current patients first; a home hearing check has a 2-hour arrival window",
+ "questions_before_times": [
+  "a new or a current patient",
+  "which visit: the practice's own visit types only, never a symptom or a reason typed into the AI",
+  "a plan (its name only) or self-pay",
+  "for a video follow-up: which state the patient will be in",
+  "who the visit is for: the person booking, a child (3 and up), or another adult"
+ ],
+ "safety_stop": [
+  "trouble breathing or swallowing, a throat that is swelling shut, drooling with trouble breathing, or bleeding from the nose or mouth that won't stop",
+  "chest pain, signs of a stroke (a drooping face, a weak arm, slurred speech, a sudden severe headache), fainting, or sudden severe dizziness with a fall",
+  "an overdose, or swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "Health history, medicines, the consent and the privacy notice",
+  "The plan check",
+  "A written price estimate for self-pay patients",
+  "Records and past hearing tests from the last doctor",
+  "A referral, where the plan asks for one",
+  "Sam's OK for a new patient"
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "optional: the business may add any license or registration it holds (a clinician's, a practice's); Rosie never requires one and never looks one up",
+ "staff_skills": "the ENT surgeon (Mara): new patient consults, follow-ups, sick visits, office procedures and video follow-ups; the audiologists (Ivan at the office, Tomas at home): hearing tests and home hearing checks; the nurse (Lia): sick visit support and home visits; only people the owner clears for home visits go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, the body part, symptoms, medicines, results or the clinician's name (at a home visit the clinician's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/ear+nose+and+throat+ent",
+  "pexels": "https://www.pexels.com/search/ear%2C%20nose%20and%20throat%20(ent)/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

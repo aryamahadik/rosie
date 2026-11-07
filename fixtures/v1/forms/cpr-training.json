@@ -1,0 +1,853 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "cpr-training",
+  "name": "CPR and first aid training",
+  "type": "class",
+  "started_from": "gym"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K01",
+   "field": "Class timetable: day, time, teacher, room (sent as a photo or typed)",
+   "type": "schedule",
+   "need": "R for class work",
+   "shows": "booking page (sessions with seats left)",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K02",
+   "field": "Seats Rosie can book per session, the fewest to run, the cutoff",
+   "type": "numbers",
+   "need": "R for class work",
+   "shows": "seats left; owner decides at the cutoff",
+   "source": "S1-83, A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K03",
+   "field": "Trial seats per class (one trial each)",
+   "type": "number",
+   "need": "P",
+   "shows": "booking page",
+   "source": "A4-33",
+   "google": "no",
+   "turned_on_by": "fact classes"
+  },
+  {
+   "id": "K08",
+   "field": "Groups: size limits and a chaperone count",
+   "type": "numbers",
+   "need": "P",
+   "shows": "booking",
+   "source": "A4-32, fact groups",
+   "google": "no",
+   "turned_on_by": "fact groups"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact results"
+  },
+  {
+   "id": "V14",
+   "field": "Waitlist",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "times card",
+   "source": "S1-21, A4-60, fact waitlist",
+   "google": "no",
+   "turned_on_by": "fact waitlist"
+  }
+ ],
+ "facts": [
+  "classes",
+  "groups",
+  "forms",
+  "waitlist",
+  "children",
+  "results"
+ ],
+ "switches": [],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|full|none",
+   "paths": [
+    "list|full|none",
+    "list|none|bill"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "list|none|bill",
+   "paths": [
+    "list|none|bill",
+    "list|full|none"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Heartsaver CPR and first aid",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$95",
+   "deposit": null,
+   "rest": null,
+   "paid": "$95",
+   "fee": "$95",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "The main story: Alex's seat in Saturday's 9am Heartsaver class, $95, paid in full when booking. A student who doesn't pass the skills check gets no card that day and one free retest within 30 days."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|bill",
+   "name": "Company account seat",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$95",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$95",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A company account: the company's contact books seats for named staff, nothing is taken, and the company gets one bill a month."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "On-site class (9 students)",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$765",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$510",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: an on-site class for 9 staff at Alex's office, $85 a student ($765), nothing taken to book; the bill comes after the class for the final count (at least 6 students, $510)."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Family class at home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$300",
+   "deposit": null,
+   "rest": null,
+   "paid": "$300",
+   "fee": "$300",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A family or babysitter class at home for up to 4 people, $300, paid in full when booking."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Heartsaver CPR, AED and First Aid (adult, child, infant)",
+   "price": "$95",
+   "kind": "one price per student",
+   "length": "5 hours",
+   "where": "at the training center",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "BLS for health care providers",
+   "price": "$80",
+   "kind": "one price per student",
+   "length": "3½ hours",
+   "where": "at the training center",
+   "before": "paid in full",
+   "after": "nothing more"
+  },
+  {
+   "name": "Blended skills session (online part done first)",
+   "price": "$60; the online part is bought from the program on its own site",
+   "kind": "one price per student",
+   "length": "1½ hours",
+   "where": "at the training center",
+   "before": "paid in full",
+   "after": "nothing more"
+  },
+  {
+   "name": "Pediatric first aid and CPR (child care providers)",
+   "price": "$90",
+   "kind": "one price per student",
+   "length": "6 hours",
+   "where": "at the training center",
+   "before": "paid in full",
+   "after": "nothing more"
+  },
+  {
+   "name": "Babysitter safety and CPR (ages 11 to 15)",
+   "price": "$75",
+   "kind": "one price per student",
+   "length": "5 hours",
+   "where": "at the training center",
+   "before": "paid in full",
+   "after": "nothing more"
+  },
+  {
+   "name": "Company account seats",
+   "price": "the class's price",
+   "kind": "one price per student",
+   "length": "as the class",
+   "where": "at the training center",
+   "before": "nothing taken",
+   "after": "one bill a month to the company"
+  },
+  {
+   "name": "On-site group class",
+   "price": "$85 a student, at least 6 students ($510)",
+   "kind": "one price per student, with a minimum",
+   "length": "as the course",
+   "where": "at the company's place (flow B)",
+   "before": "nothing taken",
+   "after": "the bill after the class, for the final count"
+  },
+  {
+   "name": "Family or babysitter class at home",
+   "price": "$300 for up to 4 people",
+   "kind": "one price per group",
+   "length": "3 hours",
+   "where": "at the customer's home (flow B)",
+   "before": "paid in full",
+   "after": "nothing more"
+  },
+  {
+   "name": "Skills check retest",
+   "price": "free once within 30 days; $30 after that",
+   "kind": "one price",
+   "length": "30 minutes",
+   "where": "at the training center",
+   "before": "nothing taken for the free retest",
+   "after": "nothing more"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "which course, and if it's for a job or a board (some accept only certain programs)",
+   "a new card or a renewal (a renewal brings a current card that's still in date)",
+   "how many students, for a group or an on-site class",
+   "for a blended course: is the online part done"
+  ],
+  "after_time": [
+   "each student's full name as it should read on the card, and an email for the card",
+   "anything the instructor should know to help, like trouble kneeling, a hearing need or a language"
+  ],
+  "secure_page_only": [
+   "each student's name, email and, where the program asks, date of birth",
+   "a physical limit that affects doing compressions on the floor (it may mean a course completion without a card)",
+   "a latex allergy (gloves)",
+   "the online part's certificate, uploaded",
+   "for a student under 18: the parent's OK and who picks them up",
+   "for a company's student: whether the company may see their attendance and card"
+  ],
+  "who_may_book": "an adult for themselves; a parent or guardian for a student under 18 (12 and up for CPR courses, 11 to 15 for the babysitter course); a company's contact for named staff, each of whom gets their own card"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "someone collapsed or not breathing right now, choking, chest pain, a stroke sign",
+    "say": "Call 911 now. Start CPR if they're not breathing normally, and use an AED if one is near.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "pregnant, a bad knee or back, a recent surgery",
+    "what": "the booking goes on; the instructor helps with ways to practice; a card needs the skills the program requires; Rosie gives no health advice"
+   },
+   {
+    "words": "a student booking after a recent death or a scary event",
+    "what": "the booking goes on, kindly; crisis words get the crisis line"
+   }
+  ],
+  "always": "the generic screen, always on",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "Blended course: the online part",
+    "when": "due 24 hours before the skills session",
+    "who": "the student",
+    "result": "the certificate uploaded on the secure page; not in time: the session moves to a later date, free once"
+   },
+   {
+    "name": "Renewal: the current card",
+    "when": "on the secure page while booking",
+    "who": "the student",
+    "result": "a card still in date is shown at check-in; an expired one is a full course"
+   },
+   {
+    "name": "On-site class: the final student list",
+    "when": "3 business days before",
+    "who": "the company's contact",
+    "result": "the final list, with each name as it should read on the card, sets the bill; late: the owner is told, and nothing is cancelled for it"
+   },
+   {
+    "name": "Under 18: the parent's OK",
+    "when": "on the secure page while booking",
+    "who": "the parent or guardian",
+    "result": "no OK: the student isn't booked"
+   }
+  ],
+  "prep": "wear clothes you can kneel in; bring a photo ID (the card's name is checked against it); bring the online certificate for a blended course",
+  "forms_fact": true,
+  "first_steps_fact": false,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "courses each instructor may teach, languages, teaching minors, on-site travel",
+  "licenses_or_certificates": "each instructor's card for the courses taught, under a program or training center: the business's own word, never checked by Rosie",
+  "who_oks": "Sam OKs company accounts, on-site classes and refunds",
+  "stand_in": "another instructor certified for the same course; students in a public class aren't asked; a company that named an instructor is asked first, and nobody moves on silence",
+  "ratio": "the program's limits: up to 6 students per manikin station and 12 per instructor; a second instructor for larger classes"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "an adult for themselves; a parent or guardian for a student under 18 (12 and up for CPR courses, 11 to 15 for the babysitter course); a company's contact for named staff, each of whom gets their own card",
+  "minors_texts": "texts go to the parent who booked"
+ },
+ "visit": {
+  "check_in": "the instructor ticks each student on the class roster, or takes each student's own code; an on-site class checks in on the company's list",
+  "done": "the instructor texts DONE once the roster and the results are in",
+  "changes_at_visit": "an extra student added on site is priced at the per-student rate, and the company says yes first"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "none from the state for teaching CPR and first aid in most places; each instructor holds a current instructor card from a nationally recognized program (the program's own card, which the business shows as its word); where a state agency approves providers for some uses (child care staff, school staff), the business shows only the approvals it really holds",
+  "who": "the business, for its registration and any provider approval; each instructor, for their instructor card and the courses it covers",
+  "ask": "the business registration; each instructor's card: the courses it covers and its end date; the program or training center the business teaches under; any provider approval",
+  "insurance": "liability insurance: the business's own word, shown once it's sent",
+  "background": "background checks for instructors who teach minors or at schools: the business's own word, where the school or its rules ask"
+ },
+ "never_in_a_text": "test results (passed or not), health or physical limits, dates of birth: only on the secure page",
+ "languages": "English and Spanish; classes in other languages where an instructor teaches in them",
+ "unmapped_keys": {
+  "pf.questions": [
+   "told"
+  ],
+  "pf.safety": [
+   "inClass"
+  ],
+  "pf.license": [
+   "scope"
+  ],
+  "pf.messages": [
+   "employer"
+  ],
+  "pf.visit": [
+   "lateEntry",
+   "result"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

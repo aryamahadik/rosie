@@ -1,0 +1,191 @@
+{
+ "id": "doula",
+ "name": "Doula",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "pediatrician",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Doula",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Birth Support",
+   "staff": "Mara (birth doula) and Wren (birth doula)",
+   "customer": "Alex M. (client) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Birth doula package",
+     "price": "$1,800",
+     "deposit": "$400",
+     "rest": "$1,400",
+     "paid_now": null,
+     "fee": "$400",
+     "story": "The main story: the birth doula package. A $400 deposit when the agreement is signed; the rest is paid at the visits, never charged on its own on a set day.",
+     "due_now_at_booking": 400,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Meet the doula (free consult)",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The free meet-the-doula consult: nothing is taken and nothing is to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Prenatal session",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A prenatal session: nothing taken when booking; $95 is paid at the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Birth prep session",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$0",
+     "story": "A birth prep session for two, paid in full when booking.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Support",
+   "staff": "Esme (birth doula) and Dara (postpartum doula), who visit at home",
+   "customer": "Alex M. (client) · other families",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|deposit|bill",
+   "services": [
+    {
+     "combo": "list|deposit|bill",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Home birth doula package",
+     "price": "$1,800",
+     "deposit": "$400",
+     "rest": "$1,400",
+     "paid_now": null,
+     "fee": "$400",
+     "story": "The main story: the home birth doula package. A $400 deposit when the agreement is signed; the rest is on the bill after the birth, paid by a link.",
+     "due_now_at_booking": 400,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Postpartum visit at home (3 hours)",
+     "price": "$210",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A postpartum visit at home (3 hours): nothing taken at booking; the bill comes after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Overnight support at home",
+     "price": "$480",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$480",
+     "fee": "$0",
+     "story": "An overnight support visit at home, paid in full when booking.",
+     "due_now_at_booking": 480,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "support for the family through pregnancy, birth and the weeks after: prenatal sessions at the office or by video, birth support on call from about 37 weeks, and postpartum visits at home; sessions are booked one at a time, the next at checkout",
+ "questions_before_times": [
+  "the first name of the person booking",
+  "a new family or a current one",
+  "which visit: the business's own visit types only, never a symptom typed into the AI",
+  "where the visit is: at the office, by video, or at home (home visits only inside the business's area)",
+  "how the family will pay: the package deposit, or pay for the visit itself"
+ ],
+ "safety_stop": [
+  "heavy bleeding, a seizure, trouble breathing, chest pain, a fall or a car crash, or a baby who isn't breathing",
+  "labor, your water breaking, or a worry about the baby",
+  "thoughts of harming yourself or the baby, or a crisis after the birth",
+  "swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "The intake, the birth plan and the agreement",
+  "A written price estimate for a session paid by the family",
+  "The owner's OK for a new family"
+ ],
+ "facts": [
+  "children",
+  "documents",
+  "extrawork",
+  "firststeps",
+  "forms",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "optional, and never verified by Rosie: a doula may add a certification or training certificate it holds; Rosie looks nothing up and never says anything is checked",
+ "staff_skills": "birth doulas: prenatal sessions, birth support on call from about 37 weeks, and birth prep sessions; postpartum doulas: postpartum visits and overnight support at home; only people the owner clears go to homes",
+ "messages_never": "texts carry only the business's name, the date, the time, the address and a secure link: never the visit type, the pregnancy, the birth plan, symptoms or results (at a home visit the doula's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/doula",
+  "pexels": "https://www.pexels.com/search/doula/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

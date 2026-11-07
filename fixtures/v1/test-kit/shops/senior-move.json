@@ -1,0 +1,170 @@
+{
+ "id": "senior-move",
+ "name": "Senior move manager",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "movers",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Senior move manager",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Senior move manager",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|none|none",
+   "services": [
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Family planning call",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 30-minute family planning call by phone. Nothing is taken and nothing is owed.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Remote move plan",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$20",
+     "story": "The $150 remote move plan by video, paid in full when booking, with a floor plan after.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Senior move manager",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Senior move",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: a free assessment; an agreement at $85 an hour per person, estimated 40 to 60 hours, with a $500 retainer; a bill every Friday for that week's hours; the retainer comes off the last bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Senior move",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same move billed the business's own way, like a check from the older adult's agent under a power of attorney. Rosie sends no bills.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Downsizing session",
+     "price": "$255",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$85",
+     "story": "A 3-hour downsizing session for someone staying put, at $85 an hour ($255 minimum); billed after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Project: a free in-home assessment with the older adult and the family, then a written plan and estimate, then a series of sessions (sorting, packing, move day, unpacking) over weeks, billed by the hour every Friday",
+ "questions_before_times": [
+  "Who is moving, and who is asking (the older adult, a family member, a care manager)?",
+  "Where from and where to: the town or ZIP of each (a house, an apartment, assisted living, a family member's home)",
+  "Any date the move must happen by: a move-in date set by the community, a closing or a lease end",
+  "What help is needed: the whole move, sorting only, or setting up the new home"
+ ],
+ "safety_stop": [
+  "the older adult has fallen and can't get up, is suddenly confused, has chest pain or trouble breathing",
+  "a fire, smoke or a gas smell"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "video",
+  "monthlybill"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  },
+  "welfare": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "no state license to plan, sort, pack or set up a home in most places, only a business registration; a household goods mover's license (and the state's mover rules) only where the business itself carries belongings in its own truck for pay; otherwise the move is done by a licensed moving company the family hires",
+ "staff_skills": "",
+ "messages_never": "[\"Health, memory or care details, and money details\",\"Door codes and lockbox codes\",\"Why someone is moving: owner and staff texts never say it\",\"Contract papers and lab or medical papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/senior+move+manager",
+  "pexels": "https://www.pexels.com/search/senior%20move%20manager/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

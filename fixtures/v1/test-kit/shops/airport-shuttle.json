@@ -1,0 +1,165 @@
+{
+ "id": "airport-shuttle",
+ "name": "Airport shuttle",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "home-care",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Airport shuttle",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Airport shuttle",
+   "staff": "Wes and Dara (express drivers)",
+   "customer": "Alex M. (customer, rides to the airport) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Express seat",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$35",
+     "fee": "$20",
+     "story": "The main story: a $35 seat on Lee Airport Line's express van from the stop to the airport, leaving Sat at 11:00am, paid in full when booking.",
+     "due_now_at_booking": 35,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Express seat",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A hotel books express seats for its guests. Nothing is taken when it books, and Rosie texts the hotel one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Airport shuttle",
+   "staff": "Hector and Priya (drivers)",
+   "customer": "Alex M. (customer, books a ride to the airport) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private ride",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$75",
+     "fee": "$30",
+     "story": "The main story: Alex's private ride from home to the airport, Thu Oct 22, pickup at 8:00am for an 11:30am flight. $75 for the van, paid in full when booking. Hector drives.",
+     "due_now_at_booking": 75,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Private ride",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$30",
+     "story": "A regular rider's standing order: the same airport ride every Monday at 8:00am. A card is saved, and each ride is charged when Hector texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Private ride",
+     "price": "$75",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$30",
+     "story": "A hotel books a guest's ride on its account. Nothing is taken at booking, and Rosie texts the hotel one bill a month.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|card",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Group van",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$30",
+     "story": "A group van for 12 riders, priced by Sam after the trip details are read: $640. A card is saved, and it's charged when the ride is done.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a ride between a home, hotel or office and the airport, at a set pickup time worked back from the flight. Flow A is a seat on the company's scheduled express van from its own stop.\",\"list\":[{\"name\":\"Private ride to or from the airport\",\"price_kind\":\"one fare by distance, for the whole van\",\"example\":\"$75 within 15 miles of the airport, then $4 a mile beyond (the example company's own price); up to 3 riders and 3 bags each\",\"where\":\"pickup at the rider's home, hotel or office; or at the airport, to go home\",\"money\":\"paid in full when booking; a regular rider on a standing order saves a card and is charged at each drop-off\"},{\"name\":\"Shared door-to-door seat\",\"price_kind\":\"one fare per person\",\"example\":\"$38 a seat; the van picks up other riders on the way, so the pickup is a 30-minute window around the time shown\",\"where\":\"at the rider's home or hotel\",\"money\":\"paid in full when booking\"},{\"name\":\"Group van\",\"price_kind\":\"priced from the request\",\"example\":\"9 to 14 riders, priced by the owner after the trip details are read (for example $640); the owner OKs it\",\"money\":\"a card saved, charged when the ride is done\"},{\"name\":\"Round trip\",\"price_kind\":\"two rides booked together: out, then back\",\"example\":\"Each ride is its own booking, with its own code and its own charge. The ride home from the airport is booked with the flight number, and moves with the flight.\",\"note\":\"Both can be booked in one chat.\"},{\"name\":\"Flight pickup wait\",\"price_kind\":\"the driver tracks the flight\",\"example\":\"the first 60 minutes after landing are free (the example company's rule). After that, $15 for each extra 30 minutes, priced first, and the rider says yes\",\"money\":\"added at the visit: nothing taken before; paid with the ride\"},{\"name\":\"Extras\",\"price_kind\":\"added to the ride\",\"example\":\"an extra stop on the way $15; an extra bag beyond three $5 each; a child seat $10 each, booked ahead; a night pickup (10pm to 5am) $20\",\"money\":\"added at the visit with a yes first; paid with the ride, never before\"},{\"name\":\"Standing order\",\"price_kind\":\"each ride at its list price\",\"example\":\"the same airport ride on set days, like every Monday at 5:30am\",\"money\":\"a repeat plan with its own yes; each ride charged at its own drop-off\"},{\"name\":\"Hotel or company account\",\"price_kind\":\"list prices, billed once a month\",\"example\":\"a hotel or a company books rides for its guests or staff; the rider sees no prices\",\"money\":\"nothing taken at booking; one bill a month\"},{\"name\":\"Express seat (flow A)\",\"price_kind\":\"one price per seat\",\"example\":\"round trip $35; one way $20; a seat with extra bags $40; seat for two $55; four seats booked together $140. The example timetable runs every day from 4:30am to 10:30pm, every 30 minutes\",\"money\":\"paid in full when booking; a hotel can be billed one bill a month instead\"}],\"capacity\":\"A private ride has one vehicle and one driver, up to 3 riders and 3 bags each (a van holds up to 8 riders). A shared seat is one of the vehicle's seats. An express van has 14 seats. No two bookings share a seat.\",\"nobody_home\":\"No. The rider must be at the pickup. The pickup may be a hotel lobby, a curb or a terminal door.\",\"online\":\"No. Rides are in person.\",\"same_day\":\"Same-day rides only when a vehicle and a driver are free, soonest first. Nothing is sent now and nobody is on call.\",\"not_offered\":\"Rides that need medical care on the way; chartered coaches; luggage-only deliveries; rides for a child riding alone.\"}",
+ "questions_before_times": [
+  "Where the pickup is (a home, a hotel, an office or the airport) and the town",
+  "Which airport and terminal, and whether the ride is to the airport or from it",
+  "The flight time (it sets the pickup time), and for a ride from the airport, the flight number",
+  "How many riders and how many bags",
+  "Any children riding, in age groups (under 4, 4 to 7, 8 and up), for the right child seat",
+  "One way or round trip, and the time for the return"
+ ],
+ "safety_stop": [
+  "someone hurt or ill right now",
+  "a crash or a danger on the road",
+  "a threat to a driver or a rider",
+  "words about suicide or self-harm"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "monthlybill",
+  "extrawork",
+  "classes"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "Where the state's rules or the local for-hire authority require it: a passenger carrier permit for the company, with each vehicle inspected and listed. Where the airport's rules require it, a ground-transport permit to pick up and drop off there. Elsewhere, the business registration.",
+ "staff_skills": "[\"Private and shared rides in a car or van\",\"The accessible van (securement training)\",\"Group van (a larger vehicle, with the license it needs)\",\"Child seats fitted correctly\"]",
+ "messages_never": "[\"The street address with the flight number, together\",\"Gate and building codes\",\"The names of the children riding\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/airport+shuttle",
+  "pexels": "https://www.pexels.com/search/airport%20shuttle/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

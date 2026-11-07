@@ -1,0 +1,159 @@
+{
+ "id": "sports-medicine",
+ "name": "Sports medicine",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "physical-therapist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Sports medicine",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Sports Medicine",
+   "staff": "Dr. Nolan and Dr. Hale (sports physicians) and the front desk",
+   "customer": "Alex M. (a new patient) · other athletes",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "New injury exam",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The main story: a $165 new injury exam with Dr. Nolan. Nothing is taken. Alex pays at the front desk: the self-pay price, or a plan's share.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "New injury exam",
+     "price": "$165",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "The same visit where the clinic turns on its $50 missed-visit fee: a card is saved for it, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Sports Mobile",
+   "staff": "Dr. Vance and Dr. Quinn (sports physicians), who visit homes and fields",
+   "customer": "Alex M. (a new patient, at home) · other athletes",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home injury exam",
+     "price": "$220",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "The main story: a $220 home injury exam with Dr. Vance. A card is saved for the $75 missed-visit fee, and charged $220 when Dr. Vance texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Home sports physical",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "A home sports physical with nothing saved. Rosie texts the $95 bill when Dr. Vance texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Home injury exam",
+     "price": "$220",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$75",
+     "story": "A home visit after a school or car injury claim. Nothing is taken, and the office bills the claim its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visit types in the clinic's exam rooms, and at a home or a field, each with a set length; a sports physical is a yearly check for a school sport; an injury exam is a history, an exam and a plan, with imaging only when the doctor orders it; a return to play is written only by a doctor after an exam; a plan of care's follow-ups are booked as a series only with the patient's own yes, and each is paid when it happens",
+ "questions_before_times": [
+  "for you, or for your child (a parent or guardian books a minor, who stays)",
+  "new or returning patient (a new patient gets the 45-minute new injury exam)",
+  "which visit: the clinic's own visit types only, never an injury described in the AI chat",
+  "a school sport, a car accident, or a work injury (then it's billed to that claim)",
+  "a health plan (its name only), or paying yourself",
+  "mornings, midday or evenings"
+ ],
+ "safety_stop": [
+  "trouble breathing, chest pain, collapsing or passing out during exercise, a seizure, or a head hit with vomiting, confusion, a worse headache or drowsiness",
+  "a bone poking through the skin, a joint badly out of line, or a limb that's cold, pale or can't move; or heat with vomiting or confusion",
+  "thoughts of ending a life"
+ ],
+ "first_steps": [
+  "Health history and consent",
+  "The school's sports form",
+  "The plan check",
+  "The claim for a school, auto, or work injury",
+  "A written price estimate for self-pay patients",
+  "A return-to-play note"
+ ],
+ "facts": [
+  "plans",
+  "planbill",
+  "forms",
+  "children",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "each sports doctor holds their own state medical license; the clinic where the state's form asks",
+ "staff_skills": "sports doctors: exams, injury care, sports physicals, return-to-play notes and imaging orders; the front desk: check-in, plan checks, school forms, estimates and payment; only people cleared for home and field visits go out",
+ "messages_never": "texts carry only the clinic's name, the date, the time, the address and a secure link: never the injury, the visit type, the reason, the plan or the doctor's name (at home or a field, the doctor's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/sports+medicine",
+  "pexels": "https://www.pexels.com/search/sports%20medicine/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

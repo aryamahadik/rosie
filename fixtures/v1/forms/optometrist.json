@@ -1,0 +1,966 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "optometrist",
+  "name": "Optometrist",
+  "type": "clinic",
+  "started_from": "dentist"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children; fact incare"
+  },
+  {
+   "id": "Q06",
+   "field": "Sensitive work switch (texts never name the service; initials; no rating, nothing sold; gentle words)",
+   "type": "switch",
+   "need": "S",
+   "shows": "every text and pay page",
+   "source": "S13-22, switch sensitive",
+   "google": "no",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact aftercare; fact results"
+  },
+  {
+   "id": "V18",
+   "field": "Insurance plan billed (the customer's part is billed after the plan pays)",
+   "type": "choice",
+   "need": "P",
+   "shows": "booking page",
+   "source": "fact planbill, S1-13, A4-53, A9-20",
+   "google": "no",
+   "turned_on_by": "fact planbill"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  }
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "children",
+  "incare",
+  "aftercare",
+  "extrawork",
+  "results"
+ ],
+ "switches": [
+  "sensitive"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|own",
+   "paths": [
+    "list|none|own",
+    "list|none|bill",
+    "visit|none|own",
+    "list|deposit|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Eye exam with a contact lens fitting",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$165",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: an eye exam with a contact lens fitting, $165 on the list. Nothing is taken. The desk checks Alex's vision plan, and Alex pays the share at the front desk."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|own",
+   "name": "Eye exam at the care home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The main story: a $179 eye exam at Sunrise Gardens care home. Nothing is taken. The office bills Alex's plan its own way."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Eye exam at the care home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The same eye exam, paid privately: nothing is taken, and Rosie texts the $179 bill when Marcus texts DONE."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|own",
+   "name": "Eye check for a sore eye",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": "$245",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "A sore, red eye at the care home. Only the $89 eye check is promised. Marcus prices any test or treatment at the visit, with Alex's yes first."
+  },
+  {
+   "flow": "B",
+   "path": "list|deposit|bill",
+   "name": "New glasses, delivered and fitted",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": "$40",
+   "rest": "$110",
+   "paid": null,
+   "fee": "$0",
+   "money_before": "deposit",
+   "money_before_label": "A deposit",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "New glasses from the exam's prescription, delivered and fitted at Sunrise Gardens: $150, a $40 deposit when booked, and Rosie texts the bill for the rest."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Retina photo",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Glasses check",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "counter",
+   "price": "$40"
+  },
+  {
+   "flow": "A",
+   "name": "Eye exam (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Retina photo",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "own",
+   "price": "$20"
+  },
+  {
+   "flow": "B",
+   "name": "Child's eye exam at home",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "own",
+   "price": "$120"
+  },
+  {
+   "flow": "B",
+   "name": "Eye exam (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Eye exam (for glasses)",
+   "price": "$120",
+   "kind": "one price; the plan's share is shown when a plan pays",
+   "length": "45 min: 15 of pre-tests with the optician, then 30 with the eye doctor",
+   "where": "at the office",
+   "before": "nothing taken",
+   "after": "the patient's share at the front desk"
+  },
+  {
+   "name": "Contact lens fitting (added to an eye exam)",
+   "price": "$45",
+   "kind": "one price",
+   "length": "+15 min, with one follow-up included",
+   "where": "at the office",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Eye problem visit (red, sore, itchy or dry eyes)",
+   "price": "$140",
+   "kind": "one price; billed to medical insurance, not the vision plan",
+   "length": "30 min, same day with the owner's OK",
+   "where": "at the office",
+   "before": "nothing taken",
+   "after": "the share at the front desk"
+  },
+  {
+   "name": "Glasses check during an eye problem visit",
+   "price": "$40",
+   "kind": "one price",
+   "length": "+10 min",
+   "where": "at the office",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Retina photo instead of dilating drops",
+   "price": "$20",
+   "kind": "one price, added at the visit",
+   "length": "+5 min",
+   "where": "both places",
+   "before": "nothing taken",
+   "after": "with the visit"
+  },
+  {
+   "name": "Child's eye exam (5 and up)",
+   "price": "$120",
+   "kind": "one price; the plan's share when a plan pays",
+   "length": "45 min",
+   "where": "both places",
+   "before": "nothing taken",
+   "after": "at the front desk, or billed to the plan"
+  },
+  {
+   "name": "Contact lens follow-up",
+   "price": "included in the fitting",
+   "kind": "one price",
+   "length": "15 min, 1 to 2 weeks after the fitting",
+   "where": "at the office",
+   "before": "nothing taken",
+   "after": "nothing more"
+  },
+  {
+   "name": "Glasses (frame and lenses)",
+   "price": "the office's own frame and lens prices; the plan's frame allowance and lens copay come off",
+   "kind": "ordered after the exam",
+   "length": "ready in about 7 to 10 days",
+   "where": "at the office (or delivered at a care home)",
+   "before": "not booked: ordered at the visit",
+   "after": "half the patient's share as a deposit at the front desk when ordered, the rest at pick-up"
+  },
+  {
+   "name": "Contact lens supply",
+   "price": "priced by the box",
+   "kind": "ordered after the fitting is final",
+   "length": "ready in a few days",
+   "where": "at the office",
+   "before": "not booked: ordered at the desk",
+   "after": "paid at the front desk when ordered"
+  },
+  {
+   "name": "Eye exam at a care home",
+   "price": "$179",
+   "kind": "one price",
+   "length": "45 min, with a portable eye exam kit",
+   "where": "at the customer's place (a care home or a home)",
+   "before": "nothing taken",
+   "after": "the office bills the plan its own way; private pay: Rosie texts the bill after"
+  },
+  {
+   "name": "Eye check for an eye problem at a care home",
+   "price": "the $89 eye check is promised; any test or treatment is priced at the visit (the example: $245 in all)",
+   "kind": "quoted at the visit",
+   "length": "30 min",
+   "where": "at the customer's place",
+   "before": "nothing taken",
+   "after": "the office's own way"
+  },
+  {
+   "name": "New glasses, delivered and fitted at a care home",
+   "price": "$150 (a frame and lenses from the optician's case, made from the exam's prescription)",
+   "kind": "one price",
+   "length": "20 min, about 2 weeks after the exam",
+   "where": "at the customer's place",
+   "before": "a $40 deposit when booked",
+   "after": "Rosie texts the bill for the rest when the optician texts DONE"
+  },
+  {
+   "name": "Low vision aids (magnifiers and special glasses)",
+   "price": "a free exam, then a quote (the example: $640)",
+   "kind": "quoted after a first exam",
+   "length": "two visits",
+   "where": "at the customer's place",
+   "before": "nothing taken: once the quote is OK'd, the second visit is booked at that price",
+   "after": "the office's own way when a plan pays; private pay: Rosie texts the bill"
+  },
+  {
+   "name": "School vision day",
+   "price": "set with the school: free to families, or billed to each child's plan",
+   "kind": "one price per child",
+   "length": "a whole morning",
+   "where": "at the school (the host's place)",
+   "before": "nothing taken",
+   "after": "the office bills plans its own way"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "for you, your child, or someone you help (a care home resident)",
+   "new or returning patient",
+   "which visit: an eye exam, a contact lens fitting too, or an eye problem visit (the office's own visit types; never a symptom typed into the AI)",
+   "a vision plan or medical insurance (its name only), or paying yourself",
+   "early morning, midday or afternoon"
+  ],
+  "after_time": [
+   "do you wear contacts now",
+   "anything the office should know to help, like a wheelchair or needing an interpreter",
+   "for a care home or school visit: the place's name, the room, and who meets the eye doctor"
+  ],
+  "secure_page_only": [
+   "birth date",
+   "plan member ID, the plan holder and a photo of the card (the vision plan, or the medical insurance for an eye problem)",
+   "health history: medicines, allergies, eye conditions, diabetes",
+   "current glasses and contact lens details (the brand and power from the box), and the last eye exam date",
+   "consent and the privacy notice",
+   "a parent's or guardian's consent for anyone under 18, or the consent of the person who decides for an adult who can't"
+  ],
+  "never_asked": "Rosie never asks for symptoms, reasons, results or prescriptions in the AI chat; what a patient types anyway is checked for danger, and the details go only to the secure page",
+  "who_may_book": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to eye care (a switch)"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "sudden vision loss, sudden flashes of light, or a shadow or curtain across the vision",
+    "say": "This needs care now. Go to the nearest emergency room or call 911. Don't wait for an eye visit.",
+    "booking": "no booking; the same words are repeated if a same-day request is declined, and if it starts before a booked visit (the visit stays booked and the owner is told)"
+   },
+   {
+    "words": "a chemical splash in the eye, or something stuck in it",
+    "say": "Rinse a chemical splash with clean running water right away, and call Poison Help at 1-800-222-1222 or 911. Don't rub something stuck in the eye: go to the emergency room or call 911.",
+    "booking": "no booking; the words are fixed and the same for everyone"
+   },
+   {
+    "words": "an eye hit hard or cut, or sudden bad eye pain with a headache or throwing up",
+    "say": "This needs care now. Go to the nearest emergency room or call 911.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "red, itchy, sore or dry eyes with nothing else",
+    "what": "matched to the office's own eye problem visit; Rosie never judges how urgent it is, and same-day times need the owner's OK"
+   }
+  ],
+  "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "Health history, consent and the plan's papers",
+    "when": "on the secure page only, never by text; due the day before the visit (a same-day visit: before the time is held); one reminder before it's due",
+    "who": "every new patient; returning patients once a year, or when their health changes",
+    "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or the door, before any pre-test), moves it, or cancels with no fee"
+   },
+   {
+    "name": "The plan check",
+    "when": "while booking, by the front desk, by hand",
+    "who": "every patient who names a plan",
+    "result": "covered; some services only (like a contact lens fitting the plan won't pay); not covered; or can't check now (the desk checks later, and the patient may cancel free); the plan's exam not due yet: keep the time at the office's own price, or move it to the date the plan allows"
+   },
+   {
+    "name": "A written price estimate for self-pay patients",
+    "when": "told while booking; sent within 1 business day (the example office's rule), or sooner where the rules require it",
+    "who": "every patient paying for themselves",
+    "result": "a to-do for the front desk, with its due date"
+   },
+   {
+    "name": "The care home's or school's OK",
+    "when": "before any visit there",
+    "who": "the host place agrees to host the visits",
+    "result": "no OK: no times at that place"
+   }
+  ],
+  "prep": "bring your glasses, your contact lens box or its prescription, a photo ID and the plan card; the eyes may be dilated and stay blurry and light-sensitive for a few hours, so bring sunglasses and plan a ride home; at a care home: the medicine list ready with the nurse",
+  "forms_fact": true,
+  "first_steps_fact": false,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "eye doctors: exams, contact lens fittings, dilating drops, eye problem visits and prescriptions; opticians: pre-tests, frames and lenses, glasses fittings and repairs, and teaching contact lens care; only people cleared for visits away go to care homes and schools",
+  "licenses_or_certificates": "each optometrist's own license, per state; opticians only where the state licenses them",
+  "supervision": "an optician's pre-tests are read by the eye doctor; which tests an optician may run comes from the state form (a switch)",
+  "who_oks": "the owner OKs same-day eye problem visits, and anything an optician flags",
+  "stand_in": "an eye doctor out: another eye doctor takes the exam, or new times; an optician out: the eye doctor runs the pre-tests, and the glasses desk waits; a one-doctor day means new times for that day's patients"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": true,
+  "animals_fact": false,
+  "who_may_book": "an adult for themselves; a parent or guardian for anyone under 18; a guardian or health care agent for an adult who can't consent; the care home's staff for a resident, with the decider's consent on the secure page; a minor alone only where the state's rules let minors consent to eye care (a switch)",
+  "minors_texts": "a minor's texts go to the parent or guardian; a minor who may consent alone gets texts only on their own phone, with no visit type",
+  "minors_rules": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)"
+ },
+ "visit": {
+  "check_in": "at the office: the check-in code at the front desk; at a care home or school: the code from the patient, or from the nurse or staff member named on the booking",
+  "done": "the check-in code or DONE; the eye doctor's notes, results and prescriptions stay in the office's own records, never in Rosie or a text",
+  "changes_at_visit": "an extra test, like a retina photo, is priced and OK'd before it's done; a medical problem found at a routine exam may move the visit to the medical plan, with the share shown first",
+  "before_work": "the optician reads the health history and asks about changes before any test"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "always: each optometrist holds their own active license from the state's optometry board",
+  "who": "each person; opticians only where the state licenses them (a switch from the state form); the practice too where the state's form registers eye care offices or their owners",
+  "ask": "each optometrist's license number in their invite reply (or the owner sends it); an optician's license number where the state asks; the practice's registration from the owner",
+  "insurance": "malpractice insurance where the state's form asks for it"
+ },
+ "never_in_a_text": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the plan, the reason, results or a prescription; at the office, not the eye doctor's name either; when the eye doctor or optician comes to a care home, school or home, their name stays, for the door check; a READY text says only that the order is ready to pick up",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.license": [
+   "scope",
+   "eyewear"
+  ],
+  "pf.messages": [
+   "decider"
+  ],
+  "pf.visit": [
+   "parts",
+   "dilation",
+   "contacts",
+   "prescriptions",
+   "orders"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

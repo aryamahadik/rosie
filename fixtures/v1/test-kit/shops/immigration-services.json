@@ -1,0 +1,155 @@
+{
+ "id": "immigration-services",
+ "name": "Immigration and paralegal services",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Immigration and paralegal services",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Immigration and paralegal services",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Forms appointment",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a $150 forms appointment at the office. Nothing is taken, and a YES books it. Alex pays at the front desk when the forms are signed.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Certified translation, 3 pages",
+     "price": "$105",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$105",
+     "fee": "$0",
+     "story": "A certified translation, 3 pages at $35 a page ($105). Paid in full when it is dropped off or uploaded; nothing more to pay.",
+     "due_now_at_booking": 105,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Forms appointment",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A $150 forms appointment by video. There is no front desk, so Rosie texts the bill when Ana texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Immigration and paralegal services",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Forms appointment at home",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a forms appointment at the customer's home, $190 ($150 form package plus the $40 travel fee). Nothing is taken; Rosie texts the bill after.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Forms appointment at home",
+     "price": "$190",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The same home appointment with a card saved for the $40 fee the business sets for a late cancel or a no-show. The $190 is charged when Luis texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "Consult: appointments to fill in immigration forms from the customer's own answers, certified translation of documents, and (only where the business has a lawyer or an accredited representative) legal consultations. The case, the filing and any agency appointment stay outside Rosie.",
+ "questions_before_times": [
+  "What kind of help: forms for a card renewal or replacement, a work permit, naturalization, a fee waiver, a translation, or something else. Only the kind, no details.",
+  "Is there a date your papers must reach the government by, like a date on a notice, a card that expires, or a hearing? The date only.",
+  "In the office, by video, at your home, or at a forms day?",
+  "Which language would you like to use?",
+  "For a translation: how many pages, and from which language?"
+ ],
+ "safety_stop": [
+  "someone is in danger or being hurt right now, or a medical emergency",
+  "crisis words"
+ ],
+ "first_steps": [],
+ "facts": [
+  "forms",
+  "firststeps",
+  "documents",
+  "dropoff",
+  "video",
+  "children",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "Non-lawyer: a business registration, plus an immigration consultant registration and a bond where the state's rules require them. Law firm: each lawyer's active license in good standing in any state (immigration is federal law), plus the state's rules for law firms. Nonprofit: the organization's federal recognition and each representative's current federal accreditation (the federal rule: only a lawyer or an accredited representative of a recognized organization may give immigration legal advice or represent someone).",
+ "staff_skills": "languages spoken; form packages; translation language pairs",
+ "messages_never": "[\"immigration status, the government's person number, receipt or case numbers\",\"country of birth, passport or card numbers\",\"any arrest, court case or hearing\",\"which form or what the forms are for\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/immigration+and+paralegal+services",
+  "pexels": "https://www.pexels.com/search/immigration%20and%20paralegal%20services/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

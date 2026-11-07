@@ -1,0 +1,174 @@
+{
+ "id": "food-truck",
+ "name": "Food truck for events",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "caterer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Food truck for events",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Food truck for events",
+   "staff": "Remy and Sasha (cooks at the commissary)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Wedding tasting, up to 4 guests",
+     "price": "$60",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$60",
+     "fee": "$20",
+     "story": "The main story: a wedding tasting for 4, $60, paid in full when booking.",
+     "due_now_at_booking": 60,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Planning call by video",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free 20-minute planning call by video. Nothing is taken.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Food truck for events",
+   "staff": "Rowan and Emery (the truck's crew)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 days before"
+   },
+   "main": "list|deposit|card",
+   "services": [
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Wedding for 100 guests",
+     "price": "$1,800",
+     "deposit": "$300",
+     "rest": "$1,500",
+     "paid_now": null,
+     "fee": "$300",
+     "story": "The main story: a wedding for 100 guests at $18 each ($1,800). A $300 deposit now, and the $1,500 rest charged to the saved card when Rowan marks it done.",
+     "due_now_at_booking": 300,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private party for 50 guests",
+     "price": "$900",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$900",
+     "fee": "$300",
+     "story": "A private party for 50 guests, the $900 minimum, paid in full when booking.",
+     "due_now_at_booking": 900,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Brewery night, $800 sales minimum",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "A brewery night with an $800 sales minimum. Nothing is taken; the bill after the event covers any shortfall.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Office lunch for 40",
+     "price": "$560",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$50",
+     "story": "An office lunch for 40 at $14 a meal ($560). A card is saved, and $560 is charged when Rowan marks it done.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (flow B)\":[{\"service\":\"Wedding or private party: guests eat, $18 a guest\",\"price kind\":\"per guest\",\"price\":\"$18 a guest, 50-guest minimum ($900); an 18% service charge the business keeps (not a tip)\",\"length\":\"2 hours of service, plus 1 hour to set up and 30 minutes to pack up\",\"place\":\"at the customer's site, up to 25 miles; $2 a mile after\",\"before\":\"a $300 deposit when booking\",\"after\":\"the rest charged to the saved card when the truck marks it done, on the final guest count\",\"capacity\":\"up to 150 guests\"},{\"service\":\"Brewery or public night: guests buy their own\",\"price kind\":\"minimum guarantee\",\"price\":\"an $800 sales minimum: if guest sales come under it, the host pays the difference on the bill after\",\"length\":\"3 hours of service\",\"place\":\"at the venue\",\"before\":\"nothing taken\",\"after\":\"the bill for any shortfall, after the event\"},{\"service\":\"Office lunch: meals paid by the company\",\"price kind\":\"per meal\",\"price\":\"$14 a meal, 30-meal minimum\",\"length\":\"90 minutes of service\",\"place\":\"at the company's office or lot\",\"before\":\"a card saved\",\"after\":\"charged at DONE for the meals served, or the minimum\"}],\"at the business (flow A)\":[{\"service\":\"Wedding tasting, up to 4 guests at the commissary kitchen\",\"price kind\":\"one price\",\"price\":\"$60\",\"length\":\"45 minutes, up to 4 people\",\"place\":\"at Lee's Commissary, 19 Pine St\",\"before\":\"paid in full when booking\",\"after\":\"nothing more\"},{\"service\":\"Event planning call by video\",\"price kind\":\"free\",\"price\":\"free\",\"length\":\"20 minutes\",\"place\":\"by video or phone\",\"before\":\"nothing taken\",\"after\":\"nothing\"}],\"capacity\":\"One truck, one event at a time. A crew of 2 serves up to 75 guests; 3 serve up to 150.\",\"nobody needs to be there\":\"Never: food is handed to a person on the crew, who checks it.\",\"online\":\"Planning calls by video or phone. Window food on a regular day is goods, sold at the window, never booked through Rosie.\"}",
+ "questions_before_times": [
+  "The event date, the start time and how many hours of service",
+  "About how many guests, and whether guests eat free or buy their own",
+  "The town or ZIP, and the kind of site: a home, a venue, a park, a brewery, an office lot",
+  "Is there a level spot 40 by 12 feet, with 14 feet of clearance, for the truck to park on?",
+  "Is there power (a 50-amp or 30-amp hookup), and does the site allow a generator?"
+ ],
+ "safety_stop": [
+  "A gas or propane smell, a fire, or someone hurt at the site right now",
+  "Someone has a severe allergic reaction now (trouble breathing, swelling)"
+ ],
+ "first_steps": [],
+ "facts": [
+  "firststeps",
+  "forms",
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 days before"
+  }
+ },
+ "license": "The truck's mobile food permit from the health department where it serves, with its commissary agreement; a fire inspection of the propane and cooking setup where the fire code requires one; a business license; commercial vehicle insurance. An event food permit where the local rules require one: the contract says whether the organizer or the truck files it, and by when.",
+ "staff_skills": "[\"Private events and weddings\",\"Public nights with a minimum\",\"Office lunches\",\"Tastings at the commissary\"]",
+ "messages_never": "Allergy details (only the count, on the secure page), gate codes, card details.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/food+truck+for+events",
+  "pexels": "https://www.pexels.com/search/food%20truck%20for%20events/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

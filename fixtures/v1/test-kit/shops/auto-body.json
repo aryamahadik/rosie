@@ -1,0 +1,209 @@
+{
+ "id": "auto-body",
+ "name": "Auto body and collision repair",
+ "booking_type": "Drop-off",
+ "pattern": "dropoff",
+ "built_from": "auto-repair",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Auto body and collision repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Auto body and collision repair",
+   "staff": "Derek and Nina (body techs)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "photos|none|counter",
+   "services": [
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Rear bumper repair",
+     "price": "$2,255",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The main story: an insurance claim. Derek's $2,255 photo estimate goes to Alex's insurer. Nothing is taken. The insurer pays the shop directly, and Alex pays the $500 deductible at the counter at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Rear bumper repair",
+     "price": "$2,255",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same claim, with the $500 deductible on the bill Rosie texts with READY, so Alex can pay before pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Rear bumper repair",
+     "price": "$2,255",
+     "deposit": "$400",
+     "rest": "$1,855",
+     "paid_now": null,
+     "fee": "free",
+     "story": "Alex pays for the repair, with no claim. Alex signs the $2,255 estimate and pays a $400 deposit, half the parts cost, so the parts can be ordered. The rest is paid at the counter at pick-up.",
+     "due_now_at_booking": 400,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Rear bumper repair",
+     "price": "$2,255",
+     "deposit": "$400",
+     "rest": "$1,855",
+     "paid_now": null,
+     "fee": "free",
+     "story": "The same repair paid by Alex, with the rest on the bill Rosie texts with READY.",
+     "due_now_at_booking": 400,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Headlight restoration",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "free",
+     "story": "A $35 headlight restoration from the shop's board, the example shop's own price. Nothing is taken: a YES books the drop-off, and Alex pays at the counter at pick-up the same day.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Auto body and collision repair",
+   "staff": "Tony and Wes (dent and glass techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "photos|none|bill",
+   "services": [
+    {
+     "combo": "photos|none|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Hail dent repair",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: $640 of hail dent repair in Alex's driveway, priced from photos. Sam OKs it, since it's over $500. Nothing is taken, and Rosie texts the bill when Tony texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Door and fender dent repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A dented door and fender, priced at the car. Only the $89 travel fee is promised, taken off the repair. Rosie texts the bill at DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Door ding repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A $179 door ding repair from Sam's list, the example's own price. Nothing is taken, and Rosie texts the bill when Tony texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"drop-off: the car is left at the shop for days, and picked up when it's READY; dent repair, glass and estimates can also be done at the customer's place\",\"list\":[{\"name\":\"Photo estimate\",\"price\":\"free; the customer adds 4 to 8 photos and the VIN sticker on the secure page; the estimator answers within 1 business day\",\"place\":\"online, before any booking; no time is saved while it's priced\",\"before\":\"nothing taken\",\"after\":\"nothing: the estimate is free\"},{\"name\":\"A look at the car first\",\"price\":\"free, about 20 minutes, when the estimator asks to see the car before writing the estimate\",\"length\":\"20 minutes, on weekdays in the shop's estimate hours (the example shop: Mon to Fri, 8am to 4pm)\",\"place\":\"at the shop\"},{\"name\":\"Collision repair on an insurance claim\",\"price\":\"quoted from photos first: the written estimate, sent to the insurer; the insurer's approved total is the price\",\"length\":\"working days set by the estimate (the example: about 5)\",\"place\":\"at the shop: a drop-off\",\"before\":\"nothing taken\",\"after\":\"the customer pays the deductible at pick-up, at the counter or by the pay link with READY; the insurer pays the shop the rest directly\"},{\"name\":\"Collision repair, paid by the customer\",\"price\":\"the same written estimate, signed by the customer\",\"place\":\"at the shop: a drop-off\",\"before\":\"a deposit of half the parts cost, once the estimate is signed and before parts are ordered\",\"after\":\"the rest at pick-up, at the counter or by the pay link with READY\"},{\"name\":\"Hidden damage found at teardown (a supplement)\",\"price\":\"added lines priced by the estimator; the insurer OKs them on a claim, and the customer says yes before any of it is done\",\"place\":\"at the shop, during the repair\"},{\"name\":\"Paintless dent repair\",\"price\":\"priced from photos, by the panel (the example shop: from $150 a panel)\",\"place\":\"at the shop, or at the customer's place\",\"before\":\"nothing taken\",\"after\":\"at the shop: at the counter; at the customer's place: Rosie texts the bill\"},{\"name\":\"Dent estimate at the customer's place\",\"price\":\"quoted at the visit; only the travel fee is promised (the example: $89, taken off the repair)\",\"place\":\"at the customer's place\",\"before\":\"nothing taken\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Scans before and after a repair; camera and radar calibration\",\"price\":\"lines on the repair's estimate, by the carmaker's steps (the example shop: $140 a calibration)\",\"place\":\"at the shop; a calibration the shop can't do goes to the carmaker's dealer, at the shop's cost\"},{\"name\":\"Small list jobs, like headlight restoration or a paint chip touch-up\",\"price\":\"one price from the shop's board (the example shop's own prices)\",\"place\":\"at the shop; headlight restoration can also be done at the customer's place\"},{\"name\":\"Windshield and car glass\",\"price\":\"one price by car, or quoted from photos\",\"place\":\"at the customer's place, or at the shop\"},{\"name\":\"Tow-in\",\"price\":\"the tow's own price, often paid by the insurer; the repair is estimated the usual way\",\"place\":\"the car comes by tow at any time, and the keys go in the key box\"}],\"capacity\":\"repair starts by bay (the example shop: 4 bays); one car per booking; drop-off slots that name no person; the paint booth and the frame rack are saved like equipment\",\"drop_off_window\":\"drop-off slots by the shop's daily number, shown as drop-off times with no body tech named; tow-ins at any time, with the keys in the key box\",\"rental\":\"a rental car through the customer's insurer, booked by the shop with the insurer's rental partner; Rosie never contacts the rental desk; the shop is told of every date change\",\"loaners\":\"only if the shop keeps loaner cars; the owner OKs each one; a damage hold when it's handed over\",\"warranty\":\"on the receipt (the example: lifetime on repair, paint and dent repair, while the customer owns the car)\",\"nobody_home\":\"no: an adult on the booking meets the tech, hands over the keys and sees the work\",\"online\":\"no: a car is looked at in person or from photos\",\"example_prices\":\"every price in the example flows is the example business's own, made up for the story: the $2,255 estimate, the $728 supplement, the $500 deductible and the $45 storage day come from the old flowchart; the board prices ($35 to $140), the $89 travel fee, the $179 door ding, the $640 hail repair, Ben's $300 parts deposit, Nia K.'s $1,180 estimate and her $1,300 emergency quote are made up\"}",
+ "questions_before_times": [
+  "What happened, and which parts of the car are damaged? In the customer's own words",
+  "Does it drive safely? Any dripping fluid, a bent wheel, or lights or brakes that don't work?",
+  "Any warning lights on? Do the cameras and sensors work?",
+  "An insurance claim, or paying yourself? Your own insurer, or the other driver's?",
+  "Year, make and model",
+  "For a visit at the customer's place: where the car is parked, and if there's room and shade to work"
+ ],
+ "safety_stop": [
+  "someone hurt in the crash",
+  "a fire, smoke from the engine, or a fuel smell",
+  "a crash that just happened, on the road"
+ ],
+ "first_steps": [],
+ "facts": [
+  "planbill",
+  "dropoff",
+  "photos",
+  "extrawork",
+  "multiday",
+  "documents",
+  "sentnow"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "if: where the state licenses or registers body shops or auto repair shops; each person only where the state certifies them",
+ "staff_skills": "[\"estimates and supplements\",\"body and frame\",\"paint\",\"scans and calibration\",\"dent repair at the customer's place\",\"glass\"]",
+ "messages_never": "[\"The claim number or the policy number\",\"The VIN or the plate\",\"The key-box code\",\"A gate or door code\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/auto+body+and+collision+repair",
+  "pexels": "https://www.pexels.com/search/auto%20body%20and%20collision%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

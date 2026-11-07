@@ -1,0 +1,175 @@
+{
+ "id": "lactation",
+ "name": "Lactation consultant",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "pediatrician",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Lactation consultant",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Feeding",
+   "staff": "Ada (lactation consultant) and Nell (lactation consultant)",
+   "customer": "Alex M. (parent) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Lactation visit at the office",
+     "price": "$120",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a lactation visit at the office, billed to the family's plan. Nothing is taken when booking; the desk checks the plan, and any share is paid at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|none",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Nothing more",
+     "name": "Free phone chat",
+     "price": "$0",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The free 15-minute phone chat: nothing is taken and nothing is to pay.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Video lactation visit",
+     "price": "$95",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$95",
+     "fee": "$0",
+     "story": "A video lactation visit, paid in full when booking.",
+     "due_now_at_booking": 95,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Home Feeding",
+   "staff": "Ivo (lactation consultant) and Pia (lactation consultant), who visit at home",
+   "customer": "Alex M. (parent) · other families",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|bill",
+   "services": [
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Lactation visit at home",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a lactation visit at home, self-pay. Nothing is taken when booking; Rosie texts the $150 bill after the visit.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Lactation visit at home (plan)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same visit billed to the family's plan: nothing taken at booking; the office bills the plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Lactation visit at home (paid)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$0",
+     "story": "A lactation visit at home, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "breastfeeding support for a parent and baby: visits at the office, at home, or by video; a free phone chat to ask if a visit fits; visits are booked one at a time, with the next at checkout",
+ "questions_before_times": [
+  "the first name of the parent booking",
+  "a new family or a current one",
+  "which visit: the office's own visit types only, never a symptom typed into the AI",
+  "where the visit is: at the office, by video, or at home (home visits only inside the business's area)",
+  "a plan (its name only) or self-pay"
+ ],
+ "safety_stop": [
+  "trouble breathing, a seizure, a baby who isn't breathing, a baby who is blue or won't wake up, or heavy bleeding",
+  "swallowed medicine or a chemical",
+  "thoughts of harming yourself or the baby, or a crisis after the birth"
+ ],
+ "first_steps": [
+  "The feeding history, the health history and the consent",
+  "The plan check",
+  "A written price estimate for a self-pay family",
+  "The owner's OK for a new family"
+ ],
+ "facts": [
+  "children",
+  "firststeps",
+  "forms",
+  "planbill",
+  "video"
+ ],
+ "switches": {
+  "sensitive": true,
+  "welfare": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "optional, and never verified by Rosie: a consultant may add a lactation certification it holds (IBCLC or similar), and the business may add a registration; Rosie looks nothing up and never says anything is checked",
+ "staff_skills": "lactation consultants: office and home visits, video visits and weight checks; only consultants the owner clears go to homes",
+ "messages_never": "texts carry only the business's name, the date, the time, the address and a secure link: never the visit type, the feeding, the baby's weight, symptoms or results (at a home visit the consultant's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/lactation+consultant",
+  "pexels": "https://www.pexels.com/search/lactation%20consultant/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

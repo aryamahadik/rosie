@@ -1,0 +1,208 @@
+{
+ "id": "junk",
+ "name": "Junk removal",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Junk removal",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Junk removal",
+   "staff": "Tasha and Luis (yard hands at the gate)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Mattress drop-off",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 mattress drop-off at the yard. Nothing is taken: a YES books it. Alex pays at the gate.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Mixed load drop-off",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A mixed load, priced at the gate by how much of the bed it fills. Only the $25 minimum is promised, and nothing is owed if Alex says no.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Remodel debris drop-off",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Remodel debris, priced from Alex's photos at $90. Booked once Sam OKs it; paid at the gate.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Fridge drop-off",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 fridge drop-off, paid in full when booking, so the refrigerant station is set for it.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Junk removal",
+   "staff": "Rafael and Nate (crew leads, each with a helper)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": null,
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Junk haul-away",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a basement and garage, priced on site by how much of the truck it fills: $439. A card is saved for the $89 trip fee, kept only for a late cancel or nobody there. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Junk haul-away",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same cleanout, but nothing is taken up front, the old example owner's way. No fee can be charged for a late cancel.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Single item pickup",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 single item pickup: an old sofa from the den. A card is saved and charged $179 when Rafael texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Hot tub removal",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A hot tub cut apart and hauled, priced from photos at $640. Sam OKs it. A card is saved for the $89 trip fee; the rest is on the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Curbside pickup",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 curbside pickup: bags and an old chair left by the curb, paid in full when booking. Nobody needs to be home.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a crew of two and a truck come in an arrival window, and the load is priced by how much of the truck it fills.\",\"at the customer's place (the example: Clean Slate Hauling's own list)\":[{\"service\":\"Trip fee\",\"price kind\":\"one price\",\"price\":\"$89\",\"note\":\"A card is saved for it at booking. Charged only for a late cancel or nobody there, and only if the owner confirms. Not booked alone.\"},{\"service\":\"Junk removal by truck space\",\"price kind\":\"a range from the customer's photos, then a firm price set at the visit, before loading\",\"price\":\"1/8 truck (the minimum) $179 · 1/4 $259 · 3/8 $329 · 1/2 $389 · 5/8 $449 · 3/4 $509 · 7/8 $569 · full truck, about 15 cubic yards, $629\",\"length\":\"about 1 to 3 hours, set by the size\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"Only the $89 trip fee is promised before. No charge if the customer says no to the firm price: nothing is loaded.\"},{\"service\":\"Add-ons\",\"price kind\":\"one price each, on top of truck space\",\"price\":\"fridge, freezer or AC unit +$50 (refrigerant recovered) · mattress or box spring +$25 each · TV or monitor +$25 · each flight of stairs past the first +$25\",\"note\":\"Added to the firm price before loading. Items over 300 lb, like a piano or a safe, are priced on site.\"},{\"service\":\"Single item pickup (one big item, like a sofa, a recliner or a treadmill)\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"about 30 min\",\"place\":\"at the customer's place, inside or by the curb\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill, or the saved card is charged at DONE\",\"note\":\"Nobody needs to be home when the item is left outside. DONE comes with a photo.\"},{\"service\":\"Curbside pickup (up to 1/8 truck, left by the curb)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"about 15 min\",\"place\":\"at the customer's place; nobody needs to be home\",\"before\":\"the full price, when booking\",\"after\":\"nothing more\",\"note\":\"A late cancel or nobody there: the $89 fee may be kept and the rest refunded, only if the owner confirms.\"},{\"service\":\"Appliance pickup (a fridge, freezer, washer or AC unit)\",\"price kind\":\"one price\",\"price\":\"$199\",\"length\":\"about 30 min\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"The refrigerant is recovered before scrapping, and the record is kept with the job.\"},{\"service\":\"Loading help (labor only)\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum; $140 with Rafael's crew\",\"place\":\"at the customer's place\",\"note\":\"Goes on a job, or loads the customer's own truck or dumpster.\"},{\"service\":\"Hot tub removal (cut apart and hauled)\",\"price kind\":\"quoted from the customer's photos\",\"price\":\"the quote (the example: $640)\",\"length\":\"about 3 hours\",\"place\":\"at the customer's place\",\"before\":\"a card saved for the $89 trip fee\",\"after\":\"Rosie texts the bill\",\"note\":\"The owner OKs each quote over $500. A written estimate is signed first, as the owner set.\"},{\"service\":\"Estate or whole-home cleanout\",\"price kind\":\"a free estimate visit, then a quote\",\"price\":\"the quote\",\"length\":\"1 to 3 days\",\"place\":\"at the customer's place\",\"note\":\"Becomes its own job with a signed estimate and work days.\"}],\"at the business (the example: Clean Slate Recycling's drop-off yard)\":[{\"service\":\"Mattress drop-off\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"15 min\",\"place\":\"both: at the yard, or picked up at home by a yard hand with the yard's truck ($75, paid in full when booking)\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"Car load (trunk and back seat)\",\"price kind\":\"one price\",\"price\":\"$40\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"Box spring drop-off\",\"price kind\":\"one price\",\"price\":\"$20\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"Tires, up to 4, off the rim\",\"price kind\":\"one price\",\"price\":\"$25\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"Fridge drop-off (a fridge, freezer or AC unit)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"30 min\",\"before\":\"the full price, when booking\",\"after\":\"nothing more\",\"note\":\"The refrigerant is recovered before scrapping, and the record is kept. A late cancel or no-show may keep a $20 fee, if the owner confirms.\"},{\"service\":\"Pickup-truck load (a full bed)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"30 min\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"TV or monitor (electronics recycling)\",\"price kind\":\"one price\",\"price\":\"$15\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\"},{\"service\":\"Remodel debris (drywall, old tile, wood)\",\"price kind\":\"quoted from the customer's photos\",\"price\":\"the quote (the example: $90)\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\",\"note\":\"The owner OKs each quote.\"},{\"service\":\"Mixed load\",\"price kind\":\"priced at the yard, by how much of the bed it fills\",\"price\":\"only the $25 minimum is promised\",\"before\":\"nothing taken\",\"after\":\"paid at the gate\",\"note\":\"Nothing is owed if the customer says no to the price and takes the load home.\"}],\"capacity\":\"Each truck has a crew of two: a crew lead and a helper. One truck, about 4 jobs a day. The yard takes one car or truck at a time at each bay.\",\"the truck's day\":\"2-hour arrival windows, as the owner sets them (the example: 8 to 10, 10 to 12, 12 to 2, 2 to 4), Monday to Saturday. A dump run after any job of half a truck or more, and whenever the truck is full.\",\"skills each needs\":\"Two-person carries (a fridge on stairs, a treadmill, a sofa) need two people. Refrigerant recovery needs the certified person or the recycler that does it.\",\"nobody home\":\"Fine when the items are reachable: left outside, or in a garage or shed with a code. The firm price goes by text before loading. DONE comes with a photo.\",\"won't take\":\"Paint, solvents, pesticides, pool chemicals, propane tanks, asbestos and car batteries. Checked at booking and again on site. Each one gets where it can go instead: the town's household hazardous waste drop-off, a propane dealer or a tank exchange.\",\"weather\":\"Outdoor teardowns, like a swing set or a hot tub, stop for heavy rain, lightning or ice. A move for weather is free.\",\"online\":\"No. A video call can help size a load, where the owner offers it.\",\"extras\":\"Service area (the example: 25 miles). Dump and recycling fees are in the price. No tax line unless the owner sets a rate.\"}",
+ "questions_before_times": [
+  "What's going: a list, and photos (on the secure page)",
+  "Where each item is: garage, basement, which floor, and how many flights of stairs",
+  "Anything over 300 lb, like a piano, a safe or a hot tub",
+  "A fridge or freezer, and is it empty",
+  "Any paint, chemicals, propane tanks, asbestos or car batteries (the won't-take list)",
+  "At the yard: what's in the load, and the vehicle (a car, a pickup or a trailer)"
+ ],
+ "safety_stop": [
+  "A gas smell, or a propane tank that's leaking or hissing",
+  "Someone hurt, a fire, or a medical emergency"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  }
+ },
+ "license": "Hauling household junk needs a hauler or waste transporter license, permit or registration where the state, county or city asks for one. Many places ask for none: the state's form says which.",
+ "staff_skills": "[\"Two-person carries\",\"Appliances with refrigerant\",\"Hot tub teardown\",\"Estate cleanouts\",\"The yard gate\"]",
+ "messages_never": "Door or gate codes, card details, and photos from inside the home: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/junk+removal",
+  "pexels": "https://www.pexels.com/search/junk%20removal/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,209 @@
+{
+ "id": "snow",
+ "name": "Snow removal",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "cleaner",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Snow removal",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Snow removal",
+   "staff": "Shay and Remy (yard hands)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Rock salt, a quarter-yard",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a quarter-yard of rock salt, $35, loaded into Alex's pickup. Nothing is taken: a YES books the load-out. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Salt-sand mix, a half-yard",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$0",
+     "story": "A half-yard of salt-sand mix, $55, paid in full when booking, so it's set aside on a storm-rush day.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Salt by weight",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "Salt by weight: a trailer load weighed at the scale, priced at the counter. Only the $25 minimum is promised; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|none|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Trailer fill",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "A trailer fill, priced at $90 from photos of the trailer. Sam OKs it; nothing taken; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Snow removal",
+   "staff": "Rory and Devon (route leads)",
+   "customer": "Alex M. (customer) · other customers",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Per-push plan: driveway and front walk",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$30",
+     "story": "The main story: a per-push plan. $55 a push for the driveway and front walk, plus $15 ice melt: $70, charged to the saved card when Rory texts DONE. No snow, no charge.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Per-push plan: driveway and front walk",
+     "price": "$70",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$30",
+     "story": "The same per-push plan, with nothing taken. Rosie texts the $70 bill after each push.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Seasonal contract, Oct 15 to Apr 30",
+     "price": "$540",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$540",
+     "fee": "$30",
+     "story": "A seasonal contract, Oct 15 to Apr 30: $540 paid in full when booking. Every push at 2 inches or more is covered.",
+     "due_now_at_booking": 540,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|full|none",
+     "price_kind": "Quoted from photos first",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Gravel lane season (600 ft)",
+     "price": "$640",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$640",
+     "fee": "$30",
+     "story": "A 600-ft gravel lane with a turnaround, priced from Alex's photos at $640 for the season. Sam OKs it, both sign the contract, and it's paid in full.",
+     "due_now_at_booking": 640,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service on a route: homes and businesses join a route, and the crew comes when the snow passes the trigger, in route order, with no set time.\",\"trigger\":\"2 inches at the business's own check point, any hour. One push per storm; a second push only when a storm passes 12 inches. The owner calls each storm with one text.\",\"list\":[{\"name\":\"Per-push plan (driveway and front walk)\",\"price_kind\":\"set by the customer's answers: the driveway's length, and walks and steps\",\"example\":\"driveway up to 60 ft and the front walk: $55 a push; +$10 for each extra 20 ft (the example business's own prices)\",\"length\":\"about 20 to 30 minutes a stop\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved at booking; each push charged at its own DONE. No snow over the trigger: no push, no charge.\"},{\"name\":\"Walk and steps only\",\"price_kind\":\"one price\",\"example\":\"$35 a push (the example business's own price)\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved; charged after each push\"},{\"name\":\"Ice melt on the walk and steps\",\"price_kind\":\"one price, added only when the customer asks\",\"example\":\"$15 a time; pet-safe ice melt on request, same price\",\"where\":\"with a push\"},{\"name\":\"One-time push\",\"price_kind\":\"set by the customer's answers\",\"example\":\"$65 for the next storm only (driveway up to 60 ft and the front walk)\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"card saved; charged once after the push. Plan homes go first on storm days, one-time pushes after.\"},{\"name\":\"Seasonal contract (Oct 15 to Apr 30)\",\"price_kind\":\"one price for the season, set by the customer's answers\",\"example\":\"$540 for a driveway up to 60 ft and the front walk: every push at 2 inches or more, ice melt included\",\"where\":\"at the customer's place; nobody needs to be home\",\"money\":\"paid in full when booking, or 3 payments of $180 (Nov 1, Dec 1, Jan 1) charged to the saved card, each told the day before. Not refunded in a light winter. Renews each fall only after the reminder text.\"},{\"name\":\"Long private lanes and business lots, by the season\",\"price_kind\":\"quoted from the customer's photos or a map first; the owner OKs it over his limit\",\"example\":\"a 600-ft gravel lane with a turnaround: $640 for the season (the example business's own quote)\",\"where\":\"at the customer's place; a stop on a route\",\"money\":\"paid in full once the quote is OK'd and both sign the contract\"},{\"name\":\"Loader work\",\"price_kind\":\"per hour\",\"example\":\"$120 an hour, 1-hour minimum: moving big piles after a heavy storm\",\"where\":\"at the customer's place, at a set time\",\"money\":\"card saved; charged at DONE for the hours worked\"},{\"name\":\"City plow berm\",\"price_kind\":\"free\",\"example\":\"the pile a city plow leaves across the driveway's end: cleared once per storm, free, within 12 hours of the push\"},{\"name\":\"Trip charge\",\"price_kind\":\"one price\",\"example\":\"$30: only when the crew comes and can't plow (a locked gate), or for a skip sent after the routes started, and only if the owner confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Lawn mowing (the second kind of work)\",\"price_kind\":\"from the list, by lawn size\",\"example\":\"the example business's own prices, set at sign-up\",\"where\":\"at the customer's place; nobody needs to be home\"},{\"name\":\"Salt and ice melt at the yard (a second company)\",\"price_kind\":\"one price by amount\",\"example\":\"rock salt, quarter-yard $35; treated salt, quarter-yard $40; ice melt bag $20; bucket fill $25; salt-sand mix, half-yard $55; rock salt, full yard $140\",\"where\":\"loaded into the customer's truck at the yard at a booked load-out time; a quarter-yard can also be delivered ($75)\",\"money\":\"nothing taken; paid at the yard counter. Bagged salt can be paid in full when booking.\",\"priced_other_ways\":\"a trailer fill is priced from photos of the trailer, and the owner OKs it (the example: $90); salt by weight is priced at the scale, with a $25 minimum promised. Both are paid at the counter.\"}],\"capacity\":\"One plow truck and driver per route; routes of up to 30 stops. A shoveler rides along on busy routes. At the yard: one loader, one load-out at a time.\",\"route_order\":\"Seasonal and plan stops in route order first, one-time pushes after.\",\"nobody_home\":\"Yes, for every push: no check-in code. DONE with a photo confirms it.\",\"online\":\"No.\",\"not_offered\":\"Roof snow, ice dams, hauling snow away. The AI can look for a roofer.\"}",
+ "questions_before_times": [
+  "The driveway's length and width, and is it sloped?",
+  "Which walks and steps to clear",
+  "Ice melt on the walk and steps, and does it need to be pet-safe?",
+  "A per-push plan, one storm only, or the season",
+  "For a business lot: photos or a map, and the hours it must be clear by",
+  "At the yard: how much salt, and what truck it goes in"
+ ],
+ "safety_stop": [
+  "someone trapped, hurt or stuck in the cold",
+  "no heat in freezing weather",
+  "a fallen power line in the snow",
+  "a car stuck with someone inside, or its tailpipe buried",
+  "roof snow or ice dams",
+  "ice hanging from the roof edge over a walk or door"
+ ],
+ "first_steps": [],
+ "facts": [
+  "plans",
+  "stages",
+  "documents",
+  "sentnow",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": false,
+  "no2": false,
+  "welfare": false,
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "No statewide snow-removal license is known so far. Where a state's or city's rules require a license or a business registration, the form asks for it.",
+ "staff_skills": "[\"Plow truck driving (residential driveways)\",\"Business lots with a loader or skid steer\",\"Shoveling and ice melt\",\"Setting stakes\",\"Loader work at the salt yard\",\"Lawn mowing\"]",
+ "messages_never": "[\"Gate codes\",\"Where a key or a garage remote is kept\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/snow+removal",
+  "pexels": "https://www.pexels.com/search/snow%20removal/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,157 @@
+{
+ "id": "tennis-coach",
+ "name": "Tennis Coach",
+ "booking_type": "Lesson",
+ "pattern": "class",
+ "built_from": "coach",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Tennis Coach",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Tennis Coach",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Private lesson",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$90",
+     "fee": "$90",
+     "story": "The main story: a $90 private lesson, paid in full when booking.",
+     "due_now_at_booking": 90,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Private lesson",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "A weekly $90 lesson: a card is saved and charged when the coach texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Private lesson",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$90",
+     "story": "A $90 lesson paid at the court on the coach's phone. Nothing is taken when booking.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Tennis Coach",
+   "staff": null,
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": {
+    "B": "24 hours before"
+   },
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Home-court lesson",
+     "price": "$110",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$110",
+     "fee": "$110",
+     "story": "The main story: a $110 home-court lesson, paid in full when booking.",
+     "due_now_at_booking": 110,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Home-court lesson",
+     "price": "$110",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$110",
+     "story": "A $110 home-court lesson: a card is saved and charged when the coach texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the business's courts (the club or park courts the example coach teaches on; prices include the court)\":[{\"service\":\"Private lesson, 60 min (tennis or pickleball)\",\"price kind\":\"one price\",\"price\":\"$90\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Private lesson, 30 min\",\"price kind\":\"one price\",\"price\":\"$50\",\"length\":\"30 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Semi-private lesson (2 players), 60 min\",\"price kind\":\"one price\",\"price\":\"$120 for the pair, booked by one player\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"Adult group clinic, 90 min (4 to 8 players)\",\"price kind\":\"per seat\",\"price\":\"$35 a seat\",\"length\":\"90 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"note\":\"runs with at least 4\"},{\"service\":\"Kids' clinic, ages 6 to 12, 60 min (4 to 8 kids)\",\"price kind\":\"per seat\",\"price\":\"$25 a seat\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"note\":\"runs with at least 4; children may be left\"},{\"service\":\"Pickleball intro for beginners, 60 min\",\"price kind\":\"one price\",\"price\":\"$70\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"service\":\"5-lesson pack (private, 60 min)\",\"price kind\":\"pack\",\"price\":\"$425\",\"length\":\"5 lessons, good for 6 months\",\"before\":\"bought on the page\",\"after\":\"each lesson uses one\"},{\"service\":\"Weekly lesson (same day and time each week)\",\"price kind\":\"one price a lesson\",\"price\":\"$90 a lesson\",\"length\":\"60 min\",\"before\":\"a card saved\",\"after\":\"charged after each lesson\",\"note\":\"a repeat plan, with its own yes\"}],\"at the customer's place (flow B: a home court, or a community or HOA court near them)\":[{\"service\":\"Home-court private lesson, 60 min\",\"price kind\":\"one price\",\"price\":\"$110\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\",\"note\":\"inside the travel area; the customer's court must be free\"},{\"service\":\"Family pickleball lesson at a home court (up to 4 players), 60 min\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"60 min\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"}],\"capacity\":\"One coach per lesson; a clinic has seats.\",\"online\":\"None.\"}",
+ "questions_before_times": [
+  "Tennis or pickleball",
+  "Level: new, beginner, intermediate, advanced or competitive",
+  "Private, semi-private, or a clinic",
+  "Who plays: an adult or a child, and the child's age",
+  "For a home court: where it is, and is the court free then"
+ ],
+ "safety_stop": [
+  "Someone collapsed, chest pain, can't breathe, or a head injury with confusion",
+  "Lightning or thunder",
+  "Heat illness: dizzy, sick, confused, or stopped sweating"
+ ],
+ "first_steps": [],
+ "facts": [
+  "packs",
+  "classes",
+  "plans",
+  "forms",
+  "children",
+  "waitlist",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": {
+   "B": "24 hours before"
+  }
+ },
+ "license": "No state license for coaching. The business registers as the state's rules require (registration only). The practice's own word, not checked by Rosie.",
+ "staff_skills": "[\"Tennis\",\"Pickleball\",\"Children\",\"Beginners\",\"Advanced and competitive players\"]",
+ "messages_never": "Injuries and health notes, a child's details, and who may pick a child up.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/tennis+coach",
+  "pexels": "https://www.pexels.com/search/tennis%20coach/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

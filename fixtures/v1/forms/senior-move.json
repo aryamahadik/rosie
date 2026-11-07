@@ -1,0 +1,993 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "senior-move",
+  "name": "Senior move manager",
+  "type": "project",
+  "started_from": "movers"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "K06",
+   "field": "Stays: a start and an end date, a price per night or day, drop-off and pick-up times",
+   "type": "dates",
+   "need": "R when the work has stays",
+   "shows": "booking page, confirmation",
+   "source": "A4-68, B4-85",
+   "google": "no",
+   "turned_on_by": "fact multiday"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact firststeps"
+  },
+  {
+   "id": "Q02",
+   "field": "Documents to sign or OK (a contract, a written estimate, a proposal, a design); the business's own standard agreement can be added once",
+   "type": "document",
+   "need": "O per service",
+   "shows": "secure page",
+   "source": "A5-19, A5-20, S1-29, S11-56, fact documents",
+   "google": "no",
+   "turned_on_by": "fact documents"
+  },
+  {
+   "id": "Q07",
+   "field": "Customer's yes to show photos of their work (per booking; no answer is no)",
+   "type": "tick per booking",
+   "need": "O",
+   "shows": "booking page",
+   "source": "A4-65, B4-69, fact photos",
+   "google": "n/a",
+   "turned_on_by": "fact photos"
+  },
+  {
+   "id": "Q09",
+   "field": "Welfare check before any no-show words",
+   "type": "switch",
+   "need": "S",
+   "shows": "no-show steps",
+   "source": "S13-10, A8-14, switch welfare",
+   "google": "no",
+   "turned_on_by": "switch welfare"
+  },
+  {
+   "id": "V17",
+   "field": "One bill for many visits",
+   "type": "on or off",
+   "need": "O (off)",
+   "shows": "bill",
+   "source": "fact monthlybill, S11-56, A9-17",
+   "google": "no",
+   "turned_on_by": "fact monthlybill"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  },
+  {
+   "id": "V20",
+   "field": "Cancel period for signed work (the right to cancel what was signed today)",
+   "type": "switch",
+   "need": "S",
+   "shows": "notice and cancel text",
+   "source": "switch cancelright, A10-05, A10-26",
+   "google": "no",
+   "turned_on_by": "switch cancelright"
+  }
+ ],
+ "facts": [
+  "firststeps",
+  "documents",
+  "multiday",
+  "extrawork",
+  "photos",
+  "video",
+  "monthlybill"
+ ],
+ "switches": [
+  "cancelright",
+  "welfare"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|none",
+   "paths": [
+    "list|none|none",
+    "list|full|none"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "2 days before",
+   "main_path": "visit|none|bill",
+   "paths": [
+    "visit|none|bill",
+    "visit|none|own",
+    "list|none|bill"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|none",
+   "name": "Family planning call",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "free",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A free 30-minute family planning call by phone. Nothing is taken and nothing is owed."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Remote move plan",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$150",
+   "deposit": null,
+   "rest": null,
+   "paid": "$150",
+   "fee": "$20",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "The $150 remote move plan by video, paid in full when booking, with a floor plan after."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|bill",
+   "name": "Senior move",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "free",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a free assessment; an agreement at $85 an hour per person, estimated 40 to 60 hours, with a $500 retainer; a bill every Friday for that week's hours; the retainer comes off the last bill."
+  },
+  {
+   "flow": "B",
+   "path": "visit|none|own",
+   "name": "Senior move",
+   "price_kind": "visit",
+   "price_kind_label": "Quoted at the visit",
+   "price": null,
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "free",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The same move billed the business's own way, like a check from the older adult's agent under a power of attorney. Rosie sends no bills."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Downsizing session",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$255",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$85",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "A 3-hour downsizing session for someone staying put, at $85 an hour ($255 minimum); billed after."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "In-home assessment",
+   "price": "free (example)",
+   "kind": null,
+   "length": "about 90 minutes",
+   "where": "at the older adult's home; the older adult is there and takes part, and family may join in person or by phone",
+   "before": "nothing taken",
+   "after": "nothing owed; the written plan and estimate follow within 3 business days"
+  },
+  {
+   "name": "Full senior move (plan, sort, pack, move day, unpack)",
+   "price": "$85 an hour per person, estimated 40 to 60 person-hours (example): $3,400 to $5,100; the rate and range are set in the signed agreement",
+   "kind": null,
+   "length": "3 to 8 weeks of sessions",
+   "where": "at the old home and the new home",
+   "before": "nothing taken at the assessment; a $500 retainer when the agreement is signed (example), taken off the last bill",
+   "after": "billed every Friday for the hours worked that week, with each session's start and end times"
+  },
+  {
+   "name": "Downsizing and sorting session",
+   "price": "$85 an hour per person, 3-hour minimum: $255 (example)",
+   "kind": null,
+   "length": "3 to 4 hours",
+   "where": "at the older adult's home",
+   "before": "nothing taken",
+   "after": "billed after the session"
+  },
+  {
+   "name": "Home setup visit (unpacking and setting up the new home)",
+   "price": "$85 an hour per person, 2-hour minimum: $170 (example)",
+   "kind": null,
+   "length": "1 to 2 days",
+   "where": "at the new home (an apartment, assisted living or a family member's home)",
+   "before": "nothing taken",
+   "after": "billed after"
+  },
+  {
+   "name": "Floor plan visit",
+   "price": "$275: measured at the new home, a drawn plan after (example)",
+   "kind": null,
+   "length": "about 2 hours",
+   "where": "at the new home",
+   "before": "nothing taken",
+   "after": "billed after"
+  },
+  {
+   "name": "Room-by-room plan from photos",
+   "price": "priced from the family's photos (example)",
+   "kind": null,
+   "length": null,
+   "where": "by photos; for families who live far away",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Phone check-in",
+   "price": "free: 10 minutes by phone with the lead before the assessment",
+   "kind": null,
+   "length": null,
+   "where": "by phone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Labor",
+   "price": "$85 an hour per person; billed by the hour, each session's times listed",
+   "kind": null,
+   "length": null,
+   "where": "added to a session, never booked alone",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Change order",
+   "price": "priced, written and signed by the payer before the changed work",
+   "kind": null,
+   "length": null,
+   "where": null,
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Family planning call",
+   "price": "free (example)",
+   "kind": null,
+   "length": "30 minutes",
+   "where": "by phone or video; for family who live far away",
+   "before": "nothing taken",
+   "after": "nothing owed"
+  },
+  {
+   "name": "Planning session",
+   "price": "$35, 45 minutes",
+   "kind": null,
+   "length": null,
+   "where": "by video",
+   "before": "a card saved for the $20 missed-session fee",
+   "after": "nothing more"
+  },
+  {
+   "name": "Evening planning session",
+   "price": "$40, 45 minutes",
+   "kind": null,
+   "length": null,
+   "where": "by video",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Extra floor plan sheet",
+   "price": "$20, an add-on",
+   "kind": null,
+   "length": null,
+   "where": "by video or email",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Mover quote review",
+   "price": "$25, 15 minutes: the planner reads the moving company's quote with the family",
+   "kind": null,
+   "length": null,
+   "where": "by phone or video",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Remote move plan and floor plan",
+   "price": "$150 (example)",
+   "kind": null,
+   "length": "90 minutes by video, then a floor plan of the new home",
+   "where": "by video",
+   "before": "paid in full when booking",
+   "after": "nothing more; a late cancel may keep $20 of it, only with the owner's yes"
+  },
+  {
+   "name": "Planning package (plan, floor plan sheet, mover quote review)",
+   "price": "$250 (example)",
+   "kind": null,
+   "length": null,
+   "where": "by video",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Plan from photos",
+   "price": "priced from the family's photos of the home (example: $90); Sam OKs each one",
+   "kind": null,
+   "length": null,
+   "where": "by photos",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Care-move planning call",
+   "price": "set on the call",
+   "kind": null,
+   "length": null,
+   "where": "by phone or video",
+   "before": null,
+   "after": null
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "Who is moving, and who is asking (the older adult, a family member, a care manager)?",
+   "Where from and where to: the town or ZIP of each (a house, an apartment, assisted living, a family member's home)",
+   "Any date the move must happen by: a move-in date set by the community, a closing or a lease end",
+   "What help is needed: the whole move, sorting only, or setting up the new home"
+  ],
+  "after_time": [
+   "Who will be at the assessment, and who decides what goes and what stays?",
+   "Anything that helps the visit go well: hearing, sight, walking, the best time of day",
+   "Pets, and who will care for them on move day",
+   "The new home's rules: move-in hours, an elevator to book, an insurance certificate"
+  ],
+  "secure_page_only": [
+   "Both street addresses and how to get in",
+   "The older adult's own contact, and how they like to be reached (text, a call to a landline, or only through the family)",
+   "Who has a power of attorney or guardianship, if anyone, and who signs and pays",
+   "Health or memory details that change how sessions run (only on this page, only for the lead)"
+  ],
+  "who_may_book": "An adult. The older adult agrees to the move and to the sessions themself whenever they can. A family member may book and pay for them. Where the older adult can't decide, an agent under a power of attorney or a guardian signs the agreement. The business never books a move the older adult says they don't want."
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "the older adult has fallen and can't get up, is suddenly confused, has chest pain or trouble breathing",
+    "says": "Call 911 now.",
+    "booking": "no booking in that chat"
+   },
+   {
+    "words": "a fire, smoke or a gas smell",
+    "says": "Leave the home now, and call 911.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "dementia, memory loss or confusion",
+    "says": "Sessions are short and at the best time of day, the same person comes each time, and a family member is on call.",
+    "booking": "goes on; the details stay on the secure page"
+   },
+   {
+    "words": "the older adult is being pressured, neglected or has money taken by someone",
+    "says": "A hotline is given. The owner is told privately the same day; the business follows its own reporting steps where the state's rules require them. Rosie gives no advice.",
+    "booking": "goes on"
+   },
+   {
+    "words": "oxygen in the home, a fall risk, a walker or wheelchair",
+    "says": "Paths are kept clear during sessions. Oxygen tanks are never packed in a moving truck.",
+    "booking": "goes on"
+   },
+   {
+    "words": "hoarding, pests or a home that isn't safe to work in",
+    "says": "The assessment notes it. A cleanup company may be needed first (no company named).",
+    "booking": "goes on"
+   },
+   {
+    "words": "medicines in the home",
+    "says": "Staff never handle or give medicine. The family packs them in a labeled bag that travels with the older adult.",
+    "booking": "goes on"
+   },
+   {
+    "words": "firearms in the home",
+    "says": "Staff never touch them. The family removes them before sorting.",
+    "booking": "goes on"
+   }
+  ],
+  "business_line": "Questions about money, medicines, or what a doctor or a lawyer should decide go to the business's own line",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "prep": "Before the assessment: have whoever decides there or on the phone, and don't throw things away yet. Before sorting: set aside papers, medicines and valuables. Before move day: pack a bag with medicines, glasses, hearing aids and chargers that travels with the older adult.",
+  "forms_fact": false,
+  "first_steps_fact": true,
+  "documents_fact": true
+ },
+ "staff": {
+  "licenses_or_certificates": "No person license; a background check for everyone in clients' homes",
+  "who_oks": "The owner OKs every agreement and any estimate change",
+  "stand_in": "The older adult keeps the same lead wherever possible; a new person is offered only with the older adult's or the family's OK first, never on silence",
+  "roles": "Move leads (Marta, Joel) run each move; move assistants help on packing and move days. Planners (Joan, Priya) take the planning calls and the remote plans."
+ },
+ "children_and_age": {
+  "children_fact": false,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "An adult. The older adult agrees to the move and to the sessions themself whenever they can. A family member may book and pay for them. Where the older adult can't decide, an agent under a power of attorney or a guardian signs the agreement. The business never books a move the older adult says they don't want.",
+  "minors_texts": "Never booked by a minor"
+ },
+ "visit": {
+  "check_in": "The check-in code from whoever meets the lead at the door (the older adult or a family member). An older adult without a mobile: the family member gets the code, or the lead texts DONE at the end. Unpacking with nobody home: a start photo and DONE with photos. Planning calls: the code is said at the start of the call.",
+  "done": "Each session ends with DONE and its hours; the move ends when the new home is set up and the older adult has walked through it",
+  "changes_at_visit": "Hours over the estimate's top need the payer's yes first. Added services (an estate sale, a cleanout) go to partner businesses the family picks and pays."
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "no state license to plan, sort, pack or set up a home in most places, only a business registration; a household goods mover's license (and the state's mover rules) only where the business itself carries belongings in its own truck for pay; otherwise the move is done by a licensed moving company the family hires",
+  "who": "the business",
+  "ask": [
+   "The business registration",
+   "A mover's license, only if the business itself moves goods",
+   "General liability insurance, and a bond or crime coverage for staff working in clients' homes"
+  ],
+  "background": "A criminal background check for every person who works in a client's home (the business's own rule, shown to the customer as checked)"
+ },
+ "never_in_a_text": [
+  "Health, memory or care details, and money details",
+  "Door codes and lockbox codes",
+  "Why someone is moving: owner and staff texts never say it",
+  "Contract papers and lab or medical papers (secure page only, with a copy by email)"
+ ],
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.questions": [
+   "planning"
+  ],
+  "pf.first_steps": [
+   "before_agreement",
+   "after_agreement",
+   "planning_prep"
+  ],
+  "pf.staff": [
+   "two_people",
+   "never"
+  ],
+  "pf.license": [
+   "credentials"
+  ],
+  "pf.messages": [
+   "older_adult",
+   "tone"
+  ],
+  "pf.visit": [
+   "at_the_visit",
+   "items",
+   "found_items",
+   "nobody_answers"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,942 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "lab",
+  "name": "Lab tests and mobile blood draw",
+  "type": "clinic",
+  "started_from": "primary-care"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "K04",
+   "field": "Places and things (room, table, court, lane, bay, boat, van, vehicle, kennel, suite, property or unit): name, photos, how many it fits, which services use it, hours, how many Rosie can book, private access notes on the secure page only (never in a text). The fields of each kind are in the table below",
+   "type": "list",
+   "need": "R when the work books spaces",
+   "shows": "booking page (space and size, never a person)",
+   "source": "S1-80, S1-81, A4-62, S13-05",
+   "google": "no",
+   "turned_on_by": "fact spaces"
+  },
+  {
+   "id": "K07",
+   "field": "Items taken per day (drop-off) and daily caps",
+   "type": "number",
+   "need": "R when the work is a drop-off",
+   "shows": "times card (a full day is not shown)",
+   "source": "S1-03 block 12, A4-14",
+   "google": "no",
+   "turned_on_by": "fact dropoff"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms; fact firststeps"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children; fact incare"
+  },
+  {
+   "id": "Q06",
+   "field": "Sensitive work switch (texts never name the service; initials; no rating, nothing sold; gentle words)",
+   "type": "switch",
+   "need": "S",
+   "shows": "every text and pay page",
+   "source": "S13-22, switch sensitive",
+   "google": "no",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact results"
+  },
+  {
+   "id": "Q09",
+   "field": "Welfare check before any no-show words",
+   "type": "switch",
+   "need": "S",
+   "shows": "no-show steps",
+   "source": "S13-10, A8-14, switch welfare",
+   "google": "no",
+   "turned_on_by": "switch welfare"
+  },
+  {
+   "id": "V18",
+   "field": "Insurance plan billed (the customer's part is billed after the plan pays)",
+   "type": "choice",
+   "need": "P",
+   "shows": "booking page",
+   "source": "fact planbill, S1-13, A4-53, A9-20",
+   "google": "no",
+   "turned_on_by": "fact planbill"
+  },
+  {
+   "id": "V19",
+   "field": "Extra work priced first at the visit (the customer says yes before it is done)",
+   "type": "rule",
+   "need": "P",
+   "shows": "text, secure page",
+   "source": "fact extrawork, A8-33, A8-85",
+   "google": "no",
+   "turned_on_by": "fact extrawork"
+  }
+ ],
+ "facts": [
+  "forms",
+  "firststeps",
+  "planbill",
+  "children",
+  "results",
+  "dropoff",
+  "spaces",
+  "incare",
+  "extrawork"
+ ],
+ "switches": [
+  "sensitive",
+  "welfare"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|bill",
+   "paths": [
+    "list|none|bill",
+    "list|full|none",
+    "list|none|counter"
+   ]
+  },
+  "B": {
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|bill",
+   "paths": [
+    "list|none|bill",
+    "list|full|none",
+    "list|card|card",
+    "list|none|own"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|bill",
+   "name": "Fasting blood test (basic metabolic panel)",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$25",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$0",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a fasting blood test on a doctor's order. Nothing taken when booking; the plan is billed, then the patient's share is billed after."
+  },
+  {
+   "flow": "A",
+   "path": "list|full|none",
+   "name": "Direct-to-you wellness panel",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$79",
+   "deposit": null,
+   "rest": null,
+   "paid": "$79",
+   "fee": "$0",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A direct-to-you wellness panel ($79), paid in full when booking; nothing more after the draw."
+  },
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Complete blood count",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$20",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": null,
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "A self-pay draw on a doctor's order with no plan, paid at the desk after the draw."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|bill",
+   "name": "Mobile blood draw",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$65",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$65",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "bill",
+   "money_after_label": "Rosie texts the bill",
+   "example": "The main story: a mobile draw on a doctor's order. Nothing taken; the plan is billed, then the $65 visit fee and any share are billed after."
+  },
+  {
+   "flow": "B",
+   "path": "list|full|none",
+   "name": "Direct-to-you panel at home",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$79",
+   "deposit": null,
+   "rest": null,
+   "paid": "$79",
+   "fee": "$65",
+   "money_before": "full",
+   "money_before_label": "Full price",
+   "money_after": "none",
+   "money_after_label": "Nothing more",
+   "example": "A direct-to-you panel drawn at home, paid in full when booking."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Mobile blood draw",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$65",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$65",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "A mobile draw with a card saved; the $65 visit fee is charged to that card at DONE."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|own",
+   "name": "Employer drug test",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$45",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$65",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "An employer's drug tests at the workplace, billed to the employer's account its own way."
+  }
+ ],
+ "extra_services": [],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Blood draw with a doctor's order",
+   "price": "billed to the health plan; self-pay from the lab's price list (example: basic metabolic panel $25, complete blood count $20)",
+   "kind": "one price per test",
+   "length": "15 min",
+   "where": "at the patient service center",
+   "before": "nothing taken",
+   "after": "the plan is billed; any share is billed after the plan pays"
+  },
+  {
+   "name": "Fasting blood test (cholesterol, glucose)",
+   "price": "as above",
+   "kind": "one price per test",
+   "length": "15 min",
+   "where": "at the patient service center",
+   "before": "nothing taken",
+   "after": "as above"
+  },
+  {
+   "name": "Glucose tolerance test",
+   "price": "billed to the plan; $65 self-pay (example)",
+   "kind": "one price",
+   "length": "2 to 3 hours at the center",
+   "where": "at the patient service center",
+   "before": "nothing taken",
+   "after": "as above"
+  },
+  {
+   "name": "Direct-to-you test panel",
+   "price": "example: wellness panel $79, vitamin D $45, A1C $35",
+   "kind": "one price",
+   "length": "15 min",
+   "where": "at the patient service center",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  },
+  {
+   "name": "Sample drop-off (urine, stool or a 24-hour collection)",
+   "price": "billed with the order",
+   "kind": "one price per test",
+   "length": "5 min",
+   "where": "at the patient service center",
+   "before": "nothing taken",
+   "after": "as the order is billed"
+  },
+  {
+   "name": "Mobile blood draw",
+   "price": "$65 visit fee (example) plus the tests",
+   "kind": "one price plus the tests",
+   "length": "20 min at the place; a 2-hour arrival window in the morning",
+   "where": "at the patient's home, workplace or care home",
+   "before": "nothing taken (the visit fee billed after), or paid in full for a direct-to-you panel, or a card saved and charged at DONE",
+   "after": "the bill after the plan pays, or the saved card"
+  },
+  {
+   "name": "Employer drug test (urine)",
+   "price": "$45 (example), on the employer's account",
+   "kind": "one price",
+   "length": "20 min",
+   "where": "at the patient service center, or at the workplace",
+   "before": "nothing taken from the employee",
+   "after": "billed to the employer its own way"
+  },
+  {
+   "name": "Legal paternity DNA test",
+   "price": "$350 (example) for the parent and one child",
+   "kind": "one price",
+   "length": "30 min",
+   "where": "at the patient service center",
+   "before": "paid in full when booking",
+   "after": "nothing more"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "which test, or whether there's a doctor's order (sets the length, fasting and price)",
+   "does the test need fasting (the order or the test list says; sets morning-only times)",
+   "a health plan or self-pay (only the plan's name here)",
+   "for a child: the child's age",
+   "for a mobile draw: the town, and whether the patient can come to the door",
+   "for a drug test: the employer's account (who pays)"
+  ],
+  "after_time": [
+   "any access need",
+   "fainted at a draw before, or hard to draw (a note for the phlebotomist)",
+   "for a mobile draw: the address, parking and any gate code"
+  ],
+  "secure_page_only": [
+   "the doctor's order (a photo, or the doctor's office sends it), or the consent for a direct-to-you test",
+   "the plan's member details",
+   "date of birth (every sample is matched to the patient by two details)",
+   "medicines that matter for the test, like a blood thinner, only where the order asks",
+   "for a drug test: the employee's own consent and the employer's chain-of-custody details",
+   "for a paternity test: each person's ID and consent; a parent or guardian consents for the child",
+   "who may get the results: the ordering doctor; for a direct-to-you test, the patient; never the payer unless the patient says so"
+  ],
+  "who_may_book": "an adult for themselves; a parent or guardian for a child; an employer may book and pay for an employee's drug test, but the employee consents on their own link and the result goes only to the employer's medical review officer; each adult in a paternity test consents for themselves"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "chest pain, trouble breathing, fainting with an injury, or bleeding that won't stop",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "faints at the sight of needles, or fainted at a draw before",
+    "what": "the booking goes on; the phlebotomist is told on the secure page and draws with the patient lying back where the center can"
+   },
+   {
+    "words": "on a blood thinner, or bleeds easily",
+    "what": "the booking goes on; noted for the phlebotomist"
+   },
+   {
+    "words": "asks what a result means, or about a medicine",
+    "what": "never answered by Rosie: the ordering doctor; for a direct-to-you test, the lab's own doctor service line"
+   },
+   {
+    "words": "a result the lab finds dangerous (a critical value)",
+    "what": "the lab's own process calls the ordering doctor at once; never a text from Rosie"
+   }
+  ],
+  "always": "the generic screen: danger to life, fire, gas, a medical emergency → call 911, and no booking",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "The doctor's order",
+    "when": "on file before the draw: the doctor's office sends it, or the patient brings it",
+    "who": "the lab gets it from the doctor's office when the patient hasn't got it",
+    "result": "on file: the draw goes on; missing at the visit: the draw waits while the desk asks the doctor's office, or moves with no fee"
+   },
+   {
+    "name": "Consent for a direct-to-you test",
+    "when": "signed on the secure page while booking",
+    "result": "signed: booked; not signed: no booking"
+   },
+   {
+    "name": "The plan check",
+    "when": "by the desk before the visit",
+    "result": "covered, part covered (the share shown), or not covered (self-pay or a free cancel); where the plan's rules require it, a notice of likely non-coverage is signed before the draw"
+   },
+   {
+    "name": "Fasting",
+    "when": "from the hour the test says, the night before",
+    "result": "fasted: drawn; ate: the fasting part moves"
+   },
+   {
+    "name": "A 24-hour collection container",
+    "when": "picked up at the center before the collection day",
+    "result": "the sample is dropped off within the time the test allows"
+   },
+   {
+    "name": "Employer drug test papers",
+    "when": "the employer's authorization on the account before the visit; the employee's photo ID at the visit",
+    "result": "no ID: no collection; the employer's own rules decide what follows"
+   }
+  ],
+  "prep": "for the reminder: the fasting hours if the test needs them (water is fine), drink water, bring photo ID, the plan card and the doctor's order, and wear a short-sleeved shirt; for a 24-hour urine test, the container and the start time",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "phlebotomy, children's draws, glucose tolerance tests, drug-test collection, paternity collection, mobile draws, Spanish",
+  "licenses_or_certificates": "phlebotomy certificates and collector training, on the owner's own records (where the state requires them); Rosie never looks them up",
+  "supervision": "the lab director (the certificate holder) is responsible for the tests; a new phlebotomist draws under a trained one until signed off",
+  "who_oks": "the owner OKs fees, refunds and free re-draws",
+  "stand_in": "any phlebotomist with the skill; nobody is booked by name; a drug test that must be watched only by a trained collector of the same gender"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": true,
+  "animals_fact": false,
+  "who_may_book": "an adult for themselves; a parent or guardian for a child; an employer may book and pay for an employee's drug test, but the employee consents on their own link and the result goes only to the employer's medical review officer; each adult in a paternity test consents for themselves",
+  "minors_texts": "a child's texts go to the parent or guardian"
+ },
+ "visit": {
+  "check_in": "at the service center: the code at the desk, then photo ID and date of birth checked against the order (two details on every sample); mobile: the code at the door, then ID; a drug test: photo ID and the chain-of-custody form, watched only where the test's rules require it and then by a collector of the same gender",
+  "done": "the code, then DONE from the phlebotomist once the samples are labeled; the samples go to the lab by courier the same day; results go to the ordering doctor, and for a direct-to-you test to the patient's secure page; Rosie keeps only booking records",
+  "changes_at_visit": "the doctor adds a test to the order: drawn at the same visit if the samples allow, priced first for self-pay; nothing else is sold at a draw"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "the lab's federal certificate for the kinds of tests it runs, and the state's lab license where the state requires one; a phlebotomist's certificate where the state requires one; collector training for drug tests (federal transport tests follow the federal collection rules); a doctor's order where the state requires one for a test",
+  "who": "both: the lab or draw business, and each phlebotomist or collector where the state's rules or the test's rules require it",
+  "ask": "optional, for the owner's own page: the lab's certificate number, the state license number, each phlebotomist's certificate; nothing is needed to book",
+  "insurance": "the owner's own liability insurance; Rosie never verifies it",
+  "background": "the practice's own background checks for phlebotomists who go into homes and care homes, where its rules or the state require them; Rosie never verifies them"
+ },
+ "never_in_a_text": "the test names, the order, results, health answers, medicines, ID numbers and plan details never go in a text: only the secure page; texts say only the lab's name, the day, the time and the place; a drug test or a paternity test is never named in a text",
+ "languages": "English and Spanish",
+ "unmapped_keys": {
+  "pf.safety": [
+   "fasting"
+  ],
+  "pf.license": [
+   "scope",
+   "telehealth"
+  ],
+  "pf.messages": [
+   "results"
+  ],
+  "pf.visit": [
+   "cantGoAhead",
+   "rejected",
+   "dropOff"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

@@ -1,0 +1,270 @@
+{
+ "id": "appliance",
+ "name": "Appliance repair",
+ "booking_type": "Home visit",
+ "pattern": "fix",
+ "built_from": "plumber",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Appliance repair",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Appliance repair",
+   "staff": "Nadia and Gwen (techs at the repair shop)",
+   "customer": null,
+   "arrive": {
+    "B": "window"
+   },
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|card|counter",
+   "services": [
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Stand mixer repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Alex's stand mixer won't turn. Only the $25 bench check is promised; Nadia prices the repair at the counter. A card is saved for the shop's $20 late-cancel fee, and Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Stand mixer repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same mixer repair, priced at the counter. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Vacuum tune-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 vacuum tune-up. A card is saved for the shop's $20 fee. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Vacuum tune-up",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 vacuum tune-up. Nothing is taken: a YES books it. Alex pays at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Sewing machine tune-up",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The $55 sewing machine tune-up, paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Vintage mixer restore",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A vintage mixer restore, priced from Alex's photos at $90. Booked once Sam OKs it; paid at the counter.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Appliance repair",
+   "staff": "Isaac and Luis (appliance techs)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "24 hours before"
+   },
+   "main": "visit|card|bill",
+   "services": [
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Fridge repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a fridge that stopped cooling, priced at the visit. A card is saved; the $89 service call is owed, even after a no to the price, and counts toward the repair. Rosie texts the bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Fridge repair",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same fridge repair. Nothing is taken before, as the old example's owner chose. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|deposit|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Fridge repair",
+     "price": "$245",
+     "deposit": "$89",
+     "rest": "$156",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same fridge repair. Alex pays the $89 service call when booking, as a deposit. It comes off the $245 bill.",
+     "due_now_at_booking": 89,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Dryer heat repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A $179 dryer heat repair, from the price list. A card is saved for the $89 fee. Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Dryer vent cleaning",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A $150 dryer vent cleaning, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Built-in fridge install",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A built-in fridge install, priced from photos at $640. Sam OKs it. A $160 deposit now, the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's home (the example: Delta Appliance Repair's own list)\":[{\"service\":\"Service call (find the problem)\",\"price kind\":\"one price\",\"price\":\"$89, credited to the repair\",\"length\":\"45 to 60 min\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\",\"note\":\"Goes on the repairs below; not booked alone\"},{\"service\":\"Fridge or freezer repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"60 to 90 min, plus a return visit if a part is ordered\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Washer, dryer or dishwasher repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Range, oven or cooktop repair\",\"price kind\":\"quoted at the visit\",\"price\":\"only the $89 service call is promised\",\"length\":\"60 to 90 min\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\",\"note\":\"Gas models only by a tech with the gas skill\"},{\"service\":\"Dryer heat repair (a dryer that runs but won't heat)\",\"price kind\":\"one price\",\"price\":\"$179, the $89 call included\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\"},{\"service\":\"Dryer vent cleaning\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Often rebooked once a year\"},{\"service\":\"Built-in fridge install (a fridge the customer bought)\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $640)\",\"length\":\"half a day, a crew of two\",\"place\":\"at the customer's home\",\"before\":\"a 25% deposit once the quote is OK'd\",\"after\":\"the rest on the bill\"},{\"service\":\"Sealed-system repair (a fridge's refrigerant system)\",\"price kind\":\"quoted at the visit\",\"price\":\"its own quote, after the service call\",\"length\":\"set by the owner\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\",\"note\":\"Only techs with an EPA card. The maker's longer cover is checked from the serial first.\"},{\"service\":\"Failure report for an insurance claim\",\"price kind\":\"by person\",\"price\":\"$199, or $249 when the owner goes\",\"length\":\"60 min\",\"place\":\"at the customer's home\",\"before\":\"a card saved; the $89 service call is owed\",\"after\":\"Rosie texts the bill\",\"note\":\"The report link comes later\"},{\"service\":\"Labor\",\"price kind\":\"per hour\",\"price\":\"$120 an hour, 1-hour minimum\",\"place\":\"at the customer's home\",\"note\":\"Goes on quoted jobs; not booked alone\"},{\"service\":\"Return visit for a part on order\",\"price kind\":\"part of the same job\",\"price\":\"no new service call\",\"place\":\"at the customer's home\",\"note\":\"Booked once the part's due date is known\"}],\"at the business (the example: Delta Repair Shop's own price list)\":[{\"service\":\"Small appliance repair (a mixer, a coffee maker, a vacuum)\",\"price kind\":\"quoted at the counter\",\"price\":\"only the $25 bench check is promised, credited to the repair\",\"length\":\"30 min, or left until it's ready\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Vacuum tune-up\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"both: at the shop, or at the customer's home as a $75 home visit paid in full\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Coffee maker descale\",\"price kind\":\"one price\",\"price\":\"$40\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"New power cord, fitted\",\"price kind\":\"one price\",\"price\":\"$20\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Often added at the visit\"},{\"service\":\"Toaster repair\",\"price kind\":\"one price\",\"price\":\"$25\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\"},{\"service\":\"Sewing machine tune-up\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the shop\",\"before\":\"the full price\",\"after\":\"nothing more\"},{\"service\":\"Espresso machine rebuild\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2½ hours, or a drop-off\",\"place\":\"at the shop\",\"before\":\"a card saved for a $40 fee (over 2 hours)\",\"after\":\"paid at the counter\"},{\"service\":\"Vintage mixer restore\",\"price kind\":\"quoted from photos\",\"price\":\"the quote (the example: $90)\",\"place\":\"at the shop\",\"before\":\"a card saved for the $20 fee\",\"after\":\"paid at the counter\",\"note\":\"Only Nadia does restores. The owner OKs each quote.\"},{\"service\":\"Video check of a small appliance\",\"price kind\":\"the owner's own price\",\"place\":\"at the business (a video session)\",\"before\":\"the full price\",\"after\":\"nothing more\",\"note\":\"Only where the owner offers it\"}],\"capacity\":\"One tech per booking. A built-in install, or pulling a built-in fridge out, needs a crew of two. The shop's restores need its restore bench.\",\"skills each needs\":\"Sealed-system work needs an EPA refrigerant card. Gas ranges, ovens and dryers need the gas skill. Built-ins need a tech cleared for them. Restores at the shop need the restore skill.\",\"nobody home\":\"Never at the home: an adult (18 or older) is there for the whole visit. At the shop, a drop-off needs nobody to wait.\",\"online\":\"A video check of a small appliance only, where the owner offers it. No repair is done by video.\",\"warranty jobs\":\"Under the maker's warranty: the maker sends its own servicer, so Rosie points the customer there and takes nothing. Only a business the maker authorized takes them, and the owner adds that service.\",\"extras\":\"Travel inside the service area only (the example: 25 miles). Parts at the owner's price, shown on the quote. No tax line unless the owner sets a rate. The business's own warranty on the receipt (the example: 90 days on parts and labor). A loaner mini fridge while a part is on order, only where the owner offers one: the customer says yes on the secure page, and the general rules for rentals set any deposit or card saved for damage.\"}",
+ "questions_before_times": [
+  "Which appliance, and its brand: a fridge, freezer, washer, dryer, dishwasher, range, oven or cooktop",
+  "Gas or electric, for a range, oven or dryer",
+  "Built in, or freestanding",
+  "What it's doing, since when, and any error code on the display",
+  "Bought when, and any warranty: the maker's, a store plan or a home warranty, or not sure",
+  "At the shop: which small appliance, its brand, and what it's doing"
+ ],
+ "safety_stop": [
+  "A gas smell or a carbon monoxide alarm (a gas range, oven or dryer)",
+  "Smoke or flames"
+ ],
+ "first_steps": [],
+ "facts": [
+  "dropoff",
+  "extrawork",
+  "planbill",
+  "photos",
+  "firststeps",
+  "documents",
+  "video",
+  "results"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "B": "window"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "24 hours before"
+  }
+ },
+ "license": "Most states don't license appliance repair. Some register repair companies, and some cities license repair shops: the state's or city's form says. Refrigeration work and gas or electric hookups can need that trade's own license.",
+ "staff_skills": "[\"Fridges and freezers\",\"Washers and dryers\",\"Dishwashers\",\"Ranges, ovens and cooktops\",\"Gas appliances\",\"Sealed systems (EPA card)\",\"Built-ins\",\"Shop repairs and restores\"]",
+ "messages_never": "Gate or lock codes, card details, the label photo's serial number, and photos from inside the home: these stay on the secure page.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/appliance+repair",
+  "pexels": "https://www.pexels.com/search/appliance%20repair/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

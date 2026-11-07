@@ -1,0 +1,144 @@
+{
+ "id": "pediatrician",
+ "name": "Pediatrician",
+ "booking_type": "Clinic",
+ "pattern": "clinic",
+ "built_from": "dentist",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pediatrician",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Lee Family Pediatrics",
+   "staff": "Nina (pediatrician) and Elena (pediatric nurse practitioner)",
+   "customer": "Alex M. (parent of Mia, 4) · other families",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|none|counter",
+   "services": [
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Well-child visit",
+     "price": "$195",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: Mia's well-child visit with Nina, billed to her plan. Nothing is taken. The desk checks the plan, and any share is paid at the front desk. Sick visits, shots and self-pay visits are paid the same way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Well-child visit",
+     "price": "$195",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The same visit where the office turns on its $20 no-show fee. A card is saved for it, never for a fee-free family.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Lee Newborn Care",
+   "staff": "Felix (nurse practitioner and lactation consultant) and Hugo (nurse practitioner), who visit with a baby scale",
+   "customer": "Alex M. (parent of Leo, born Sat Oct 17) · other families",
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "list|none|own",
+   "services": [
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Newborn home visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The main story: a $179 newborn home visit for Leo with Felix. Nothing is taken. The office bills Leo's plan its own way.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Newborn home visit",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "The same visit, paid by the family itself: nothing is taken, and Rosie texts the $179 bill when Felix texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "visits with a set length, booked with a pediatrician or a nurse practitioner by name; well-child visits follow the office's own schedule of ages; same-day sick times open each morning; the shots due at a visit are chosen by the clinician there and never paid up front, and a flu shot can also be booked on its own as a nurse visit; a newborn's visit at home has a 2-hour arrival window",
+ "questions_before_times": [
+  "the child's first name and age (the birth date only on the secure page)",
+  "a current patient or a new family",
+  "which visit: the office's own visit types only, never a symptom typed into the AI",
+  "a plan (its name only) or self-pay",
+  "for a video visit: which state the child will be in"
+ ],
+ "safety_stop": [
+  "trouble breathing, won't wake up, blue lips, or a seizure",
+  "swallowed medicine or a chemical"
+ ],
+ "first_steps": [
+  "Health history, changes since the last visit, the vaccine record and the consent",
+  "The plan check",
+  "A written price estimate for self-pay families",
+  "A new family's records from the last doctor",
+  "Sam's OK for a new family"
+ ],
+ "facts": [
+  "children",
+  "forms",
+  "planbill",
+  "video",
+  "extrawork"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "always: each pediatrician (MD or DO), nurse practitioner, physician assistant and nurse holds their own active license from the state where the child is during the visit; which roles need which license comes from the state's form (a switch)",
+ "staff_skills": "pediatricians and nurse practitioners: well-child visits, sick visits, new families, video visits and newborn home visits; nurses: flu shots and shot-only visits on the clinician's order; the lactation consultant: breastfeeding help; only people cleared for home visits go to homes",
+ "messages_never": "texts carry only the practice's name, the date, the time, the address and a secure link: never the visit type, the reason, symptoms, shots, results or the clinician's name (at a home visit the clinician's name stays, for the door check)",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pediatrician",
+  "pexels": "https://www.pexels.com/search/pediatrician/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,154 @@
+{
+ "id": "golf-instructor",
+ "name": "Golf instructor",
+ "booking_type": "Chair",
+ "pattern": "chair",
+ "built_from": "trainer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Golf instructor",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Golf instructor",
+   "staff": "Kenji and Dana (pros at the academy)",
+   "customer": "Alex M. (student) · other students",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|full|none",
+   "services": [
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "golf lesson (5-lesson pack)",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "The main story: Alex buys a 5-lesson pack, $275 ($55 a lesson), and the first 60-minute lesson with Kenji uses one. A no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "golf lesson",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A single 30-minute lesson, $35. A card is saved for the academy's $20 fee, and Alex pays at the front desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "video swing review",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A video swing review, $35. A card is saved, and charged when Kenji texts DONE after the reply call.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Golf instructor",
+   "staff": "Tomas and Lia (pros who travel)",
+   "customer": "Alex M. (student) · other students",
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "60-minute lesson at home",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The main story: a $179 60-minute lesson at Alex's home with Tomas. A card is saved and charged $179 when Tomas texts DONE.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Lesson at home (3-lesson pack)",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "A 3-lesson pack at home, $450 ($150 a lesson), paid in full when booking. Each lesson uses one, and a no-show can use one up, if Sam confirms.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "one person's time: a lesson with a named pro, booked by the pro's free hours, at the academy, at the client's home net, or on a course the business lists; a partner lesson adds a second person",
+ "questions_before_times": [
+  "new or returning (a new student gets the free swing check first, and the waiver)",
+  "what to work on: full swing, short game, putting, or a round on a course",
+  "where: the academy, at home, or on a course",
+  "a single lesson, a pack or a weekly plan",
+  "for a junior: the age",
+  "one person or two (a partner lesson)"
+ ],
+ "safety_stop": [
+  "someone unwell right now: chest pain, trouble breathing, fainting, or sudden weakness",
+  "someone hit in the head by a ball or a club, and now confused, bleeding badly or not waking up",
+  "lightning or a storm right now at the course or the range"
+ ],
+ "first_steps": [
+  "Free swing check",
+  "Health questions",
+  "Waiver",
+  "Doctor's OK"
+ ],
+ "facts": [
+  "packs",
+  "firststeps",
+  "forms",
+  "video"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": "setstart",
+  "cutoff": "24 hours before"
+ },
+ "license": "none checked by Rosie: golf lessons need no state license here; a license or insurance is optional and the business's own word (D96)",
+ "staff_skills": "full swing, short game, putting, juniors, and course play; juniors only with pros the owner clears for them",
+ "messages_never": "health answers, injuries, a doctor's note and incident notes never go in a text or through the AI: only the secure page and the student's record",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/golf+instructor",
+  "pexels": "https://www.pexels.com/search/golf%20instructor/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

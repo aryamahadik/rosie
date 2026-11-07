@@ -1,0 +1,164 @@
+{
+ "id": "funeral",
+ "name": "Funeral home",
+ "booking_type": "Consult",
+ "pattern": "consult",
+ "built_from": "lawyer",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Funeral home",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Funeral home",
+   "staff": "Helen and Victor (funeral directors at the chapel)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Cremation and memorial",
+     "price": "$2,585",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a free arrangement meeting with Helen. The family picks only what they want from the price list: direct cremation, a memorial service and an urn, $2,585. Rosie texts a bill for the $1,000 deposit when they sign, and one for the $1,585 rest before the service day.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Cremation and memorial",
+     "price": "$2,585",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same free meeting. The family pays the chapel its own way: a deposit on its card reader when they sign and the rest before the service, or from an insurance policy the chapel handles in its own tools.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Planning-ahead meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free planning-ahead meeting with Helen, a licensed seller, about Alex's own wishes. Nothing is taken, and nothing is paid through Rosie: any plan is the chapel's own contract.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Funeral home",
+   "staff": "Henry and Clara (funeral directors)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": null,
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Funeral and burial",
+     "price": "$6,130",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The main story: a free arrangement meeting at the family's home with Henry, the morning after he brought Alex's mother into the home's care. The family picks a funeral and burial from the price list: $6,130, with the first call's $395 on it. Rosie texts a bill for the $2,000 deposit when they sign, and one for the $4,130 rest before the service day.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Funeral and burial",
+     "price": "$6,130",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$0",
+     "story": "The same meeting at home. The family pays from an insurance policy, which the funeral home handles in its own tools. Rosie texts no bill.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|own",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Planning-ahead meeting",
+     "price": "free",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": null,
+     "story": "A free planning-ahead meeting at Alex's own home with Henry, a licensed seller. Nothing is taken, and nothing is paid through Rosie: any plan is the home's own contract.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Consult: a first meeting with a named, licensed funeral director, at a hard moment. At the funeral home, or by phone or video (flow A). At the family's home (flow B). Bringing the person who died into the home's care (the first call) is sent now to the director on call, any hour.\",\"at the business (the example home's own prices)\":[{\"name\":\"Arrangement meeting\",\"length\":\"about 2 hours\",\"price\":\"no charge; every choice is priced at the meeting from the home's price list\",\"where\":\"the funeral home, or by phone or video\",\"before\":\"nothing taken\",\"after\":\"a deposit when the family signs, and the rest before the service day: the bill Rosie texts, or the home's own way\"},{\"name\":\"Planning-ahead meeting\",\"length\":\"about 1 hour\",\"price\":\"no charge\",\"before\":\"nothing taken\",\"after\":\"nothing through Rosie; any plan is the home's own contract\",\"who\":\"a licensed preneed seller, where the state's rules require one\"},{\"name\":\"Prices by phone or text\",\"price\":\"free, to anyone who asks, read from the price list\"},{\"name\":\"Example lines on the price list (chosen at the meeting)\",\"price\":\"Direct cremation $1,595 · Memorial service $795 · Urns from $95 · Bringing someone into our care $395 · Funeral with burial: each item from the list\"}],\"at the customer's place (the example home's own prices)\":[{\"name\":\"The first call: bringing the person who died into the home's care\",\"where\":\"a home, a hospice or a care home\",\"when\":\"any hour, sent now to the director on call\",\"price\":\"from the price list ($395 in the example); it goes on the family's statement at the arrangement meeting\",\"before\":\"nothing taken\"},{\"name\":\"Arrangement meeting at the family's home\",\"length\":\"about 2 hours\",\"price\":\"no charge; every choice is priced at the meeting from the price list\",\"before\":\"nothing taken\",\"after\":\"a deposit when the family signs, and the rest before the service day: the bill Rosie texts, or the home's own way\"},{\"name\":\"Planning-ahead meeting at home\",\"length\":\"about 1 hour\",\"price\":\"no charge\",\"after\":\"nothing through Rosie\"}],\"the case itself\":\"Never booked or run in Rosie: case files, death certificates, permits, obituaries, cemetery or crematory paperwork, and planning-ahead contracts and their trust funds stay in the home's own tools.\",\"travel area\":\"The home's setting (the example: 25 miles).\",\"capacity\":\"One director per meeting. The first call: two of the home's team, where the home's rules call for two.\",\"online\":\"Phone and video meetings count as at the funeral home. Relatives far away join by a video link the family forwards.\",\"booking window\":\"Arrangement meetings: usually the next day, up to 2 weeks ahead, set start times. Planning ahead: up to 60 days ahead.\",\"hold\":\"A picked time is saved for 30 minutes, not the usual 10, so a family in grief is never rushed.\"}",
+ "questions_before_times": [
+  "Has someone died, or is this about planning ahead?",
+  "Where did the death happen: a hospice, hospital or care home; at home under hospice care; or at home, not expected? (the safety check)",
+  "At the funeral home, by phone or video, or at your home?",
+  "Burial, cremation, or not sure yet? Only if the family wants to say."
+ ],
+ "safety_stop": [
+  "A death at home that was not expected, or not under hospice care: 911 first, and nobody is moved until the authorities say so",
+  "Someone may still be alive, or a medical emergency: 911",
+  "Crisis words: the 988 line first"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "sentnow"
+ ],
+ "switches": {
+  "sensitive": true
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  }
+ },
+ "license": "Always, where the state's rules require it: the funeral home's own establishment license, and each funeral director's own license. A crematory license where the home runs its own crematory and the state's rules require one. Planning ahead: a preneed seller's license where the state's rules require one. All of it comes from the state's form.",
+ "staff_skills": "[\"Arrangement meetings\",\"The first call (bringing someone into care)\",\"Meetings at a family's home\",\"Planning ahead (a preneed seller's license where required)\",\"Embalming (a licensed embalmer, only with permission)\"]",
+ "messages_never": "[\"The cause of death, or any medical detail\",\"The Social Security number of the person who died\",\"The family's money details: insurance, payment\",\"None of these in texts to the owner or staff either\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/funeral+home",
+  "pexels": "https://www.pexels.com/search/funeral%20home/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

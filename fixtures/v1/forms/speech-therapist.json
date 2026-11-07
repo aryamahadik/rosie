@@ -1,0 +1,1063 @@
+{
+ "form": "rosfield-registration",
+ "version": 1,
+ "profession": {
+  "id": "speech-therapist",
+  "name": "Speech therapist",
+  "type": "clinic",
+  "started_from": "physical-therapist"
+ },
+ "made_by": "work/phase4/tools/frontend-map.js",
+ "spec": "FRONTEND-SPEC.md (section 5)",
+ "note": "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+ "core": [
+  {
+   "id": "B01",
+   "field": "Business name (and a trade name per kind of work)",
+   "type": "text",
+   "need": "R",
+   "shows": "listing page, booking page, texts, card statement",
+   "source": "S1-09, S1-04, S1-29",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "suggestion": true
+  },
+  {
+   "id": "B03",
+   "field": "Business address (the shop or office; in flow B it is also the centre of the travel area)",
+   "type": "address + map pin",
+   "need": "R for flow A; flow B uses it as the centre",
+   "shows": "listing page, confirmation (flow A)",
+   "source": "S1-09, B4-77",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B04",
+   "field": "The business's own phone (from the listing). Customers never use it to book; they use Rosie's number (D102)",
+   "type": "phone",
+   "need": "R",
+   "shows": "listing page; used only for the control code and the go-live notice",
+   "source": "S1-09, S1-75, S1-35, S13-32",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B05",
+   "field": "Website or listing link (read to draft B06 and B07)",
+   "type": "link",
+   "need": "O",
+   "shows": "not shown",
+   "source": "S1-09, S1-84",
+   "google": "[G]",
+   "suggestion": true
+  },
+  {
+   "id": "B06",
+   "field": "About us line",
+   "type": "one line of text",
+   "need": "R (go-live waits for it)",
+   "shows": "listing page, booking page, preview",
+   "source": "S1-84",
+   "google": "[G] drafted, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B07",
+   "field": "Photos (the place, the work, the team, a logo; never a customer without their written yes)",
+   "type": "images, a few",
+   "need": "R (go-live waits for them)",
+   "shows": "listing page",
+   "source": "S1-84",
+   "google": "[G] picked, owner confirms",
+   "suggestion": true
+  },
+  {
+   "id": "B08",
+   "field": "FAQs (question and answer)",
+   "type": "list",
+   "need": "O",
+   "shows": "listing page; the AI answers from them",
+   "source": "S1-84",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B09",
+   "field": "Kinds of work (each one brings its profession file)",
+   "type": "pick-list, one or more",
+   "need": "R (at least one)",
+   "shows": "every screen: services, questions, safety, money paths",
+   "source": "S1-02, S1-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B10",
+   "field": "Which kinds of work belong to one company (one tax number, one Stripe, one bill)",
+   "type": "choice, only if more than one kind",
+   "need": "R when more than one kind",
+   "shows": "listing page (one listing per kind), Money page",
+   "source": "S1-04",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B11",
+   "field": "Owner name",
+   "type": "text",
+   "need": "R",
+   "shows": "sign-in, notices",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B12",
+   "field": "Owner mobile (the one only they use; it is their sign-in; never the listing's number)",
+   "type": "phone, proven by a 4-digit code typed on the page",
+   "need": "R",
+   "shows": "sign-in code, owner texts",
+   "source": "S1-10",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B13",
+   "field": "Owner email (notices, sign-in recovery, answers by email)",
+   "type": "email, proven by a code typed on the page",
+   "need": "R",
+   "shows": "owner emails",
+   "source": "S1-10, S1-77",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B14",
+   "field": "ID check (ID photo and selfie on the secure page; face data deleted in 30 days; or a person on Rosie's team on a video call)",
+   "type": "secure page",
+   "need": "R",
+   "shows": "not shown",
+   "source": "S1-10, S1-52",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "B15",
+   "field": "Proof the business is theirs (a code to the listing's own phone or email, typed back; else Rosie's team checks in 1 business day)",
+   "type": "code",
+   "need": "R to go live",
+   "shows": "not shown",
+   "source": "S1-75, S1-76",
+   "google": "[G] uses the listing's phone or email",
+   "suggestion": true
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "L02",
+   "field": "Travel area (flow B): a centre and a distance",
+   "type": "address + miles",
+   "need": "R for any service at the customer's place",
+   "shows": "booking page (inside or outside answer, before any times)",
+   "source": "S1-21, B4-77, B4-30",
+   "google": "[G] centre is the confirmed B03",
+   "suggestion": true
+  },
+  {
+   "id": "L03",
+   "field": "Travel fee for farther towns",
+   "type": "amount",
+   "need": "O",
+   "shows": "price shown before the yes",
+   "source": "B4-77, S1-12",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H01",
+   "field": "Opening hours",
+   "type": "weekly hours",
+   "need": "R",
+   "shows": "times card, listing page",
+   "source": "S1-21, A4-14",
+   "google": "yes [G]: offered as prefill, the owner confirms each one (section 10)",
+   "suggestion": true
+  },
+  {
+   "id": "H02",
+   "field": "Time off, closed days, blocked times (per person; per space)",
+   "type": "dates",
+   "need": "O",
+   "shows": "times card",
+   "source": "S11-13, S11-43, S1-81",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H03",
+   "field": "Calendar link per person (Rosie sees only busy times) or 'None booked yet'",
+   "type": "connect (Google, Apple, Outlook)",
+   "need": "O (nothing blocked if none)",
+   "shows": "times card",
+   "source": "S1-24, S2-06, D88",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H04",
+   "field": "Text hours (default 8am to 8pm; same-day requests reach the owner at any hour)",
+   "type": "hours",
+   "need": "O (default kept)",
+   "shows": "owner clocks",
+   "source": "S1-21",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H05",
+   "field": "Booking rules: notice, same-day, new customers, which bookings wait for the owner's OK",
+   "type": "rules",
+   "need": "O (suggested rules kept)",
+   "shows": "booking page says 'This is a request' (A4-98)",
+   "source": "S1-21, S11-57, A4-98",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H06",
+   "field": "Free-cancel time (the cutoff), e.g. '24 hours before'",
+   "type": "time rule",
+   "need": "R (starts from pf.settings.cutoff)",
+   "shows": "times card, confirmation, reminder",
+   "source": "S1-21, A7-01, pf.settings.cutoff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "H07",
+   "field": "Arrival setting: arrival window or a set start",
+   "type": "choice per flow",
+   "need": "R (starts from pf.settings.arrive)",
+   "shows": "times card, confirmation",
+   "source": "pf.settings.arrive, B4-83",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T01",
+   "field": "Staff list: name, role (staff, office manager = admin, or someone with their own business)",
+   "type": "list",
+   "need": "O ('just me' is allowed)",
+   "shows": "team page, times card (first names)",
+   "source": "S1-70, S2-02",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T02",
+   "field": "Staff mobile (the phone Rosie texts: invite, day list, DONE, code)",
+   "type": "phone",
+   "need": "R per person",
+   "shows": "not shown to customers",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T03",
+   "field": "The owner's yes that each person agreed to a text",
+   "type": "tick per person",
+   "need": "R per person",
+   "shows": "invite",
+   "source": "S2-02, S2-05",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T04",
+   "field": "Skills: which work each person takes",
+   "type": "list",
+   "need": "R per person",
+   "shows": "times card (only people with the skill are offered)",
+   "source": "S2-02, S2-15, pf.staff",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T05",
+   "field": "Who may OK what (owner, admin, staff)",
+   "type": "rules",
+   "need": "O",
+   "shows": "owner requests",
+   "source": "S2-02, S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "T06",
+   "field": "Price by person (default: the same price whoever goes)",
+   "type": "amount",
+   "need": "O",
+   "shows": "times card (price of whoever comes, before the yes)",
+   "source": "S2-15",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V01",
+   "field": "Service name",
+   "type": "text",
+   "need": "R",
+   "shows": "everywhere",
+   "source": "S1-12",
+   "google": "no (read from the price-list photo)",
+   "suggestion": true
+  },
+  {
+   "id": "V02",
+   "field": "Price kind: from the list / quoted from photos first / quoted at the visit (free = a list price of $0)",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page, times card",
+   "source": "S1-12, A4-05, B4-06, money.dims.price",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V03",
+   "field": "Price (one price, per hour, per unit, or set by the customer's answers); for 'at the visit': the visit fee and any 'from' price",
+   "type": "amount(s)",
+   "need": "R, except quoted at the visit",
+   "shows": "times card",
+   "source": "S1-12, A4-06, A4-13, B4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V04",
+   "field": "Length",
+   "type": "minutes",
+   "need": "R",
+   "shows": "times card",
+   "source": "S1-12, A4-14",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V05",
+   "field": "Money before: nothing / a card saved / a deposit / the full price",
+   "type": "choice",
+   "need": "R",
+   "shows": "booking page money lines",
+   "source": "S1-13, A5-04, B5-02, money.dims.before",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V06",
+   "field": "Deposit amount (never more than the price known then) and the rest",
+   "type": "amount",
+   "need": "R when V05 is a deposit",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, A5-13, B5-11",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V07",
+   "field": "Money after: flow A counter / bill / saved card / nothing; flow B bill / saved card / own way / nothing",
+   "type": "choice",
+   "need": "R",
+   "shows": "confirmation, DONE, bill",
+   "source": "S1-13, A9-01, B9-01, money.dims.after",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V08",
+   "field": "Late-cancel and no-show fee (one amount per service; a booking uses the largest)",
+   "type": "amount",
+   "need": "R when V05 is card, deposit or full",
+   "shows": "booking page, confirmation",
+   "source": "S1-13, S1-21, S13-55",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "V09",
+   "field": "Questions before the times, after the time, and only on the secure page",
+   "type": "read-only list",
+   "need": "P",
+   "shows": "chat, booking page, secure page",
+   "source": "pf.questions, A4-50, A4-84, A4-65",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M01",
+   "field": "Stripe connection (the business's own account; the name Stripe uses must match the registration)",
+   "type": "Stripe's own page",
+   "need": "R when any service takes money through Rosie",
+   "shows": "Money page",
+   "source": "S1-27",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M03",
+   "field": "Consent to Rosfield's fee: $2 a booking, and 1% of a membership or repeat plan charged monthly through Rosie (the owner's yes)",
+   "type": "OK button; saved with time and who",
+   "need": "R to go live",
+   "shows": "fee card, Money page, summary",
+   "source": "S1-25 (D97)",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M04",
+   "field": "Card for Rosfield's monthly bill (one card pays every company)",
+   "type": "card on Stripe",
+   "need": "R",
+   "shows": "monthly bill",
+   "source": "S1-29, S11-66",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "M05",
+   "field": "Terms accepted (who answers for what)",
+   "type": "tick",
+   "need": "R",
+   "shows": "preview page",
+   "source": "S1-29, S13-30",
+   "google": "no",
+   "suggestion": true
+  },
+  {
+   "id": "N01",
+   "field": "Owner notices: end-of-day summary (6pm by default; move or turn off), AWAY, PAUSE",
+   "type": "choices",
+   "need": "O",
+   "shows": "owner texts",
+   "source": "S11-41, S11-15, S11-17",
+   "google": "no",
+   "suggestion": true
+  }
+ ],
+ "elements": [
+  {
+   "id": "B02",
+   "field": "Display name (the plain name in texts, pay pages and on the card statement; a plain one is suggested for sensitive work)",
+   "type": "text",
+   "need": "R",
+   "shows": "texts, pay page, card statement",
+   "source": "S1-29, S13-22",
+   "google": "no (starts as B01)",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "L01",
+   "field": "Where each service happens: at the business / at the customer's place / both / a listed meeting spot / video or phone (and a price per place)",
+   "type": "choice per service",
+   "need": "R per service",
+   "shows": "booking page (place pick, both prices before the yes)",
+   "source": "S1-13, S1-43, A4-01, B4-01, B4-02",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "L06",
+   "field": "Video link, or 'the pro calls the customer's mobile', per person",
+   "type": "link or choice",
+   "need": "R when a service is by video or phone",
+   "shows": "confirmation, reminder",
+   "source": "S2-15, S2-21, A4-36",
+   "google": "no",
+   "turned_on_by": "fact video"
+  },
+  {
+   "id": "P02",
+   "field": "Memberships and repeat plans: name, price, how often, when charged, how to pause or end",
+   "type": "list",
+   "need": "O",
+   "shows": "booking page; the plan's terms get their own yes",
+   "source": "A4-30, A5-21, A5-22, S13-39, facts packs and plans",
+   "google": "no",
+   "turned_on_by": "fact plans"
+  },
+  {
+   "id": "Q01",
+   "field": "Forms and first steps (waiver, consent, intake, patch test, skin test)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "secure page, times card (a pair)",
+   "source": "A4-43, A4-84, pf.first_steps",
+   "google": "no",
+   "turned_on_by": "fact forms; fact firststeps"
+  },
+  {
+   "id": "Q05",
+   "field": "Children, people in care and animals: age rules, who a child is handed to, who may book (adult, teen, parent)",
+   "type": "from the profession file",
+   "need": "P (owner confirms)",
+   "shows": "booking page, check-in, pick-up",
+   "source": "A4-80, A8-42, pf.questions, facts children, incare, animals",
+   "google": "no",
+   "turned_on_by": "fact children"
+  },
+  {
+   "id": "Q06",
+   "field": "Sensitive work switch (texts never name the service; initials; no rating, nothing sold; gentle words)",
+   "type": "switch",
+   "need": "S",
+   "shows": "every text and pay page",
+   "source": "S13-22, switch sensitive",
+   "google": "no",
+   "turned_on_by": "switch sensitive"
+  },
+  {
+   "id": "Q08",
+   "field": "Results and aftercare links (sent after the visit)",
+   "type": "from the profession file",
+   "need": "P",
+   "shows": "receipt, secure page",
+   "source": "A10-22, A10-42, facts results, aftercare",
+   "google": "no",
+   "turned_on_by": "fact results"
+  },
+  {
+   "id": "Q09",
+   "field": "Welfare check before any no-show words",
+   "type": "switch",
+   "need": "S",
+   "shows": "no-show steps",
+   "source": "S13-10, A8-14, switch welfare",
+   "google": "no",
+   "turned_on_by": "switch welfare"
+  },
+  {
+   "id": "V18",
+   "field": "Insurance plan billed (the customer's part is billed after the plan pays)",
+   "type": "choice",
+   "need": "P",
+   "shows": "booking page",
+   "source": "fact planbill, S1-13, A4-53, A9-20",
+   "google": "no",
+   "turned_on_by": "fact planbill"
+  }
+ ],
+ "facts": [
+  "planbill",
+  "forms",
+  "plans",
+  "video",
+  "children",
+  "firststeps",
+  "results"
+ ],
+ "switches": [
+  "sensitive",
+  "welfare"
+ ],
+ "flows": {
+  "A": {
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main_path": "list|none|counter",
+   "paths": [
+    "list|none|counter",
+    "list|card|counter",
+    "list|card|card"
+   ]
+  },
+  "B": {
+   "arrive": "setstart",
+   "cutoff": "7am the day of",
+   "main_path": "list|none|own",
+   "paths": [
+    "list|none|own",
+    "list|card|card"
+   ]
+  }
+ },
+ "suggested_services_note": "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+ "suggested_services": [
+  {
+   "flow": "A",
+   "path": "list|none|counter",
+   "name": "Speech and language evaluation",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The main story: Lily's evaluation with Iris. Nothing is taken. The desk checks the plan, and Alex pays the $35 copay at the front desk. Weekly sessions are paid the same way, one at a time. A self-pay family pays $140, then $110 a session."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|counter",
+   "name": "Speech and language evaluation",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$140",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "counter",
+   "money_after_label": "At the counter",
+   "example": "The same evaluation where the clinic turns on its $20 late-cancel fee, free to cancel until 24 hours before. A card is saved for it, never for a fee-free family, and Sam confirms any charge."
+  },
+  {
+   "flow": "A",
+   "path": "list|card|card",
+   "name": "Speech therapy session",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$110",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$20",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "A Saturday-morning visit, when the front desk is closed: a card is saved, and the $110 session is charged to it when Iris texts DONE. Video sessions are paid this way too."
+  },
+  {
+   "flow": "B",
+   "path": "list|none|own",
+   "name": "Home evaluation",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "none",
+   "money_before_label": "Nothing taken",
+   "money_after": "own",
+   "money_after_label": "Business's own way",
+   "example": "The main story: Max's home evaluation with Caleb. Nothing is taken. The office bills the family's health plan its own way."
+  },
+  {
+   "flow": "B",
+   "path": "list|card|card",
+   "name": "Home evaluation",
+   "price_kind": "list",
+   "price_kind_label": "From the price list",
+   "price": "$179",
+   "deposit": null,
+   "rest": null,
+   "paid": null,
+   "fee": "$89",
+   "money_before": "card",
+   "money_before_label": "Card saved",
+   "money_after": "card",
+   "money_after_label": "Saved card charged",
+   "example": "The same visit, paid by the family itself: a card is saved, and the $179 is charged when Caleb texts DONE. Free to cancel until 7am on the day; after that, an $89 fee only if Sam confirms it."
+  }
+ ],
+ "extra_services": [
+  {
+   "flow": "A",
+   "name": "Hearing screening",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "counter",
+   "price": "$35",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Feeding evaluation",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$160",
+   "paid": "$160",
+   "fee": "$20"
+  },
+  {
+   "flow": "A",
+   "name": "Speech therapy session (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  },
+  {
+   "flow": "B",
+   "name": "Hearing screening at home",
+   "price_kind": "list",
+   "money_before": "card",
+   "money_after": "card",
+   "price": "$60",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Feeding evaluation at home",
+   "price_kind": "list",
+   "money_before": "full",
+   "money_after": "none",
+   "price": "$199",
+   "paid": "$199",
+   "fee": "$89"
+  },
+  {
+   "flow": "B",
+   "name": "Home session (plan visit)",
+   "price_kind": "list",
+   "money_before": "none",
+   "money_after": "none",
+   "paid_by": "credit"
+  }
+ ],
+ "services_listed_in_profession_file": [
+  {
+   "name": "Speech and language evaluation (a child)",
+   "price": "$140 self-pay; with a plan, the plan's share (the example: a $35 copay)",
+   "kind": "one price",
+   "length": "75 min",
+   "where": "at the clinic, or at home",
+   "before": "nothing taken; a card saved only where the clinic turns on its late-cancel fee or keeps a card on file",
+   "after": "the share at the front desk, or the saved card charged when the therapist texts DONE where the clinic keeps a card on file"
+  },
+  {
+   "name": "Hearing screening (added to an evaluation)",
+   "price": "$20",
+   "kind": "one price, added to a visit",
+   "length": "15 min",
+   "where": "both places",
+   "before": "nothing taken",
+   "after": "with the visit"
+  },
+  {
+   "name": "Therapy session (from the plan of care)",
+   "price": "$110 self-pay; with a plan, the plan's share",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the clinic, by video, or at home",
+   "before": "nothing taken",
+   "after": "at the front desk, or the saved card at DONE"
+  },
+  {
+   "name": "Re-check (progress re-evaluation)",
+   "price": "$120 self-pay; with a plan, the plan's share",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the clinic, or at home",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Adult evaluation (voice, stuttering, or speech after a stroke)",
+   "price": "$140 self-pay; with a plan, the plan's share",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the clinic",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Voice check (an adult's voice)",
+   "price": "$40",
+   "kind": "one price",
+   "length": "30 min, in the clinic's one recording room",
+   "where": "at the clinic",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Feeding or swallowing evaluation",
+   "price": "$160 self-pay; with a plan, the plan's share",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the clinic, or at home",
+   "before": "nothing taken",
+   "after": "at the front desk, or the office's own way at home"
+  },
+  {
+   "name": "Feeding therapy session",
+   "price": "$110 self-pay; with a plan, the plan's share",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the clinic",
+   "before": "nothing taken",
+   "after": "at the front desk"
+  },
+  {
+   "name": "Video therapy session",
+   "price": "$110 self-pay; with a plan, the plan's share where it pays for video",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "by video, counted as at the clinic",
+   "before": "a card saved",
+   "after": "the saved card charged when the therapist texts DONE"
+  },
+  {
+   "name": "Check-in session (after the weekly plan ends)",
+   "price": "$60 a visit at the clinic; $150 a visit at home",
+   "kind": "one price, every 4 weeks",
+   "length": "30 to 45 min",
+   "where": "both places",
+   "before": "nothing taken",
+   "after": "each visit paid when it happens, like a single visit"
+  },
+  {
+   "name": "Home evaluation (a young child)",
+   "price": "$179 self-pay; with a plan, the office bills the plan",
+   "kind": "one price",
+   "length": "75 min",
+   "where": "at the client's home",
+   "before": "nothing taken when a plan pays; a card saved for self-pay",
+   "after": "the office bills the plan its own way; self-pay: the saved card charged when the therapist texts DONE"
+  },
+  {
+   "name": "Home session",
+   "price": "$150 self-pay; with a plan, the office bills the plan",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the client's home",
+   "before": "nothing taken when a plan pays; a card saved for self-pay",
+   "after": "the office's own way, or the saved card at DONE"
+  },
+  {
+   "name": "Preschool or daycare session",
+   "price": "the same as a home session",
+   "kind": "one price",
+   "length": "45 min",
+   "where": "at the child's preschool or daycare, on the days the preschool OKs",
+   "before": "nothing taken when a plan pays; a card saved for self-pay",
+   "after": "the office's own way, or the saved card at DONE"
+  },
+  {
+   "name": "Mealtime visit (feeding at home)",
+   "price": "$160, with written tips on the secure page",
+   "kind": "one price",
+   "length": "60 min",
+   "where": "at the client's home",
+   "before": "nothing taken when a plan pays; a card saved for self-pay",
+   "after": "with the visit"
+  },
+  {
+   "name": "Adult evaluation at home (after a stroke)",
+   "price": "$199 ($249 when Sam does it)",
+   "kind": "one price",
+   "length": "75 min",
+   "where": "at the client's home, or on a host's visit day",
+   "before": "nothing taken when a plan pays; a card saved for self-pay",
+   "after": "with the visit"
+  },
+  {
+   "name": "Missed-visit or late-cancel fee",
+   "price": "$20 at the clinic; $89 for a home visit",
+   "kind": "a fee, never booked alone",
+   "length": null,
+   "where": "both places",
+   "before": null,
+   "after": null
+  },
+  {
+   "name": "Hearing screenings at a preschool (hearing tests)",
+   "price": "$120 an hour, 2-hour minimum (the example's own)",
+   "kind": "per hour",
+   "length": null,
+   "where": "at the customer's place (a preschool or daycare)",
+   "before": "nothing taken, or a card saved for a self-pay school",
+   "after": "the business's own way, or the saved card at DONE"
+  }
+ ],
+ "intake_questions": {
+  "before_times": [
+   "who it's for: your child (and their age), or you",
+   "for a child: are you the parent or legal guardian (often clear from 'my daughter')",
+   "what it's about, in a few words: speech and language, stuttering, voice, or feeding and swallowing (it sets the evaluation and its length; never the details)",
+   "languages spoken at home (a therapist who speaks it, or an interpreter)",
+   "a school plan (IEP) for speech: none, has one and wants private too, or wants the school's services",
+   "a doctor's referral: yes, or not yet",
+   "a health plan (its name only), Medicaid, or paying yourself",
+   "for a video session: which state the client will be in during the session",
+   "days and times that suit you, like after preschool"
+  ],
+  "after_time": [
+   "anything that helps at the visit, like a favorite toy or needing an interpreter",
+   "at home: who will be there, any pets, and where to park",
+   "at a preschool: the preschool's name and its contact for the visit day"
+  ],
+  "secure_page_only": [
+   "the child's name and birth date; the parent's name, how they're related, and 'I'm 18 or older'",
+   "the home address",
+   "plan member ID, the plan holder and photos of both sides of the plan card",
+   "the child's doctor, and the parent's OK for the office to ask for a referral",
+   "a copy of the school plan (IEP), if there is one",
+   "intake, consent and health history forms",
+   "who else may bring the child, with the parent's signed OK",
+   "for a preschool session: the parent's signed OK and the preschool's contact"
+  ],
+  "never_asked": "the child's name, birth date, the reason in detail, test results, the member ID and the health history never go through the AI chat: only the kind of visit, the child's age, the plan's name and the days and times",
+  "who_may_book": "a parent or legal guardian for anyone under 18 (Rosie's rule for speech therapy, labeled as such, until a state's form says otherwise); an adult for themselves; a guardian or health care agent for an adult who can't consent, like after a stroke; anyone else, like a grandparent or a sitter, is asked to have a parent book",
+  "who_may_bring": "a switch: the parent or guardian brings the child and stays, or an adult the parent names on the secure page with a signed OK; at a preschool or daycare session, the parent signs an OK and stays reachable by phone; a child is never with the therapist without the parent's OK"
+ },
+ "safety_and_stop_words": {
+  "stop": [
+   {
+    "words": "sudden trouble speaking or understanding, a drooping face, or weakness on one side (stroke signs), at any age",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   },
+   {
+    "words": "choking now, trouble breathing, turning blue, or a child who can't swallow at all",
+    "say": "Call 911 now.",
+    "booking": "no booking"
+   },
+   {
+    "words": "words about self-harm",
+    "say": "Call or text 988 now. If anyone is in danger right now, call 911.",
+    "booking": "no booking"
+   }
+  ],
+  "go_on": [
+   {
+    "words": "coughing or gagging at meals, with no choking now",
+    "what": "the safety words first (choking or trouble breathing: call 911), then the booking goes on: a feeding or swallowing evaluation, once the owner OKs it"
+   },
+   {
+    "words": "a child who stopped using words they had",
+    "what": "booked as an evaluation, and the parent is told to let the child's doctor know too; Rosie never judges how serious anything is"
+   }
+  ],
+  "always": "the general screen: danger to life, fire, gas or a medical emergency gets 911, and words about self-harm get 988; every message is checked, every time",
+  "owner_may_add_words": true
+ },
+ "first_steps_and_forms": {
+  "steps": [
+   {
+    "name": "The evaluation",
+    "when": "before any weekly sessions",
+    "who": "every new client",
+    "result": "it sets the plan of care; sessions are booked after it, with the family's own yes"
+   },
+   {
+    "name": "The referral",
+    "when": "asked before the times (yes, or not yet)",
+    "who": "where the state's form, the plan or Medicaid asks for a doctor's referral or prescription before therapy (a switch)",
+    "result": "the evaluation goes ahead either way where the state allows; the office asks the child's doctor itself, with the parent's OK on the secure page; weekly sessions wait for it where it's needed"
+   },
+   {
+    "name": "Intake, consent and health history forms",
+    "when": "on the secure page only, never by text; due the day before the visit; one reminder before it's due",
+    "who": "every new client",
+    "result": "not done by its due date: Sam keeps the visit (signed on the secure page at the desk or door first), moves it, or cancels with no fee"
+   },
+   {
+    "name": "The plan check",
+    "when": "while booking, by the front desk, by hand",
+    "who": "every family that names a plan",
+    "result": "covered, some services only, not covered, or can't check now (the desk checks later, and the family may cancel free)"
+   },
+   {
+    "name": "A written price estimate for self-pay families",
+    "when": "told while booking; sent on time, as the federal rules say",
+    "who": "every family paying for itself",
+    "result": "a to-do for the front desk, with its due date"
+   },
+   {
+    "name": "The plan's OK for the sessions after the evaluation",
+    "when": "after the evaluation, asked by the desk on the plan's own website",
+    "who": "families whose plan asks for it",
+    "result": "OK'd: the weekly plan is booked within the sessions and dates OK'd; pending: only the next session is booked; no: self-pay, or stop"
+   }
+  ],
+  "prep": "come 10 minutes early to the first visit; bring a photo ID, the plan card, and any school plan or hearing test results; a parent stays for the whole visit",
+  "forms_fact": true,
+  "first_steps_fact": true,
+  "documents_fact": false
+ },
+ "staff": {
+  "skills": "speech therapists: evaluations, re-checks, the plan of care, and every session; assistants: sessions only, under a speech therapist's plan of care, where the state allows; feeding and swallowing work only by a therapist trained for it (Iris, Caleb); each therapist's languages (Iris: Spanish); only people cleared for home visits go to homes and preschools; hearing tests only by an audiologist",
+  "licenses_or_certificates": "each speech therapist's own license, per state; an assistant's or a clinical fellow's credential where the state's form asks for one; an audiologist's own license for hearing tests",
+  "supervision": "an assistant or a clinical fellow works only under a named supervising speech therapist, with the supervision the state's form sets (a switch: on site, or reachable by phone); how many of a plan's sessions an assistant may do, and how often the therapist comes back, is a switch from the state's form too",
+  "who_oks": "the owner OKs same-day times, feeding or swallowing evaluations, any custom price (at the clinic, every one; at home, over $500), and anything a therapist flags",
+  "stand_in": "an evaluation or a re-check: only another speech therapist; a session: a speech therapist, or an assistant under the same plan; a video session: only someone licensed where the client is; the plug-in turns Rosie's no-reply default off: nobody, and never a child, is moved to another therapist without the family's yes"
+ },
+ "children_and_age": {
+  "children_fact": true,
+  "in_care_fact": false,
+  "animals_fact": false,
+  "who_may_book": "a parent or legal guardian for anyone under 18 (Rosie's rule for speech therapy, labeled as such, until a state's form says otherwise); an adult for themselves; a guardian or health care agent for an adult who can't consent, like after a stroke; anyone else, like a grandparent or a sitter, is asked to have a parent book",
+  "minors_texts": "a child's texts go only to the parent or guardian's phone",
+  "minors_rules": "who may consent for a minor, and at what age a minor may consent alone (a switch from the state form)"
+ },
+ "visit": {
+  "check_in": "at the clinic: the check-in code at the front desk, from the parent; by video: the code read out at the start, and the parent says which state the child is in that day; at home or at a preschool: the code at the door, from the parent or the adult named on the booking",
+  "done": "the check-in code or DONE; results are explained in person; the written report and the plan of care stay in the practice's own records, never in Rosie or a text",
+  "changes_at_visit": "the evaluation sets the plan of care: goals, how many sessions a week, for how many weeks, and practice at home; any added service only with the parent's yes and its price first",
+  "before_work": "the therapist reads the intake forms, the school plan and any referral before starting"
+ },
+ "license": {
+  "note": "Optional. Upload anything. Rosie never checks it and never shows it as checked (D96).",
+  "need": "always: each speech-language pathologist (a speech therapist) holds their own active license from the state's board; a speech therapy assistant or a clinical fellow works only with the credential the state's form asks for, if any",
+  "who": "each person; the practice too, where the state's form registers practices or their owners (a switch)",
+  "ask": "each person's license number in their invite reply (or the owner sends it); the practice's registration number from the owner, where the state's form asks for one",
+  "insurance": "malpractice insurance where the state's form asks for it"
+ },
+ "never_in_a_text": "texts carry only the practice's name, the date, the time, the address and a secure link: never the child's name, the visit type, the reason, the plan, test results or health details; at the clinic, no therapist's name in a family's texts; at home, the therapist's name stays, for the door check",
+ "languages": "English and Spanish; a family's home language picks a therapist who speaks it, or an interpreter the practice sets up",
+ "unmapped_keys": {
+  "pf.questions": [
+   "publicPrograms"
+  ],
+  "pf.staff": [
+   "desk"
+  ],
+  "pf.license": [
+   "national",
+   "remote",
+   "hearing",
+   "feeding"
+  ],
+  "pf.messages": [
+   "agent",
+   "healthQuestions",
+   "results",
+   "decider",
+   "staffReasons"
+  ],
+  "pf.visit": [
+   "inside",
+   "parent",
+   "home"
+  ]
+ },
+ "duplicate_spellings_dropped": []
+}

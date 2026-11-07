@@ -1,0 +1,261 @@
+{
+ "id": "flooring",
+ "name": "Flooring installer",
+ "booking_type": "Project",
+ "pattern": "project",
+ "built_from": "contractor",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Flooring installer",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Flooring installer",
+   "staff": "Elena and Leo (floor consultants)",
+   "customer": null,
+   "arrive": "setstart",
+   "cutoff": "24 hours before",
+   "main": "list|card|counter",
+   "services": [
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Floor consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Floor consult, $35 at the showroom; a card saved for the $20 missed-consult fee; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "Floor consult",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Floor consult, $35; nothing taken; a YES books it; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Floor preview session",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "Floor preview session, $55, paid in full when booking; credited to the floor if Alex orders an install.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "Whole-home floor plan",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Whole-home floor plan, $140; a $40 deposit now; the $100 rest at the showroom desk.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Pattern layout",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Pattern layout, priced from Alex's photos at $90 (Sam OKs it); a card saved for the $20 fee; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|counter",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Floor match",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "Floor match, priced at the showroom after a $25 consult; a card saved for the $20 fee; paid at the showroom desk.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Flooring installer",
+   "staff": "Danny and Hugo (estimator and crew lead)",
+   "customer": null,
+   "arrive": "window",
+   "cutoff": "24 hours before",
+   "main": "visit|none|bill",
+   "services": [
+    {
+     "combo": "visit|none|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Wood floor install",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Wood floors, 594 sq ft: the $89 measure visit, nothing taken; Danny's $9,200 written quote; the contract, a $920 deposit, $3,370 when the wood arrives; the last $4,910 on the bill Rosie texts.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|none|own",
+     "price_kind": "Quoted at the visit",
+     "before": "Nothing taken",
+     "after": "Business's own way",
+     "name": "Wood floor install",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same floors, but Sam bills the deposit, the wood payment and the last payment his own way; Rosie sends nothing about money.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "visit|card|bill",
+     "price_kind": "Quoted at the visit",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Wood floor install",
+     "price": null,
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "The same floors, with a card saved for the $89 measure visit fee when he books.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Laundry room floor",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$89",
+     "story": "A laundry room floor priced from photos at $640 (over $500, so Sam OKs it); a signed contract; a 25% deposit of $160; the rest on the bill.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|bill",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Rosie texts the bill",
+     "name": "Board repair",
+     "price": "$179",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$89",
+     "story": "Board repair, $179 from the list (or a garage floor sealing); a card saved for the $89 fee; Rosie texts the bill after the job.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Buff and recoat",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$89",
+     "story": "Buff and recoat, $150 from the list, paid in full when booking; nothing more after.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Measure visit, then project: the install is booked only after a written quote and a signed contract. The example business's own prices.\",\"B\":[{\"name\":\"Measure visit with samples\",\"price\":\"$89, credited to the floor if Alex signs within 30 days (the example's own price; a free measure is a starting option)\",\"length\":\"60 minutes, plus the drive\",\"where\":\"at the customer's place; an adult is home\",\"before\":\"nothing taken at booking; a card may be saved for the $89 fee\",\"after\":\"billed only if no contract follows\"},{\"name\":\"Wood floor install (engineered or solid)\",\"price\":\"quoted after the measure visit, by the square foot with material and 10% for waste (the example: about $11 a sq ft); a written quote the next business day, good for 30 days\",\"length\":\"one crew lays about 600 sq ft in 3 days, after the wood rests at least 3 days\",\"where\":\"at the customer's place\",\"before\":\"nothing at booking; a deposit only after the contract is signed\",\"after\":\"the wood payment once it's delivered; the last payment after the walk-through\"},{\"name\":\"Vinyl plank install\",\"price\":\"quoted after the measure visit (the example: about $7 a sq ft); in stock, no resting days\",\"where\":\"at the customer's place\",\"before\":\"the same\",\"after\":\"the same\"},{\"name\":\"Tile floor (Lee Tile)\",\"price\":\"free measure visit, then a quote\",\"where\":\"at the customer's place\"},{\"name\":\"Laundry room floor\",\"price\":\"priced from photos (example: $640); over $500, Sam OKs it\",\"length\":\"1 day\",\"where\":\"at the customer's place\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest on the bill\"},{\"name\":\"Board repair\",\"price\":\"$179, from the list (up to 3 boards)\",\"length\":\"1 to 2 hours\",\"where\":\"at the customer's place\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Buff and recoat\",\"price\":\"$150, from the list\",\"length\":\"half a day\",\"where\":\"at the customer's place\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Garage floor sealing\",\"price\":\"$179, from the list\",\"where\":\"at the customer's place; nobody needs to be home\",\"before\":\"a card saved for the $89 fee\",\"after\":\"Rosie texts the bill\"},{\"name\":\"Moisture test\",\"price\":\"$199, with a written report a few days later\",\"where\":\"at the customer's place\"},{\"name\":\"Old floor removal\",\"price\":\"per sq ft, in the quote; old tile or black glue only after a clear lab test\"},{\"name\":\"Lab test of old tile and glue\",\"price\":\"in the quote; done by an outside licensed inspector\"},{\"name\":\"New baseboards and thresholds\",\"price\":\"per foot, in the quote\"},{\"name\":\"Furniture moving\",\"price\":\"per room, in the quote; no pianos or safes\"},{\"name\":\"Subfloor repair\",\"price\":\"priced by a signed change order when it's found (the example: $190 a sheet)\"},{\"name\":\"Labor\",\"price\":\"$120 an hour, 1-hour minimum; added to a job, never booked alone\"},{\"name\":\"Wood sold with no install\",\"price\":\"a store sale, the business's own, outside Rosie. Sold at the home, it gets any cancel notice the rules require.\"}],\"A\":[{\"name\":\"Floor consult\",\"price\":\"$35, 30 minutes, with the showroom samples\",\"where\":\"at the showroom\",\"before\":\"a card saved for the $20 missed-consult fee\",\"after\":\"paid at the showroom desk\"},{\"name\":\"Stair and trim picks\",\"price\":\"$40\",\"where\":\"at the showroom\",\"before\":\"a card saved\",\"after\":\"at the showroom desk\"},{\"name\":\"Sample loan\",\"price\":\"$20, up to 5 samples to take home for a week\"},{\"name\":\"Finish sample\",\"price\":\"$15, an add-on to a floor match\"},{\"name\":\"Stain pick\",\"price\":\"$25\",\"where\":\"at the showroom\"},{\"name\":\"Floor preview session\",\"price\":\"$55, 60 minutes: the floors shown in the customer's own room photos; credited to the floor if Alex orders an install\",\"where\":\"at the showroom\",\"before\":\"paid in full when booked\",\"after\":\"nothing more\"},{\"name\":\"Whole-home floor plan (layout, thresholds, materials)\",\"price\":\"$140, 2½ hours\",\"where\":\"at the showroom\",\"before\":\"a $40 deposit, with the $100 rest at the desk, or a card saved for the $20 fee\",\"after\":\"at the showroom desk\"},{\"name\":\"Pattern layout\",\"price\":\"priced from the customer's photos and measurements (example: $90), like herringbone; Sam OKs each one\",\"where\":\"at the showroom\"},{\"name\":\"Floor match\",\"price\":\"priced at the showroom after a $25 consult, once the old floor is seen (the example: from $110); a 15-minute board check first\",\"where\":\"at the showroom\"}],\"capacity\":\"One estimator or consultant per booking; one install crew, one job at a time; the showroom's one layout table is saved with specialty work\",\"skills\":\"Measure visits and quotes: estimators (the owner can stand in). Installs: the crew lead and crew. Showroom: floor consultants. Specialty work: only the consultants Sam names.\",\"nobody_home\":\"Install days with a lockbox and garage floor sealing: nobody needs to be home; a start and end photo. The measure visit needs an adult home.\",\"online\":\"No video consult: the showroom's samples are the point\",\"store_sales\":\"Materials sold at the showroom counter are the showroom's own sales, outside Rosie\"}",
+ "questions_before_times": [
+  "What's on the floor now? (carpet, tile, vinyl, wood, not sure)",
+  "Which rooms, and about how big?",
+  "What floor would you like? (wood, vinyl plank, tile, carpet)"
+ ],
+ "safety_stop": [
+  "part of a floor has caved in or dropped, cracking sounds under foot, a hole someone could fall through",
+  "a gas smell, sparking wires, a carbon monoxide alarm"
+ ],
+ "first_steps": [],
+ "facts": [
+  "photos",
+  "documents",
+  "firststeps",
+  "extrawork",
+  "stages",
+  "banktransfer",
+  "multiday"
+ ],
+ "switches": {
+  "cancelright": {
+   "A": false,
+   "B": true
+  }
+ },
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "window"
+  },
+  "cutoff": "24 hours before"
+ },
+ "license": "if: a home improvement or contractor license for the company, where the state's form requires one. Some states license flooring only above a job size, or only for some floor types (hard floors but not carpet). Some license none.",
+ "staff_skills": "",
+ "messages_never": "[\"Door or lockbox codes\",\"The budget\",\"Contract, change order and test papers (secure page only, with a copy by email)\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/flooring+installer",
+  "pexels": "https://www.pexels.com/search/flooring%20installer/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

@@ -1,0 +1,202 @@
+{
+ "id": "clown",
+ "name": "Clown and balloon artist",
+ "booking_type": "Event",
+ "pattern": "event",
+ "built_from": "dj",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Clown and balloon artist",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Clown and balloon artist",
+   "staff": "Pip and Bo (balloon coaches)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "list|deposit|counter",
+   "services": [
+    {
+     "combo": "list|deposit|counter",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "At the counter",
+     "name": "balloon class",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "The main story: a $140 balloon class (2½ hours, one to one). A $40 deposit now, and the $100 rest at the studio.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|card|counter",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "balloon lesson",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 balloon lesson. A card is saved for the studio's $20 fee. Alex pays at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|counter",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "At the counter",
+     "name": "balloon lesson",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A $35 balloon lesson for a returning student. Nothing is taken: a YES books it.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "private balloon lesson",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 private lesson (60 minutes), paid in full when booking.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|card|counter",
+     "price_kind": "Quoted from photos first",
+     "before": "Card saved",
+     "after": "At the counter",
+     "name": "Custom character plan",
+     "price": "$90",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "A custom character plan for a party routine, priced from the show list at $90. Booked once Sam OKs it, and paid at the studio.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Clown and balloon artist",
+   "staff": "Clem and Dot (clowns)",
+   "customer": null,
+   "arrive": null,
+   "cutoff": null,
+   "main": "photos|deposit|card",
+   "services": [
+    {
+     "combo": "photos|deposit|card",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Birthday party clown",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "The main story: a 2-hour birthday party, quoted from Alex's plan at $640 (over $500, so Sam OKs it). Both sign the contract. A $160 deposit holds the date, and the $480 rest goes on the saved card at DONE.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "photos|deposit|bill",
+     "price_kind": "Quoted from photos first",
+     "before": "A deposit",
+     "after": "Rosie texts the bill",
+     "name": "Birthday party clown",
+     "price": "$640",
+     "deposit": "$160",
+     "rest": "$480",
+     "paid_now": null,
+     "fee": "$160",
+     "story": "A company party, quoted from the plan at $640 (over $500, so Sam OKs it). Both sign the contract, a $160 deposit holds the date, and the rest, with any overtime, goes on the bill after.",
+     "due_now_at_booking": 160,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Kids' party",
+     "price": "$150",
+     "deposit": "$40",
+     "rest": "$110",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $150 kids' party (2 hours). A $40 deposit now, and the $110 rest on the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Kids' party",
+     "price": "$150",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$150",
+     "fee": "$40",
+     "story": "The $150 kids' party, paid in full when booking.",
+     "due_now_at_booking": 150,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"at the customer's place (the example: Lee Party Clowns' own list)\":[{\"service\":\"Kids' party clown (2 hours: a show, games and balloon animals)\",\"price kind\":\"one price\",\"price\":\"$150\",\"length\":\"2 hours\",\"place\":\"at a home or a hall\",\"before\":\"the full price, or a $40 deposit\",\"after\":\"nothing more, or the $110 rest on the saved card at DONE\",\"note\":\"A parent or an adult on the booking is in the room the whole time. A late cancel or no-show keeps at most $40, only if the owner confirms; the rest is refunded.\"},{\"service\":\"Party clown (a birthday or a company party, quoted from the plan: a clown and up to a helper)\",\"price kind\":\"quoted from the plan first (the date, hours, guests and ages)\",\"price\":\"the quote (the example: $640 for a 2-hour party with a helper)\",\"length\":\"the party's hours, plus 45 minutes to set up\",\"place\":\"at the venue or a home\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"Only the lead clown runs the show and the MC. A party with an adult guest list is quoted from the plan.\"},{\"service\":\"Company event (a show for a work party, quoted from the plan)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"the event's hours\",\"place\":\"at the venue or the office\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"Rosie texts the bill after, with any overtime on it\"},{\"service\":\"Wedding entertainer (quoted from the plan; the owner OKs every wedding)\",\"price kind\":\"quoted from the plan first\",\"price\":\"the quote\",\"length\":\"the hours agreed\",\"place\":\"at the venue\",\"before\":\"a signed contract, then a 25% deposit\",\"after\":\"the rest goes on the saved card at DONE\",\"note\":\"One wedding a day per clown, booked up to 18 months ahead.\"},{\"service\":\"Character visit (a costumed character, 1 hour, with a photo with the guests)\",\"price kind\":\"one price\",\"price\":\"$179\",\"length\":\"1 hour\",\"place\":\"at the party\",\"before\":\"booked alone: a $40 deposit; with a party: in the party's quote\",\"after\":\"booked alone: the rest on the saved card at DONE; with a party: with the party\",\"note\":\"Booked alone for a small event, or added to a party. No one is picked from the crowd.\"},{\"service\":\"Second act (a magician or a second clown, added to the show)\",\"price kind\":\"by person\",\"price\":\"$199 with Dot, $249 with Clem (the example)\",\"length\":\"the party's hours\",\"place\":\"at the venue\",\"before\":\"with the main booking\",\"after\":\"with the main booking\"},{\"service\":\"Magic table set (a tabletop magic act, added to the show)\",\"price kind\":\"one price\",\"price\":\"$149\",\"length\":\"the party's hours\",\"place\":\"at the party\",\"before\":\"with the main booking\",\"after\":\"with the main booking\",\"note\":\"Set up on the table the host names\"},{\"service\":\"Overtime on the night\",\"price kind\":\"per hour, by the half hour\",\"price\":\"$160 an hour with Clem, $120 with anyone else (the example)\",\"length\":\"30 or 60 minutes\",\"place\":\"at the event\",\"before\":\"nothing: asked on the night\",\"after\":\"one pay link after, or on the bill\",\"note\":\"Only with the customer's written yes, at the rate shown before booking, and never past the venue's curfew\"},{\"service\":\"Travel\",\"price kind\":\"travel fee\",\"price\":\"free within 15 miles; $89 from 15 to 25 miles (the travel area)\",\"length\":\"\",\"place\":\"at the customer's place\",\"before\":\"added to the quote or the deposit\",\"after\":\"with the rest\"},{\"service\":\"Weekend kids' show (a regular show at a restaurant, 1 hour)\",\"price kind\":\"one price, on a plan\",\"price\":\"$179 a show (the example)\",\"length\":\"1 hour\",\"place\":\"at the restaurant\",\"before\":\"a card saved\",\"after\":\"one bill a month, paid by the saved card after the month's shows\",\"note\":\"Skip, pause or end by text; a price change gets 30 days' notice\"}],\"at the business (the example: Lee Balloon Studio's own list)\":[{\"service\":\"Balloon class (2 hours, one to one, at the studio)\",\"price kind\":\"one price\",\"price\":\"$140\",\"length\":\"2 hours\",\"place\":\"at the studio\",\"before\":\"a $40 deposit\",\"after\":\"the $100 rest at the studio\"},{\"service\":\"Balloon lesson (30 minutes: animals and twists)\",\"price kind\":\"one price\",\"price\":\"$35\",\"length\":\"30 min\",\"place\":\"at the studio\",\"before\":\"a card saved for a $20 fee\",\"after\":\"the $35 paid at the studio after the lesson\"},{\"service\":\"Private balloon lesson (60 minutes, one to one, paid in full)\",\"price kind\":\"one price\",\"price\":\"$55\",\"length\":\"60 min\",\"place\":\"at the studio\",\"before\":\"the full price when booking\",\"after\":\"nothing more\"},{\"service\":\"Custom character plan (a show written for your party, priced from the show list)\",\"price kind\":\"quoted from the show list first\",\"price\":\"$90 (the example)\",\"length\":\"about a week\",\"place\":\"at the studio, then handed over there\",\"before\":\"a card saved for the $20 fee; booked once the studio OKs it\",\"after\":\"paid at the studio when the plan is handed over\",\"note\":\"Handed over as a written plan at the studio; nothing is shipped\"}],\"capacity\":\"One booking per clown at a time. A party with a helper books the lead clown and the helper together. The studio's teaching table holds one lesson at a time.\",\"nobody needs to be home\":\"Never: someone from the party is there. Props are set up early only with the venue's OK and a venue contact there.\",\"online\":\"A planning call can be a video call. Lessons are in person.\",\"plans\":[\"Balloon class every 4 weeks (the studio): the same day and time, $140 a visit, a $40 deposit and the $100 rest at the studio, each visit booked and paid like a single one\",\"Yearly kids' party (clown work): $150 a visit, each booked and paid like a single one\",\"Weekend kids' show (clown work): one bill a month, paid by the saved card after the month's shows\",\"Every plan: skip, pause or end by text; a price change gets 30 days' notice\"]}",
+ "questions_before_times": [
+  "The kind of event: a birthday, a company party, a wedding, a restaurant show or a small event",
+  "The date, and the start and end time",
+  "The venue's name and town (for the travel fee), and indoors, outdoors or both",
+  "About how many guests, and the ages of the children (it sets the show)",
+  "Add-ons: a second act, a magic table, an extra hour",
+  "At the studio: the class or lesson and the age of the student"
+ ],
+ "safety_stop": [
+  "Someone hurt, a fire, or a fight at the party right now"
+ ],
+ "first_steps": [],
+ "facts": [
+  "documents",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {},
+ "license": "None for clown work or balloon lessons in most places. A local business license where the city or county asks for one: from the state form.",
+ "staff_skills": "[\"Kids' parties (leads only)\",\"Birthday and company parties\",\"Weddings (leads only)\",\"Balloon work\",\"Lessons\"]",
+ "messages_never": "Gate codes, access notes, a child's name, age and details, and family notes stay on the secure page. The show form stays on the form. Texts to the clown carry none of them either.",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/clown+and+balloon+artist",
+  "pexels": "https://www.pexels.com/search/clown%20and%20balloon%20artist/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}

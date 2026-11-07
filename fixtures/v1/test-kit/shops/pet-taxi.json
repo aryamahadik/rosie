@@ -1,0 +1,178 @@
+{
+ "id": "pet-taxi",
+ "name": "Pet taxi",
+ "booking_type": "Set service",
+ "pattern": "service",
+ "built_from": "dog-walker",
+ "google_prefill": {
+  "business name": "[G] from the Google listing",
+  "address": "[G] 123 Demo St, Anytown (demo)",
+  "phone": "[G] the listed phone (stays the business's; customers use Rosie's one number)",
+  "hours": "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)",
+  "category": "[G] Pet taxi",
+  "website": "[G] https://example.com (demo)",
+  "photos": "[G] or the IMAGES.md links"
+ },
+ "flows": {
+  "A": {
+   "flow": "A: the customer comes to the business (video or phone count as A)",
+   "business": "Pet taxi",
+   "staff": "Perry and Lane (depot drivers)",
+   "customer": "Alex M. (customer, with Nugget) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Daycare run, round trip",
+     "price": "$35",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$20",
+     "story": "The main story: a $35 daycare run for Nugget, round trip from the depot. A card is saved for the depot's $20 late-cancel and no-show fee, and charged $35 when Perry texts DONE at pick-up.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Hospital run, round trip",
+     "price": "$55",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$55",
+     "fee": "$20",
+     "story": "A $55 hospital run, round trip, around a vet appointment, paid in full when booking. Nothing more is owed at pick-up.",
+     "due_now_at_booking": 55,
+     "money_flags": []
+    }
+   ]
+  },
+  "B": {
+   "flow": "B: the business goes to the customer",
+   "business": "Pet taxi",
+   "staff": "Skye and Marlo (pet taxi drivers)",
+   "customer": "Alex M. (customer, with Pretzel) · other customers",
+   "arrive": "setstart",
+   "cutoff": {
+    "A": "24 hours before",
+    "B": "2 hours before"
+   },
+   "main": "list|card|card",
+   "services": [
+    {
+     "combo": "list|card|card",
+     "price_kind": "From the price list",
+     "before": "Card saved",
+     "after": "Saved card charged",
+     "name": "Local trip, one way",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "The main story: a $45 local trip for Pretzel to the vet. A card is saved for the $25 late-cancel and no-show fee, and charged $45 when Skye texts DONE at the clinic.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|none|bill",
+     "price_kind": "From the price list",
+     "before": "Nothing taken",
+     "after": "Rosie texts the bill",
+     "name": "Local trip, one way",
+     "price": "$45",
+     "deposit": null,
+     "rest": null,
+     "paid_now": null,
+     "fee": "$25",
+     "story": "A $45 local trip. Nothing is taken. Rosie texts the bill after the ride.",
+     "due_now_at_booking": 0,
+     "money_flags": []
+    },
+    {
+     "combo": "list|full|none",
+     "price_kind": "From the price list",
+     "before": "Full price",
+     "after": "Nothing more",
+     "name": "Vet round trip",
+     "price": "$85",
+     "deposit": null,
+     "rest": null,
+     "paid_now": "$85",
+     "fee": "$25",
+     "story": "A $85 vet round trip, with up to 30 minutes of waiting at the clinic, paid in full when booking.",
+     "due_now_at_booking": 85,
+     "money_flags": []
+    },
+    {
+     "combo": "list|deposit|card",
+     "price_kind": "From the price list",
+     "before": "A deposit",
+     "after": "Saved card charged",
+     "name": "Long-distance trip",
+     "price": "$140",
+     "deposit": "$40",
+     "rest": "$100",
+     "paid_now": null,
+     "fee": "$40",
+     "story": "A $140 long-distance trip, 30 to 60 miles one way. A $40 deposit when booking, and the $100 rest charged to the saved card at DONE.",
+     "due_now_at_booking": 40,
+     "money_flags": []
+    }
+   ]
+  }
+ },
+ "services_shape": "{\"pattern\":\"Set service: a driver picks the pet up at the customer's door and takes it to the vet, groomer, daycare or another address, then back. Depot runs start and end at the business's own depot.\",\"list\":[{\"name\":\"Local trip, one way\",\"price_kind\":\"one price\",\"example\":\"$45 for up to 10 miles, one pet (the example business's own price)\",\"length\":\"about 30 minutes\",\"where\":\"door to door; an adult hands the pet over\",\"money\":\"card saved at booking; charged at DONE, when the pet is handed over at the destination\"},{\"name\":\"Vet round trip\",\"price_kind\":\"one price\",\"example\":\"$85 for up to 10 miles each way, with up to 30 minutes of waiting at the clinic\",\"where\":\"door to door; the pet comes home with the driver\",\"money\":\"paid in full when booked\"},{\"name\":\"Long trip, 10 to 30 miles one way\",\"price_kind\":\"one price\",\"example\":\"$95\",\"where\":\"door to door\",\"money\":\"card saved; charged at DONE\"},{\"name\":\"Long-distance trip, 30 to 60 miles one way\",\"price_kind\":\"one price\",\"example\":\"$140: a $40 deposit when booked, and the $100 rest charged to the saved card at DONE\",\"where\":\"door to door\",\"money\":\"a deposit when booked; the rest at DONE\"},{\"name\":\"Extra pet, same trip\",\"price_kind\":\"one price, added to a trip\",\"example\":\"$12 a trip, up to 3 pets in all\"},{\"name\":\"After-hours trip\",\"price_kind\":\"added to a trip before 7am or after 8pm\",\"example\":\"$15 more, shown before the yes\"},{\"name\":\"Extra wait time\",\"price_kind\":\"per 15 minutes past the 30 minutes\",\"example\":\"$10 per 15 minutes, only if the customer says yes by text at the time\"},{\"name\":\"Crate fit check\",\"price_kind\":\"free\",\"length\":\"15 minutes\",\"where\":\"at the depot, with the customer there\",\"money\":\"nothing taken\",\"note\":\"The driver checks that the crate or carrier fits the pet and the van.\"},{\"name\":\"Late cancel or no-show\",\"price_kind\":\"a fee, never more than what was paid\",\"example\":\"up to $25, only if the owner confirms it\",\"where\":\"not booked alone\"},{\"name\":\"Depot run, round trip (Lee Pet Express, the second company)\",\"price_kind\":\"one price each\",\"example\":\"daycare or groomer run $35; hospital run, with a vet appointment, $55; short run, up to 5 miles, $25; extra pet $20; long run, up to 60 miles, $140\",\"where\":\"the pet is dropped off and picked up at the business's depot by the customer, the same day\",\"money\":\"a daycare run saves a card and is charged at pick-up; a hospital run is paid in full when booked\"}],\"capacity\":\"Door to door: up to 3 pets of one household per trip, each in its own crate or carrier, or clipped into a safety harness. Depot runs: up to 6 crates a van.\",\"nobody_home\":\"No. An adult hands the pet over at the door and takes it back. A pet is never taken from an empty home, and never from a child alone.\",\"online\":\"No.\",\"not_offered\":\"Emergency vet transport (call the vet or an emergency service), flights and moves across states, rides over 60 miles, pets over 100 lb, wildlife, livestock, venomous pets and puppies under 8 weeks. A pet that has bitten a person rides only if the owner OKs it, crated and muzzled.\",\"drop_off_slots\":\"Depot runs are booked as drop-off slots that name no driver: the pet is dropped off at the depot and picked up there with the check-in code.\"}",
+ "questions_before_times": [
+  "What kind of pet, its weight, and how many pets",
+  "Has the pet ever bitten or snapped at a person or another animal? (a yes sends the request to the owner first)",
+  "The pick-up address and where it goes: a vet, groomer, daycare or another address",
+  "One way or a round trip, and how long the stop is",
+  "Does the pet ride in a crate or carrier, or in a safety harness?",
+  "Does the pet get carsick, or panic in cars?"
+ ],
+ "safety_stop": [
+  "a pet that is hurt, very sick, struggling to breathe, overheating or ate something toxic, right now",
+  "a person bitten and hurt",
+  "a pet that got out at a stop and is lost right now",
+  "signs of a catching illness, like kennel cough, for a depot run in a shared van"
+ ],
+ "first_steps": [],
+ "facts": [
+  "animals",
+  "plans",
+  "forms",
+  "dropoff",
+  "extrawork"
+ ],
+ "switches": {},
+ "settings": {
+  "arrive": {
+   "A": "setstart",
+   "B": "setstart"
+  },
+  "cutoff": {
+   "A": "24 hours before",
+   "B": "2 hours before"
+  }
+ },
+ "license": "A business registration. Some states or cities also ask for a pet transport license or a commercial pet carrier permit, and commercial vehicle insurance. Drivers need a valid driver's license. The state's or city's form says which.",
+ "staff_skills": "[\"Door-to-door rides, crate and harness handling\",\"Nervous or carsick pets, and large dogs\",\"Long-distance trips (30 to 60 miles)\",\"Depot runs in the shared van, up to 6 crates\"]",
+ "messages_never": "[\"Gate, door, garage and building codes\",\"The pet's health conditions, medicines and vet records\",\"The vet's phone number and the vet-care spending limit\"]",
+ "images": {
+  "unsplash": "https://unsplash.com/s/photos/pet+taxi",
+  "pexels": "https://www.pexels.com/search/pet%20taxi/"
+ },
+ "demo_note": "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field."
+}
