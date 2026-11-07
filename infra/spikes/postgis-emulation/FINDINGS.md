@@ -4,16 +4,16 @@ Spike T-1125, Nov 7 2026. Measured by the release engineer with `bench.mjs` (one
 
 ## Timings (10 runs each)
 
-| Step                                           | Local, emulated amd64 `postgis/postgis:17-3.5` | CI, native                                           | Local, native arm64 `imresamu/postgis:17-3.5-bookworm` |
-| ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
-| Start, existing volume (`npm run db:up`)       | 6.0 s                                          | Not measured yet (the PostGIS service's health wait) | about 1 s                                              |
-| Start, fresh volume, to ready                  | 5.1 s                                          | Not measured yet                                     | about 1 s                                              |
-| Migrate, empty schema (median)                 | 124 ms                                         | Not measured yet (merge-check's `migrate` step)      | 60 ms                                                  |
-| 2,000 GiST EXCLUDE inserts                     | 598 ms (0.3 ms each)                           | Not measured yet (`test:integration` total)          | 835 ms (noisy: 553 to 2,308)                           |
-| Overlapping insert refused (SQLSTATE 23P01)    | 3 ms                                           | Not measured yet                                     | 1 ms                                                   |
-| 25 nearest-50 PostGIS queries on 20,000 points | 75 ms                                          | Not measured yet                                     | 21 ms                                                  |
+| Step                                           | Local, emulated amd64 `postgis/postgis:17-3.5` | CI, native                                                                                     | Local, native arm64 `imresamu/postgis:17-3.5-bookworm` |
+| ---------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Start, existing volume (`npm run db:up`)       | 6.0 s                                          | 19 s (merge-check's "Initialize containers", which includes the PostGIS service's health wait) | about 1 s                                              |
+| Start, fresh volume, to ready                  | 5.1 s                                          | 19 s (CI always starts a fresh service)                                                        | about 1 s                                              |
+| Migrate, empty schema (median)                 | 124 ms                                         | under 1 s (merge-check's "Apply the migrations", 0001_init only)                               | 60 ms                                                  |
+| 2,000 GiST EXCLUDE inserts                     | 598 ms (0.3 ms each)                           | not run in CI (the bench is not a CI step); `test:integration` total: 1 s with no DB tests yet | 835 ms (noisy: 553 to 2,308)                           |
+| Overlapping insert refused (SQLSTATE 23P01)    | 3 ms                                           | not run in CI (the bench is not a CI step)                                                     | 1 ms                                                   |
+| 25 nearest-50 PostGIS queries on 20,000 points | 75 ms                                          | not run in CI (the bench is not a CI step)                                                     | 21 ms                                                  |
 
-The CI column is filled from the first merge-check run that runs this spike (`node infra/spikes/postgis-emulation/repeat.mjs 10` against the service, 0 differences expected).
+The CI column comes from merge-check run 42344823865 on this branch (Nov 7 2026), the native postgis/postgis:17-3.5 service on ubuntu-latest. CI runs no bench step, so the per-operation timings and the 10-run repeat exist only locally; running the bench in CI would change a workflow, which is outside this spike (a later release-engineer task, with T-1057's database tests in merge-check).
 
 ## Repeat runs
 
