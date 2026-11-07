@@ -1,0 +1,70 @@
+{
+  "after": [
+    "../../core/fixtures/seed-bundle-registry.json",
+    "../../core/fixtures/seed-phone-chat-open.json",
+    "../../core/fixtures/seed-sealing-key.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-gift-card",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0005"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0005",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-22T14:20:04Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "gap_cases",
+      "values": {
+        "turn_id": "turn-alex-gift-card",
+        "business_id": "biz-lees-barbershop",
+        "outcome": "log_gap",
+        "summary_sealed": "\\x6b33372d736565642d7365616c65642d73756d6d6172792d6e6f742d7265616c2d63697068657274657874",
+        "sealed_for_person_id": "person-alex",
+        "open_question_ids": [],
+        "versions_read": [
+          {
+            "table": "businesses",
+            "rowId": "biz-lees-barbershop",
+            "version": 3
+          }
+        ],
+        "frontier": [
+          {
+            "question": null,
+            "branch": null,
+            "anytimeRow": "danger-or-crisis",
+            "door": null,
+            "hub": null,
+            "fields": [],
+            "stakes": "low",
+            "stakesFrom": [],
+            "choiceId": "c-05",
+            "kind": "anytime",
+            "label": "Danger or crisis",
+            "definition": "Every message and every call is checked before any answer, every time, by meaning.",
+            "step": "A3-22",
+            "target": {
+              "businessId": "biz-lees-barbershop",
+              "businessName": "Lee's Barbershop",
+              "bookingId": null,
+              "visitAt": null
+            }
+          }
+        ],
+        "logged_at": "2026-10-22T14:20:04Z",
+        "review_state": "open",
+        "version": 1
+      }
+    }
+  ]
+}

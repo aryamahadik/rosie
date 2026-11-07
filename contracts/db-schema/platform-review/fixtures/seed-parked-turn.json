@@ -1,0 +1,34 @@
+{
+  "after": ["../../core/fixtures/seed-bundle-registry.json", "../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-riley-done-1",
+        "handle_id": "handle-riley",
+        "event_ids": ["evt-riley-0031"],
+        "state": "parked",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-riley-0031",
+        "joined_trace_ids": [],
+        "tries": 3,
+        "committed_at": null,
+        "parked_at": "2026-10-24T15:36:10Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "parked_turns",
+      "values": {
+        "turn_id": "turn-riley-done-1",
+        "error_summary": "Exceeded CPU time limit before the commit, on try 3 of 3",
+        "person_told_at": "2026-10-24T15:36:11Z",
+        "reply_due_at": "2026-10-26T15:36:10Z",
+        "state": "open",
+        "version": 2
+      }
+    }
+  ]
+}
