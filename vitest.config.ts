@@ -59,7 +59,7 @@ export default defineConfig({
         // Needs PostgreSQL: `npm run db:up` locally, a service container in CI.
         test: {
           name: "integration",
-          include: ["db/**/*.int.test.ts"],
+          include: ["db/**/*.int.test.ts", "actions/**/*.int.test.ts"],
           env: databaseUrl === undefined ? {} : { DATABASE_URL: databaseUrl },
         },
       },
