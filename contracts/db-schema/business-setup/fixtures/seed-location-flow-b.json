@@ -1,0 +1,44 @@
+{
+  "after": ["seed-company-two-kinds.json"],
+  "rows": [
+    {
+      "table": "locations",
+      "values": {
+        "id": "loc-lee-home-services-office",
+        "business_id": "biz-lee-home-services",
+        "kind": "office",
+        "name": null,
+        "address": "1200 Main St, Springfield",
+        "map_point": "SRID=4326;POINT(-90 40)",
+        "end_address": null,
+        "travel_miles": 25,
+        "travel_centre": null,
+        "travel_fee_cents": null,
+        "travel_fee_currency": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "flow_defaults",
+      "values": {
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "arrive": "window",
+        "version": 1
+      }
+    },
+    {
+      "table": "flow_defaults",
+      "values": {
+        "business_id": "biz-lee-home-services",
+        "flow": "A",
+        "cutoff_before": "24 hours",
+        "cutoff_day_before_at": null,
+        "arrive": "setstart",
+        "version": 1
+      }
+    }
+  ]
+}

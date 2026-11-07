@@ -1,0 +1,24 @@
+{
+  "after": ["seed-company-two-kinds.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "company_kinds",
+    "set": {
+      "pf_facts": ["children", "documents", "extrawork", "groups", "photos", "nomoney"],
+      "version": 2
+    },
+    "where": {
+      "company_id": "company-lees-barbershop",
+      "kind_id": "barber"
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["company_kinds_nomoney_fact_and_switch"]
+    }
+  }
+}
