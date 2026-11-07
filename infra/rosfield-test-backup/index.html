@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <title>Rosie · Rosfield</title>
+    <meta
+      name="description"
+      content="Ask Rosie, Rosfield’s AI front desk, to book anything. Rosie finds the right local business, follows its rules and books it, for people and their AI agents."
+    />
+    <meta name="color-scheme" content="light only" />
+    <meta name="theme-color" content="#f8f3f7" />
+    <link rel="canonical" href="https://rosfield.com/test" />
+    <link rel="preload" href="/assets/fonts/spacegrotesk-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/assets/fonts/geistpixel-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/assets/test/test.css" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/assets/brand/rosfield-app-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Rosfield" />
+    <meta property="og:url" content="https://rosfield.com/test" />
+    <meta property="og:title" content="Ask Rosie · Rosfield" />
+    <meta property="og:description" content="The front desk every human and AI books through." />
+    <meta property="og:image" content="https://rosfield.com/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://rosfield.com/og.png" />
+    <script src="/assets/ga.js" async></script>
+  </head>
+  <body class="is-rest">
+    <svg width="0" height="0" class="sr-only" aria-hidden="true" focusable="false">
+      <symbol id="mark" viewBox="25.744 3.861 68.512 111.247">
+        <path
+          fill="currentColor"
+          d="M46.271,16.761 L50.186,20.113 L55.081,46.960 L41.026,23.569 L41.752,18.466 L36.602,9.894 L34.248,17.142 L26.744,15.817 L31.895,24.389 L36.741,26.144 L52.126,51.750 L67.874,51.750 L83.259,26.144 L88.105,24.389 L93.256,15.817 L85.752,17.142 L83.398,9.894 L78.248,18.466 L78.974,23.569 L64.919,46.960 L69.814,20.113 L73.729,16.761 L75.522,6.923 L68.969,10.811 L64.209,4.861 L62.415,14.698 L64.895,19.217 L60.000,46.063 L55.105,19.217 L57.585,14.698 L55.791,4.861 L51.031,10.811 L44.478,6.923 Z M40.000,65.250 L80.000,65.250 L80.000,54.750 L40.000,54.750 Z M31.673,107.144 L44.884,98.749 L38.883,95.144 L41.026,96.431 L55.081,73.040 L50.186,99.887 L45.759,99.079 L50.134,114.108 L59.532,101.591 L52.646,100.335 L55.105,100.783 L60.000,73.937 L64.895,100.783 L67.354,100.335 L60.468,101.591 L69.866,114.108 L74.241,99.079 L69.814,99.887 L64.919,73.040 L78.974,96.431 L81.117,95.144 L75.116,98.749 L88.327,107.144 L87.117,91.539 L83.259,93.856 L67.874,68.250 L52.126,68.250 L36.741,93.856 L32.883,91.539 Z"
+        />
+      </symbol>
+    </svg>
+
+    <main class="stage" id="main">
+      <h1 class="sr-only">Ask Rosie, the Rosfield front desk</h1>
+
+      <section class="sheet" id="sheet" aria-label="Chat with Rosie">
+        <div class="sheet-bg" aria-hidden="true"></div>
+
+        <header class="sheet-head">
+          <a class="head-mark" href="/" aria-label="Rosfield home">
+            <svg aria-hidden="true" focusable="false"><use href="#mark" /></svg>
+          </a>
+          <button class="close" id="close" type="button" aria-label="Close the chat">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+            </svg>
+          </button>
+        </header>
+
+        <div class="scroll" id="scroll">
+          <div
+            class="log"
+            id="log"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-label="Messages"
+          ></div>
+          <div class="typing" id="typing" hidden aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="boot" id="boot" aria-hidden="true"></div>
+
+        <form class="composer" id="composer" action="#" autocomplete="off">
+          <label class="sr-only" for="message">Message Rosie</label>
+          <input
+            id="message"
+            name="message"
+            type="text"
+            placeholder="Ask Rosie to book anything"
+            maxlength="2000"
+            autocomplete="off"
+            enterkeyhint="send"
+            spellcheck="true"
+          />
+          <button class="send" id="send" type="submit" aria-label="Send">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.1"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M12 18.5V5.5M6.5 11 12 5.5 17.5 11" />
+            </svg>
+          </button>
+        </form>
+
+        <footer class="sheet-foot">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+        </footer>
+      </section>
+    </main>
+
+    <script src="/assets/chat.js" defer></script>
+    <script src="/assets/test/open.js" defer></script>
+  </body>
+</html>
