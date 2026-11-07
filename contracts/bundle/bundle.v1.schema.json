@@ -3707,7 +3707,7 @@
     },
     "journeyGate": {
       "title": "JourneyGate",
-      "description": "Whether a journey may ship: 'A journey with a failing step does not ship; fixes go in an overlay Jay approves' (arch 12 line 592; Q-17).",
+      "description": "One journey: its steps, and whether it may ship: 'A journey with a failing step does not ship; fixes go in an overlay Jay approves' (arch 12 line 592; Q-17). The gold set is made journey by journey from its steps once they pass the lint (BP starting shape, last paragraph; K-10's journey on every gold item).",
       "type": "object",
       "properties": {
         "journey": {
@@ -3716,19 +3716,28 @@
           "minimum": 1,
           "maximum": 12
         },
+        "steps": {
+          "description": "The journey's steps, by id, each once, from both flows; a step may be in more than one journey. Journey N holds section N's steps (out-of-scope ones too: their lists.outOfScope markers keep them unreachable; 01-inventory.md N-5) and the steps of other sections that ride with it. Sources: journeys 1 and 2, ops/plan/02-contracts.md K-09 v1 Defines, 'Journey 1' (headed S1-01 to S1-79, its list also naming S1-80 to S1-84) and 'Journey 2' (headed S2-02 to S2-24, its list also naming S2-27 to S2-31), all section 1 and section 2 steps, and BP's starting shape, M4 row (business and team onboarding); journeys 3 to 12, 02-contracts.md K-09's table 'Tool API minor versions, one per journey', its Steps column (v1.1 to v1.10): S11-62 rides with journey 3 and S11-22 with journey 7 (BP starting shape, M5 and M6 rows), and each section 12 step with the first journey that uses it (BP 3.6): S12-01 to S12-05 and S12-28 with journey 4, S12-16 to S12-18 and S12-26 with journey 5, S12-33 with journey 6, and journey 12 holds those not already shipped (S12-06 to S12-08, S12-19, S12-23 to S12-25, S12-27, S12-29 to S12-32); S12-09 to S12-14, K-09 v1's shared core (M3b), are in no journey until the lead names theirs (README open gap). S11-62 and S11-22 are in journey 11 too, as section 11 steps. Section 13's rule nodes and homes are in no journey: every journey calls them (BP 3.5). contracts/bundle/README.md, 'Journey membership', has the table and its open gaps.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
         "ships": {
           "description": "true only when none of its steps fails the lint; a journey that ships lists no failing step (arch 12 line 592: 'A journey with a failing step does not ship'; Q-17).",
           "type": "boolean"
         },
         "failingSteps": {
-          "description": "Its failing steps, by id (arch 12 line 592).",
+          "description": "Its failing steps, by id, each one of its steps (arch 12 line 592).",
           "type": "array",
           "items": {
             "$ref": "#/$defs/stepId"
           }
         }
       },
-      "required": ["journey", "ships", "failingSteps"],
+      "required": ["journey", "steps", "ships", "failingSteps"],
       "additionalProperties": false,
       "if": {
         "properties": {

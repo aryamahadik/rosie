@@ -11,8 +11,8 @@
       "file": "bundle-mini-a.json",
       "version": "v1",
       "expect": "accept",
-      "shows": "Flow A and the barber trade: the money split A5-04 whose branches are lookups that name what they read (the before choice), A5-31's clock branch 'Not done in time' and its booking:shop vary, A6-02's card and clock branch, the hub A7-02, the door A3-51, the danger check A3-22 with A3-24, the STOP path A7-96 to A7-11 (flag stopped), A7-12's judgment rule 58, A6-14's record slots ({{pay.price}}, {{pay.took}}, {{pay.cancel}}), the rule nodes S13-23 to S13-29, S13-53, S13-54 and S13-32, and S1-37 marked as failing guard-keyword-button, so the manifest's journey 1 does not ship",
-      "source": "02-contracts K-01 Fixtures; master-A.json; engine/work/prof/barber.json; arch 03 lines 161 to 177; arch 12 line 592; Q-14; Q-17; MC R6"
+      "shows": "Flow A and the barber trade: the money split A5-04 whose branches are lookups that name what they read (the before choice), A5-31's clock branch 'Not done in time' and its booking:shop vary, A6-02's card and clock branch, the hub A7-02, the door A3-51, the danger check A3-22 with A3-24, the STOP path A7-96 to A7-11 (flag stopped), A7-12's judgment rule 58, A6-14's record slots ({{pay.price}}, {{pay.took}}, {{pay.cancel}}), the rule nodes S13-23 to S13-29, S13-53, S13-54 and S13-32, and S1-37 marked as failing guard-keyword-button, so the manifest's journey 1, listing its steps (the 45 section 1 steps of both flows), does not ship",
+      "source": "02-contracts K-01 Fixtures; master-A.json; engine/work/prof/barber.json; arch 03 lines 161 to 177; arch 12 line 592; Q-14; Q-17; MC R6; journey 1's steps: 02-contracts K-09 v1 'Journey 1', master-A.json and master-B.json section 1"
     },
     {
       "file": "bundle-mini-b.json",
@@ -26,8 +26,8 @@
       "version": "v1",
       "def": "manifest",
       "expect": "accept",
-      "shows": "A manifest of a bundle holding the two sample flow graphs and the barber overlay: the bundle id (sha256 of the sorted value lines, build 1), every input with its sha256 (both flows, the trade file, Master Corrections, LINES.md, fixture set v1's MANIFEST.sha256, overlay-core.js, lib.js, msgtext.js), sample prompts, claude-haiku-5-5 and claude-sonnet-5-5, routing by stakes (Sonnet first on high stakes), the lint summary with S1-37's failure, journey 1 not shipping, the KV keys with each value's size and hash, and the shared lists",
-      "source": "02-contracts K-01 'The manifest' and 'Storage'; arch 01 line 87; arch 10 line 536; arch 11 line 564; arch 12 line 592; Q-26; Q-36; CQ-09"
+      "shows": "A manifest of a bundle holding the two sample flow graphs and the barber overlay: the bundle id (sha256 of the sorted value lines, build 1), every input with its sha256 (both flows, the trade file, Master Corrections, LINES.md, fixture set v1's MANIFEST.sha256, overlay-core.js, lib.js, msgtext.js), sample prompts, claude-haiku-5-5 and claude-sonnet-5-5, routing by stakes (Sonnet first on high stakes), the lint summary with S1-37's failure, journey 1 with its steps (the 45 section 1 steps of both flows) not shipping, the KV keys with each value's size and hash, and the shared lists",
+      "source": "02-contracts K-01 'The manifest' and 'Storage'; arch 01 line 87; arch 10 line 536; arch 11 line 564; arch 12 line 592; Q-26; Q-36; CQ-09; journey 1's steps: 02-contracts K-09 v1 'Journey 1', master-A.json and master-B.json section 1"
     },
     {
       "file": "trade-overlay.json",
@@ -148,6 +148,14 @@
       "expect": "refuse",
       "shows": "A7-12 pointing to judgment rule 68, outside 1 to 67, is refused whatever its lint says",
       "source": "MC R6; DECISIONS.md D2; 02-contracts K-01 ('a number that does not resolve, or lies outside 1 to 67, is refused')"
+    },
+    {
+      "file": "invalid/refuse-journey-ships-with-failing-step.json",
+      "version": "v1",
+      "def": "journeyGate",
+      "expect": "refuse",
+      "shows": "Journey 1, its 45 section 1 steps listed, marked to ship while it lists the failing step S1-37, is refused",
+      "source": "arch 12 line 592 ('A journey with a failing step does not ship'); Q-17; Q-14; S1-37 in master-A.json and master-B.json; 02-contracts K-09 v1 'Journey 1'"
     }
   ]
 }
