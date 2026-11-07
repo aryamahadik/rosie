@@ -1,0 +1,4032 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/tool-api/tool-api.v1.schema.json",
+  "title": "ToolApiV1",
+  "description": "K-09 Tool API v1, DRAFT (T-009; not frozen: T-018 freezes it with journeys 1 and 2). The calls that own every read and write (arch 02 line 139): the turn face (called by the handle actor and the AI layer) and the shared core (M3b: the any-time rows every chat needs from its first text). The same calls serve texts, secure pages and outside AIs under the same limits; free text from pages and AIs gets the safety read first (arch 02 line 129); row-level security per business on every call (arch 10 line 546). There is no root payload: each payload is one definition under $defs, named <call>.request, <call>.response and <call>.errors. contracts/tool-api/README.md states each call's read, repeat safety and time budget.",
+  "$defs": {
+    "id": {
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "title": "NullableId",
+      "description": "An opaque id, or null (CQ-09).",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "turnId": {
+      "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+    },
+    "utc": {
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "title": "NullableUtc",
+      "description": "An instant in UTC, or null (CQ-09).",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "stepId": {
+      "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+    },
+    "fixedLineId": {
+      "title": "FixedLineId",
+      "description": "A fixed line's id in the pinned bundle, such as optOutLine or stopLaterReply (K-01 v1 fixedLine.id; arch 07 line 361: fixed lines go word for word).",
+      "type": "string",
+      "pattern": "^[a-z][A-Za-z0-9]*$"
+    },
+    "phoneNumber": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/phoneNumber"
+    },
+    "rowRef": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/rowRef"
+    },
+    "tableName": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/tableName"
+    },
+    "version": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/version"
+    },
+    "caller": {
+      "title": "Caller",
+      "description": "Who makes a call, under which business, and the key a repeat is known by. Every request carries it (arch 02 lines 129, 139; arch 10 line 546).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "Who calls: turn (the handle actor's turn, through gateAndCommit; arch 02 line 121), page (a secure page or the portal, through K-21), agent (an outside AI through the Agent API, K-20), console (the team console, C-194), job (an offline or queue job, such as the dispatcher or a calendar renewal), clockFiring (a clock row's firing with no handle, the minute sweep's: arch 10 line 540) or actorOnReturn (a line the handle actor sent while PostgreSQL was down, written on return: arch 11 line 566). The same calls serve texts, secure pages and outside AIs under the same limits (arch 02 line 129).",
+          "type": "string",
+          "enum": ["turn", "page", "agent", "console", "job", "clockFiring", "actorOnReturn"]
+        },
+        "turnId": {
+          "description": "For kind turn, the turn whose one commit carries the call (arch 02 line 121; arch 10 line 508); null otherwise.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requestId": {
+          "description": "The caller's own id for this request: the key a repeat is known by when no turn carries the call (a page or agent request id, a console tap, a job run or a clock row id). For kind turn, the turn id again.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "businessId": {
+          "description": "The business the call runs under: row-level security scopes every Tool API call by it (arch 10 line 546; K-04 v1 rule 4). Null only where no business exists yet, or for a call that covers every business (a STOP: RULES 7.2).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "personId": {
+          "description": "The person the caller acts for, when known: the sender of the turn's texts, the signed-in person on a page, the customer an agent token is bound to, or the team member at the console (limit 1: arch 06 line 299).",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "traceId": {
+          "description": "The trace the call joins (K-08 v1; arch 10 line 548): each call adds its span (hops frontier, search, gate, commit, compose, fillAndChecks, rewriteOrFallback, pageRequest, agentApiRequest).",
+          "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/traceId"
+        }
+      },
+      "required": ["kind", "turnId", "requestId", "businessId", "personId", "traceId"],
+      "additionalProperties": false
+    },
+    "sentByActor": {
+      "description": "A line the handle actor already sent straight through Linq while PostgreSQL was down: written on return, never sent again (arch 11 line 566; QUESTIONS.md NQ-RT-9's default: with PostgreSQL up, the line is an outbox row). Null when the call writes the row to be sent.",
+      "anyOf": [
+        {
+          "title": "SentByActor",
+          "type": "object",
+          "properties": {
+            "at": {
+              "description": "When the actor sent it (arch 11 line 566).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            },
+            "fixedLineId": {
+              "description": "The checked line it sent from its local copy (C-053).",
+              "$ref": "#/$defs/fixedLineId"
+            },
+            "linqMessageId": {
+              "description": "Linq's message id for the send, so the row written on return matches it (K-07 v1 outbox parts).",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["at", "fixedLineId", "linqMessageId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "notFoundError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/notFoundError"
+    },
+    "transientError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/transientError"
+    },
+    "constraintError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/constraintError"
+    },
+    "versionChangedError": {
+      "$ref": "../data-access/data-access.v1.schema.json#/$defs/versionChangedError"
+    },
+    "notAllowedError": {
+      "title": "NotAllowedError",
+      "description": "Limit 1 or row-level security refused the caller: a change that adds a person, a way in, money or authority needs the decider's own yes (arch 06 line 299; S13-45), and no call reads or writes another business's rows (arch 10 line 546). Nothing was written.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "notAllowed"
+        },
+        "why": {
+          "description": "notDecider: the caller is not the person who decides (the person served or who decides for them; the owner or a permitted admin for fees, refunds beyond the terms, team and settings: arch 06 line 299); unprovenSender: the sender is not yet proven (a proof code goes first: proveCode); wrongRole: the step is not this role's (S11-12 and S11-42 are the owner's); otherBusiness: the row is another business's (arch 10 line 546).",
+          "type": "string",
+          "enum": ["notDecider", "unprovenSender", "wrongRole", "otherBusiness"]
+        }
+      },
+      "required": ["error", "why"],
+      "additionalProperties": false
+    },
+    "bookingPausedError": {
+      "title": "BookingPausedError",
+      "description": "PostgreSQL is down: agents and the booking page hear that booking is paused (arch 11 line 566; S12-12). Nothing was written; the caller may try again later. Q-45's default: nothing covers an outage of Cloudflare itself, so this answer exists only while the Workers run.",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "bookingPaused"
+        },
+        "retryAfterSeconds": {
+          "description": "When the caller may try again, in seconds. No source gives the number: the runtime sets it (README open gaps).",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["error", "retryAfterSeconds"],
+      "additionalProperties": false
+    },
+    "turnParkedError": {
+      "title": "TurnParkedError",
+      "description": "The turn was parked after a third crash before its commit and never commits (arch 11 line 576; K-05 v1 parkTurn).",
+      "type": "object",
+      "properties": {
+        "error": {
+          "const": "turnParked"
+        },
+        "turnId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "parkedAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["error", "turnId", "parkedAt"],
+      "additionalProperties": false
+    },
+    "gateOutcome": {
+      "description": "What a failed limit does to its choice (arch 02 line 121: 'A failed limit runs its own outcome and stops only its choice and what depends on it'): ask (Rosie asks one question now and the choice waits for its answer as an open question), refuse (the choice ends: nothing is saved, and Rosie says why) or wait (the choice is held, nothing committed for it, until something outside this turn happens: a code typed back, a person, a safety hold's release). Each limit's own outcomes are listed in limit1Outcome to limit6Outcome.",
+      "type": "string",
+      "enum": ["ask", "refuse", "wait"]
+    },
+    "limit1Outcome": {
+      "title": "Limit1Outcome",
+      "description": "Limit 1's outcome when it fails (arch 06 line 299). Each action has one kind of outcome (gateOutcome): proofCodeSent is wait; askedDecider is ask.",
+      "oneOf": [
+        {
+          "title": "Limit1Outcome_proofCodeSent",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 1: Allowed (arch 06 line 299).",
+              "const": 1
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): wait.",
+              "type": "string",
+              "enum": ["wait"]
+            },
+            "action": {
+              "description": "Unproven sender: a code to the contact on file, in words that never confirm a booking exists (arch 06 line 299; RULES 6.2); the choice waits for the code typed back within 10 minutes (proveCode).",
+              "type": "string",
+              "enum": ["proofCodeSent"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit1Outcome_askedDecider",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 1: Allowed (arch 06 line 299).",
+              "const": 1
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): ask.",
+              "type": "string",
+              "enum": ["ask"]
+            },
+            "action": {
+              "description": "Wrong person: a question in the decider's own chat (arch 06 line 299; S13-45).",
+              "type": "string",
+              "enum": ["askedDecider"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limit2Outcome": {
+      "title": "Limit2Outcome",
+      "description": "Limit 2's outcome when it fails (arch 06 line 301). Each action has one kind of outcome (gateOutcome): saidWhatRuleAllows is refuse.",
+      "oneOf": [
+        {
+          "title": "Limit2Outcome_saidWhatRuleAllows",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 2: Owner rules (arch 06 line 301).",
+              "const": 2
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): refuse.",
+              "type": "string",
+              "enum": ["refuse"]
+            },
+            "action": {
+              "description": "Rosie says what the rule allows; nothing is saved (arch 06 line 301).",
+              "type": "string",
+              "enum": ["saidWhatRuleAllows"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limit3Outcome": {
+      "title": "Limit3Outcome",
+      "description": "Limit 3's outcome when it fails (arch 06 line 303). Each action has one kind of outcome (gateOutcome): freshReadBack is ask; safeDefault is refuse.",
+      "oneOf": [
+        {
+          "title": "Limit3Outcome_freshReadBack",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 3: Exact yes (arch 06 line 303).",
+              "const": 3
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): ask.",
+              "type": "string",
+              "enum": ["ask"]
+            },
+            "action": {
+              "description": "A fresh read-back, once (arch 06 line 303; S13-25 rules 16 to 18).",
+              "type": "string",
+              "enum": ["freshReadBack"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit3Outcome_safeDefault",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 3: Exact yes (arch 06 line 303).",
+              "const": 3
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): refuse.",
+              "type": "string",
+              "enum": ["refuse"]
+            },
+            "action": {
+              "description": "After the fresh read-back, still no exact yes: the step's safe default, and the owner is told (arch 06 line 303).",
+              "type": "string",
+              "enum": ["safeDefault"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limit4Outcome": {
+      "title": "Limit4Outcome",
+      "description": "Limit 4's outcome when it fails (arch 06 line 305; K-05 v1 commitTurn versionChanged). Each action has one kind of outcome (gateOutcome): freshYes is ask; saidWhatChanged is refuse; toPerson is wait.",
+      "oneOf": [
+        {
+          "title": "Limit4Outcome_freshYes",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 4: Versions (arch 06 line 305). The gate reloads once first; nothing shown changed means the choice commits and the limit passes.",
+              "const": 4
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): ask.",
+              "type": "string",
+              "enum": ["ask"]
+            },
+            "action": {
+              "description": "Changed but still possible: today's facts and a fresh yes (arch 06 line 305).",
+              "type": "string",
+              "enum": ["freshYes"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit4Outcome_saidWhatChanged",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 4: Versions (arch 06 line 305). The gate reloads once first; nothing shown changed means the choice commits and the limit passes.",
+              "const": 4
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): refuse.",
+              "type": "string",
+              "enum": ["refuse"]
+            },
+            "action": {
+              "description": "No longer possible: say what changed and offer the current choices (arch 06 line 305).",
+              "type": "string",
+              "enum": ["saidWhatChanged"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit4Outcome_toPerson",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 4: Versions (arch 06 line 305). The gate reloads once first; nothing shown changed means the choice commits and the limit passes.",
+              "const": 4
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): wait.",
+              "type": "string",
+              "enum": ["wait"]
+            },
+            "action": {
+              "description": "A second conflict on one question: a person (arch 06 line 305).",
+              "type": "string",
+              "enum": ["toPerson"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limit5Outcome": {
+      "title": "Limit5Outcome",
+      "description": "Limit 5's outcome when it fails (arch 06 line 307; K-05 v1 commitTurn reservationLost). Each action has one kind of outcome (gateOutcome): nextOpenTimes is ask; nothingBooked is refuse.",
+      "oneOf": [
+        {
+          "title": "Limit5Outcome_nextOpenTimes",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 5: Reserved (arch 06 line 307).",
+              "const": 5
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): ask.",
+              "type": "string",
+              "enum": ["ask"]
+            },
+            "action": {
+              "description": "The next open times (arch 06 line 307).",
+              "type": "string",
+              "enum": ["nextOpenTimes"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit5Outcome_nothingBooked",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 5: Reserved (arch 06 line 307).",
+              "const": 5
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): refuse.",
+              "type": "string",
+              "enum": ["refuse"]
+            },
+            "action": {
+              "description": "No pick in 10 minutes on the page, or 2 of their text hours otherwise: nothing booked (arch 06 line 307; A6-11).",
+              "type": "string",
+              "enum": ["nothingBooked"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limit6Outcome": {
+      "title": "Limit6Outcome",
+      "description": "Limit 6's outcome when it fails (arch 06 line 309). Each action has one kind of outcome (gateOutcome): oneQuestion is ask; nothingChanged is refuse.",
+      "oneOf": [
+        {
+          "title": "Limit6Outcome_oneQuestion",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "const": 6
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): ask.",
+              "type": "string",
+              "enum": ["ask"]
+            },
+            "action": {
+              "description": "After the re-read, one question (arch 06 line 309).",
+              "type": "string",
+              "enum": ["oneQuestion"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        },
+        {
+          "title": "Limit6Outcome_nothingChanged",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Limit 6: Values (arch 06 line 309). The one Sonnet re-read is decide's and has run before the gate (arch 02 line 119; K-02 v1 decideResult.reread).",
+              "const": 6
+            },
+            "outcome": {
+              "description": "The kind of outcome (gateOutcome): refuse.",
+              "type": "string",
+              "enum": ["refuse"]
+            },
+            "action": {
+              "description": "Still failing after the question: nothing changes (arch 06 line 309).",
+              "type": "string",
+              "enum": ["nothingChanged"]
+            }
+          },
+          "required": ["limit", "outcome", "action"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "limitOutcome": {
+      "title": "LimitOutcome",
+      "description": "The failed limit (1 to 6, checked before the commit) and its outcome (arch 06 lines 295 to 309; arch 02 line 121).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/limit1Outcome"
+        },
+        {
+          "$ref": "#/$defs/limit2Outcome"
+        },
+        {
+          "$ref": "#/$defs/limit3Outcome"
+        },
+        {
+          "$ref": "#/$defs/limit4Outcome"
+        },
+        {
+          "$ref": "#/$defs/limit5Outcome"
+        },
+        {
+          "$ref": "#/$defs/limit6Outcome"
+        }
+      ]
+    },
+    "guardTargets": {
+      "title": "GuardTargets",
+      "description": "What the guard listed for the handle: its roles, open questions and bookings (arch 02 line 115). The guard reads them through K-05 v1.2's state reads (T-072); this call takes them as given.",
+      "type": "object",
+      "properties": {
+        "roles": {
+          "description": "The handle's roles per business (arch 02 line 115).",
+          "type": "array",
+          "items": {
+            "title": "GuardRole",
+            "type": "object",
+            "properties": {
+              "businessId": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              },
+              "personId": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              },
+              "role": {
+                "description": "The role as K-04 v1 person_roles names it (FS line 723).",
+                "type": "string",
+                "enum": ["owner", "admin", "staff", "own_business", "customer"]
+              }
+            },
+            "required": ["businessId", "personId", "role"],
+            "additionalProperties": false
+          }
+        },
+        "openQuestionIds": {
+          "description": "Every open question sent to this handle (arch 03 line 159; S13-12).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "bookingIds": {
+          "description": "The handle's bookings (arch 02 line 115).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "noTarget": {
+          "description": "true when nothing fits as a target: the doors are offered (arch 02 line 115; arch 03 line 165). No business named yet: search first; named-only work gets one ask for a name (S13-20).",
+          "type": "boolean"
+        }
+      },
+      "required": ["roles", "openQuestionIds", "bookingIds", "noTarget"],
+      "additionalProperties": false
+    },
+    "buildFrontier.request": {
+      "title": "BuildFrontierRequest",
+      "description": "Build the frontier: the turn, its targets from the guard and the pinned bundle give K-02 v1's context (choices, cards, facts with their row versions, the rules prefix by hash, the last 6 messages). Each fact comes once from its one home (S13-30); a second value for one key is refused, the home's value goes in and the step is flagged for a fix (arch 02 line 117; arch 03 lines 157 to 167). Over 60 choices, each booking other than the target collapses to one 'which booking?' choice (arch 03 line 167). Reads: the primary, uncached (decision reads: arch 02 line 117; arch 10 lines 504, 538), and the pinned bundle from KV (its PostgreSQL copy on a miss: arch 10 line 536). Repeat: safe: a read; it writes nothing (a flagged step is reported in the response and on the frontier span). Time budget: at most 150 ms (arch 04 line 215: 'Build the frontier (uncached reads)').",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "turn": {
+          "description": "The turn as K-05 v1 will commit it: its id, handle, event ids, pinned bundle, trace ids and tries.",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+        },
+        "texts": {
+          "description": "The turn's texts after the edge scrub, in order (K-02 v1 text).",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/text"
+          },
+          "minItems": 1
+        },
+        "targets": {
+          "$ref": "#/$defs/guardTargets"
+        },
+        "now": {
+          "description": "The time the turn reads 'now' at (the fake clock on staging: BP 9.4).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "turn", "texts", "targets", "now"],
+      "additionalProperties": false
+    },
+    "buildFrontier.response": {
+      "title": "BuildFrontierResponse",
+      "description": "The context for decide, with what the builder flagged or collapsed.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "K-02 v1's context bundle, passed to decide unchanged (CQ-25 settled: the AI gateway's two calls a read are the wire form, not the Tool API's).",
+          "$ref": "../model/model.v1.schema.json#/$defs/context"
+        },
+        "flagged": {
+          "description": "Steps flagged for a fix: a second value for one key was refused and the home's value went in (arch 02 line 117; this closes nm01).",
+          "type": "array",
+          "items": {
+            "title": "FlaggedStep",
+            "type": "object",
+            "properties": {
+              "stepId": {
+                "$ref": "#/$defs/stepId"
+              },
+              "key": {
+                "description": "The fact key that had a second value (arch 02 line 117).",
+                "type": "string",
+                "minLength": 1
+              },
+              "kept": {
+                "description": "The home's row and version whose value went in (S13-30).",
+                "$ref": "#/$defs/rowRef"
+              }
+            },
+            "required": ["stepId", "key", "kept"],
+            "additionalProperties": false
+          }
+        },
+        "collapsedBookingIds": {
+          "description": "Bookings other than the target collapsed to one 'which booking?' choice because the frontier passed 60 (arch 03 line 167); empty when none.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      },
+      "required": ["context", "flagged", "collapsedBookingIds"],
+      "additionalProperties": false
+    },
+    "buildFrontier.errors": {
+      "title": "BuildFrontierErrors",
+      "description": "Refused, nothing written: buildFrontier's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "title": "BundleNotFoundError",
+          "description": "The pinned bundle is in neither KV nor its PostgreSQL copy (arch 10 line 536; K-05 v1 readBundleValue).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "bundleNotFound"
+            },
+            "bundleId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+            }
+          },
+          "required": ["error", "bundleId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "TooManyChoicesError",
+          "description": "Still over 60 choices after every other booking collapsed (arch 01 line 69: never more than 60). A builder fault: the turn takes the outage path (arch 06 line 293).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "tooManyChoices"
+            },
+            "count": {
+              "description": "How many choices were left.",
+              "type": "integer",
+              "minimum": 61
+            }
+          },
+          "required": ["error", "count"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "closestEntries.request": {
+      "title": "ClosestEntriesRequest",
+      "description": "Add the closest entries when nothing fits: meaning search over this business's step graph adds the 3 closest entry steps as choices of kind searchEntry, and the turn's one re-read runs on them (arch 03 line 189; K-02 v1 context.meaningSearch). The model or index is Q-42's (a spike picks it). Reads: the pinned bundle and the meaning-match index (Q-42); the facts an added entry needs are read as buildFrontier reads them, on the primary, uncached. Repeat: safe: a read; the same context gives the same entries. Once per turn: a second call for one turn is refused (searchedAlready). Time budget: none in the sources. Proposed: at most 200 ms, the budget of 'Search, one indexed query' (arch 04 line 217, DD), since it is one indexed query (README default 3).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "context": {
+          "description": "The turn's context as buildFrontier gave it (K-02 v1).",
+          "$ref": "../model/model.v1.schema.json#/$defs/context"
+        },
+        "quotes": {
+          "description": "The parts of the text nothing fit, each by its exact quote (arch 03 line 185).",
+          "type": "array",
+          "items": {
+            "description": "A quote of a part nothing fit (K-02 v1 noneFits).",
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["caller", "context", "quotes"],
+      "additionalProperties": false
+    },
+    "closestEntries.response": {
+      "title": "ClosestEntriesResponse",
+      "description": "The context with the closest entries added.",
+      "type": "object",
+      "properties": {
+        "context": {
+          "description": "The same context with at most 3 entry steps added as choices of kind searchEntry and meaningSearch set (K-02 v1).",
+          "$ref": "../model/model.v1.schema.json#/$defs/context"
+        },
+        "added": {
+          "description": "The entry steps added, closest first (arch 03 line 189).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepId"
+          },
+          "maxItems": 3
+        }
+      },
+      "required": ["context", "added"],
+      "additionalProperties": false
+    },
+    "closestEntries.errors": {
+      "title": "ClosestEntriesErrors",
+      "description": "Refused, nothing written: closestEntries's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "SearchedAlreadyError",
+          "description": "Meaning search already ran for this turn (arch 03 line 189: the turn's one re-read).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "searchedAlready"
+            },
+            "turnId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            }
+          },
+          "required": ["error", "turnId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "IndexUnavailableError",
+          "description": "The meaning-match index cannot be read: the turn goes on to the planner with no entries added (arch 03 line 189). Q-42 is open.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "indexUnavailable"
+            }
+          },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "plannerVerbs.request": {
+      "title": "PlannerVerbsRequest",
+      "description": "The planner's verbs: answer from stored facts, ask one question, pass a question on, hand to a person, or log a gap case (arch 06 line 291). Never a booking, charge, refund, cancel, move or a change to a setting, contact or consent. Carried inside gateAndCommit.request.input.planner, because a turn commits once (arch 02 line 121); never called on its own. Every such turn is a gap case (arch 03 line 189; K-37 v1 gap_cases). Reads: the primary, uncached, inside the turn's commit. Repeat: as gateAndCommit, by the turn id. Time budget: inside gateAndCommit's 300 ms.",
+      "type": "object",
+      "properties": {
+        "output": {
+          "description": "The Sonnet planner's output, one of its five verbs (K-02 v1; arch 06 line 291).",
+          "$ref": "../model/model.v1.schema.json#/$defs/plannerOutput"
+        },
+        "parts": {
+          "description": "The parts nothing fit, after meaning search (arch 03 line 189).",
+          "type": "array",
+          "items": {
+            "description": "A part's index in decide.parts.",
+            "type": "integer",
+            "minimum": 0
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["output", "parts"],
+      "additionalProperties": false
+    },
+    "plannerVerbs.response": {
+      "title": "PlannerVerbsResponse",
+      "description": "What the planner's verb committed in the turn's commit.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "The verb committed (K-02 v1 plannerOutput; K-37 v1 gap_cases.outcome).",
+          "type": "string",
+          "enum": ["answer", "ask", "pass_on", "hand_off", "log_gap"]
+        },
+        "outboxRowIds": {
+          "description": "The outbox rows the verb wrote: the answer, the question, the pass-on or the hand-off's alert.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "openQuestionId": {
+          "description": "For ask, the open question; a reply to it that fits nothing goes to a person (S13-29 rule 54).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "handOffId": {
+          "description": "For hand_off about another matter, the hand-off row (K-36 v1 hand_offs).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "harmReportId": {
+          "description": "For hand_off about the owner or staff, the harm report Rosie's team follows up that day, never told to the person named (K-34 v1 harm_reports; arch 06 line 329).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "gapCaseTurnId": {
+          "description": "The gap case logged for this turn (K-37 v1 gap_cases.turn_id: one per turn).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        }
+      },
+      "required": ["verb", "outboxRowIds", "openQuestionId", "handOffId", "harmReportId", "gapCaseTurnId"],
+      "additionalProperties": false
+    },
+    "plannerVerbs.errors": {
+      "title": "PlannerVerbsErrors",
+      "description": "Refused, nothing written for the planner's part: plannerVerbs' errors.",
+      "oneOf": [
+        {
+          "title": "PlannerRefusedError",
+          "description": "Code refused the planner's output: an answer naming a fact the context does not hold, or an ask with more than one question (K-02 v1 README: code checks; C-092). The part takes the passed-on path: 'I've passed this on.' (arch 02 line 123).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "plannerRefused"
+            },
+            "why": {
+              "description": "Which check refused it.",
+              "type": "string",
+              "enum": ["factNotInContext", "moreThanOneQuestion"]
+            }
+          },
+          "required": ["error", "why"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "coreAction": {
+      "title": "CoreAction",
+      "description": "A shared-core call carried inside a turn's one commit (arch 02 line 121): its request rides in gateAndCommit.request.core with caller.kind turn, and its response or error comes back in gateAndCommit.response.core. A refused core action stops only itself.",
+      "oneOf": [
+        {
+          "title": "CoreAction_recordSafetyOutcome",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "recordSafetyOutcome"
+            },
+            "request": {
+              "$ref": "#/$defs/recordSafetyOutcome.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_releaseSafetyHold",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "releaseSafetyHold"
+            },
+            "request": {
+              "$ref": "#/$defs/releaseSafetyHold.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_recordStopOrStart",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "recordStopOrStart"
+            },
+            "request": {
+              "$ref": "#/$defs/recordStopOrStart.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_setRecordFlag",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "setRecordFlag"
+            },
+            "request": {
+              "$ref": "#/$defs/setRecordFlag.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_handOff",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "handOff"
+            },
+            "request": {
+              "$ref": "#/$defs/handOff.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_answerHandOff",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "answerHandOff"
+            },
+            "request": {
+              "$ref": "#/$defs/answerHandOff.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_pageTeam",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "pageTeam"
+            },
+            "request": {
+              "$ref": "#/$defs/pageTeam.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_acknowledgePage",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "acknowledgePage"
+            },
+            "request": {
+              "$ref": "#/$defs/acknowledgePage.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_openReviewItem",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "openReviewItem"
+            },
+            "request": {
+              "$ref": "#/$defs/openReviewItem.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_enterDoor",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "enterDoor"
+            },
+            "request": {
+              "$ref": "#/$defs/enterDoor.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_sendFixedLine",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "sendFixedLine"
+            },
+            "request": {
+              "$ref": "#/$defs/sendFixedLine.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_sendProofCode",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "sendProofCode"
+            },
+            "request": {
+              "$ref": "#/$defs/sendProofCode.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_proveCode",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "proveCode"
+            },
+            "request": {
+              "$ref": "#/$defs/proveCode.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreAction_issueChatLink",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "issueChatLink"
+            },
+            "request": {
+              "$ref": "#/$defs/issueChatLink.request"
+            }
+          },
+          "required": ["call", "request"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "coreResult": {
+      "title": "CoreResult",
+      "description": "One core action's result inside gateAndCommit.response.core, in the order of the request.",
+      "oneOf": [
+        {
+          "title": "CoreResult_recordSafetyOutcome",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "recordSafetyOutcome"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/recordSafetyOutcome.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/recordSafetyOutcome.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_releaseSafetyHold",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "releaseSafetyHold"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/releaseSafetyHold.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/releaseSafetyHold.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_recordStopOrStart",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "recordStopOrStart"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/recordStopOrStart.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/recordStopOrStart.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_setRecordFlag",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "setRecordFlag"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/setRecordFlag.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/setRecordFlag.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_handOff",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "handOff"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/handOff.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/handOff.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_answerHandOff",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "answerHandOff"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/answerHandOff.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/answerHandOff.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_pageTeam",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "pageTeam"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/pageTeam.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/pageTeam.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_acknowledgePage",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "acknowledgePage"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/acknowledgePage.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/acknowledgePage.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_openReviewItem",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "openReviewItem"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/openReviewItem.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/openReviewItem.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_enterDoor",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "enterDoor"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/enterDoor.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/enterDoor.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_sendFixedLine",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "sendFixedLine"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/sendFixedLine.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/sendFixedLine.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_sendProofCode",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "sendProofCode"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/sendProofCode.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/sendProofCode.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_proveCode",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "proveCode"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/proveCode.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/proveCode.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "CoreResult_issueChatLink",
+          "type": "object",
+          "properties": {
+            "call": {
+              "const": "issueChatLink"
+            },
+            "response": {
+              "description": "Its response, or null when refused.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/issueChatLink.response"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "error": {
+              "description": "Its error, or null when it went through.",
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/issueChatLink.errors"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["call", "response", "error"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "partResult": {
+      "title": "PartResult",
+      "description": "What the gate did with one part: committed, or the failed limit (1 to 6) and its outcome, which stops only that choice and what depends on it (arch 02 line 121; arch 06 lines 295 to 309).",
+      "type": "object",
+      "properties": {
+        "part": {
+          "description": "The part's index in the decide result's parts (K-02 v1 decideResult.parts).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "choiceId": {
+          "description": "The choice the part chose or entered (K-02 v1 choose or enter), or null for another verb.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "result": {
+          "description": "committed: every limit passed and the choice's effects went in the commit (arch 02 line 121); stopped: a limit failed and ran its own outcome (stoppedBy); dependsOnStopped: it depends on a stopped choice, so it stops too (arch 02 line 121); held: a safety outcome holds the turn's routine actions (arch 06 lines 315 to 327; K-34 v1 safety_holds); asked: decide ended it in one question, nothing changed (K-02 v1 resultPart oneQuestion); noAction: a verb that commits nothing for it (no_op, redact, or a none_fits the planner took).",
+          "type": "string",
+          "enum": ["committed", "stopped", "dependsOnStopped", "held", "asked", "noAction"]
+        },
+        "limits": {
+          "description": "Each of limits 1 to 6 with its result (pass, fail or notChecked), as the gate span logs them (K-08 v1 limitResult).",
+          "type": "array",
+          "items": {
+            "$ref": "../event-trace/event-trace.v1.schema.json#/$defs/limitResult"
+          }
+        },
+        "stoppedBy": {
+          "description": "For stopped, the limit that failed and its outcome; null otherwise.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/limitOutcome"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dependsOnPart": {
+          "description": "For dependsOnStopped, the part it depends on; null otherwise.",
+          "anyOf": [
+            {
+              "description": "The index of the stopped part it depends on.",
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["part", "choiceId", "result", "limits", "stoppedBy", "dependsOnPart"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.request": {
+      "title": "GateAndCommitRequest",
+      "description": "Gate and commit a turn: the gate checks limits 1 to 6 on the agreed parts with their quotes; code adds each choice's effects; one transaction writes state, one outbox row per message (no plan yet), clock rows, effect rows and the event log under the turn id (arch 02 line 121; arch 06 lines 295 to 309; arch 10 line 508). It commits through K-05 v1 commitTurn, or for a clock's firing through K-05 v1 fireClock (QUESTIONS.md NQ-RT-4); effect rows and the waiting rows' moves (K-07 v1 waiting_chat to superseded or withdrawn) are K-05 v1.1's (T-071). A limit 4 or 5 refusal from the commit reloads once and gates again (arch 06 line 305). Reads: the primary, uncached (arch 02 line 117; arch 10 lines 504, 508). Repeat: safe: the turn id is the key; a repeat writes nothing and returns the first commit with repeated true (K-05 v1 commitTurn; tour line 418). Time budget: at most 300 ms (arch 04 line 223: 'Gate and commit').",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "turn": {
+          "description": "The turn row the commit writes (K-05 v1 turn). For a clock's firing, the firing's turn (K-05 v1 fireClock.request.turn).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/turn"
+        },
+        "input": {
+          "description": "What the turn acts on: decided texts, a clock's firing, or only core actions (the guard's keyword-only texts: arch 02 line 115).",
+          "oneOf": [
+            {
+              "title": "DecidedInput",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "decided"
+                },
+                "decided": {
+                  "description": "The context and decide's result, as the gate reads them (K-02 v1 contextAndDecide; its named rules are the gate's: optionOffered, quoteInText).",
+                  "$ref": "../model/model.v1.schema.json#/$defs/contextAndDecide"
+                },
+                "planner": {
+                  "description": "The planner's verb when nothing fit after meaning search; null otherwise.",
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/plannerVerbs.request"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": ["kind", "decided", "planner"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ClockInput",
+              "description": "A clock's firing runs its branch with no decide reads (QUESTIONS.md NQ-RT-4; arch 02 line 127).",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "clock"
+                },
+                "clockRowId": {
+                  "description": "The clock row firing (K-05 v1 fireClock).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "expectVersion": {
+                  "$ref": "#/$defs/version"
+                },
+                "firedAt": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+                },
+                "by": {
+                  "description": "As K-05 v1 fireClock.request.by: the actor's alarm, the minute sweep, or staging's Fire now (BP 9.4).",
+                  "type": "string",
+                  "enum": ["alarm", "sweep", "fireNow"]
+                },
+                "jobId": {
+                  "description": "The firing's job id for the event log (K-05 v1 fireClock).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["kind", "clockRowId", "expectVersion", "firedAt", "by", "jobId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "CoreOnlyInput",
+              "description": "Only core actions: STOP, START, HELP and the like, which code alone acts on (arch 02 line 115).",
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "coreOnly"
+                }
+              },
+              "required": ["kind"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "core": {
+          "description": "Shared-core calls this turn commits, in order (README 'In a turn or alone'). Each of the turn's texts carries one recordSafetyOutcome, whatever its outcome, since K-34 v1 writes one outcome row per text under the turn that joins it (README default 5); a clock's turn carries none.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coreAction"
+          }
+        },
+        "now": {
+          "description": "The time the gate reads 'now' at.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "turn", "input", "core", "now"],
+      "additionalProperties": false
+    },
+    "gateAndCommit.response": {
+      "title": "GateAndCommitResponse",
+      "description": "Committed: per part either committed or the failed limit and its outcome, and what the one commit wrote.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "committed"
+        },
+        "turnId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "committedAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "repeated": {
+          "description": "true when this turn id had committed before: nothing was written and the first commit comes back (K-05 v1 commitTurn).",
+          "type": "boolean"
+        },
+        "parts": {
+          "description": "One result per decide part, in order; empty for a clock's or a core-only turn.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/partResult"
+          }
+        },
+        "planner": {
+          "description": "The planner's verb as committed, or null.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/plannerVerbs.response"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "core": {
+          "description": "One result per core action, in the request's order.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coreResult"
+          }
+        },
+        "written": {
+          "description": "What the commit wrote: rows with their versions, outbox rows in commit order, promotions (K-05 v1).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/commitResult"
+        },
+        "effects": {
+          "description": "Effect rows written in the commit, to run after it (K-07 v1 effect rows; written through K-05 v1.1's commit, T-071). Empty until K-05 v1.1 freezes.",
+          "type": "array",
+          "items": {
+            "title": "EffectWritten",
+            "type": "object",
+            "properties": {
+              "effectId": {
+                "description": "The effect id reconciliation matches by (arch 10 line 550).",
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              },
+              "kind": {
+                "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/effectKind"
+              }
+            },
+            "required": ["effectId", "kind"],
+            "additionalProperties": false
+          }
+        },
+        "openQuestions": {
+          "title": "OpenQuestionsWritten",
+          "type": "object",
+          "properties": {
+            "opened": {
+              "description": "Open questions opened (K-05 v1 writes.openQuestions.open).",
+              "type": "array",
+              "items": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              }
+            },
+            "closed": {
+              "description": "Open questions closed (answered, defaulted or withdrawn).",
+              "type": "array",
+              "items": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              }
+            }
+          },
+          "required": ["opened", "closed"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "result",
+        "turnId",
+        "committedAt",
+        "repeated",
+        "parts",
+        "planner",
+        "core",
+        "written",
+        "effects",
+        "openQuestions"
+      ],
+      "additionalProperties": false
+    },
+    "gateAndCommit.errors": {
+      "title": "GateAndCommitErrors",
+      "description": "Refused, nothing written: gateAndCommit's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/turnParkedError"
+        },
+        {
+          "title": "BundleMismatchError",
+          "description": "The context or decide result names another bundle than the turn's pinned one (arch 10 line 548: the bundle id is on every turn). Nothing was written.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "bundleMismatch"
+            },
+            "turnBundleId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+            },
+            "givenBundleId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/bundleId"
+            }
+          },
+          "required": ["error", "turnBundleId", "givenBundleId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "DecideRefusedError",
+          "description": "The decide result breaks a K-02 v1 named rule: a choice the context did not offer (optionOffered; arch 06 line 333) or a quote not found in the turn's texts (quoteInText; arch 03 line 185). Nothing was written; the AI layer treats it as a failed read (arch 06 line 293).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "decideRefused"
+            },
+            "rule": {
+              "description": "The K-02 v1 rule broken.",
+              "type": "string",
+              "enum": ["optionOffered", "quoteInText"]
+            },
+            "parts": {
+              "description": "The parts that broke it.",
+              "type": "array",
+              "items": {
+                "description": "A part index.",
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["error", "rule", "parts"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/constraintError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "composeInput.request": {
+      "title": "ComposeInputRequest",
+      "description": "Compose input: for one committed outbox row, K-03 v1's composer input, with its committed choices and only what limit 7 lets its recipient see, never the frontier (arch 07 line 397). An email copy takes its text row's plan instead, so it gets no composer input (arch 07 line 397). After a crash only rows without a plan are composed (arch 11 line 576). Reads: the primary, uncached: the row and today's record (limit 7 reads what this recipient may see: arch 06 line 311). Repeat: safe: a read. Time budget: none in the sources; it sits inside 'Write the reply, or one rewrite: 2–3 s' (arch 04 line 225).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "outboxRowId": {
+          "description": "The committed outbox row (K-04 v1 outbox_rows; K-07 v1 state planned or stale).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["caller", "outboxRowId"],
+      "additionalProperties": false
+    },
+    "composeInput.response": {
+      "title": "ComposeInputResponse",
+      "description": "The composer input, or the text row an email copy takes its plan from.",
+      "oneOf": [
+        {
+          "title": "ComposeInputReady",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "compose"
+            },
+            "input": {
+              "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/composeInput"
+            }
+          },
+          "required": ["result", "input"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ComposeInputEmailCopy",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "emailCopy"
+            },
+            "textRowId": {
+              "description": "The text row whose plan the copy reuses (K-03 v1 rowPlan.copyOf; RULES 4.1).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["result", "textRowId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "composeInput.errors": {
+      "title": "ComposeInputErrors",
+      "description": "Refused, nothing written: composeInput's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "title": "AlreadyPlannedError",
+          "description": "The row already holds a plan: nothing to compose (arch 11 line 576; K-05 v1 writePlan alreadyPlanned).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "alreadyPlanned"
+            },
+            "outboxRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "outboxRowId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "RowClosedError",
+          "description": "The row is no longer to be sent (K-07 v1: dropped_stopped, withdrawn, superseded or failed): nothing is composed.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "rowClosed"
+            },
+            "outboxRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "state": {
+              "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/rowState"
+            }
+          },
+          "required": ["error", "outboxRowId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "finalizeMessage.request": {
+      "title": "FinalizeMessageRequest",
+      "description": "Finalize a message: for an outbox row and its plan, code inserts the options word for word, adds the fixed lines, fills the slots, runs the claim check (limit 7) and the message checks (arch 02 line 123; arch 07 lines 405 to 417). Every check passed, or only shape, length and reading after the one rewrite: the final parts are written with the plan (K-05 v1 writePlan; K-07 v1 planned to checked). A blocking miss on the composed plan: the failed checks come back for the one rewrite. A blocking miss on the rewrite: code fills the step's fallback text (Jay's reviewed one, or its master line with slots filled) through the same checks; none passes: 'I've passed this on. Rosie's team will reply within 1 business day.', the question withdrawn so no clock arms (K-05 v1 cancelClock with withdrawQuestion; RULES 5.2), and the team paged (pageTeam, reason passed_on). Reads: the primary, uncached: the row, its slots' values and the reader's audience (limit 7: arch 06 line 311). Repeat: safe: a row with a plan keeps it; a repeat answers alreadyPlanned with the stored final parts (K-05 v1 writePlan). Time budget: none in the sources; the checks are code, inside 'Write the reply, or one rewrite: 2–3 s' (arch 04 line 225).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "outboxRowId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "description": "The row's version when its input was composed (limit 4 at the write: K-05 v1 writePlan).",
+          "$ref": "#/$defs/version"
+        },
+        "attempt": {
+          "description": "composed: the composer's plan; rewrite: the one rewrite, told what failed (K-03 v1 checkResult.attempt). The fallback is code's, run inside this call.",
+          "type": "string",
+          "enum": ["composed", "rewrite"]
+        },
+        "plan": {
+          "description": "The plan as the row will store it (K-03 v1 rowPlan).",
+          "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/rowPlan"
+        }
+      },
+      "required": ["caller", "outboxRowId", "expectVersion", "attempt", "plan"],
+      "additionalProperties": false
+    },
+    "finalizeMessage.response": {
+      "title": "FinalizeMessageResponse",
+      "description": "The check results and what was written.",
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "description": "send: every check passed and the final parts are written; sendAndLog: only shape, length and reading or format missed after the one rewrite, written and logged (arch 07 line 417); rewrite: a miss on the composed plan, nothing written, the composer gets one rewrite told what failed; passedOn: the rewrite and the fallback both failed (arch 02 line 123).",
+          "type": "string",
+          "enum": ["send", "sendAndLog", "rewrite", "passedOn"]
+        },
+        "checks": {
+          "description": "Each attempt's check result, in order: the attempt sent, then the fallback when code ran it (K-03 v1 checkResult).",
+          "type": "array",
+          "items": {
+            "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/checkResult"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "finalParts": {
+          "description": "The final parts written, or null for rewrite.",
+          "anyOf": [
+            {
+              "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questionWithdrawn": {
+          "description": "true for passedOn: the question is withdrawn, so no clock arms (RULES 5.2).",
+          "type": "boolean"
+        },
+        "teamPageId": {
+          "description": "For passedOn, the page to Rosie's team (K-36 v1 team_pages reason passed_on); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["outcome", "checks", "finalParts", "questionWithdrawn", "teamPageId"],
+      "additionalProperties": false
+    },
+    "finalizeMessage.errors": {
+      "title": "FinalizeMessageErrors",
+      "description": "Refused, nothing written: finalizeMessage's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "title": "FinalizeAlreadyPlannedError",
+          "description": "The row already holds a plan and final parts (K-05 v1 writePlan alreadyPlanned): they come back unchanged.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "alreadyPlanned"
+            },
+            "outboxRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "finalParts": {
+              "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts"
+            }
+          },
+          "required": ["error", "outboxRowId", "finalParts"],
+          "additionalProperties": false
+        },
+        {
+          "title": "RewriteUsedError",
+          "description": "The one rewrite was already checked for this row (arch 07 line 417: one rewrite).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "rewriteUsed"
+            },
+            "outboxRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "outboxRowId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "FinalizeRowClosedError",
+          "description": "The row is no longer to be sent (K-07 v1 rowState).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "rowClosed"
+            },
+            "outboxRowId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "state": {
+              "$ref": "../outbox-effects/outbox-effects.v1.schema.json#/$defs/rowState"
+            }
+          },
+          "required": ["error", "outboxRowId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "recordSafetyOutcome.request": {
+      "title": "RecordSafetyOutcomeRequest",
+      "description": "Record a safety outcome and its holds (arch 06 lines 315 to 329; A3-22 to A3-26, A3-48 to A3-50, B3-17): the outcome row (K-34 v1 safety_outcomes, one per text, No included), the hold with its release rule (safety_holds: at once, when private, after a clear 'we're safe', or never), the outcome step's checked line as an outbox row of send class safety, at any hour, past any opt-out (arch 02 line 111; NQ-RT-9), and who is told (arch 06 line 329): crisis words, the owner and Rosie's team at once; an emergency or a threat, the owner, then after 5 minutes whoever they named and Rosie's team (handOff); harm to a child or older adult, or a report about the owner or staff, Rosie's team that day (K-34 v1 harm_reports). For a text it rides in the commit of the turn its text joins (gateAndCommit core; README default 5); for free text from a page or an outside AI it is called alone, and danger returns the safety message to the caller and nothing books (arch 02 line 129). Reads: the primary, uncached. Repeat: safe: the text's event id (K-02 v1 safetyResult.eventId) is the key; one outcome row per text, and a repeat returns the first. Time budget: the checked line is sent first, within 5 s (QUESTIONS.md NQ-RT-9's default); the read itself is 2 s per model, 4 s in all (arch 02 line 111), the AI layer's.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "safety": {
+          "description": "The safety read's result for one text, page or AI request (K-02 v1).",
+          "$ref": "../model/model.v1.schema.json#/$defs/safetyResult"
+        },
+        "handleId": {
+          "description": "The handle the text came from; null for page or agent free text with no handle (K-34 v1 safety_outcomes.handle_id).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "description": "The booking the text is about, or null: danger is read at any step (S13-10).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "sentByActor": {
+          "$ref": "#/$defs/sentByActor"
+        }
+      },
+      "required": ["caller", "safety", "handleId", "bookingId", "sentByActor"],
+      "additionalProperties": false
+    },
+    "recordSafetyOutcome.response": {
+      "title": "RecordSafetyOutcomeResponse",
+      "description": "The outcome, its hold, its line and who is told.",
+      "type": "object",
+      "properties": {
+        "outcomeId": {
+          "description": "The outcome row (K-34 v1 safety_outcomes.id).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "outcomes": {
+          "description": "What holds after code's rules (K-02 v1 safetyResult.outcomes).",
+          "type": "array",
+          "items": {
+            "$ref": "../model/model.v1.schema.json#/$defs/safetyOutcome"
+          }
+        },
+        "hold": {
+          "description": "The hold on routine actions, or null when the outcome holds nothing (No, with no stop words).",
+          "anyOf": [
+            {
+              "title": "SafetyHold",
+              "type": "object",
+              "properties": {
+                "holdId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "releaseRule": {
+                  "description": "K-34 v1 safety_holds.release_rule: the strictest of its outcomes (arch 06 line 327).",
+                  "type": "string",
+                  "enum": ["at_once", "when_private", "after_safe", "never"]
+                },
+                "blocksBooking": {
+                  "description": "Plug-in stop words matched: they still block booking after an at-once release (A3-26).",
+                  "type": "boolean"
+                }
+              },
+              "required": ["holdId", "releaseRule", "blocksBooking"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "safetyLine": {
+          "description": "The outcome step's checked line, or null for No.",
+          "anyOf": [
+            {
+              "title": "SafetyLine",
+              "type": "object",
+              "properties": {
+                "fixedLineId": {
+                  "$ref": "#/$defs/fixedLineId"
+                },
+                "outboxRowId": {
+                  "description": "The outbox row of send class safety, or null when the actor already sent it (sentByActor) or the caller is a page or an agent, which shows it.",
+                  "$ref": "#/$defs/nullableId"
+                }
+              },
+              "required": ["fixedLineId", "outboxRowId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "told": {
+          "description": "Who is told and through which row (arch 06 line 329).",
+          "type": "array",
+          "items": {
+            "title": "SafetyTold",
+            "type": "object",
+            "properties": {
+              "who": {
+                "description": "The owner, whoever the owner named, or Rosie's team (arch 06 line 329; Q-18: Jay and the CTO until launch).",
+                "type": "string",
+                "enum": ["owner", "named", "team"]
+              },
+              "via": {
+                "description": "The row that tells them: a hand-off (K-36 v1 hand_offs), a page (team_pages) or a harm report (K-34 v1 harm_reports).",
+                "type": "string",
+                "enum": ["handOff", "teamPage", "harmReport"]
+              },
+              "id": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              }
+            },
+            "required": ["who", "via", "id"],
+            "additionalProperties": false
+          }
+        },
+        "nothingBooks": {
+          "description": "true when danger holds: for a page or an AI, the safety message is returned and nothing books (arch 02 line 129).",
+          "type": "boolean"
+        },
+        "repeated": {
+          "description": "true when this event id was recorded before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["outcomeId", "outcomes", "hold", "safetyLine", "told", "nothingBooks", "repeated"],
+      "additionalProperties": false
+    },
+    "recordSafetyOutcome.errors": {
+      "title": "RecordSafetyOutcomeErrors",
+      "description": "Refused, nothing written: recordSafetyOutcome's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "releaseSafetyHold.request": {
+      "title": "ReleaseSafetyHoldRequest",
+      "description": "Release a safety hold by its rule (arch 06 lines 319 to 327): at once after the outcome's message; once the booking is private (A3-50); after a clear 'we're safe' whose own safety read holds no danger, with a fresh read-back (A3-24, A3-25). A threat's hold is never released (A3-48). The held routine actions are then decided again from today's record, with the booking's own fresh read-back and exact yes (limit 3; K-34 v1 safety_holds). Reads: the primary, uncached. Repeat: safe: a released hold answers repeated with its first release. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "holdId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "why": {
+          "description": "K-34 v1 safety_holds.released_why; it must fit the hold's rule.",
+          "type": "string",
+          "enum": ["outcome_message_sent", "booking_private", "safe_readback"]
+        },
+        "releasedByOutcomeId": {
+          "description": "For safe_readback, the safety read of the 'we're safe' text itself (K-34 v1 released_by_outcome_id); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["caller", "holdId", "expectVersion", "why", "releasedByOutcomeId"],
+      "additionalProperties": false
+    },
+    "releaseSafetyHold.response": {
+      "title": "ReleaseSafetyHoldResponse",
+      "description": "Released.",
+      "type": "object",
+      "properties": {
+        "holdId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "releasedAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "redecideTurnId": {
+          "description": "The held turn whose routine actions are decided again with a fresh read-back (K-34 v1 safety_holds.turn_id); null for page or agent free text.",
+          "anyOf": [
+            {
+              "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "repeated": {
+          "description": "true when the hold was already released by this rule.",
+          "type": "boolean"
+        }
+      },
+      "required": ["holdId", "releasedAt", "redecideTurnId", "repeated"],
+      "additionalProperties": false
+    },
+    "releaseSafetyHold.errors": {
+      "title": "ReleaseSafetyHoldErrors",
+      "description": "Refused, nothing written: releaseSafetyHold's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NeverReleasedError",
+          "description": "A threat to staff or others: never released; nothing books and new requests wait for the owner (arch 06 line 325; A3-48).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "neverReleased"
+            },
+            "holdId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "holdId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "StillDangerError",
+          "description": "The 'we're safe' text's own read holds danger: the hold stays and the message goes again (arch 06 line 323; K-34 v1).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "stillDanger"
+            },
+            "outcomeId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "outcomeId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "WrongRuleError",
+          "description": "The reason does not fit the hold's release rule (K-34 v1 safety_holds_why_fits_rule).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "wrongRule"
+            },
+            "releaseRule": {
+              "description": "The hold's rule.",
+              "type": "string",
+              "enum": ["at_once", "when_private", "after_safe", "never"]
+            }
+          },
+          "required": ["error", "releaseRule"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "recordStopOrStart.request": {
+      "title": "RecordStopOrStartRequest",
+      "description": "Record STOP, START and a work phone's answer to 'which texts?' (RULES 7.2, 7.5, 7.7; MC C1): a STOP (any of msgtext.js's 16 opt-out words, the text only that word: arch 02 line 115) sets the phone's stopped flag and clears chat open, across every business since one number serves them all, and adds a consent row that withdraws texts (K-29 v1 consents; K-04 v1 phones); CANCEL or CANCELAR also flags the visit (RULES 7.4; S13-28 rule 46); START clears it and adds a texts row; a work phone's STOP asks which texts, and no answer by the end of its next text hour means all (RULES 7.7). The stop reply is C1's every-business reply (Q-01's words). Written on return when PostgreSQL was down: the actor sent the reply and keeps the stopped flag (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: the text's turn (or the clock row for workPhoneNoAnswer) is the key; a repeat answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "kind": {
+          "description": "stop and start (RULES 7.2, 7.5); workPhoneAnswer: a work phone's answer to 'which texts?'; workPhoneNoAnswer: its clock ran out, so all (RULES 7.7).",
+          "type": "string",
+          "enum": ["stop", "start", "workPhoneAnswer", "workPhoneNoAnswer"]
+        },
+        "phoneNumber": {
+          "$ref": "#/$defs/phoneNumber"
+        },
+        "words": {
+          "description": "The person's own words, kept as the consent row's exact words (K-29 v1 consents.exact_words).",
+          "type": "string",
+          "minLength": 1
+        },
+        "alsoCancelVisit": {
+          "description": "CANCEL or CANCELAR: also flags the visit (RULES 7.4).",
+          "type": "boolean"
+        },
+        "workPhoneBusinessIds": {
+          "description": "For workPhoneAnswer, the businesses the answer names; null means all, and for any other kind it is null (RULES 7.7).",
+          "anyOf": [
+            {
+              "description": "The businesses whose texts it stops.",
+              "type": "array",
+              "items": {
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sentByActor": {
+          "$ref": "#/$defs/sentByActor"
+        }
+      },
+      "required": [
+        "caller",
+        "kind",
+        "phoneNumber",
+        "words",
+        "alsoCancelVisit",
+        "workPhoneBusinessIds",
+        "sentByActor"
+      ],
+      "additionalProperties": false
+    },
+    "recordStopOrStart.response": {
+      "title": "RecordStopOrStartResponse",
+      "description": "Recorded.",
+      "type": "object",
+      "properties": {
+        "consentRowIds": {
+          "description": "The consent rows added, never edited (K-29 v1 consents).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "stopped": {
+          "description": "The phone's stopped flag after the call (K-04 v1 phones.stopped).",
+          "type": "boolean"
+        },
+        "chatOpen": {
+          "description": "The phone's chat-open flag after the call (RULES 4.1b).",
+          "type": "boolean"
+        },
+        "phoneVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "reply": {
+          "description": "The stop or start reply, or null for a work phone's STOP, which asks instead.",
+          "anyOf": [
+            {
+              "title": "StopReply",
+              "type": "object",
+              "properties": {
+                "fixedLineId": {
+                  "$ref": "#/$defs/fixedLineId"
+                },
+                "outboxRowId": {
+                  "description": "Its outbox row (send class quick_reply, a reply in the same turn: Q-15; README default 6), or null when the actor sent it.",
+                  "$ref": "#/$defs/nullableId"
+                }
+              },
+              "required": ["fixedLineId", "outboxRowId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "askedWhichTexts": {
+          "description": "For a work phone's STOP, the 'which texts?' question; null otherwise.",
+          "anyOf": [
+            {
+              "title": "WhichTextsQuestion",
+              "type": "object",
+              "properties": {
+                "openQuestionId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                },
+                "clockRowId": {
+                  "description": "Due at the end of the work phone's next text hour (RULES 7.7; CQ-05).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["openQuestionId", "clockRowId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "flaggedBookingIds": {
+          "description": "Visits flagged by CANCEL or CANCELAR (RULES 7.4).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "repeated": {
+          "description": "true when this request was recorded before.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "consentRowIds",
+        "stopped",
+        "chatOpen",
+        "phoneVersion",
+        "reply",
+        "askedWhichTexts",
+        "flaggedBookingIds",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "recordStopOrStart.errors": {
+      "title": "RecordStopOrStartErrors",
+      "description": "Refused, nothing written: recordStopOrStart's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotAWorkPhoneError",
+          "description": "A work-phone kind for a phone with no owner, admin or staff role (RULES 7.7).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notAWorkPhone"
+            },
+            "phoneNumber": {
+              "$ref": "#/$defs/phoneNumber"
+            }
+          },
+          "required": ["error", "phoneNumber"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "setRecordFlag.request": {
+      "title": "SetRecordFlagRequest",
+      "description": "Set or clear a record flag (arch 03 lines 175 to 177): private (booking: only the person served, those they added and the business are reached; A3-50), paused (person, phone or address: visits and requests wait for the owner; A3-48) and deceased (booking: reminders and sales texts stop, nothing new is charged, bills wait for the owner; A7-81). Setting one is a change that only protects: anyone's word (limit 1; S13-57). Clearing: the person served clears private, the owner clears deceased and paused. Still paused at 7pm the day before, or 2 hours before a same-day visit, the visit is called off with no fee and prepaid visits refunded (S11-62): the call-off clock rows are armed here. The stopped flag is set and cleared only by recordStopOrStart. Reads: the primary, uncached. Repeat: safe: a flag already as asked answers repeated; a clear compares the row's version (limit 4). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "flag": {
+          "description": "The flag (arch 03 line 175).",
+          "type": "string",
+          "enum": ["private", "paused", "deceased"]
+        },
+        "action": {
+          "description": "Set or clear it.",
+          "type": "string",
+          "enum": ["set", "clear"]
+        },
+        "target": {
+          "description": "What the flag is on: a booking for private and deceased (K-04 v1 bookings); a person, phone or address for paused (K-04 v1 pauses).",
+          "oneOf": [
+            {
+              "title": "FlagOnBooking",
+              "type": "object",
+              "properties": {
+                "bookingId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["bookingId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "FlagOnPerson",
+              "type": "object",
+              "properties": {
+                "personId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["personId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "FlagOnPhone",
+              "type": "object",
+              "properties": {
+                "phoneNumber": {
+                  "$ref": "#/$defs/phoneNumber"
+                }
+              },
+              "required": ["phoneNumber"],
+              "additionalProperties": false
+            },
+            {
+              "title": "FlagOnPauseRow",
+              "type": "object",
+              "properties": {
+                "pauseId": {
+                  "description": "For a clear, the pause row; an address is never sent back in plain (K-04 v1 pauses.address is sealed).",
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["pauseId"],
+              "additionalProperties": false
+            },
+            {
+              "title": "FlagOnAddress",
+              "type": "object",
+              "properties": {
+                "address": {
+                  "description": "For setting a pause on an address: the address, sealed under sealedForPersonId's key on write (K-04 v1 pauses).",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sealedForPersonId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["address", "sealedForPersonId"],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "expectVersion": {
+          "description": "The booking's or pause row's version as read; null when setting a new pause.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/version"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["caller", "flag", "action", "target", "expectVersion"],
+      "additionalProperties": false
+    },
+    "setRecordFlag.response": {
+      "title": "SetRecordFlagResponse",
+      "description": "The flag as it now stands.",
+      "type": "object",
+      "properties": {
+        "rowId": {
+          "description": "The booking or pause row.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "callOffClockRowIds": {
+          "description": "For a set pause, the call-off clock rows armed for the visits it covers (S11-62); empty otherwise.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "repeated": {
+          "description": "true when the flag was already as asked.",
+          "type": "boolean"
+        }
+      },
+      "required": ["rowId", "version", "callOffClockRowIds", "repeated"],
+      "additionalProperties": false
+    },
+    "setRecordFlag.errors": {
+      "title": "SetRecordFlagErrors",
+      "description": "Refused, nothing written: setRecordFlag's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notAllowedError"
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "handOff.request": {
+      "title": "HandOffRequest",
+      "description": "Hand to a person (arch 06 line 329; S13-29 rules 53 to 57): crisis words, the owner and Rosie's team at once; an emergency or a threat, the owner, then after 5 minutes with no reply or console tap whoever they named and Rosie's team, paged every 5 minutes until acknowledged; any other hand-off, the owner in text hours, then Rosie's team after 2 days unanswered (S11-19). A report about the owner or staff goes to Rosie's team that day and never to the person named (K-02 v1 handOff.about ownerOrStaff; K-34 v1 harm_reports). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers repeated. Time budget: crisis words at once; an emergency or a threat 5 minutes; any other 2 days (arch 06 line 329; S11-19).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "kind": {
+          "description": "K-36 v1 hand_offs.kind: which row of 'Who is told' (arch 06 line 329).",
+          "type": "string",
+          "enum": ["crisis_words", "emergency", "threat", "other"]
+        },
+        "about": {
+          "description": "K-02 v1 handOffAbout: ownerOrStaff goes to Rosie's team that day as a harm report, never to the person named.",
+          "type": "string",
+          "enum": ["ownerOrStaff", "other"]
+        },
+        "safetyOutcomeId": {
+          "description": "For crisis_words, emergency and threat, the safety read behind it (K-36 v1).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "aboutPersonId": {
+          "description": "The person it is about, when known.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "summary": {
+          "description": "What is handed off, in plain words with no private value (K-36 v1 hand_offs.summary).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["caller", "kind", "about", "safetyOutcomeId", "bookingId", "aboutPersonId", "summary"],
+      "additionalProperties": false
+    },
+    "handOff.response": {
+      "title": "HandOffResponse",
+      "description": "Handed off.",
+      "type": "object",
+      "properties": {
+        "handOffId": {
+          "description": "The hand-off (K-36 v1 hand_offs), or null for a report about the owner or staff.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "harmReportId": {
+          "description": "For about ownerOrStaff, the harm report (K-34 v1 harm_reports); null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "alertOutboxRowId": {
+          "description": "The alert to the person told, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "escalateAt": {
+          "description": "When Rosie's team is paged if nobody answers (K-36 v1 hand_offs.escalate_at).",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "escalationClockRowId": {
+          "description": "The clock row that pages at escalateAt; null for crisis words, paged at once.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "teamPageId": {
+          "description": "A page opened at once (crisis words; a report about the owner or staff), or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when recorded before.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "handOffId",
+        "harmReportId",
+        "alertOutboxRowId",
+        "escalateAt",
+        "escalationClockRowId",
+        "teamPageId",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "handOff.errors": {
+      "title": "HandOffErrors",
+      "description": "Refused, nothing written: handOff's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "answerHandOff.request": {
+      "title": "AnswerHandOffRequest",
+      "description": "Take the answer to a hand-off: the person told replies or taps the owner console, and the escalation clock is cancelled (K-36 v1 hand_offs.answered_at; arch 06 line 329: 'no reply or console tap'). Reads: the primary, uncached. Repeat: safe: an answered hand-off answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "handOffId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "via": {
+          "description": "K-36 v1 hand_offs.answered_via.",
+          "type": "string",
+          "enum": ["reply", "console_tap"]
+        }
+      },
+      "required": ["caller", "handOffId", "expectVersion", "via"],
+      "additionalProperties": false
+    },
+    "answerHandOff.response": {
+      "title": "AnswerHandOffResponse",
+      "description": "Answered.",
+      "type": "object",
+      "properties": {
+        "answeredAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "cancelledClockRowId": {
+          "description": "The escalation clock cancelled, or null when it had fired or there was none.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when already answered.",
+          "type": "boolean"
+        }
+      },
+      "required": ["answeredAt", "cancelledClockRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "answerHandOff.errors": {
+      "title": "AnswerHandOffErrors",
+      "description": "Refused, nothing written: answerHandOff's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotToldError",
+          "description": "The person answering is not the one told (K-36 v1 hand_offs.told_person_id).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notTold"
+            },
+            "handOffId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "handOffId"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "pageTeam.request": {
+      "title": "PageTeamRequest",
+      "description": "Page Rosie's team (arch 06 line 329; BP starting shape, M3b 'paging Rosie's team'): a page reaches every member of K-36 v1 team_page_recipients in their own open chat, else by email, since Rosie never writes first (MC C9); an emergency or a threat repeats every 5 minutes until acknowledged, each repeat a new clock row (K-36 v1 team_pages.next_page_clock_row_id). Until launch Rosie's team is Jay and the CTO (Q-18); on staging only roster test phones and the test console (BP 9.4). Reads: the primary, uncached. Repeat: safe: the caller's request id (or, for a repeat page, the clock row) is the key; a repeat answers repeated. Time budget: every 5 minutes until acknowledged, for a repeating page (arch 06 line 329, DD).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "reason": {
+          "description": "K-36 v1 team_pages.reason.",
+          "type": "string",
+          "enum": [
+            "hand_off",
+            "owner_cannot_act",
+            "harm_report",
+            "review_item",
+            "safety_timer_missed",
+            "passed_on",
+            "hard_invariant_breach"
+          ]
+        },
+        "pointerId": {
+          "description": "The row the reason points at: the hand-off, harm report, review item or safety timer (K-36 v1 team_pages CHECKs); null for the other reasons.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "namedPersonId": {
+          "description": "For hand_off, whoever the owner named, paged with the team (K-22 names them; not yet frozen).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "summary": {
+          "description": "What the team needs to know, ids and kinds, never a person's words (K-36 v1).",
+          "type": "string",
+          "minLength": 1
+        },
+        "repeating": {
+          "description": "true when the page repeats every 5 minutes until acknowledged (an emergency or a threat: arch 06 line 329).",
+          "type": "boolean"
+        },
+        "repeatOfPageId": {
+          "description": "For the next page of a repeating page, fired by its clock row; null for a new page.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": [
+        "caller",
+        "reason",
+        "pointerId",
+        "namedPersonId",
+        "summary",
+        "repeating",
+        "repeatOfPageId"
+      ],
+      "additionalProperties": false
+    },
+    "pageTeam.response": {
+      "title": "PageTeamResponse",
+      "description": "Paged.",
+      "type": "object",
+      "properties": {
+        "pageId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "timesPaged": {
+          "description": "How many times it has been paged, the first included.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "outboxRowIds": {
+          "description": "One row per member reached (send class safety for crisis words, an emergency or a threat; routine otherwise).",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        },
+        "nextPageClockRowId": {
+          "description": "The clock row for the next page, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when this page was sent before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["pageId", "timesPaged", "outboxRowIds", "nextPageClockRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "pageTeam.errors": {
+      "title": "PageTeamErrors",
+      "description": "Refused, nothing written: pageTeam's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "PageClosedError",
+          "description": "The page was acknowledged: the repeat sends nothing (K-36 v1 team_pages.state).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "pageClosed"
+            },
+            "pageId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "pageId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NoRecipientsError",
+          "description": "No member is on the list (K-36 v1 team_page_recipients; Q-18).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "noRecipients"
+            }
+          },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "PointerMissingError",
+          "description": "The reason needs a row it points at and none was given (K-36 v1 team_pages CHECKs).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "pointerMissing"
+            },
+            "reason": {
+              "description": "The reason given.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["error", "reason"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "acknowledgePage.request": {
+      "title": "AcknowledgePageRequest",
+      "description": "Take the acknowledgement of a page: a reply to the page or a tap in the team console stops the paging and cancels its next-page clock row (K-36 v1 team_pages; arch 06 line 329). How a paged person's reply reaches this call is CQ-32's: here, as a core action of that person's turn. Reads: the primary, uncached. Repeat: safe: an acknowledged page answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "pageId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "via": {
+          "description": "K-36 v1 team_pages.acknowledged_via.",
+          "type": "string",
+          "enum": ["reply", "console_tap"]
+        }
+      },
+      "required": ["caller", "pageId", "expectVersion", "via"],
+      "additionalProperties": false
+    },
+    "acknowledgePage.response": {
+      "title": "AcknowledgePageResponse",
+      "description": "Acknowledged.",
+      "type": "object",
+      "properties": {
+        "acknowledgedAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "cancelledClockRowId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when already acknowledged.",
+          "type": "boolean"
+        }
+      },
+      "required": ["acknowledgedAt", "cancelledClockRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "acknowledgePage.errors": {
+      "title": "AcknowledgePageErrors",
+      "description": "Refused, nothing written: acknowledgePage's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotPagedError",
+          "description": "The person is neither a member reached nor the person named (K-36 v1).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notPaged"
+            },
+            "pageId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "pageId"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "openReviewItem.request": {
+      "title": "OpenReviewItemRequest",
+      "description": "Open a team review item (K-37 v1 review_items), due within 1 business day for new work (S1-03), control (S1-75), a listing that does not match or is already on Rosie (S1-76), an owner claim (S11-52) and the booking cap flag (S12-28); a harm report the same day (A3-49). The business stays as its step's safe default leaves it until decided (Q-18). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers repeated. Time budget: the team's answer within 1 business day, or that day for a harm report (S1-03, S1-75, S1-76, S11-52, S12-28, A3-49).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "kind": {
+          "description": "K-37 v1 review_items.kind.",
+          "type": "string",
+          "enum": [
+            "new_work",
+            "control",
+            "listing_match",
+            "owner_claim",
+            "booking_cap",
+            "harm_report",
+            "missed_deadline"
+          ]
+        },
+        "subject": {
+          "description": "The row under review, or null while its part is not frozen (K-37 v1 subject_table, subject_row_id).",
+          "anyOf": [
+            {
+              "title": "ReviewSubject",
+              "type": "object",
+              "properties": {
+                "table": {
+                  "$ref": "#/$defs/tableName"
+                },
+                "rowId": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/id"
+                }
+              },
+              "required": ["table", "rowId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "description": "What the team must check, without private values (K-37 v1).",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["caller", "kind", "subject", "summary"],
+      "additionalProperties": false
+    },
+    "openReviewItem.response": {
+      "title": "OpenReviewItemResponse",
+      "description": "Opened.",
+      "type": "object",
+      "properties": {
+        "reviewItemId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "dueAt": {
+          "description": "As code computes it from the kind (K-37 v1 review_items.due_at).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "repeated": {
+          "description": "true when opened before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["reviewItemId", "dueAt", "repeated"],
+      "additionalProperties": false
+    },
+    "openReviewItem.errors": {
+      "title": "OpenReviewItemErrors",
+      "description": "Refused, nothing written: openReviewItem's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "decideReviewItem.request": {
+      "title": "DecideReviewItemRequest",
+      "description": "Decide a team review item, or set it waiting on someone else until a time (S11-52: the account owner has 3 business days to send their own papers). Only a person on Rosie's team decides (Q-18). What the decision changes is written by the journey call it names (journeys 1 and 11). Reads: the primary, uncached. Repeat: safe: a decided item answers repeated with its first decision; a wait compares the version. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "reviewItemId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expectVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "decision": {
+          "description": "Done with an outcome, or waiting until a time (K-37 v1 review_items.state).",
+          "oneOf": [
+            {
+              "title": "ReviewDone",
+              "type": "object",
+              "properties": {
+                "state": {
+                  "const": "done"
+                },
+                "outcome": {
+                  "description": "The decision in plain words, without private values.",
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": ["state", "outcome"],
+              "additionalProperties": false
+            },
+            {
+              "title": "ReviewWaiting",
+              "type": "object",
+              "properties": {
+                "state": {
+                  "const": "waiting"
+                },
+                "waitUntil": {
+                  "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+                }
+              },
+              "required": ["state", "waitUntil"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": ["caller", "reviewItemId", "expectVersion", "decision"],
+      "additionalProperties": false
+    },
+    "decideReviewItem.response": {
+      "title": "DecideReviewItemResponse",
+      "description": "Decided or waiting.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "The item's state after the call.",
+          "type": "string",
+          "enum": ["waiting", "done"]
+        },
+        "decidedAt": {
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "repeated": {
+          "description": "true when already decided.",
+          "type": "boolean"
+        }
+      },
+      "required": ["state", "decidedAt", "repeated"],
+      "additionalProperties": false
+    },
+    "decideReviewItem.errors": {
+      "title": "DecideReviewItemErrors",
+      "description": "Refused, nothing written: decideReviewItem's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotTeamError",
+          "description": "The person is not on Rosie's team (Q-18).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notTeam"
+            }
+          },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "title": "AlreadyDoneError",
+          "description": "Decided before with another outcome.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "alreadyDone"
+            },
+            "reviewItemId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "reviewItemId"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "enterDoor.request": {
+      "title": "EnterDoorRequest",
+      "description": "Enter one of the shared-core doors (arch 03 line 165; BP starting shape, M3b row): S11-12, an owner command; S11-21, an unclear owner text or HELP or MENU (says what the owner can text, or gets a person); S11-42, a team change. Code walks from the door to the first step that asks someone, waits on a clock or event, or ends the journey (arch 03 line 191). The doors of journeys 3 and on (A3-51, A3-43) are later minor versions. Reads: the primary, uncached, inside the turn's commit. Repeat: as gateAndCommit: by the turn id. Time budget: inside gateAndCommit's 300 ms.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "door": {
+          "description": "The door's step (arch 03 line 165).",
+          "type": "string",
+          "enum": ["S11-12", "S11-21", "S11-42"]
+        },
+        "by": {
+          "description": "decide: K-02 v1 enter on the door; guardKeyword: the guard's HELP or MENU from an owner (S11-21); noTarget: the guard found no target (arch 02 line 115).",
+          "type": "string",
+          "enum": ["decide", "guardKeyword", "noTarget"]
+        }
+      },
+      "required": ["caller", "door", "by"],
+      "additionalProperties": false
+    },
+    "enterDoor.response": {
+      "title": "EnterDoorResponse",
+      "description": "Entered.",
+      "type": "object",
+      "properties": {
+        "walkedTo": {
+          "description": "The step the walk stopped at (arch 03 line 191).",
+          "$ref": "#/$defs/stepId"
+        },
+        "openQuestionId": {
+          "description": "The question it asks, or null.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "outboxRowIds": {
+          "description": "The rows it wrote.",
+          "type": "array",
+          "items": {
+            "$ref": "../common/formats.v1.schema.json#/$defs/id"
+          }
+        }
+      },
+      "required": ["walkedTo", "openQuestionId", "outboxRowIds"],
+      "additionalProperties": false
+    },
+    "enterDoor.errors": {
+      "title": "EnterDoorErrors",
+      "description": "Refused, nothing written: enterDoor's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notAllowedError"
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "sendFixedLine.request": {
+      "title": "SendFixedLineRequest",
+      "description": "Send a fixed line word for word (arch 07 line 361): the guard's HELP reply to someone who is not an owner (arch 02 line 115; Q-01), and the outage lines: 'Rosie is down for a few minutes. If anyone is in danger, call 911.' once to each text whose turn has not committed, never to a stopped number (arch 11 line 564; S12-12), and the line a text waiting 20 s gets while PostgreSQL is down, sent by the actor and written on return (arch 11 line 566). Reads: the primary, uncached. Repeat: safe: once per text (the caller's turn or request id); a repeat answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "fixedLineId": {
+          "$ref": "#/$defs/fixedLineId"
+        },
+        "recipientHandleId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "sendClass": {
+          "description": "quick_reply for a guard reply in its turn (Q-15); safety for an outage line about danger (RULES 4.3).",
+          "$ref": "../data-access/data-access.v1.schema.json#/$defs/sendClass"
+        },
+        "sentByActor": {
+          "$ref": "#/$defs/sentByActor"
+        }
+      },
+      "required": ["caller", "fixedLineId", "recipientHandleId", "sendClass", "sentByActor"],
+      "additionalProperties": false
+    },
+    "sendFixedLine.response": {
+      "title": "SendFixedLineResponse",
+      "description": "Written.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "description": "The row written, or null when the actor sent it and only the record was written.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when sent before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["outboxRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "sendFixedLine.errors": {
+      "title": "SendFixedLineErrors",
+      "description": "Refused, nothing written: sendFixedLine's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "PhoneStoppedError",
+          "description": "The number is stopped: only stop replies and safety lines go (RULES 7.2; arch 11 line 564).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "phoneStopped"
+            },
+            "recipientHandleId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "recipientHandleId"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "sendsFailing.request": {
+      "title": "SendsFailingRequest",
+      "description": "Texting goes down (S12-09, S12-10): a row whose sends still fail after 15 minutes of tries goes the next way the person allows (email); with none left, the owner gets the number to call (arch 02 line 125; K-07 v1 followUp nextWay, ownerGetsNumber). It writes the follow-up row and moves the row to failed through K-05 v1.1's dispatcherGivesUp (T-071). Reads: the primary, uncached. Repeat: safe: a failed row answers repeated with its follow-up. Time budget: after 15 minutes of tries (arch 02 line 125).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "outboxRowId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "failingSince": {
+          "description": "When the first try failed: 15 minutes count from it.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "outboxRowId", "failingSince"],
+      "additionalProperties": false
+    },
+    "sendsFailing.response": {
+      "title": "SendsFailingResponse",
+      "description": "The follow-up written.",
+      "type": "object",
+      "properties": {
+        "followUp": {
+          "description": "K-07 v1 followUp.why.",
+          "type": "string",
+          "enum": ["nextWay", "ownerGetsNumber"]
+        },
+        "followUpOutboxRowId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "repeated": {
+          "description": "true when given up before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["followUp", "followUpOutboxRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "sendsFailing.errors": {
+      "title": "SendsFailingErrors",
+      "description": "Refused, nothing written: sendsFailing's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotYetError",
+          "description": "Under 15 minutes of tries (arch 02 line 125).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notYet"
+            },
+            "retryAt": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            }
+          },
+          "required": ["error", "retryAt"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "textingBack.request": {
+      "title": "TextingBackRequest",
+      "description": "Texts work again (S12-09 'Yes', S12-10): one short 'all set' to each person who got a message the other way during the outage (arch 02 line 125: 'once texts work, one short all set'). Reads: the primary, uncached. Repeat: safe: one 'all set' per person per outage; a repeat answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "recipientHandleId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "outageStartedAt": {
+          "description": "When the outage began, which names the outage.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "recipientHandleId", "outageStartedAt"],
+      "additionalProperties": false
+    },
+    "textingBack.response": {
+      "title": "TextingBackResponse",
+      "description": "Written.",
+      "type": "object",
+      "properties": {
+        "outboxRowId": {
+          "description": "The 'all set' row, or null when nothing went the other way.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "repeated": {
+          "description": "true when sent before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["outboxRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "textingBack.errors": {
+      "title": "TextingBackErrors",
+      "description": "Refused, nothing written: textingBack's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "calendarLinkDropped.request": {
+      "title": "CalendarLinkDroppedRequest",
+      "description": "A calendar link drops (S12-11 'A calendar link drops', S12-13): Rosie stops offering that person's times past what she knows, asks the owner to reconnect, and a clock reminds once after 24 hours if it is not back, the times staying off (S12-14; arch 05 line 271). Links are made in journey 1 (S1-24), on the calendar double until J-13 (Q-56). Reads: the primary, uncached. Repeat: safe: a dropped link answers repeated. Time budget: the reminder 24 hours after (02-contracts K-09; S12-14).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "calendarLinkId": {
+          "description": "The link (K-27, not yet frozen: an opaque id).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "personId": {
+          "description": "Whose calendar it is.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "why": {
+          "description": "A renewal still failing after the effect retries, the token refused, or change pushes lost (arch 05 line 271; arch 10 line 542).",
+          "type": "string",
+          "enum": ["renewalFailed", "tokenRevoked", "pushesLost"]
+        },
+        "droppedAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "calendarLinkId", "personId", "why", "droppedAt"],
+      "additionalProperties": false
+    },
+    "calendarLinkDropped.response": {
+      "title": "CalendarLinkDroppedResponse",
+      "description": "Recorded; the person's times are off.",
+      "type": "object",
+      "properties": {
+        "openQuestionId": {
+          "description": "The owner's question: reconnect? (S12-13)",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "outboxRowId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "reminderClockRowId": {
+          "description": "Fires once after 24 hours if the link is not back (S12-14).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "repeated": {
+          "description": "true when recorded before.",
+          "type": "boolean"
+        }
+      },
+      "required": ["openQuestionId", "outboxRowId", "reminderClockRowId", "repeated"],
+      "additionalProperties": false
+    },
+    "calendarLinkDropped.errors": {
+      "title": "CalendarLinkDroppedErrors",
+      "description": "Refused, nothing written: calendarLinkDropped's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "calendarLinkBack.request": {
+      "title": "CalendarLinkBackRequest",
+      "description": "A dropped calendar link is back (S12-13 'Yes: checks for clashes'): the reminder clock is cancelled and a fresh read checks for clashes before the times are offered again (arch 05 line 259). Reads: the primary, uncached. Repeat: safe: a link already back answers repeated. Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "calendarLinkId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "backAt": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "calendarLinkId", "backAt"],
+      "additionalProperties": false
+    },
+    "calendarLinkBack.response": {
+      "title": "CalendarLinkBackResponse",
+      "description": "Back.",
+      "type": "object",
+      "properties": {
+        "cancelledClockRowId": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "clashCheck": {
+          "description": "The clash check runs as a fresh free/busy read through K-16 (not yet frozen).",
+          "type": "string",
+          "enum": ["queued"]
+        },
+        "repeated": {
+          "description": "true when already back.",
+          "type": "boolean"
+        }
+      },
+      "required": ["cancelledClockRowId", "clashCheck", "repeated"],
+      "additionalProperties": false
+    },
+    "calendarLinkBack.errors": {
+      "title": "CalendarLinkBackErrors",
+      "description": "Refused, nothing written: calendarLinkBack's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "NotDroppedError",
+          "description": "The link was not dropped.",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "notDropped"
+            },
+            "calendarLinkId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["error", "calendarLinkId"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "sendProofCode.request": {
+      "title": "SendProofCodeRequest",
+      "description": "Send a proof code (RULES 6.2; S13-45; MC C9): to the email on file, or by asking the person to text it from that mobile, since Rosie never texts first; in words that never confirm a booking exists (limit 1: arch 06 line 299). A code lives 10 minutes; 5 wrong give a 15-minute pause. The code itself never comes back to the caller for the email route. Where codes are kept is K-22's (not yet frozen). Reads: the primary, uncached. Repeat: safe: the caller's turn or request id is the key; a repeat answers with the same code row, not a new code. Time budget: the code lives 10 minutes (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "purpose": {
+          "description": "unprovenSender: limit 1 (arch 06 line 299); newContact: a new phone or email, limit 3 (arch 06 line 303); signIn: a page sign-in (S13-45).",
+          "type": "string",
+          "enum": ["unprovenSender", "newContact", "signIn"]
+        },
+        "route": {
+          "description": "emailOnFile: an email to the address on file; textFromMobile: the person texts the code from that mobile (MC C9).",
+          "type": "string",
+          "enum": ["emailOnFile", "textFromMobile"]
+        },
+        "contactHandleId": {
+          "description": "The email address or mobile the code proves (K-04 v1 handles).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["caller", "purpose", "route", "contactHandleId"],
+      "additionalProperties": false
+    },
+    "sendProofCode.response": {
+      "title": "SendProofCodeResponse",
+      "description": "Sent.",
+      "type": "object",
+      "properties": {
+        "proofCodeId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "expiresAt": {
+          "description": "10 minutes after it was made (RULES 6.2).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "outboxRowId": {
+          "description": "For emailOnFile, the email row; null otherwise.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "readyText": {
+          "description": "For textFromMobile, the ready text shown to the person; null otherwise.",
+          "anyOf": [
+            {
+              "description": "The words to text from that mobile, with the code in them.",
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "repeated": {
+          "description": "true when made before for this request.",
+          "type": "boolean"
+        }
+      },
+      "required": ["proofCodeId", "expiresAt", "outboxRowId", "readyText", "repeated"],
+      "additionalProperties": false
+    },
+    "sendProofCode.errors": {
+      "title": "SendProofCodeErrors",
+      "description": "Refused, nothing written: sendProofCode's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "title": "ProofPausedError",
+          "description": "5 wrong codes gave a 15-minute pause (RULES 6.2).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "paused"
+            },
+            "until": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            }
+          },
+          "required": ["error", "until"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NoContactOnFileError",
+          "description": "No email or mobile on file to send to (RULES 6.2).",
+          "type": "object",
+          "properties": {
+            "error": {
+              "const": "noContactOnFile"
+            }
+          },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "proveCode.request": {
+      "title": "ProveCodeRequest",
+      "description": "Check a proof code typed back, or texted from the mobile it proves (RULES 6.2; S13-45): within 10 minutes and from the right contact, the contact is proven; a wrong code counts one of 5 tries, and the fifth gives a 15-minute pause. Reads: the primary, uncached. Repeat: keyed: the inbound event or page request id is the key, and a repeat answers its first result; every new event counts a try. Time budget: the code lives 10 minutes; 5 wrong give a 15-minute pause (RULES 6.2).",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "proofCodeId": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "typed": {
+          "description": "The code as typed or texted.",
+          "type": "string",
+          "minLength": 1
+        },
+        "fromHandleId": {
+          "description": "For textFromMobile, the handle it came from, which must be the mobile; null on a page.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "at": {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        }
+      },
+      "required": ["caller", "proofCodeId", "typed", "fromHandleId", "at"],
+      "additionalProperties": false
+    },
+    "proveCode.response": {
+      "title": "ProveCodeResponse",
+      "description": "The result.",
+      "oneOf": [
+        {
+          "title": "ProofProven",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "proven"
+            },
+            "handleId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "repeated": {
+              "description": "true when checked before.",
+              "type": "boolean"
+            }
+          },
+          "required": ["result", "handleId", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ProofWrong",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "wrong"
+            },
+            "triesLeft": {
+              "description": "Tries left before the pause.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4
+            },
+            "repeated": {
+              "description": "true when checked before.",
+              "type": "boolean"
+            }
+          },
+          "required": ["result", "triesLeft", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ProofPaused",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "paused"
+            },
+            "until": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+            },
+            "repeated": {
+              "description": "true when checked before.",
+              "type": "boolean"
+            }
+          },
+          "required": ["result", "until", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ProofExpired",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "expired"
+            },
+            "repeated": {
+              "description": "true when checked before.",
+              "type": "boolean"
+            }
+          },
+          "required": ["result", "repeated"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "proveCode.errors": {
+      "title": "ProveCodeErrors",
+      "description": "Refused, nothing written: proveCode's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "issueChatLink.request": {
+      "title": "IssueChatLinkRequest",
+      "description": "Give the chat link and QR (MC C9; RULES 4.1b; K-29 v1 chat_links): a link that opens Messages to Rosie's number with a ready text and a short code, for a booking or a staff join. It is shown only after the mobile is a Linq contact (Q-03): until contacts/add has worked (K-07 v1 effect linq_contact_add; CQ-04) the answer waits, and if the add failed the person uses the booking page, email or their own AI. Reads: the primary, uncached. Repeat: safe: an unused link for the same purpose, booking and mobile comes back again, with where it was given added (K-29 v1 chat_links.given_via). Time budget: none in the sources.",
+      "type": "object",
+      "properties": {
+        "caller": {
+          "$ref": "#/$defs/caller"
+        },
+        "purpose": {
+          "description": "K-29 v1 chat_links.purpose.",
+          "type": "string",
+          "enum": ["booking", "staff_invite"]
+        },
+        "bookingId": {
+          "description": "For a booking link, its booking; null for a staff invite.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "personId": {
+          "description": "The person the link is for.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "phoneNumber": {
+          "description": "The mobile the link is for: its ready text counts only from this number.",
+          "$ref": "#/$defs/phoneNumber"
+        },
+        "givenVia": {
+          "description": "Where it is given (K-29 v1 chat_links.given_via).",
+          "type": "string",
+          "enum": ["booking_page", "confirmation_email", "customer_ai", "owner"]
+        }
+      },
+      "required": ["caller", "purpose", "bookingId", "personId", "phoneNumber", "givenVia"],
+      "additionalProperties": false
+    },
+    "issueChatLink.response": {
+      "title": "IssueChatLinkResponse",
+      "description": "The link, or why it cannot be shown yet.",
+      "oneOf": [
+        {
+          "title": "ChatLinkIssued",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "issued"
+            },
+            "chatLinkId": {
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            },
+            "shortCode": {
+              "description": "The short code in the ready text (K-29 v1).",
+              "type": "string",
+              "minLength": 1
+            },
+            "readyText": {
+              "description": "The ready text, with the short code in it (RULES 4.1b).",
+              "type": "string",
+              "minLength": 1
+            },
+            "link": {
+              "description": "The link that opens Messages to Rosie's number with the ready text; its host and number are config values (Q-51).",
+              "type": "string",
+              "minLength": 1
+            },
+            "qrText": {
+              "description": "The QR code's content: the same link (MC C9).",
+              "type": "string",
+              "minLength": 1
+            },
+            "repeated": {
+              "description": "true when this link was issued before.",
+              "type": "boolean"
+            }
+          },
+          "required": ["result", "chatLinkId", "shortCode", "readyText", "link", "qrText", "repeated"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChatLinkWaitingForContact",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "waitingForContact"
+            },
+            "effectId": {
+              "description": "The contacts/add effect row (CQ-04).",
+              "$ref": "../common/formats.v1.schema.json#/$defs/id"
+            }
+          },
+          "required": ["result", "effectId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ChatLinkContactAddFailed",
+          "type": "object",
+          "properties": {
+            "result": {
+              "const": "contactAddFailed"
+            },
+            "otherWays": {
+              "description": "The ways the person can use instead (Q-03).",
+              "type": "array",
+              "items": {
+                "description": "Another way in (Q-03).",
+                "type": "string",
+                "enum": ["booking_page", "email", "own_ai"]
+              },
+              "minItems": 1
+            }
+          },
+          "required": ["result", "otherWays"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "issueChatLink.errors": {
+      "title": "IssueChatLinkErrors",
+      "description": "Refused, nothing written: issueChatLink's errors. Each is a JSON object with its own \"error\" code (02-contracts section 2 item 2).",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/notAllowedError"
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/bookingPausedError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "callName": {
+      "description": "Every call this version holds: the turn face (buildFrontier, closestEntries, gateAndCommit with plannerVerbs inside it, composeInput, finalizeMessage) and the shared core (the rest). Each has <call>.request, <call>.response and <call>.errors under $defs (02-contracts section 2 item 2).",
+      "type": "string",
+      "enum": [
+        "buildFrontier",
+        "closestEntries",
+        "gateAndCommit",
+        "composeInput",
+        "finalizeMessage",
+        "recordSafetyOutcome",
+        "releaseSafetyHold",
+        "recordStopOrStart",
+        "setRecordFlag",
+        "handOff",
+        "answerHandOff",
+        "pageTeam",
+        "acknowledgePage",
+        "openReviewItem",
+        "decideReviewItem",
+        "enterDoor",
+        "sendFixedLine",
+        "sendsFailing",
+        "textingBack",
+        "calendarLinkDropped",
+        "calendarLinkBack",
+        "sendProofCode",
+        "proveCode",
+        "issueChatLink",
+        "plannerVerbs"
+      ]
+    }
+  }
+}
