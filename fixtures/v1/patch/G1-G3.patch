@@ -1,0 +1,121 @@
+--- a/engine/work/phase4/tools/frontend-map.js	2026-11-07 00:54:41
++++ b/engine/work/phase4/tools/frontend-map.js	2026-11-07 00:58:05
+@@ -1,8 +1,8 @@
+ #!/usr/bin/env node
+-/* frontend-map.js: reads work/prof/*.json and writes santiago-handover/PROFESSION-MAP.md.
++/* frontend-map.js: reads work/prof/*.json and writes PROFESSION-MAP.md.
+    node work/phase4/tools/frontend-map.js [--out path]     (run from anywhere; HERE is found from this file's place)
+-   node work/phase4/tools/frontend-map.js --check          (checks FRONTEND-SPEC.md, PROFESSION-MAP.md and santiago-handover/forms/*.json; prints PASS or FAIL lines; exit 1 on a FAIL)
+-   It also writes santiago-handover/forms/<id>.json for every profession file: the registration form that profession's owner
++   node work/phase4/tools/frontend-map.js --check          (checks FRONTEND-SPEC.md, PROFESSION-MAP.md and forms/*.json; prints PASS or FAIL lines; exit 1 on a FAIL)
++   It also writes forms/<id>.json for every profession file: the registration form that profession's owner
+    fills in (core catalog rows + the elements its facts and switches turn on + suggested services from its money amounts rows +
+    its questions, safety words, first steps, staff skills, age rule, cutoff and arrival per flow, optional license). Every value
+    is a SUGGESTION the owner edits. Key spellings are normalized with the table KEYS below; keys it does not know are listed
+@@ -19,10 +19,10 @@
+ const HERE = path.resolve(__dirname, "..", "..", "..");
+ const args = process.argv.slice(2);
+ const oi = args.indexOf("--out");
+-const OUT = oi >= 0 ? path.resolve(args[oi + 1]) : path.join(HERE, "santiago-handover", "PROFESSION-MAP.md");
++const OUT = oi >= 0 ? path.resolve(args[oi + 1]) : path.join(HERE, "..", "PROFESSION-MAP.md");
+ const PROF = path.join(HERE, "work", "prof");
+-const FORMS = path.join(HERE, "santiago-handover", "forms");
+-const SPEC_FILE = path.join(HERE, "santiago-handover", "FRONTEND-SPEC.md");
++const FORMS = path.join(HERE, "..", "forms");
++const SPEC_FILE = path.join(HERE, "..", "FRONTEND-SPEC.md");
+ 
+ /* ---- the catalog rows the map can point to (names only; the full rows are FRONTEND-SPEC.md section 2) ---- */
+ const CAT = {
+@@ -128,7 +128,7 @@
+ 
+ /* ---- --check: does the spec still match the master and the profession files? ---- */
+ if (args.includes("--check")) {
+-  const SPEC = path.join(HERE, "santiago-handover", "FRONTEND-SPEC.md"), MAP = path.join(HERE, "santiago-handover", "PROFESSION-MAP.md");
++  const SPEC = path.join(HERE, "..", "FRONTEND-SPEC.md"), MAP = path.join(HERE, "..", "PROFESSION-MAP.md");
+   const lines = []; let fails = 0;
+   const ok = (name, pass, detail) => { lines.push((pass ? "PASS " : "FAIL ") + name + (detail ? ": " + detail : "")); if (!pass) fails++; };
+   const spec = fs.existsSync(SPEC) ? fs.readFileSync(SPEC, "utf8") : "", map = fs.existsSync(MAP) ? fs.readFileSync(MAP, "utf8") : "";
+@@ -156,7 +156,7 @@
+   let formFiles = []; try { formFiles = fs.readdirSync(FORMS).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5)); } catch (e) { /* none */ }
+   const badForm = [];
+   have.forEach((id) => { try { const f = JSON.parse(fs.readFileSync(path.join(FORMS, id + ".json"), "utf8")); if (!f.profession || f.profession.id !== id) badForm.push(id + " (names '" + (f.profession && f.profession.id) + "')"); } catch (e) { badForm.push(id + " (" + (fs.existsSync(path.join(FORMS, id + ".json")) ? "does not parse" : "missing") + ")"); } });
+-  ok("every santiago-handover/forms/<id>.json parses and names its profession (" + have.length + " professions)", badForm.length === 0, badForm.slice(0, 8).join("; "));
++  ok("every forms/<id>.json parses and names its profession (" + have.length + " professions)", badForm.length === 0, badForm.slice(0, 8).join("; "));
+   ok("no form without a profession file", formFiles.every((x) => have.includes(x)), formFiles.filter((x) => !have.includes(x)).join(", "));
+   ok("spec section 2 has the table of item fields by kind (K04)", /Fields of a place or thing, by kind/.test(body));
+   ok("spec section 5 has the example form (barber)", /Example registration form: barber/.test(body));
+@@ -293,7 +293,7 @@
+   return {
+     form: "rosfield-registration", version: 1,
+     profession: { id: p.id, name: p.name || p.id, type: p.pattern || null, started_from: p.from || null },
+-    made_by: "work/phase4/tools/frontend-map.js", spec: "santiago-handover/FRONTEND-SPEC.md (section 5)",
++    made_by: "work/phase4/tools/frontend-map.js", spec: "FRONTEND-SPEC.md (section 5)",
+     note: "Every value is a SUGGESTION from the profession file. The owner edits it. Nothing here is checked by Rosie (licenses are optional and never checked: D96).",
+     core, elements, facts: facts === null ? "(none listed: every fact-gated branch shows)" : facts, switches: r.swOn, flows,
+     suggested_services_note: "Each row is one way this kind of work takes money (one of the master's 28 paths per flow). The owner keeps the services that fit and picks ONE path per service and place. Names and amounts are examples from the profession file, not prices.",
+@@ -389,13 +389,13 @@
+ out.push("Named but no file yet: " + (K04_NAMED.filter((x) => !files.includes(x + ".json")).join(", ") || "none") + ".\n");
+ 
+ out.push("## 7. Key spellings in the profession files (for the forms)\n");
+-out.push("The forms in `santiago-handover/forms/<id>.json` use one name per key. The table `KEYS` in `work/phase4/tools/frontend-map.js` maps the spellings (for example `checkIn`, `check_in`, `check-in` all become `check_in`; `oks`, `who_oks`, `who OKs what` become `who_oks`). Case, spaces, `_` and `-` are ignored when matching. Only these blocks are read: " + Object.keys(KEYS).join(", ") + " (and `pf.rules.minors`). **Keys the table does not know** are not copied into the form; the form names them under `unmapped_keys`, and they are listed here with how many files use each. Add a row to `KEYS` to map one. (A key name that holds one of the three banned words of the spec is shown with stars here.)\n");
++out.push("The forms in `forms/<id>.json` use one name per key. The table `KEYS` in `work/phase4/tools/frontend-map.js` maps the spellings (for example `checkIn`, `check_in`, `check-in` all become `check_in`; `oks`, `who_oks`, `who OKs what` become `who_oks`). Case, spaces, `_` and `-` are ignored when matching. Only these blocks are read: " + Object.keys(KEYS).join(", ") + " (and `pf.rules.minors`). **Keys the table does not know** are not copied into the form; the form names them under `unmapped_keys`, and they are listed here with how many files use each. Add a row to `KEYS` to map one. (A key name that holds one of the three banned words of the spec is shown with stars here.)\n");
+ Object.keys(KEYS).forEach((pk) => {
+   const u = UNKNOWN[pk] || {}, ks = Object.entries(u).sort((a, b) => b[1].n - a[1].n || (a[0] < b[0] ? -1 : 1));
+   out.push("**" + pk + "**: " + ks.length + " unknown keys, " + ks.reduce((a, e) => a + e[1].n, 0) + " uses. Known canonical names: " + Object.keys(KEYS[pk]).join(", ") + ".\n");
+   out.push(ks.length ? ks.map(([k, e]) => mask(k) + " (" + e.n + ")").join("; ") + "\n" : "none\n");
+ });
+-out.push("Forms written: **" + formsWritten + "** (one per profession file) in `santiago-handover/forms/`.\n");
++out.push("Forms written: **" + formsWritten + "** (one per profession file) in `forms/`.\n");
+ out.push("**Gaps in the forms** (a part the profession file has under a key the table does not know, or not at all; the form leaves it empty):\n");
+ out.push(table(["gap", "professions", "which"], [
+   ["suggested rows with no service name (the amounts rows give none)", GAPS.noName.length, GAPS.noName.join(", ")],
+--- a/engine/work/phase4/tools/test-kit.js	2026-11-07 00:54:41
++++ b/engine/work/phase4/tools/test-kit.js	2026-11-07 00:55:20
+@@ -64,6 +64,21 @@
+   return { dueNow, expected: ex, flags };
+ }
+ 
++/* G1: read each field under every spelling frontend-map.js KEYS knows (squash drops case, spaces, "_" and "-"; PREFIX matches a key that starts with a listed stem) */
++const squashK = (k) => String(k).toLowerCase().replace(/[^a-z0-9]/g, "");
++const SPELL = {
++  "safety.stop": { names: ["stop", "stop_words", "words", "words that stop a booking", "stops the booking", "stops the booking or the lesson", "safety_words"], prefix: ["wordsthatstopabooking"] },
++  "questions.before_times": { names: ["before_times", "beforeTimes", "before times"], prefix: ["beforetimes"] },
++  "messages.never": { names: ["never", "never in a text", "never_in_texts", "neverInText"], prefix: [] },
++};
++const pfField = (pl, field) => {
++  const [blk, canon] = field.split("."); const b = pfv(pl, blk); const sp = SPELL[blk + "." + canon];
++  if (!b || typeof b !== "object" || Array.isArray(b)) return undefined;
++  const want = new Set(sp.names.map(squashK));
++  for (const k of Object.keys(b)) { const q = squashK(k); if (b[k] !== undefined && (want.has(q) || sp.prefix.some((x) => q.indexOf(x) === 0))) return b[k]; }
++  return undefined;
++};
++
+ function shopFor(j) {
+   const pl = j.plugin || {};
+   const flows = {};
+@@ -87,13 +102,13 @@
+     google_prefill: { "business name": "[G] from the Google listing", address: "[G] 123 Demo St, Anytown (demo)", phone: "[G] the listed phone (stays the business's; customers use Rosie's one number)", hours: "[G] Mon-Fri 9am-5pm, Sat 10am-2pm (demo)", category: "[G] " + j.name, website: "[G] https://example.com (demo)", photos: "[G] or the IMAGES.md links" },
+     flows,
+     services_shape: text((pfv(pl, "services") || {}).shape || pfv(pl, "services")),
+-    questions_before_times: (pfv(pl, "questions") || {}).beforeTimes || null,
+-    safety_stop: arr((pfv(pl, "safety") || {}).stop).map((s) => s.words || s),
++    questions_before_times: pfField(pl, "questions.before_times") || null,
++    safety_stop: arr(pfField(pl, "safety.stop")).map((s) => s.words || s),
+     first_steps: arr((pfv(pl, "first_steps") || {}).steps).map((s) => s.name || s),
+     facts: arr(pfv(pl, "facts")), switches: sw, settings: pfv(pl, "settings") || {},
+     license: text((pfv(pl, "license") || {}).need || "optional; never verified by Rosie (D96)"),
+     staff_skills: text((pfv(pl, "staff") || {}).skills || ""),
+-    messages_never: text((pfv(pl, "messages") || {}).never || ""),
++    messages_never: text(pfField(pl, "messages.never") || ""),
+     images: { unsplash: "https://unsplash.com/s/photos/" + slug(j.name), pexels: "https://www.pexels.com/search/" + encodeURIComponent(String(j.name || "").toLowerCase()) + "/" },
+     demo_note: "Demo data for testing only. [G] = prefilled from the business's Google listing at sign-up; the owner checks each field.",
+   };
+@@ -129,7 +144,7 @@
+ for (const fl of ["A", "B"]) {
+   const miss = missing.filter((k) => k.startsWith(fl + ":")).map((k) => k.slice(2));
+   const combos = miss.length ? miss : [];
+-  const pick = combos.concat(["list|card|counter", "list|deposit|" + (fl === "A" ? "counter" : "bill"), "list|full|none"].filter((c) => M[fl].money.combos.includes(c) && !combos.includes(c)));
++  const pick = combos.concat(["list|card|" + (fl === "A" ? "counter" : "bill"), "list|deposit|" + (fl === "A" ? "counter" : "bill"), "list|full|none"].filter((c) => M[fl].money.combos.includes(c) && !combos.includes(c)));
+   const s = { id: "test-mixed-" + fl, name: "Test Mixed Shop " + fl, booking_type: "Test", pattern: "test",
+     purpose: "Covers every money combo no profession uses (" + combos.length + " in flow " + fl + "), plus a mixed booking: one booking that adds a card-saved, a deposit and a paid-in-full service together.",
+     flows: { [fl]: { flow: fl, business: "Test Mixed Shop " + fl, services: pick.map((c) => { const a = amountsFor(M[fl].amounts, c); const e = expect(c, a, fl); return { combo: c, price_kind: lab("price", c.split("|")[0]), before: lab("before", c.split("|")[1]), after: lab("after", c.split("|")[2]), name: a.name || null, price: a.price || null, deposit: a.deposit || null, rest: a.rest || null, paid_now: a.paid || null, fee: money$(a.price) === 0 ? null : a.fee || null, story: (M[fl].money.examples || {})[c] || null, due_now_at_booking: e.dueNow, money_flags: e.flags, uncovered_by_professions: combos.includes(c) }; }) } },
