@@ -15,7 +15,13 @@
   "workers_dev": true,
   // Needed for branch previews (wrangler versions upload --preview-alias).
   "preview_urls": true,
-  // No KV, R2, Queues, Hyperdrive or Durable Object bindings yet: they come with the tasks that need them.
+  // The HandleActor Durable Object (T-244 writes the class; env.staging's copies come in T-566). Used by local
+  // runs and the Vitest Workers pool. SQLite-backed, so the migration uses new_sqlite_classes.
+  "durable_objects": {
+    "bindings": [{ "name": "HANDLE_ACTOR", "class_name": "HandleActor" }],
+  },
+  "migrations": [{ "tag": "v1-handle-actor", "new_sqlite_classes": ["HandleActor"] }],
+  // No KV, R2, Queues or Hyperdrive bindings yet: they come with the tasks that need them.
   // GIT_SHA is not listed: deploys set it with --var GIT_SHA:<sha>.
   "vars": {
     "ENVIRONMENT": "production",
