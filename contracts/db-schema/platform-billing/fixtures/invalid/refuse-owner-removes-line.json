@@ -1,0 +1,24 @@
+{
+  "after": ["seed-monthly-bill.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "update",
+    "table": "monthly_bill_lines",
+    "set": {
+      "answered_at": "2026-11-03T15:00:00Z",
+      "answered_by_person_id": "person-sam",
+      "outcome": "removed",
+      "version": 3
+    },
+    "where": {
+      "id": "billline-lees-barbershop-2026-10-ben"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

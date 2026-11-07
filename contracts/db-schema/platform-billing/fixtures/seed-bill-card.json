@@ -1,0 +1,31 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json"],
+  "rows": [
+    {
+      "table": "bill_cards",
+      "values": {
+        "id": "billcard-lees-barbershop-1",
+        "business_id": "biz-lees-barbershop",
+        "saved_by_person_id": "person-sam",
+        "stripe_customer_id": "stripe-customer-demo-sam-lee",
+        "stripe_payment_method_id": "stripe-card-demo-sam-lee-1",
+        "saved_at": "2026-10-19T18:18:00Z",
+        "removed_at": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "bill_cards",
+      "values": {
+        "id": "billcard-yoga-studio-1",
+        "business_id": "biz-yoga-studio",
+        "saved_by_person_id": "person-sam",
+        "stripe_customer_id": "stripe-customer-demo-sam-lee",
+        "stripe_payment_method_id": "stripe-card-demo-sam-lee-1",
+        "saved_at": "2026-10-20T14:30:00Z",
+        "removed_at": null,
+        "version": 1
+      }
+    }
+  ]
+}

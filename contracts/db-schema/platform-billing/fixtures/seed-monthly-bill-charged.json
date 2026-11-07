@@ -1,0 +1,86 @@
+{
+  "after": ["seed-bill-card.json", "../../core/fixtures/seed-booking-head.json"],
+  "rows": [
+    {
+      "table": "effects",
+      "values": {
+        "id": "effect-bill-yoga-studio-2026-10-charge",
+        "turn_id": null,
+        "job_id": "job-monthly-billing-charge-2026-11-04",
+        "business_id": "biz-yoga-studio",
+        "booking_id": null,
+        "kind": "rosfield_monthly_charge",
+        "port": "stripe",
+        "calendar_provider": null,
+        "visit_id": null,
+        "person_id": "person-sam",
+        "handle_id": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "port_request": {
+          "monthlyBillId": "bill-yoga-studio-2026-10"
+        },
+        "idempotency_key": "rosfield-bill-yoga-studio-2026-10-charge",
+        "state": "succeeded",
+        "tries": 1,
+        "runs": 1,
+        "first_try_at": "2026-11-04T16:00:00Z",
+        "last_try_at": "2026-11-04T16:00:00Z",
+        "claimed_by": null,
+        "claim_lapses_at": null,
+        "provider_object_id": "stripe-charge-demo-yoga-studio-2026-10",
+        "error_code": null,
+        "ledger_line_id": null,
+        "trace_id": "trace-bill-yoga-studio-2026-10-charge",
+        "created_at": "2026-11-04T16:00:00Z",
+        "version": 3
+      }
+    },
+    {
+      "table": "monthly_bills",
+      "values": {
+        "id": "bill-yoga-studio-2026-10",
+        "business_id": "biz-yoga-studio",
+        "month": "2026-10-01",
+        "bill_date": "2026-11-02",
+        "charge_on": "2026-11-04",
+        "sent_at": "2026-11-02T16:00:00Z",
+        "total_cents": 200,
+        "currency": "USD",
+        "bill_card_id": "billcard-yoga-studio-1",
+        "state": "charged",
+        "charge_effect_id": "effect-bill-yoga-studio-2026-10-charge",
+        "charged_at": "2026-11-04T16:00:02Z",
+        "declined_at": null,
+        "pay_link_effect_id": null,
+        "pay_link_sent_at": null,
+        "pay_by": null,
+        "paid_at": null,
+        "paused_at": null,
+        "version": 3
+      }
+    },
+    {
+      "table": "monthly_bill_lines",
+      "values": {
+        "id": "billline-yoga-studio-2026-10-alex",
+        "bill_id": "bill-yoga-studio-2026-10",
+        "business_id": "biz-yoga-studio",
+        "kind": "rosfield_2",
+        "fee_id": "fee-rosfield2-alex-workshop",
+        "booking_id": "booking-alex-workshop",
+        "counts_for_person_id": "person-maya",
+        "plan_charge_cents": null,
+        "amount_cents": 200,
+        "currency": "USD",
+        "questioned_at": null,
+        "questioned_by_person_id": null,
+        "question": null,
+        "answered_at": null,
+        "answered_by_person_id": null,
+        "outcome": null,
+        "version": 1
+      }
+    }
+  ]
+}

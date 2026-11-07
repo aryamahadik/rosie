@@ -1,0 +1,35 @@
+{
+  "after": ["seed-monthly-bill.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "monthly_bills",
+    "values": {
+      "id": "bill-lees-barbershop-2026-10-again",
+      "business_id": "biz-lees-barbershop",
+      "month": "2026-10-01",
+      "bill_date": "2026-11-02",
+      "charge_on": "2026-11-04",
+      "sent_at": "2026-11-02T16:05:00Z",
+      "total_cents": 600,
+      "currency": "USD",
+      "bill_card_id": "billcard-lees-barbershop-1",
+      "state": "sent",
+      "charge_effect_id": null,
+      "charged_at": null,
+      "declined_at": null,
+      "pay_link_effect_id": null,
+      "pay_link_sent_at": null,
+      "pay_by": null,
+      "paid_at": null,
+      "paused_at": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": ["monthly_bills_business_month_key"]
+    }
+  }
+}

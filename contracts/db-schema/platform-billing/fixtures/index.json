@@ -1,0 +1,76 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-bill-card.json",
+      "version": "v1",
+      "table": "bill_cards",
+      "expect": "accept",
+      "shows": "Sam's card for Rosfield's monthly bill, saved on Stripe at S1-29 for Lee's Barbershop at 2:18pm Mon Oct 19, and the same card chosen for his yoga studio, so one card pays both companies' bills; only Stripe's opaque customer and payment-method ids are kept",
+      "source": "S1-29 (gives bill_card; 'add it now, or before the first bill. One card can pay every company's bill'); FS row M04 ('one card pays every company'; 'card on Stripe'); FS line 599; RULES 4.5; SPEC-master 6 (sign-up Mon Oct 19)"
+    },
+    {
+      "file": "seed-monthly-bill.json",
+      "version": "v1",
+      "table": "monthly_bills",
+      "expect": "accept",
+      "shows": "Lee's Barbershop's October bill as it stands on Tue Nov 3: sent Mon Nov 2 at 11:00am (Nov 1 is a Sunday), to be charged Wed Nov 4 on Sam's bill card; three $2 lines (Alex M.'s haircut and Owen H.'s plan visit, both counting toward Riley's cap, and Ben T.'s trim toward Avery's), $6 in all; Sam has questioned Ben's line in the portal before the charge, and it waits for Rosie's team",
+      "source": "S11-66 ('On the 1st, or the next weekday'; 'Nov 1 is a Sunday, so October's bills come Mon Nov 2'; 'Mon Nov 2, 11:00am'; 'charged Wed Nov 4'; 'Sam can question a line in the portal before the charge'; 'Free: ... cancelled or missed visits'); S1-25 ('$2 a booking'; 'A plan paid per visit at the visit pays $2 per visit, at its check-in'); A9-21; A7-54 (Owen H.'s haircut plan with Riley, Sat Oct 31); SPEC-master 6 (Alex M., Riley, Avery, Ben; Sat Oct 24 with Riley)"
+    },
+    {
+      "file": "seed-monthly-bill-charged.json",
+      "version": "v1",
+      "table": "monthly_bills",
+      "expect": "accept",
+      "shows": "The yoga studio's October bill, one $2 line (Alex M.'s handstand workshop seat, counting toward Maya, the teacher), charged on Sam's one bill card on Wed Nov 4 through a K-07 rosfield_monthly_charge effect that succeeded",
+      "source": "S11-66 ('each company gets its own bill'); S11-67 (Charged; 'Each bill goes on the card Sam saved'); S1-25 ('A booking with no named person, like a class seat ... counts for the person who gives the work'); K-07 v1 effects; fixtures/v1/test-kit/shops/yoga.json (the handstand workshop with Maya)"
+    },
+    {
+      "file": "seed-bill-unpaid-pause.json",
+      "version": "v1",
+      "table": "monthly_bills",
+      "expect": "accept",
+      "shows": "Lee Home Services' October bill (Alex M.'s drain clearing with Jordan, $2), on its own bill card: the charge declined on Wed Nov 4 and was not retried, one pay link went with 'Pay by Wed Nov 18', it was still unpaid, so new bookings through Rosie paused at the start of Thu Nov 19 until it is paid",
+      "source": "S11-67 (Declined; 'Rosie never retries the card on its own'; 'with 14 days to pay'); S11-68 ('Sam gets one pay link, with no chasing'; 'Pay by Wed Nov 18'); S11-69 ('Pauses new bookings through Rosie'; 'Until it's paid'); K-07 v1 effects (rosfield_monthly_charge, stripe_pay_link); SPEC-master 6 (Lee Home Services, Jordan, the drain clearing Thu Oct 22)"
+    },
+    {
+      "file": "invalid/refuse-card-number-stored.json",
+      "version": "v1",
+      "table": "bill_cards",
+      "expect": "refuse",
+      "shows": "A bill card whose payment-method id is a card number is refused (CHECK bill_cards_no_card_number, SQLSTATE 23514); the same row with Stripe's opaque payment-method id passes",
+      "source": "RULES 4.5 ('Never kept at all: full card numbers outside the card box'); BP rule 7; FS row M04 ('card on Stripe')"
+    },
+    {
+      "file": "invalid/refuse-second-bill-same-month.json",
+      "version": "v1",
+      "table": "monthly_bills",
+      "expect": "refuse",
+      "shows": "A second October bill for Lee's Barbershop is refused (unique monthly_bills_business_month_key, SQLSTATE 23505); the same bill for November (sent Tue Dec 1, charged Thu Dec 3) passes",
+      "source": "S11-66 ('each company gets its own bill for last month's $2s')"
+    },
+    {
+      "file": "invalid/refuse-owner-removes-line.json",
+      "version": "v1",
+      "table": "monthly_bill_lines",
+      "expect": "refuse",
+      "shows": "The owner's Tool API scope answering its own questioned line and taking it off is refused (SQLSTATE 42501: the Tool API may only question a line); the same answer written on the runtime side, where Rosie's team answers, passes",
+      "source": "S11-66 ('Sam can question a line in the portal before the charge. A person on Rosie's team answers, and a wrong line comes off')"
+    },
+    {
+      "file": "invalid/refuse-line-not-two-dollars.json",
+      "version": "v1",
+      "table": "monthly_bill_lines",
+      "expect": "refuse",
+      "shows": "A $2 line for Alex M.'s beard trim with Avery billed at $3 is refused (CHECK monthly_bill_lines_two_dollars, SQLSTATE 23514); the same line at 200 cents passes",
+      "source": "S1-25 ('$2 a booking'); S11-66 ('$2 per booking'); A9-21"
+    },
+    {
+      "file": "invalid/refuse-pause-before-pay-by.json",
+      "version": "v1",
+      "table": "monthly_bills",
+      "expect": "refuse",
+      "shows": "The movers' October bill came with a pay link (no bill card yet), pay by Mon Nov 16; pausing new bookings on Tue Nov 10, before the 14 days are up, is refused (CHECK monthly_bills_paused_after_pay_by, SQLSTATE 23514); the same pause on Tue Nov 17 passes",
+      "source": "S11-67 ('No bill card yet? Then the bill comes with a pay link, with 14 days to pay'; 'Safe default: new bookings go on until the bill's pay link is past due'); S11-69"
+    }
+  ]
+}

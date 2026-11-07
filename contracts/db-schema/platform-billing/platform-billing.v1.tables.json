@@ -1,0 +1,724 @@
+{
+  "part": "platform-billing",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "bill_cards",
+      "description": "The card for Rosfield's monthly bill (FS row M04), saved on Stripe at S1-29, never a customer's card. Only Stripe's opaque ids are kept: the card itself, its number and its details stay on Stripe (FS M04 'card on Stripe'; RULES 4.5 'Never kept at all: full card numbers outside the card box'). One live card per business, the company whose bill it pays (one company is one business: K-23 companies); one card can pay every company's bill, so the same Stripe ids may sit on a row of each of the owner's businesses. A new card is a new row; the old one gets removed_at.",
+      "source": "FS row M04; S1-29 (gives bill_card; 'add it now, or before the first bill. One card can pay every company's bill'); S11-67 ('the card Sam saved for Rosfield's monthly bill, never on a customer's card'); 02-contracts section 7 row K-33; 02-contracts section 8 (bill_card)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bill card row's id: an opaque string code makes (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id) whose monthly bill the card pays; each company is its own business and gets its own bill (S11-66).",
+          "source": "S11-66 ('each company gets its own bill'); FS row B10; K-23 v1 companies; arch 10 line 546"
+        },
+        {
+          "name": "saved_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The owner who saved or chose the card (persons.id); never a helper, whose yes is not the owner's.",
+          "source": "S1-29; S1-77 ('Never: count the helper's yes as the owner's')"
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Rosfield's own Stripe customer the card is saved under, as Stripe's opaque id. Its form is K-14's (Stripe port, Rosfield's own billing); never a card number (bill_cards_no_card_number).",
+          "source": "FS row M04 ('card on Stripe'); 02-contracts K-14 ('Rosfield's own billing'); BP rule 7; RULES 4.5"
+        },
+        {
+          "name": "stripe_payment_method_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The saved card as Stripe's opaque payment-method id, which the monthly charge (K-07's rosfield_monthly_charge effect) names in its port request. Its form is K-14's; never a card number (bill_cards_no_card_number). The same id on a row of several businesses is one card paying every company's bill.",
+          "source": "FS row M04; S1-29 ('One card can pay every company's bill'); S11-67; 02-contracts K-14; RULES 4.5"
+        },
+        {
+          "name": "saved_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the owner saved or chose the card for this business: at S1-29, or later but before the first bill.",
+          "source": "S1-29 ('add it now, or before the first bill'); FS line 599 (screen 20)"
+        },
+        {
+          "name": "removed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When this card stopped paying the business's bill, because the owner saved another or took it off; null while it is the live card.",
+          "source": "S1-29; FS row M04 (one card per bill)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "bill_cards_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "bill_cards_saved_by_fk",
+          "columns": ["saved_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "bill_cards_one_live",
+          "columns": ["business_id"],
+          "where": "removed_at is null",
+          "source": "FS row M04 (the card for the monthly bill); S11-67 ('the card Sam saved')"
+        },
+        {
+          "name": "bill_cards_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "monthly_bills_card_fk (a bill is charged only on its own business's card)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "bill_cards_no_card_number",
+          "expression": "regexp_replace(stripe_customer_id, '[ -]', '', 'g') !~ '[0-9]{13,}' and regexp_replace(stripe_payment_method_id, '[ -]', '', 'g') !~ '[0-9]{13,}'",
+          "source": "RULES 4.5 ('Never kept at all: full card numbers outside the card box'); BP rule 7; FS row M04 ('card on Stripe')"
+        },
+        {
+          "name": "bill_cards_ids_present",
+          "expression": "length(stripe_customer_id) > 0 and length(stripe_payment_method_id) > 0",
+          "source": "CQ-09 (an opaque id is a non-empty string)"
+        },
+        {
+          "name": "bill_cards_removed_after_saved",
+          "expression": "removed_at is null or removed_at >= saved_at",
+          "source": "S1-29"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "bill_cards_payment_method_idx",
+          "columns": ["stripe_payment_method_id"],
+          "where": "removed_at is null",
+          "why": "Every business one card pays, so a card the owner replaces or that Stripe reports changed is found on each company's row (S1-29: 'One card can pay every company's bill')."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "monthly_bills",
+      "description": "Rosfield's monthly bill: one per company (business) and month, for last month's $2s and 1%s, sent on the 1st or the next weekday and charged 2 days later on the bill card (S11-66, S11-67). No card, or a declined charge: one pay link with 14 days to pay, with no chasing and no retry (S11-67, S11-68). Still unpaid in time: new bookings through Rosie pause until it is paid (S11-69); bookings already made, walk-ins and the owner's own bookings carry on. The charge and the pay link run through K-07's effect rows, which hold Stripe's ids; this row names them.",
+      "source": "S11-66; S11-67; S11-68; S11-69; S1-29 ('The monthly bill is sent on the 1st, or the next weekday, and charged 2 days later'); FS line 404; arch 09 line 470 (Platform billing); 02-contracts section 7 row K-33",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bill's id: an opaque string code makes (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id) the bill is for: each company gets its own bill (S11-66), and one company is one business (K-23).",
+          "source": "S11-66 ('each company gets its own bill'); K-23 v1 companies; arch 10 line 546"
+        },
+        {
+          "name": "month",
+          "type": "date",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The month billed, as its first day (2026-10-01 for October): last month's $2s and 1%s.",
+          "source": "S11-66 ('last month's $2s'; 'Rosfield's monthly bills for October')"
+        },
+        {
+          "name": "bill_date",
+          "type": "date",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The day the bill is sent: the 1st of the next month, or the next weekday when the 1st is a Saturday or Sunday (Nov 1 2026 is a Sunday, so October's bills come Mon Nov 2). Held exactly by monthly_bills_bill_date_rule.",
+          "source": "S11-66 ('On the 1st, or the next weekday'; 'Nov 1 is a Sunday, so October's bills come Mon Nov 2'); S1-29; FS line 404"
+        },
+        {
+          "name": "charge_on",
+          "type": "date",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The day the bill card is charged: 2 days after bill_date (Mon Nov 2, charged Wed Nov 4). Lines can be questioned until then.",
+          "source": "S1-29 ('charged 2 days later'); S11-66 ('October · charged Wed Nov 4'; 'question a line in the portal before the charge'); S11-67 (Wed Nov 4)"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When the bill was sent to the owner (S11-66's text and its 'See every booking' link), by the minute sweep's monthly billing job (a core clock row no handle owns).",
+          "source": "S11-66 ('Mon Nov 2, 11:00am'); arch 10 line 540 ('rows no handle owns, such as monthly billing')"
+        },
+        {
+          "name": "total_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["owner"],
+          "description": "What the bill charges, in whole cents: the lines still standing, with each person's $2s capped at $49 (4900 cents) for the month, and the 1%s uncapped. Code sums it from monthly_bill_lines and sets it again when a line comes off before the charge.",
+          "source": "S11-66 ('Never more than $49 a month per person, for each business'); S1-25 ('The $2 is capped at $49 a month per person, per business ... The 1% isn't'); A9-21; CQ-09 (whole cents)"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "default": "'USD'",
+          "audience": ["owner"],
+          "description": "The currency code: USD, since Rosfield's fee terms are stated in US dollars only ($2, $49).",
+          "source": "S1-25; S11-66; CQ-09 (money with a three-letter currency code)"
+        },
+        {
+          "name": "bill_card_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business's live bill card when the bill was made, which the charge goes on (bill_cards.id, of the same business). Null: no bill card yet, so the bill comes with a pay link (S11-67).",
+          "source": "S11-67 ('Each bill goes on the card Sam saved'; 'No bill card yet? Then the bill comes with a pay link, with 14 days to pay')"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'sent'",
+          "audience": ["owner"],
+          "description": "sent: out, to be charged on charge_on; charged: the card went through (S11-67 Charged); pay_link: no card, or the card was declined, so one pay link is out (S11-67, S11-68); paused: the pay link is past due, so new bookings through Rosie pause (S11-69); paid: paid by the pay link, which ends any pause. monthly_bills_state_matches holds each state to its times.",
+          "source": "S11-67 (Charged, Declined); S11-68 (Paid, Still unpaid in time); S11-69 ('Until it's paid')"
+        },
+        {
+          "name": "charge_effect_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The K-07 effect row (effects.id, kind rosfield_monthly_charge) that charges the bill card on charge_on; its state, tries, Stripe's id and reconciliation are K-07's. One per bill: a decline is never retried (S11-67; arch 10 line 542). Null until the charge is written, and always without a bill card.",
+          "source": "S11-67 ('Rosie never retries the card on its own'); K-07 v1 effects (rosfield_monthly_charge); arch 10 lines 508, 542, 550"
+        },
+        {
+          "name": "charged_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the card went through (S11-67 Charged); null otherwise.",
+          "source": "S11-67 (Charged)"
+        },
+        {
+          "name": "declined_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the card company said no (S11-67 Declined); the pay link goes out then. Null otherwise.",
+          "source": "S11-67 (\"Means 'Declined': the card company said no\")"
+        },
+        {
+          "name": "pay_link_effect_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The K-07 effect row (effects.id, kind stripe_pay_link) that made the bill's one pay link; the link's Stripe id is on it. Set with pay_link_sent_at.",
+          "source": "S11-68 ('Sam gets one pay link, with no chasing'); K-07 v1 effects (stripe_pay_link)"
+        },
+        {
+          "name": "pay_link_sent_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the one pay link went to the owner: with the bill when there is no bill card, or when the card was declined (S11-68's text). Never a second one: no chasing.",
+          "source": "S11-67 ('No bill card yet? Then the bill comes with a pay link'); S11-68"
+        },
+        {
+          "name": "pay_by",
+          "type": "date",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The last day to pay by the link: 14 days after the link went, that is bill_date + 14 with no card, charge_on + 14 after a decline (Wed Nov 4, pay by Wed Nov 18). Set with pay_link_sent_at.",
+          "source": "S11-67 ('with 14 days to pay'); S11-68 ('Paid by Wed Nov 18?'; 'Pay by Wed Nov 18')"
+        },
+        {
+          "name": "paid_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the bill was paid by its pay link (S11-68 Paid); it ends a pause (S11-69 'Until it's paid'). A bill charged on the card has charged_at instead.",
+          "source": "S11-68 (Paid); S11-69 ('Until it's paid')"
+        },
+        {
+          "name": "paused_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When new bookings through Rosie paused because the pay link went past due (S11-69). While it is set and paid_at is null, AI assistants and the booking page hear 'not taking new bookings right now', as after a PAUSE, and customers are not told why; bookings already made, walk-ins and the owner's own bookings carry on, and a call to the business's line gets the call notice (S13-56). Not K-23's owner PAUSE and not core's pauses.",
+          "source": "S11-69; S11-68 ('Not paid by then: new bookings through Rosie pause'; 'Bookings already made go ahead either way'); S11-67 ('Safe default: new bookings go on until the bill's pay link is past due')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "monthly_bills_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bills_card_fk",
+          "columns": ["bill_card_id", "business_id"],
+          "references": {
+            "table": "bill_cards",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bills_charge_effect_fk",
+          "columns": ["charge_effect_id"],
+          "references": {
+            "table": "effects",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bills_pay_link_effect_fk",
+          "columns": ["pay_link_effect_id"],
+          "references": {
+            "table": "effects",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "monthly_bills_business_month_key",
+          "columns": ["business_id", "month"],
+          "source": "S11-66 ('each company gets its own bill for last month's $2s')"
+        },
+        {
+          "name": "monthly_bills_id_business_key",
+          "columns": ["id", "business_id"],
+          "source": "monthly_bill_lines_bill_fk (a line belongs to its bill's business)"
+        },
+        {
+          "name": "monthly_bills_charge_effect_key",
+          "columns": ["charge_effect_id"],
+          "source": "S11-67 (one charge per bill; K-07 v1 effects)"
+        },
+        {
+          "name": "monthly_bills_pay_link_effect_key",
+          "columns": ["pay_link_effect_id"],
+          "source": "S11-68 (one pay link per bill)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "monthly_bills_month_first_day",
+          "expression": "extract(day from month) = 1",
+          "source": "S11-66 ('last month's $2s')"
+        },
+        {
+          "name": "monthly_bills_bill_date_rule",
+          "expression": "bill_date = (month + interval '1 month')::date + (case extract(isodow from month + interval '1 month') when 6 then 2 when 7 then 1 else 0 end)",
+          "source": "S11-66 ('On the 1st, or the next weekday'; 'Nov 1 is a Sunday, so October's bills come Mon Nov 2'); S1-29; FS line 404"
+        },
+        {
+          "name": "monthly_bills_charge_two_days_later",
+          "expression": "charge_on = bill_date + 2",
+          "source": "S1-29 ('charged 2 days later'); S11-66 ('charged Wed Nov 4'); FS line 404"
+        },
+        {
+          "name": "monthly_bills_money",
+          "expression": "total_cents >= 0 and currency = 'USD'",
+          "source": "S1-25; S11-66; CQ-09 (whole cents with a currency code)"
+        },
+        {
+          "name": "monthly_bills_state_known",
+          "expression": "state in ('sent', 'charged', 'pay_link', 'paused', 'paid')",
+          "source": "S11-67; S11-68; S11-69"
+        },
+        {
+          "name": "monthly_bills_state_matches",
+          "expression": "(state = 'sent' and charged_at is null and pay_link_sent_at is null and paid_at is null and paused_at is null) or (state = 'charged' and charged_at is not null and pay_link_sent_at is null and paid_at is null and paused_at is null) or (state = 'pay_link' and pay_link_sent_at is not null and paid_at is null and paused_at is null) or (state = 'paused' and paused_at is not null and paid_at is null) or (state = 'paid' and paid_at is not null)",
+          "source": "S11-67 (Charged, Declined); S11-68 (Paid, Still unpaid in time); S11-69 ('Until it's paid')"
+        },
+        {
+          "name": "monthly_bills_charge_on_card",
+          "expression": "(charge_effect_id is null or bill_card_id is not null) and ((charged_at is null and declined_at is null) or charge_effect_id is not null) and (charged_at is null or declined_at is null)",
+          "source": "S11-67 ('Each bill goes on the card Sam saved'; Charged or Declined, never both)"
+        },
+        {
+          "name": "monthly_bills_pay_link_when_due",
+          "expression": "(pay_link_sent_at is not null) = (bill_card_id is null or declined_at is not null) and (pay_link_sent_at is null) = (pay_by is null) and (pay_link_sent_at is null) = (pay_link_effect_id is null)",
+          "source": "S11-67 ('No bill card yet? Then the bill comes with a pay link'); S11-68 (after Declined: 'Sam gets one pay link')"
+        },
+        {
+          "name": "monthly_bills_pay_by_fourteen_days",
+          "expression": "pay_by is null or pay_by = (case when declined_at is not null then charge_on else bill_date end) + 14",
+          "source": "S11-67 ('with 14 days to pay'); S11-68 (declined Wed Nov 4: 'Pay by Wed Nov 18')"
+        },
+        {
+          "name": "monthly_bills_paid_by_link",
+          "expression": "paid_at is null or pay_link_sent_at is not null",
+          "source": "S11-68 (Paid: by the pay link)"
+        },
+        {
+          "name": "monthly_bills_paused_after_pay_by",
+          "expression": "paused_at is null or (pay_link_sent_at is not null and paused_at >= pay_link_sent_at + interval '14 days')",
+          "source": "S11-67 ('Safe default: new bookings go on until the bill's pay link is past due'); S11-68 ('Still unpaid in time'); S11-69"
+        },
+        {
+          "name": "monthly_bills_paid_ends_pause",
+          "expression": "paused_at is null or paid_at is null or paid_at > paused_at",
+          "source": "S11-69 ('Until it's paid'); S11-68 (Paid: no pause)"
+        },
+        {
+          "name": "monthly_bills_times_in_order",
+          "expression": "(charged_at is null or charged_at >= sent_at) and (declined_at is null or declined_at >= sent_at) and (pay_link_sent_at is null or pay_link_sent_at >= sent_at) and (paid_at is null or paid_at >= pay_link_sent_at)",
+          "source": "S11-66; S11-67; S11-68"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "monthly_bills_paused_idx",
+          "columns": ["business_id"],
+          "where": "state = 'paused'",
+          "why": "Whether a business's new bookings through Rosie are paused for an unpaid bill, read by every new booking, the booking page and the AI assistants' answer (S11-69)."
+        },
+        {
+          "name": "monthly_bills_charge_due_idx",
+          "columns": ["charge_on"],
+          "where": "state = 'sent' and bill_card_id is not null and charge_effect_id is null",
+          "why": "The monthly billing job finds the bills to charge on their day (S11-67; arch 10 line 540)."
+        },
+        {
+          "name": "monthly_bills_pay_by_idx",
+          "columns": ["pay_by"],
+          "where": "state = 'pay_link'",
+          "why": "The job finds pay links past due, to pause new bookings (S11-68 'Still unpaid in time'; S11-69)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "monthly_bill_lines",
+      "description": "A line of a monthly bill: one counted Rosfield fee, a $2 for a booking (rosfield_2) or 1% of a plan charged monthly through Rosie (rosfield_1pct), as the bill's 'See every booking' page shows it. The counting itself (when, by check-in code or DONE, for whom, which month, the cap) is K-32's fee row, which the line names; the line copies what the bill shows so the bill keeps the lines it was sent with. The owner can question a line in the portal before the charge; a person on Rosie's team answers, and a wrong line comes off.",
+      "source": "S11-66 ('Sam can question a line in the portal before the charge. A person on Rosie's team answers, and a wrong line comes off'; 'See every booking'); S1-25; A9-21; FS line 394 ('the bill line'); FS line 733 (fee: rosfield_2, rosfield_1pct); 02-contracts section 7 row K-33 ('lines for last month's $2s and 1%s ... a line can be questioned')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The line's id: an opaque string code makes (CQ-09).",
+          "source": "CQ-09"
+        },
+        {
+          "name": "bill_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bill it is on (monthly_bills.id).",
+          "source": "S11-66"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bill's business, copied from the bill and held to it by monthly_bill_lines_bill_fk, so row-level security can scope the line.",
+          "source": "arch 10 line 546; K-23 v1 company_kinds (the same pattern)"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "rosfield_2: Rosfield's $2 for a booking; rosfield_1pct: 1% of a membership or repeat plan charged monthly through Rosie (FS fee kinds).",
+          "source": "FS line 733 (fee kind rosfield_2, rosfield_1pct); S1-25; A9-21; S11-66"
+        },
+        {
+          "name": "fee_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The K-32 fee row this line bills (fee kind rosfield_2 or rosfield_1pct, with counted_at, counted_by, person_given_work and month). K-32 (money, frozen later, F16) names the fee table and adds the foreign key to it. One line per fee: a fee is billed once, and one that came out of a payment through Rosie never goes on the bill too.",
+          "source": "FS line 733; S1-25 ('It comes out of a payment made through Rosie, or goes on the monthly bill. Never both'); A9-21; 02-contracts section 7 row K-32"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking the $2 is for (bookings.id), which 'See every booking' lists; required for rosfield_2. For rosfield_1pct, the plan charge's booking if it has one, else null.",
+          "source": "S11-66 ('See every booking'); S1-25 ('One $2 per booking'); A9-21"
+        },
+        {
+          "name": "counts_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For rosfield_2, the person whose $49 cap the $2 counts toward (persons.id): the person who gave the work (a class's teacher, a table's server, never whoever checked it in), or the owner when nobody gave it, like a room hire. Null for rosfield_1pct, which has no cap.",
+          "source": "S1-25 ('A booking with no named person ... counts for the person who gives the work'; 'With nobody giving it, like a room hire, it counts toward the owner's cap'; 'The 1% isn't'); S11-66; A9-21; FS line 733 (person_given_work)"
+        },
+        {
+          "name": "plan_charge_cents",
+          "type": "bigint",
+          "null": true,
+          "audience": ["owner"],
+          "description": "For rosfield_1pct, the plan charge the 1% is of, in whole cents, as the line shows it; null for rosfield_2.",
+          "source": "S1-25 ('A membership or a repeat plan charged monthly through Rosfield pays 1% of each charge'); A9-21; CQ-09"
+        },
+        {
+          "name": "amount_cents",
+          "type": "bigint",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The line's amount in whole cents: exactly 200 for rosfield_2 ($2 a booking); for rosfield_1pct, 1% of plan_charge_cents, rounded down or up to a whole cent (which way is an open gap). The cap is applied to the bill's total, not to a line.",
+          "source": "S1-25 ('$2 a booking'; '1% of each charge'); S11-66; A9-21; CQ-09"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "default": "'USD'",
+          "audience": ["owner"],
+          "description": "The currency code: USD, as the bill's.",
+          "source": "S1-25; CQ-09"
+        },
+        {
+          "name": "questioned_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When the owner questioned the line in the portal, before the charge; null: not questioned.",
+          "source": "S11-66 ('Sam can question a line in the portal before the charge'); FS line 621 (Money page: Rosfield's monthly bill)"
+        },
+        {
+          "name": "questioned_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who questioned it (persons.id): the owner. Set with questioned_at.",
+          "source": "S11-66"
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The owner's words about the line, if they gave any, for Rosie's team; null when the line was only marked. Never a private detail of a customer (RULES 4.5): the booking is named by booking_id.",
+          "source": "S11-66; RULES 4.5"
+        },
+        {
+          "name": "answered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When a person on Rosie's team answered the question; set with answered_by_person_id and outcome.",
+          "source": "S11-66 ('A person on Rosie's team answers')"
+        },
+        {
+          "name": "answered_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who answered (persons.id; until launch Jay or the CTO, Q-18). Never the owner: only the runtime side writes the answer (README rule 2).",
+          "source": "S11-66 ('A person on Rosie's team answers'); Q-18; K-37 v1 review_items.decided_by_person_id"
+        },
+        {
+          "name": "outcome",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "stands: the line is right and stays; removed: a wrong line comes off, and the bill's total is summed again without it. Set with answered_at.",
+          "source": "S11-66 ('a wrong line comes off')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "monthly_bill_lines_bill_fk",
+          "columns": ["bill_id", "business_id"],
+          "references": {
+            "table": "monthly_bills",
+            "columns": ["id", "business_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bill_lines_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bill_lines_counts_for_fk",
+          "columns": ["counts_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bill_lines_questioned_by_fk",
+          "columns": ["questioned_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "monthly_bill_lines_answered_by_fk",
+          "columns": ["answered_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "monthly_bill_lines_fee_key",
+          "columns": ["fee_id"],
+          "source": "S1-25 ('Never both'); A9-21 ('One $2 per booking')"
+        }
+      ],
+      "checks": [
+        {
+          "name": "monthly_bill_lines_kind_known",
+          "expression": "kind in ('rosfield_2', 'rosfield_1pct')",
+          "source": "FS line 733; S1-25; S11-66"
+        },
+        {
+          "name": "monthly_bill_lines_two_dollars",
+          "expression": "kind <> 'rosfield_2' or (amount_cents = 200 and booking_id is not null and counts_for_person_id is not null and plan_charge_cents is null)",
+          "source": "S1-25 ('$2 a booking'; 'counts for the person who gives the work'); A9-21; S11-66"
+        },
+        {
+          "name": "monthly_bill_lines_one_percent",
+          "expression": "kind <> 'rosfield_1pct' or (plan_charge_cents is not null and plan_charge_cents > 0 and amount_cents in (plan_charge_cents / 100, (plan_charge_cents + 99) / 100) and counts_for_person_id is null)",
+          "source": "S1-25 ('1% of each charge'; 'The 1% isn't' capped); A9-21"
+        },
+        {
+          "name": "monthly_bill_lines_currency",
+          "expression": "currency = 'USD'",
+          "source": "S1-25; CQ-09"
+        },
+        {
+          "name": "monthly_bill_lines_question_together",
+          "expression": "(questioned_at is null) = (questioned_by_person_id is null) and (question is null or questioned_at is not null)",
+          "source": "S11-66"
+        },
+        {
+          "name": "monthly_bill_lines_answer_together",
+          "expression": "(answered_at is null) = (answered_by_person_id is null) and (answered_at is null) = (outcome is null) and (answered_at is null or (questioned_at is not null and answered_at >= questioned_at))",
+          "source": "S11-66 ('A person on Rosie's team answers')"
+        },
+        {
+          "name": "monthly_bill_lines_outcome_known",
+          "expression": "outcome is null or outcome in ('stands', 'removed')",
+          "source": "S11-66 ('a wrong line comes off')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "monthly_bill_lines_bill_idx",
+          "columns": ["bill_id"],
+          "why": "A bill's lines, for 'See every booking' and the total (S11-66)."
+        },
+        {
+          "name": "monthly_bill_lines_open_question_idx",
+          "columns": ["questioned_at"],
+          "where": "questioned_at is not null and answered_at is null",
+          "why": "Questioned lines still waiting for Rosie's team, oldest first, in the team console (S11-66; C-194)."
+        },
+        {
+          "name": "monthly_bill_lines_booking_idx",
+          "columns": ["booking_id"],
+          "where": "booking_id is not null",
+          "why": "The bill line a booking's $2 went on, for the Money page and the booking's own costs (FS line 621; S11-63)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}
