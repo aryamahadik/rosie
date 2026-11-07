@@ -19,6 +19,7 @@ export default defineConfig(
     "contracts/generated/",
     "bundles/",
     "fixtures/",
+    "infra/rosfield-test-backup/",
   ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
