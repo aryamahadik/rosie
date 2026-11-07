@@ -2,15 +2,13 @@
 //   - every change a correction makes carries its tag (`MC:C1`, `MC:C2`) in the diff output, and a change made any other
 //     way is refused (UntaggedChangeError);
 //   - the corrections run in id order, on a copy, and the applied flow they were given is left as it was;
-//   - over all 243 trades x both flows (the last block), no compiled line says texts from one business stop or are off,
-//     a mobile is asked for, "calls only" is not offered, and every changed line carries a tag.
 //
-// The last block applies each trade's overlay to both flows (the vendored apply(), about half a second each), so it
-// takes minutes, not seconds. It is the card's "over all 243 trades x both flows" proof and is the part to move to the
-// parity project (T-1067) if `npm test` must stay fast.
+// The card's "over all 243 trades x both flows" proof (no compiled line says texts from one business stop or are off,
+// a mobile is asked for, "calls only" is not offered, every changed line carries a tag) takes minutes, so it is in the
+// parity project: parity.ts and parity.shard-1.test.ts to parity.shard-8.test.ts (DL-085, DL-099).
 import { describe, expect, it, vi } from "vitest";
 import { loadMaster } from "../load/flow";
-import { listTradeIds, loadTrade } from "../load/trade";
+import { loadTrade } from "../load/trade";
 import { applyTrade, type AppliedFlow, type AppliedStep, type AppliedTrade } from "../overlay/apply";
 import {
   CORRECTIONS,
@@ -216,75 +214,4 @@ describe("the list of corrections", () => {
     expect(order.lastIndexOf("C1")).toBeLessThan(order.indexOf("C2"));
     expect(done.corrections).toStrictEqual(["C1", "C2"]);
   });
-});
-
-/** Every string anywhere in a flow: the words of every step, branch, variation and layer line. */
-function allStrings(value: unknown, out: string[] = []): string[] {
-  if (typeof value === "string") out.push(value);
-  else if (Array.isArray(value)) for (const item of value) allStrings(item, out);
-  else if (typeof value === "object" && value !== null)
-    for (const item of Object.values(value)) allStrings(item, out);
-  return out;
-}
-
-/** A text that says Rosie's texts from one business stop or are off, or that a business texts from its own number. */
-const ONE_BUSINESS =
-  /\btexts? from [^\n]{1,80}? (?:to this number )?(?:stop at once|are off|is off)\b|\btexts? from Rosie for\b|own Rosie number|texts? from its own number|text from ONE shared number/i;
-
-function find(steps: AppliedStep[], id: string): AppliedStep | undefined {
-  for (const step of steps) {
-    if (step.id === id) return step;
-    for (const branch of step.branches ?? []) {
-      const hit = find(branch.steps, id);
-      if (hit !== undefined) return hit;
-    }
-  }
-  return undefined;
-}
-
-describe("all 243 trades x both flows", () => {
-  const master = loadMaster();
-  const ids = listTradeIds();
-
-  it("has 243 trades", () => {
-    expect(ids).toHaveLength(243);
-  });
-
-  for (const id of ids) {
-    it(`${id}: no line says one business's texts stop; a mobile is asked for; calls only is not offered; every change is tagged`, () => {
-      const trade = loadTrade(id);
-      for (const flow of ["A", "B"] as const) {
-        const applied = applyTrade(master[flow], trade);
-        const done = applyCorrections(applied);
-        const where = `${id} flow ${flow}`;
-
-        // C1: nothing in the compiled flow says one business's texts stop or are off.
-        const said = allStrings(done.flow.steps).filter((text) => ONE_BUSINESS.test(text));
-        expect(said, `${where}: lines that name one business's texts`).toStrictEqual([]);
-
-        // C2: the reach card, its branch and the three call steps.
-        const card = find(done.flow.steps, flow === "A" ? "A4-82" : "B4-93");
-        const asked = allStrings(card?.say).join(" ");
-        expect(asked, `${where}: the reach card asks for a mobile`).toContain("mobile number");
-        expect(asked, `${where}: the reach card no longer asks for 'number or email'`).not.toContain(
-          "number or email",
-        );
-        expect(asked).not.toContain("Calls only");
-        expect(card?.branches?.find((branch) => branch.label === "Calls only")?.off, where).toBeTypeOf(
-          "string",
-        );
-        for (const call of [flow === "A" ? "A4-87" : "B4-109", "S13-33"])
-          expect(find(done.flow.steps, call)?.off, `${where}: ${call} is off`).toBeTypeOf("string");
-
-        // Tags: every change has one, the diff has it on every line, and the changes are all there is.
-        for (const change of done.changes) expect(change.tag).toBe(tagOf(change.correction));
-        const lines = renderDiff(done.changes);
-        expect(lines.length).toBeGreaterThan(0);
-        expect(
-          lines.every((line) => /^MC:C[12] [-+] /.test(line)),
-          where,
-        ).toBe(true);
-      }
-    });
-  }
 });
