@@ -1,0 +1,16 @@
+{
+  "call": "geocode",
+  "request": { "kind": "streetAddress", "text": "42 Oak Street, Springfield" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40.02, "lng": -90.03 },
+        "precision": "exact",
+        "normalizedAddress": "42 Oak St, Springfield",
+        "timeZone": "America/New_York",
+        "distanceMiles": 2.1
+      }
+    ]
+  }
+}

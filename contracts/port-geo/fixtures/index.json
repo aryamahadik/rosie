@@ -1,0 +1,140 @@
+{
+  "fixtures": [
+    {
+      "file": "geocode-zip.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "A customer's request names a ZIP code (arch 05 line 237's 'near 02139'): the double gives one match at ZIP precision, its point, the ZIP as its normalized address and the point's zone. The double places this ZIP beside its Springfield, so the demo shops fall within 10 miles of it for distance search",
+      "source": "02-contracts K-17 Fixtures and Defines ('a town, ZIP code or street address, giving a map point, its precision and a normalized address'; search by distance); arch 05 line 237; B4-77 ('the town or ZIP in the request'); CQ-08; FINDINGS.md section 2 (the zip precision)"
+    },
+    {
+      "file": "geocode-street.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "Alex types his street address on the secure page as '42 Oak Street, Springfield': one exact match with the normalized address '42 Oak St, Springfield', its point and its zone, which B4-30 checks against Sam's 25 miles in PostGIS",
+      "source": "02-contracts K-17 Fixtures; B4-30 in master-B.json (form row 'Street address (Alex types it)': '42 Oak St, Springfield'); B4-77 ('Alex's home in Springfield is inside it'); S13-03; CQ-08; Q-25"
+    },
+    {
+      "file": "geocode-town.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "The town in Alex's request, Springfield, checked against the travel area before any times: one match at town precision with the town's point and zone",
+      "source": "02-contracts K-17 Fixtures; B4-77 in master-B.json ('the town or ZIP in the request is checked against the travel area, before any times'; 'Alex's home in Springfield is inside it'); FS row L02; CQ-08"
+    },
+    {
+      "file": "not-found.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "Nothing matches 'the mall': the answer is notFound with no matches, not an error, and B4-77's safe default follows (ask for the ZIP; the street address on the page decides)",
+      "source": "02-contracts K-17 Fixtures; B4-77 in master-B.json (''Near the mall', or a town two states share? Ask for the ZIP'; safe default); FINDINGS.md section 2 ('Not found: the port's answer to an empty result')"
+    },
+    {
+      "file": "geocode-street-partial.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "A partial match: a street address, '42 Oak St, Riverton', of which only the town is found. The answer is found, one match at town precision (coarser than the street address asked), never an error; B4-30 asks for the address again",
+      "source": "Lead note for T-026 ('a partial match is told apart by precision, never by an error'); B4-30 in master-B.json (safe default 'ask for the address again; nothing is booked until it checks'); S12-07 and B4-31 (Riverton); FINDINGS.md section 2"
+    },
+    {
+      "file": "geocode-town-riverton.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "An AI asks for times in Riverton: one match at town precision, 40 miles north of 1200 Main St in the double, so S12-07's PostGIS check finds it outside Lee Home Services' 25 miles before any times",
+      "source": "S12-07 in master-B.json ('An AI asks for times in Riverton, a town 40 miles from 1200 Main St. Lee Home Services goes 25 miles'); B4-31; Q-25 (distance in PostGIS on stored points)"
+    },
+    {
+      "file": "geocode-travel-centre.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "At sign-up, flow B's travel area: the centre Sam confirms, 1200 Main St, Springfield, geocoded to one exact match, the point K-23 v1 stores as the location's map point and the centre of its 25 miles",
+      "source": "02-contracts K-17 ('flow B's travel area (B4-77; FS rows L02, L03)'); FS row L02 ('a centre and a distance'; 'centre is the confirmed B03'); B4-77 and S12-07 ('1200 Main St'); K-23 v1 (T-032) seed-location-flow-b.json (POINT(-90 40))"
+    },
+    {
+      "file": "geocode-demo-shop.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "The demo shops' address, 123 Demo St, Anytown (Lee's Barbershop's in fixture set v1), geocoded to one exact match for the business's map pin",
+      "source": "fixture set v1 test-kit/shops/barber.json ('address': '123 Demo St, Anytown (demo)'); FS row B03 ('address + map pin'); K-23 v1 (T-032) seed-location-travel-centre.json (POINT(-90.2 40.1))"
+    },
+    {
+      "file": "error-unavailable.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "The provider fails while the town Springfield is checked: the error unavailable with no Retry-After. It never means not found; the step's safe default holds meanwhile",
+      "source": "arch 10 line 540; K-08 v1 span outcome failed; B4-77 safe default ('ask for the ZIP; the street address on the page decides')"
+    },
+    {
+      "file": "error-rate-limited.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "accept",
+      "shows": "The provider rate-limits a ZIP lookup and gives Retry-After 30 seconds: the error rateLimited with retryAfterSeconds 30",
+      "source": "arch 10 line 540 ('a rate limit with any Retry-After'); arch 05 line 237"
+    },
+    {
+      "file": "span-geocode.json",
+      "version": "v1",
+      "def": "geocode.span",
+      "expect": "accept",
+      "shows": "The K-08 portCall span of B4-77's town check for Alex: provider geo, call geocode, attempt 1; it got the step and the kind asked and decided found, one match, town precision, with no town, ZIP or address in it",
+      "source": "K-08 v1 (contracts/event-trace README: 'portCall covers ... a geocode (K-17, C-220)'; provider geo; 'never the raw number or words'); arch 02 diagram line 105; B4-77 in master-B.json (Mon Oct 19, 6:40pm); K-01 bundle v0's id"
+    },
+    {
+      "file": "invalid/refuse-partial-as-error.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "A partial match ('42 Oak St, Riverton', only the town found) answered as an error, partialMatch: refused, since a partial match is a found answer told apart by its precision (geocode-street-partial.json) and partialMatch is no error code",
+      "source": "Lead note for T-026 ('told apart by precision, never by an error'); B4-30"
+    },
+    {
+      "file": "invalid/refuse-vendor-precision.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "Alex's street address answered with Google's own precision value, ROOFTOP: refused, since the vendor's values stay inside the adapter, which maps them to the port's list (exact here)",
+      "source": "02-contracts section 5 ('The vendor's wire format stays inside the adapter'); FINDINGS.md section 2 ('a coarse port enum that each adapter maps to')"
+    },
+    {
+      "file": "invalid/refuse-match-without-time-zone.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "Alex's street address answered with no time zone: refused, since every match carries its point's zone (with the zone added it is geocode-street.json)",
+      "source": "CQ-08 default ('The geo port returns each point's zone'); S13-03; arch 06 line 309"
+    },
+    {
+      "file": "invalid/refuse-distance-in-match.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "A match that carries a distance in miles: refused, since the port never computes distance; PostGIS does, on the stored points (without distanceMiles it is geocode-street.json)",
+      "source": "Q-25 default ('PostGIS distance on stored points'); 02-contracts K-17 ('The distance itself is computed in PostGIS on stored points'); arch 05 line 237"
+    },
+    {
+      "file": "invalid/refuse-not-found-with-match.json",
+      "version": "v1",
+      "def": "geocode.exchange",
+      "expect": "refuse",
+      "shows": "A notFound answer that still lists a match: refused, since not found carries no matches (without them it is not-found.json)",
+      "source": "FINDINGS.md section 2 ('Not found: the port's answer to an empty result'); B4-77"
+    },
+    {
+      "file": "invalid/refuse-town-in-span.json",
+      "version": "v1",
+      "def": "geocode.span",
+      "expect": "refuse",
+      "shows": "The geocode span with the town asked, Springfield, added to what it got: refused by the span's closed list of facts (K-08 alone would take the one word as a label), so no town, ZIP or address enters a span or log line (without it, it is span-geocode.json)",
+      "source": "Lead note for T-026 ('The port's answer carries no raw address into a span or log'); K-08 v1 ('never the raw number or words'); arch 02 diagram line 105"
+    }
+  ]
+}

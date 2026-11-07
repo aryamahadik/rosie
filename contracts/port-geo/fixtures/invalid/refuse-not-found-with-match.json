@@ -1,0 +1,15 @@
+{
+  "call": "geocode",
+  "request": { "kind": "town", "text": "the mall" },
+  "outcome": {
+    "result": "notFound",
+    "matches": [
+      {
+        "point": { "lat": 40.01, "lng": -90 },
+        "precision": "town",
+        "normalizedAddress": "Springfield",
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}

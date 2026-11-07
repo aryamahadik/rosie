@@ -1,0 +1,15 @@
+{
+  "call": "geocode",
+  "request": { "kind": "streetAddress", "text": "123 Demo St, Anytown" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40.1, "lng": -90.2 },
+        "precision": "exact",
+        "normalizedAddress": "123 Demo St, Anytown",
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}

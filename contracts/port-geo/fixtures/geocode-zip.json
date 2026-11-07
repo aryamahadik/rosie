@@ -1,0 +1,15 @@
+{
+  "call": "geocode",
+  "request": { "kind": "zip", "text": "02139" },
+  "outcome": {
+    "result": "found",
+    "matches": [
+      {
+        "point": { "lat": 40.03, "lng": -90.02 },
+        "precision": "zip",
+        "normalizedAddress": "02139",
+        "timeZone": "America/New_York"
+      }
+    ]
+  }
+}
