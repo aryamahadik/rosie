@@ -1,0 +1,30 @@
+{
+  "after": ["seed-customer-blocked.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lee-home-services"
+    },
+    "action": "insert",
+    "table": "customer_blocks",
+    "values": {
+      "id": "block-kim-number-oct27",
+      "business_id": "biz-lee-home-services",
+      "person_id": "person-kim",
+      "target": "number",
+      "phone_handle_id": "handle-kim",
+      "address": null,
+      "set_at": "2026-10-27T13:00:00Z",
+      "set_by_person_id": "person-sam",
+      "set_by_turn_id": null,
+      "lifted_at": null,
+      "lifted_by_person_id": null,
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": ["customer_blocks_one_open_number"]
+    }
+  }
+}

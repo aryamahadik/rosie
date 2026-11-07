@@ -1,0 +1,32 @@
+{
+  "after": ["seed-customer-blocked.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "customers",
+    "values": {
+      "id": "customer-kim-barbershop",
+      "business_id": "biz-lees-barbershop",
+      "person_id": "person-kim",
+      "name": "Kim",
+      "mobile_handle_id": "handle-kim",
+      "email_handle_id": null,
+      "way": "email",
+      "contact_times": null,
+      "first_name_only": false,
+      "no_voicemail": false,
+      "age_band": "18_or_older",
+      "fee_free": false,
+      "added_at": "2026-10-27T17:00:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["customers_way_fits_contact"]
+    }
+  }
+}

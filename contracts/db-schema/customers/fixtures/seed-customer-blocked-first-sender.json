@@ -1,0 +1,76 @@
+{
+  "after": ["../../core/fixtures/seed-person-roles.json", "../../core/fixtures/seed-bundle-registry.json"],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-first-sender",
+        "name": null,
+        "language": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-first-sender",
+        "kind": "phone",
+        "address": "+15555550114"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-first-sender",
+        "handle_id": "handle-first-sender"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550114",
+        "handle_id": "handle-first-sender",
+        "chat_open": true,
+        "chat_open_at": "2026-10-23T01:40:00Z",
+        "chat_way": "imessage",
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-23T01:40:00Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-block-first-sender",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0063"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0063",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-23T12:05:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "customer_blocks",
+      "values": {
+        "id": "block-first-sender-number",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-first-sender",
+        "target": "number",
+        "phone_handle_id": "handle-first-sender",
+        "address": null,
+        "set_at": "2026-10-23T12:05:02Z",
+        "set_by_person_id": "person-sam",
+        "set_by_turn_id": "turn-sam-block-first-sender",
+        "lifted_at": null,
+        "lifted_by_person_id": null,
+        "version": 1
+      }
+    }
+  ]
+}

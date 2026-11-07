@@ -1,0 +1,43 @@
+{
+  "after": ["../../core/fixtures/seed-phone-chat-open.json"],
+  "rows": [
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-alex-barbershop",
+        "business_id": "biz-lees-barbershop",
+        "person_id": "person-alex",
+        "name": "Alex M.",
+        "mobile_handle_id": "handle-alex",
+        "email_handle_id": "handle-alex-email",
+        "way": "texts",
+        "contact_times": null,
+        "first_name_only": false,
+        "no_voicemail": false,
+        "age_band": "18_or_older",
+        "fee_free": false,
+        "added_at": "2026-10-21T23:20:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-alex-yoga",
+        "business_id": "biz-yoga-studio",
+        "person_id": "person-alex",
+        "name": "Alex M.",
+        "mobile_handle_id": "handle-alex",
+        "email_handle_id": "handle-alex-email",
+        "way": "textsonly",
+        "contact_times": "Weekdays after 6pm",
+        "first_name_only": true,
+        "no_voicemail": true,
+        "age_band": "18_or_older",
+        "fee_free": true,
+        "added_at": "2026-10-12T16:25:00Z",
+        "version": 2
+      }
+    }
+  ]
+}

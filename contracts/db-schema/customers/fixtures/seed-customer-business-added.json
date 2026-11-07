@@ -1,0 +1,122 @@
+{
+  "after": [
+    "../../business-setup/fixtures/seed-company-two-kinds.json",
+    "../../core/fixtures/seed-bundle-registry.json"
+  ],
+  "rows": [
+    {
+      "table": "persons",
+      "values": {
+        "id": "person-tessa",
+        "name": "Tessa",
+        "language": "en",
+        "version": 1
+      }
+    },
+    {
+      "table": "handles",
+      "values": {
+        "id": "handle-tessa",
+        "kind": "phone",
+        "address": "+15555550112"
+      }
+    },
+    {
+      "table": "person_handles",
+      "values": {
+        "person_id": "person-tessa",
+        "handle_id": "handle-tessa"
+      }
+    },
+    {
+      "table": "phones",
+      "values": {
+        "number": "+15555550112",
+        "handle_id": "handle-tessa",
+        "chat_open": false,
+        "stopped": false,
+        "linq_contact_added_at": "2026-10-20T14:12:05Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "person_roles",
+      "values": {
+        "id": "role-tessa-home-services",
+        "person_id": "person-tessa",
+        "business_id": "biz-lee-home-services",
+        "role": "customer",
+        "version": 1
+      }
+    },
+    {
+      "table": "bookings",
+      "values": {
+        "id": "booking-tessa-drain",
+        "business_id": "biz-lee-home-services",
+        "flow": "B",
+        "stage": "booked",
+        "booker_person_id": "person-tessa",
+        "served_person_id": "person-tessa",
+        "payer_person_id": "person-tessa",
+        "private": false,
+        "deceased": false,
+        "version": 1
+      }
+    },
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-sam-book-tessa-yes",
+        "handle_id": "handle-sam",
+        "event_ids": ["evt-sam-0042"],
+        "state": "committed",
+        "lease_until": null,
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-sam-0042",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-20T14:12:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "customers",
+      "values": {
+        "id": "customer-tessa-home-services",
+        "business_id": "biz-lee-home-services",
+        "person_id": "person-tessa",
+        "name": "Tessa",
+        "mobile_handle_id": "handle-tessa",
+        "email_handle_id": null,
+        "way": "texts",
+        "contact_times": null,
+        "first_name_only": false,
+        "no_voicemail": false,
+        "age_band": "18_or_older",
+        "fee_free": false,
+        "added_at": "2026-10-20T14:12:02Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "consents",
+      "values": {
+        "id": "consent-tessa-texts-yes-drain",
+        "person_id": "person-tessa",
+        "business_id": "biz-lee-home-services",
+        "kind": "texts",
+        "revoked": false,
+        "handle_id": "handle-tessa",
+        "booking_id": "booking-tessa-drain",
+        "exact_words": "Book this for Tessa? Did Tessa agree to messages from Rosie? / Drain clearing · Thu Oct 22 / arriving 12–2pm · Casey / For Tessa, 18 or older / Tessa · mobile on file / No Rosie $2: Lee Home Services added this booking itself / Reply 1 Yes, send the link, 2 Not yet, 3 Change it.",
+        "words_sha256": "12c0637ee3dfa5bfcefd76cc12fe3024556404f59a138b85dbbd7d682969b563",
+        "at": "2026-10-20T14:12:00Z",
+        "channel": "text",
+        "chat_link_id": null,
+        "turn_id": "turn-sam-book-tessa-yes"
+      }
+    }
+  ]
+}
