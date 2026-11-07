@@ -10,20 +10,30 @@
 //
 // Each file runs in its own transaction, together with its row in <schema>.schema_migrations (version, name,
 // sha256, applied_at); 0001_init.sql creates that table. Files hold no BEGIN or COMMIT of their own.
-// A file whose first line is `-- migrate:no-transaction` runs outside a transaction and holds one statement:
-// that is how CREATE INDEX CONCURRENTLY runs, which PostgreSQL refuses inside a transaction (the migration
-// guard asks for it on existing tables). Write it with IF NOT EXISTS, so a retry after a failure is safe.
+// Two kinds of file run outside a transaction, one statement at a time, because PostgreSQL refuses these inside one
+// (the migration guard asks for CONCURRENTLY on existing tables): (1) a file of only CREATE INDEX CONCURRENTLY
+// statements, found by itself; (2) a file whose first line is `-- migrate:no-transaction` and that holds exactly one
+// statement of any kind (DROP INDEX CONCURRENTLY, REINDEX CONCURRENTLY, DETACH PARTITION ... CONCURRENTLY), or
+// several that are all CREATE INDEX CONCURRENTLY. The file is recorded after its last statement. A file that mixes
+// CREATE INDEX CONCURRENTLY with other statements, or a marker file with several other statements, is refused
+// before anything runs. A failed concurrent build leaves an invalid index: the next run drops it first, then builds again.
+// Write the statements with IF NOT EXISTS, so a rerun after a partial failure skips the ones already built.
 // The runner refuses to apply anything while an applied file has changed or is missing.
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import postgres from "postgres";
 
 const LOCAL_DATABASE_URL = "postgres://rosie:rosie@127.0.0.1:54329/rosie";
-const MIGRATIONS_DIR = new URL("../../db/migrations/", import.meta.url);
+const MIGRATIONS_DIR = process.env.MIGRATIONS_DIR
+  ? pathToFileURL(`${process.env.MIGRATIONS_DIR.replace(/\/+$/, "")}/`)
+  : new URL("../../db/migrations/", import.meta.url);
 const FILE_NAME = /^(\d{4})_([a-z0-9][a-z0-9_-]*)\.sql$/;
 const SCHEMA_NAME = /^[a-z_][a-z0-9_]{0,62}$/;
 const NO_TRANSACTION = /^--\s*migrate:no-transaction\s*$/;
+const CONCURRENT_INDEX =
+  /^create\s+(?:unique\s+)?index\s+concurrently\s+(?:if\s+not\s+exists\s+)?((?:"(?:[^"]|"")+"|[a-z_][a-z0-9_$]*)(?:\s*\.\s*(?:"(?:[^"]|"")+"|[a-z_][a-z0-9_$]*))?)/i;
 const LOCK_WAIT_SECONDS = 120;
 const USAGE = "Usage: node infra/scripts/migrate.mjs [--status]";
 
@@ -47,6 +57,76 @@ function schemaName() {
   return schema;
 }
 
+// Splits SQL text into statements: skips comments, keeps quoted text (strings, identifiers, dollar quotes) whole.
+function splitStatements(text) {
+  const statements = [];
+  let current = "";
+  let i = 0;
+  const flush = () => {
+    if (current.trim() !== "") {
+      statements.push(current.trim());
+    }
+    current = "";
+  };
+  while (i < text.length) {
+    const rest = text.slice(i);
+    let m;
+    if (rest.startsWith("--")) {
+      const end = text.indexOf("\n", i);
+      i = end === -1 ? text.length : end;
+    } else if (rest.startsWith("/*")) {
+      const end = text.indexOf("*/", i + 2);
+      i = end === -1 ? text.length : end + 2;
+      current += " ";
+    } else if (text[i] === "'" || text[i] === '"') {
+      const quote = text[i];
+      let j = i + 1;
+      while (j < text.length) {
+        if (text[j] === quote) {
+          if (text[j + 1] === quote) {
+            j += 2;
+            continue;
+          }
+          break;
+        }
+        j += 1;
+      }
+      current += text.slice(i, j + 1);
+      i = j + 1;
+    } else if ((m = /^\$([A-Za-z_]*)\$/.exec(rest))) {
+      const end = text.indexOf(m[0], i + m[0].length);
+      const stop = end === -1 ? text.length : end + m[0].length;
+      current += text.slice(i, stop);
+      i = stop;
+    } else if (text[i] === ";") {
+      flush();
+      i += 1;
+    } else {
+      current += text[i];
+      i += 1;
+    }
+  }
+  flush();
+  return statements;
+}
+
+// Returns the statements of a file that must run outside a transaction, or null for an ordinary file.
+// Throws UsageError for a file that mixes concurrent index builds with other statements.
+function concurrentIndexStatements(file, marker) {
+  const statements = splitStatements(file);
+  const concurrent = statements.filter((statement) => CONCURRENT_INDEX.test(statement));
+  if (concurrent.length === statements.length && statements.length > 0) {
+    return statements;
+  }
+  if (marker && statements.length === 1) {
+    return statements;
+  }
+  if (concurrent.length > 0 || marker) {
+    return undefined;
+  }
+  return null;
+}
+
 function readMigrationFiles() {
   const versions = new Map();
   return readdirSync(MIGRATIONS_DIR)
@@ -65,13 +145,23 @@ function readMigrationFiles() {
       const bytes = readFileSync(new URL(file, MIGRATIONS_DIR));
       const text = bytes.toString("utf8");
       const firstLine = text.split("\n", 1)[0] ?? "";
+      const marker = NO_TRANSACTION.test(firstLine.trim());
+      const statements = concurrentIndexStatements(text, marker);
+      if (statements === undefined) {
+        throw new UsageError(
+          `${file}: a statement that cannot run in a transaction needs its own file: either only CREATE INDEX ` +
+            `CONCURRENTLY statements, or one statement under a first line "-- migrate:no-transaction". ` +
+            `Put the other statements in another file. Nothing was run.`,
+        );
+      }
       return {
         file,
         version,
         name,
         text,
         sha256: createHash("sha256").update(bytes).digest("hex"),
-        noTransaction: NO_TRANSACTION.test(firstLine.trim()),
+        noTransaction: statements !== null,
+        statements: statements ?? [],
       };
     });
 }
@@ -140,6 +230,35 @@ async function takeLock(sql, schema) {
   throw new Error(`another migrate run still holds schema ${schema} after ${LOCK_WAIT_SECONDS} s`);
 }
 
+// A concurrent build that failed leaves an invalid index of that name; IF NOT EXISTS would then skip it for good.
+// Only the target schema is searched (an unqualified name never reaches public's index of the same name).
+async function dropInvalidIndex(sql, schema, statement) {
+  const match = CONCURRENT_INDEX.exec(statement);
+  if (!match) {
+    return;
+  }
+  const parts = [...match[1].matchAll(/"((?:[^"]|"")+)"|([a-z_][a-z0-9_$]*)/gi)].map((part) =>
+    part[1] === undefined ? part[2].toLowerCase() : part[1].replaceAll('""', '"'),
+  );
+  const indexSchema = parts.length > 1 ? parts[0] : schema;
+  const indexName = parts.at(-1);
+  const [row] = await sql`
+    select i.indisvalid as valid
+    from pg_index i
+    join pg_class c on c.oid = i.indexrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = ${indexSchema} and c.relname = ${indexName}
+  `;
+  if (row && !row.valid) {
+    console.log(`migrate: dropping invalid index ${indexSchema}.${indexName} left by a failed run`);
+    await sql.unsafe(`drop index concurrently if exists ${quoteIdent(indexSchema)}.${quoteIdent(indexName)}`);
+  }
+}
+
+function quoteIdent(name) {
+  return `"${name.replaceAll('"', '""')}"`;
+}
+
 async function applyFile(sql, schema, file) {
   const searchPath = schema === "public" ? "public" : `"${schema}", public`;
   const record = (db) => db`
@@ -148,7 +267,10 @@ async function applyFile(sql, schema, file) {
   `;
   if (file.noTransaction) {
     await sql.unsafe(`set search_path to ${searchPath}`);
-    await sql.unsafe(file.text);
+    for (const statement of file.statements) {
+      await dropInvalidIndex(sql, schema, statement);
+      await sql.unsafe(statement);
+    }
     await record(sql);
     return;
   }
