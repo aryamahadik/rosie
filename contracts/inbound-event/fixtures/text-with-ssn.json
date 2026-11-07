@@ -1,0 +1,28 @@
+{
+  "eventId": "evt-avery-0003",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550103"
+  },
+  "service": "imessage",
+  "kind": "text",
+  "messageId": "linq-msg-demo-in-avery-0003",
+  "chatId": "linq-chat-demo-avery",
+  "sentAt": "2026-10-19T15:10:00Z",
+  "receivedAt": "2026-10-19T15:10:01Z",
+  "body": "Do you need my social? It's [SSN]",
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 1
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-avery-0003"
+}

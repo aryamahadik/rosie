@@ -1,0 +1,28 @@
+{
+  "eventId": "evt-alex-0001",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550101"
+  },
+  "service": "imessage",
+  "kind": "text",
+  "messageId": "linq-msg-demo-in-alex-0001",
+  "chatId": "linq-chat-demo-alex",
+  "sentAt": "2026-10-12T16:20:00Z",
+  "receivedAt": "2026-10-12T16:20:31Z",
+  "body": "Haircut at Lee's Barbershop this Saturday?",
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-alex-0001-retry"
+}

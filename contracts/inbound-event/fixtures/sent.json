@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-linq-sent-0001",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550106"
+  },
+  "service": "sms",
+  "kind": "sent",
+  "messageId": null,
+  "chatId": "linq-chat-demo-0106",
+  "sentAt": null,
+  "receivedAt": "2026-10-24T15:00:03Z",
+  "body": null,
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": {
+    "messageId": "linq-msg-demo-0106-0001",
+    "at": "2026-10-24T15:00:02Z",
+    "failure": null
+  },
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-0106-sent-0001"
+}

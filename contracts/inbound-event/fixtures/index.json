@@ -1,0 +1,155 @@
+{
+  "fixtures": [
+    {
+      "file": "text-imessage.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex's first iMessage text to Rosie's number, 'Haircut at Lee's Barbershop this Saturday?': its event id (the dedupe key and the turn id's input), Linq's message and chat ids, the send time and the time received, the trace opened at receipt. It goes to the handle's actor.",
+      "source": "02-contracts K-06 Fixtures; arch 02 lines 109 and 113; arch 01 line 59; K-04 seed-thread-messages (evt-alex-0001, linq-chat-demo-alex)"
+    },
+    {
+      "file": "photo.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Sam sends a photo of the price list with the caption 'Here's my price list': one image attachment in K-02's attachment shape, which K-13 later turns into a file reference.",
+      "source": "02-contracts K-06 Fixtures and K-02 photo reading (S1-12); MC 8 'iPhone tests' (a photo)"
+    },
+    {
+      "file": "reaction-from-customer.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex likes Rosie's read-back message: a reaction with its message id and fromRosie false. It goes to the actor, and a tapback is never a yes.",
+      "source": "02-contracts K-06 Fixtures; arch 03 line 187; A7-17"
+    },
+    {
+      "file": "reaction-from-rosie.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Rosie's own like on Alex's 'thanks!', reported back with fromRosie true (Linq's is_from_me): it starts no turn.",
+      "source": "02-contracts K-06 Fixtures; arch 07 line 391"
+    },
+    {
+      "file": "poll-vote.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex votes 'Sat 2:00pm' in A7-03's poll: the poll and option as Linq names them (K-04's outbox part linq-msg-demo-0002 with option linq-opt-demo-2) and the option's words, in K-02's pollId and optionId names.",
+      "source": "02-contracts K-06 Fixtures; arch 07 line 379; arch 03 line 187; arch 12 line 610 (poll.updated); K-04 seed-outbox-row"
+    },
+    {
+      "file": "poll-vote-removed.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex takes the vote back (poll.vote.removed): the same poll and option, kind voteRemoved. A vote change after its turn committed is a new answer.",
+      "source": "02-contracts K-06 Fixtures; arch 12 line 610; arch 11 line 584"
+    },
+    {
+      "file": "edit-after-commit.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex edits his '1' to '2' after its turn committed (message.edited): the edited message's id and the new words. The actor treats it as a new answer (C-184; S13-25 rules 20, 21).",
+      "source": "02-contracts K-06 Fixtures; arch 11 line 584; arch 12 line 610; MC 8 'iPhone tests' (an edit)"
+    },
+    {
+      "file": "delivered.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "message.delivered on iMessage for Rosie's read-back part linq-msg-demo-0001 at 14:05:04Z: it goes to the dispatcher (the poll may now go) and arms the question's clock row.",
+      "source": "02-contracts K-06 Fixtures; arch 02 line 127; arch 07 line 367; K-04 seed-outbox-row (delivered_at)"
+    },
+    {
+      "file": "sent.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "message.sent for a part to a phone whose chat Linq reports as SMS: on SMS it is the receipt that arms the clock.",
+      "source": "02-contracts K-06 Fixtures; arch 02 line 127; arch 12 line 610; DL-031 (SMS through Linq)"
+    },
+    {
+      "file": "poll-failed.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "poll.failed for A7-03's poll part: kind failed, the poll's message id, no code (the codes are K-11's), service unreported. The dispatcher sends the part again plain, options typed.",
+      "source": "02-contracts K-06 Fixtures; arch 12 line 610; arch 07 line 367 ('A refused part goes again plain')"
+    },
+    {
+      "file": "duplicate-event.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Linq retries text-imessage.json's event 30 s later: the same event id, so the gateway answers 200 and drops it, and the actor never sees it twice (the contract test checks the drop).",
+      "source": "02-contracts K-06 Fixtures and Contract test; arch 02 line 109; arch 11 line 584"
+    },
+    {
+      "file": "email-reply-check-passed.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex replies by email to the haircut's own reply address with 'Can we make it 2pm instead?'; the sender check passed, so the reply counts like a text in the booking's thread.",
+      "source": "02-contracts K-06 and K-12 'Inbound replies'; RULES 4.1, 6.1; K-04 seed-thread-messages (booking-alex-haircut@reply.example.com)"
+    },
+    {
+      "file": "email-reply-check-failed.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "An email from Alex's address asking to cancel, whose sender check failed: it is delivered as an event, but it proves nothing, so it never counts as the contact on file.",
+      "source": "02-contracts K-06 Fixtures; RULES 6.1; arch 02 line 109"
+    },
+    {
+      "file": "text-with-card-number.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Alex types a card number: the body holds the tag '[card number]' in its place and scrubbed.cards is 1. Nothing after the gateway sees the number.",
+      "source": "02-contracts K-06 Fixtures; arch 02 line 109; arch 10 line 516"
+    },
+    {
+      "file": "text-with-ssn.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "Avery types a Social Security number: the body holds the tag '[SSN]' in its place and scrubbed.ssns is 1.",
+      "source": "02-contracts K-06 Fixtures; arch 02 line 109; arch 10 line 516"
+    },
+    {
+      "file": "test-phone-page.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "accept",
+      "shows": "A text typed on the staging test-phone page for test phone 555-0104, signed and sent through the Linq double as a threaded reply: the same shape a real Linq text takes, so the gateway and the actor cannot tell them apart.",
+      "source": "02-contracts K-06 Producers (C-205, through the Linq double C-211); BP 9.4; arch 07 line 389 (threaded reply)"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-card.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "refuse",
+      "shows": "Refused by the named rule scrubbed: the body still holds a card number (16 digits that pass the Luhn check). The same event with the tag in its place is text-with-card-number.json.",
+      "source": "02-contracts K-06 Fixtures (refuse-unscrubbed-card); arch 02 line 109"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-ssn.json",
+      "version": "v1",
+      "rule": "scrubbed",
+      "expect": "refuse",
+      "shows": "Refused by the named rule scrubbed: the body still holds a Social Security number. The same event with the tag in its place is text-with-ssn.json.",
+      "source": "arch 02 line 109; arch 10 line 516"
+    },
+    {
+      "file": "invalid/refuse-no-event-id.json",
+      "version": "v1",
+      "expect": "refuse",
+      "shows": "Refused by the schema: no event id, so duplicates could not be dropped and no turn id could be made. Otherwise text-imessage.json.",
+      "source": "02-contracts K-06 Fixtures (refuse-no-event-id); arch 02 line 109; arch 01 line 59"
+    }
+  ]
+}

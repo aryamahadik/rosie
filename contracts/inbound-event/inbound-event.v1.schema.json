@@ -1,0 +1,933 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/inbound-event/inbound-event.v1.schema.json",
+  "title": "InboundEvent",
+  "description": "K-06, the inbound event, v1: the one shape every inbound message, reaction, poll vote, edit and delivery receipt takes after the gateway (C-044) has checked the signature, scrubbed card numbers and Social Security numbers and dropped known event ids, on its way to the handle's actor or to the dispatcher and clock arming (02-contracts K-06; arch 02 steps 1, S, 2 and 9, lines 109 to 127; arch 01 line 59; arch 07 lines 379, 391; arch 11 line 584; arch 12 line 610; RULES 4.1, 6.1). The root is one event. The provider's wire format stays inside the Linq and email adapters (K-11, K-12; 02-contracts section 5); these are Rosie's names. Owner: the architect.",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "description": "The provider's event id, the key duplicates are dropped by: a known event id gets 200 and is dropped (arch 02 line 109; arch 11 line 584: 'Dropped by event id'). A turn id is a hash of its texts' event ids (arch 01 line 59; K-04 turns.event_ids; K-02 text.eventId).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "provider": {
+      "$ref": "#/$defs/provider"
+    },
+    "handle": {
+      "$ref": "#/$defs/handle"
+    },
+    "service": {
+      "description": "The service the provider reports for this event: imessage, rcs or sms from Linq (sms is Linq's SMS service in the same chat, never an SMS provider: DL-012, DL-031), or email (02-contracts K-06: 'the service Linq reports (iMessage, RCS or SMS) or email'; arch 07 line 365: the reply's channel is the service of the text it answers; K-04 phones.chat_way and messages.service). Null only on a Linq delivery receipt whose provider does not report it (README open gaps: the vendor mapping).",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/service"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "kind": {
+      "$ref": "#/$defs/kind"
+    },
+    "messageId": {
+      "description": "For a text or a photo, the provider's id of the message itself (Linq's message id; an email's Message-ID), so a later reaction, edit or threaded reply can name it (arch 07 lines 389, 391; arch 11 line 584); null for every other kind, which names what it refers to in its own object (poll, reaction, edit, status).",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "chatId": {
+      "description": "Linq's id for the chat this event belongs to, when Linq reports it (K-04 threads.linq_chat_id: 'K-11 names its form; null until Linq reports it'; S1-01 gives thread); null for email, whose thread is its reply address (RULES 4.1).",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sentAt": {
+      "description": "The sender's send time, as the provider reports it, in UTC: limit 6 resolves dates from it (arch 06 line 309; 02-contracts K-06). The gateway knows no zone: the context bundle (C-114) pairs it with the zone dates resolve in (S13-03) to make K-02's text.sentAt. Null on a delivery receipt, which carries its own time in status.at.",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "receivedAt": {
+      "description": "When the gateway received it, in UTC (02-contracts K-06: 'the time received'). The batch closes 3 s after the latest text's arrival (arch 02 line 113), and reply time runs from the last text's arrival (Q-41); the actor takes events in this order (README default 2).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "body": {
+      "description": "The words after the card-number and Social Security number scrub, each one swapped for its tag before any write (arch 02 line 109: 'Before any write it swaps card numbers (13 to 19 digits, Luhn) and Social Security numbers for a tag'; arch 10 line 516; README default 1 gives the tags). For a text, its words; for a photo, its caption or an empty string; for an edit, the new words; for an email reply, its plain text. Null for a reaction, a vote, a vote removed and a receipt. The named rule scrubbed refuses a body with a card number or a Social Security number left in it (inbound-event.rules.mjs).",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "scrubbed": {
+      "$ref": "#/$defs/scrubbed"
+    },
+    "attachments": {
+      "description": "What came with it, as file references: a photo's image, an email's attachments (02-contracts K-06: 'attachments as file references (K-13)'). The shape is K-02's attachment, reused as is (an id and a media type); K-13 (F8) turns the id into a file reference. An incoming contact card stays an attachment nothing reads until Q-43's spike. Empty for every kind but text and photo.",
+      "type": "array",
+      "items": {
+        "$ref": "../model/model.v1.schema.json#/$defs/attachment"
+      }
+    },
+    "threadedReplyTo": {
+      "description": "For a text or a photo sent as a threaded reply, the provider's id of the message it sits under (02-contracts K-06: 'what it replies to (a threaded message ...)'; arch 07 line 389); null otherwise.",
+      "anyOf": [
+        {
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "poll": {
+      "description": "For a vote or a vote removed, the poll and the option (02-contracts K-06: 'a poll and option'); null otherwise.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/pollVote"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reaction": {
+      "description": "For a reaction, what it is and the message it reacts to; null otherwise.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/reaction"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "edit": {
+      "description": "For an edit, the message edited; null otherwise (02-contracts K-06: 'or the edited message').",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/edit"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "description": "For a delivery receipt (delivered, sent or failed), the part it reports on and when; null otherwise (arch 02 line 127).",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/status"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "fromRosie": {
+      "description": "Whether Rosie sent it, as Linq's is_from_me reports: Rosie's own reactions start no turn (arch 07 line 391: 'Rosie's own reactions (is_from_me) start no turn (Linq)'; 02-contracts K-06). Always false for email.",
+      "type": "boolean"
+    },
+    "email": {
+      "description": "For an email reply, its reply address, subject and sender check; null for Linq and for an email delivery receipt (RULES 4.1, 6.1; 02-contracts K-12 'Inbound replies').",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/emailReply"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "traceId": {
+      "description": "The trace id opened at receipt, which every hop after carries (02-contracts K-06; K-08; arch 10 line 548: one trace id). K-08 (F3, not yet frozen) gives its form; until then an opaque id (CQ-09). A text joined into a turn ends its trace at the turn, which carries the first text's trace id (CQ-06's default).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    }
+  },
+  "required": [
+    "eventId",
+    "provider",
+    "handle",
+    "service",
+    "kind",
+    "messageId",
+    "chatId",
+    "sentAt",
+    "receivedAt",
+    "body",
+    "scrubbed",
+    "attachments",
+    "threadedReplyTo",
+    "poll",
+    "reaction",
+    "edit",
+    "status",
+    "fromRosie",
+    "email",
+    "traceId"
+  ],
+  "additionalProperties": false,
+  "dependentSchemas": {
+    "provider": {
+      "description": "Linq events come from a phone and carry Linq's service; email events come from an email address, carry the email service, are never from Rosie, and are only a reply or a delivered or failed receipt (02-contracts K-11 and K-12; arch 02 line 127).",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "description": "02-contracts K-11.",
+                "const": "linq"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "handle": {
+                "description": "A Linq event comes from a phone (arch 01 line 55).",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 55.",
+                    "const": "phone"
+                  }
+                }
+              },
+              "service": {
+                "description": "Linq's services (DL-012, DL-031; K-04 phones.chat_way).",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": ["imessage", "rcs", "sms"]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "email": {
+                "description": "RULES 4.1.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "description": "02-contracts K-12.",
+                "const": "email"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "handle": {
+                "description": "An email comes from an email address (arch 01 line 55).",
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "description": "arch 01 line 55.",
+                    "const": "email"
+                  }
+                }
+              },
+              "service": {
+                "description": "02-contracts K-06 ('or email').",
+                "const": "email"
+              },
+              "kind": {
+                "description": "An email reply, or Resend's delivered or failed (02-contracts K-12 'Delivery events' and 'Inbound replies'; arch 02 line 127).",
+                "type": "string",
+                "enum": ["text", "delivered", "failed"]
+              },
+              "chatId": {
+                "description": "RULES 4.1: an email's thread is its reply address.",
+                "type": "null"
+              },
+              "fromRosie": {
+                "description": "02-contracts K-06 (is_from_me is Linq's).",
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "kind": {
+      "description": "Each kind fills the fields it uses and leaves the others null (02-contracts K-06). Texts, photos, reactions, votes, votes removed and edits go to the handle's actor in order; receipts go to the dispatcher and to clock arming (arch 02 lines 113, 127; arch 07 line 367).",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "text"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "messageId": {
+                "description": "arch 07 lines 389, 391.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              },
+              "sentAt": {
+                "description": "arch 06 line 309.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+              },
+              "body": {
+                "description": "arch 02 line 109.",
+                "type": "string"
+              },
+              "service": {
+                "description": "arch 07 line 365.",
+                "$ref": "#/$defs/service"
+              },
+              "poll": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "reaction": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "edit": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "status": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "photo"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "description": "A photo message is Linq's (MC 8 'iPhone tests': a photo); an email's files are a reply's attachments.",
+                "const": "linq"
+              },
+              "messageId": {
+                "description": "arch 07 lines 389, 391.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/id"
+              },
+              "sentAt": {
+                "description": "arch 06 line 309.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+              },
+              "body": {
+                "description": "The caption, or an empty string (arch 02 line 109).",
+                "type": "string"
+              },
+              "service": {
+                "description": "arch 07 line 365.",
+                "$ref": "#/$defs/service"
+              },
+              "attachments": {
+                "description": "At least one image (02-contracts K-06; K-02 attachment).",
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "mediaType": {
+                      "description": "An image (02-contracts K-02 photo reading: a photo).",
+                      "type": "string",
+                      "pattern": "^image/"
+                    }
+                  }
+                }
+              },
+              "poll": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "reaction": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "edit": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "status": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "reaction"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "description": "arch 07 line 391 (Linq).",
+                "const": "linq"
+              },
+              "messageId": {
+                "description": "The reaction names its message in reaction.onMessageId.",
+                "type": "null"
+              },
+              "sentAt": {
+                "description": "arch 06 line 309.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+              },
+              "body": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "attachments": {
+                "description": "02-contracts K-06.",
+                "type": "array",
+                "maxItems": 0
+              },
+              "threadedReplyTo": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "poll": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "reaction": {
+                "description": "arch 07 line 391.",
+                "$ref": "#/$defs/reaction"
+              },
+              "edit": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "status": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "enum": ["pollVote", "voteRemoved"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "description": "arch 07 line 379 (Linq polls); arch 12 line 610.",
+                "const": "linq"
+              },
+              "messageId": {
+                "description": "The vote names its poll in poll.pollId.",
+                "type": "null"
+              },
+              "sentAt": {
+                "description": "arch 06 line 309.",
+                "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+              },
+              "body": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "attachments": {
+                "description": "02-contracts K-06.",
+                "type": "array",
+                "maxItems": 0
+              },
+              "threadedReplyTo": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "poll": {
+                "description": "arch 07 line 379; arch 03 line 187.",
+                "$ref": "#/$defs/pollVote"
+              },
+              "reaction": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "edit": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "status": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "edit"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "description": "arch 12 line 610 (message.edited, Linq).",
+                "const": "linq"
+              },
+              "messageId": {
+                "description": "The edit names the edited message in edit.messageId.",
+                "type": "null"
+              },
+              "sentAt": {
+                "description": "When the edit was made (arch 06 line 309).",
+                "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+              },
+              "body": {
+                "description": "The new words (arch 11 line 584; arch 02 line 109).",
+                "type": "string"
+              },
+              "attachments": {
+                "description": "02-contracts K-06.",
+                "type": "array",
+                "maxItems": 0
+              },
+              "threadedReplyTo": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "poll": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "reaction": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "edit": {
+                "description": "arch 11 line 584.",
+                "$ref": "#/$defs/edit"
+              },
+              "status": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "enum": ["delivered", "sent", "failed"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "messageId": {
+                "description": "A receipt names Rosie's part in status.messageId.",
+                "type": "null"
+              },
+              "sentAt": {
+                "description": "A receipt carries its time in status.at.",
+                "type": "null"
+              },
+              "body": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "attachments": {
+                "description": "02-contracts K-06.",
+                "type": "array",
+                "maxItems": 0
+              },
+              "threadedReplyTo": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "poll": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "reaction": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "edit": {
+                "description": "02-contracts K-06.",
+                "type": "null"
+              },
+              "status": {
+                "description": "arch 02 line 127.",
+                "$ref": "#/$defs/status"
+              },
+              "email": {
+                "description": "A receipt is not a reply (02-contracts K-12).",
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "enum": ["delivered", "sent"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "description": "A delivered or sent receipt has no failure (arch 02 line 127).",
+                "type": "object",
+                "properties": {
+                  "failure": {
+                    "description": "arch 02 line 127.",
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "sent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "provider": {
+                "description": "message.sent is Linq's; it arms clocks on SMS (arch 02 line 127; arch 12 line 610).",
+                "const": "linq"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "description": "A failed receipt says how it failed (arch 02 line 125; arch 12 line 610: poll.failed).",
+                "type": "object",
+                "properties": {
+                  "failure": {
+                    "description": "arch 02 line 125.",
+                    "$ref": "#/$defs/failure"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "description": "02-contracts K-06.",
+                "const": "text"
+              },
+              "provider": {
+                "description": "RULES 4.1, 6.1.",
+                "const": "email"
+              }
+            },
+            "required": ["provider"]
+          },
+          "then": {
+            "properties": {
+              "email": {
+                "description": "An email reply carries its reply address and sender check (RULES 4.1, 6.1).",
+                "$ref": "#/$defs/emailReply"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "provider": {
+      "title": "Provider",
+      "description": "Who delivered it: linq, Rosie's one number (MC 8 'Texting'; C-207, and the Linq double behind the staging test-phone page, C-205, C-211); email, the email provider's inbound replies and delivery events (Resend; C-213; 02-contracts K-12). Stripe and calendar events go to PostgreSQL, not here (arch 02 line 109).",
+      "type": "string",
+      "enum": ["linq", "email"]
+    },
+    "handle": {
+      "title": "Handle",
+      "description": "The handle on the other side: the phone number or email address that wrote, or that Rosie's part went to for a receipt (arch 01 line 55: 'A phone number or email address that writes to Rosie'; one actor per handle, arch 10 line 502). Written as K-04's handles.address writes it, so the actor finds the handle row by it; a new number has no row yet.",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "phone or email (K-04 handles.kind; arch 01 line 55).",
+          "type": "string",
+          "enum": ["phone", "email"]
+        },
+        "address": {
+          "description": "The phone number in E.164 form (+ then digits) or the email address in lower case (K-04 handles.address and handles_address_form).",
+          "type": "string",
+          "pattern": "^(\\+[1-9][0-9]{6,14}|[^@\\sA-Z]+@[^@\\sA-Z]+)$"
+        }
+      },
+      "required": ["kind", "address"],
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "kind": {
+          "description": "A phone handle is an E.164 number, an email handle a lower-case address (K-04 handles_address_form).",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "K-04 handles.kind.",
+                    "const": "phone"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "description": "K-04 handles_address_form.",
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "kind": {
+                    "description": "K-04 handles.kind.",
+                    "const": "email"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "address": {
+                    "description": "K-04 handles_address_form.",
+                    "type": "string",
+                    "pattern": "^[^@\\sA-Z]+@[^@\\sA-Z]+$"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "service": {
+      "title": "Service",
+      "description": "imessage, rcs or sms, as Linq reports the chat's service (Q-33's default: chat_way holds the service Linq reports; K-04 phones.chat_way and messages.service use the same words; DL-012, DL-031: sms is Linq's, and the reply goes back through Linq in that chat, text only), or email (02-contracts K-06).",
+      "type": "string",
+      "enum": ["imessage", "rcs", "sms", "email"]
+    },
+    "kind": {
+      "title": "Kind",
+      "description": "What the event is (02-contracts K-06): text, words typed (or an email reply); photo, a Linq photo message with any caption; reaction, a tapback on a message (arch 07 line 391; K-02 calls it a tapback); pollVote, a vote in a poll (arch 07 line 379; Linq's poll.updated, arch 12 line 610); voteRemoved, a vote taken back (poll.vote.removed, arch 12 line 610); edit, a message edited (message.edited, arch 12 line 610; arch 11 line 584); delivered, a delivery receipt (message.delivered on iMessage and RCS, the email provider's delivered on email: arch 02 line 127); sent, Linq's message.sent, the receipt on SMS (arch 02 line 127); failed, a part that failed, a poll that failed (poll.failed, arch 12 line 610) or an email that bounced (02-contracts K-12).",
+      "type": "string",
+      "enum": ["text", "photo", "reaction", "pollVote", "voteRemoved", "edit", "delivered", "sent", "failed"]
+    },
+    "scrubbed": {
+      "title": "Scrubbed",
+      "description": "How many card numbers and Social Security numbers the gateway swapped for their tags in the body and the email subject before any write (arch 02 line 109; arch 10 line 516: 'Cards and SSNs scrubbed at the edge'). Zero and zero when nothing was swapped.",
+      "type": "object",
+      "properties": {
+        "cards": {
+          "description": "Card numbers swapped (13 to 19 digits that pass the Luhn check: arch 02 line 109).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "ssns": {
+          "description": "Social Security numbers swapped (arch 02 line 109; README default 1 gives the forms matched).",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["cards", "ssns"],
+      "additionalProperties": false
+    },
+    "pollVote": {
+      "title": "PollVote",
+      "description": "A vote in, or a vote taken back from, one of Rosie's polls: the poll and the option, as the provider names them (02-contracts K-06; arch 07 line 379; arch 03 line 187: 'a poll vote answers its own poll'). pollId and optionId keep K-02's names (K-02 text.poll), so the context bundle passes them on; they are the provider's ids, which K-04 holds for each poll part sent (outbox_parts.linq_message_id and linq_option_ids).",
+      "type": "object",
+      "properties": {
+        "pollId": {
+          "description": "The poll: the provider's id of the poll part Rosie sent (K-04 outbox_parts.linq_message_id; K-02 text.poll.pollId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "optionId": {
+          "description": "The option, as the provider names it (K-04 outbox_parts.linq_option_ids; K-02 text.poll.optionId). An id that is none of Rosie's is an option someone added, which reads as typed words (arch 07 line 379; S13-24 rule 6).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "optionWords": {
+          "description": "The option's words as the poll shows them: Rosie's option word for word (arch 07 line 379: 'Options are the step's, word for word'), or the words of an option someone added, read as typed words (S13-24 rule 6). K-02's poll-vote text carries them as its words.",
+          "type": "string"
+        }
+      },
+      "required": ["pollId", "optionId", "optionWords"],
+      "additionalProperties": false
+    },
+    "reaction": {
+      "title": "Reaction",
+      "description": "A tapback: what it is and the message it reacts to. The same names as K-02's text.tapback, so the context bundle passes it on (arch 03 line 187: 'A tapback is never a yes'; arch 07 line 391).",
+      "type": "object",
+      "properties": {
+        "reaction": {
+          "description": "The reaction as the Linq port reports it, such as like (MC 8 'iPhone tests': Rosie's tapback, a like). The closed list is K-11's (README open gaps), so v1 keeps it a plain string, as K-02 does.",
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "onMessageId": {
+          "description": "The provider's id of the message reacted to: one of Rosie's parts (K-04 outbox_parts.linq_message_id) or, for Rosie's own reaction, the person's message (arch 07 line 391; K-02 text.tapback.onMessageId).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["reaction", "onMessageId"],
+      "additionalProperties": false
+    },
+    "edit": {
+      "title": "Edit",
+      "description": "Which message an edit changed (arch 11 line 584: 'An edit or vote change after its turn committed is a new answer'; S13-25 rules 20, 21). The new words are the event's body.",
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "description": "The provider's id of the message edited: the messageId of the text it changes (arch 11 line 584).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        }
+      },
+      "required": ["messageId"],
+      "additionalProperties": false
+    },
+    "status": {
+      "title": "Status",
+      "description": "A delivery receipt for one part Rosie sent: which part and when. The first one arms the question's clock row (arch 02 line 127: 'message.delivered on iMessage and RCS, message.sent ... on SMS, and Resend's delivered on email'); the dispatcher waits on the words' receipt before the second send (arch 07 line 367); a failure starts the next way after 15 minutes (arch 02 line 125).",
+      "type": "object",
+      "properties": {
+        "messageId": {
+          "description": "The provider's id of the part it reports on: Linq's message id (K-04 outbox_parts.linq_message_id; for poll.failed, the poll's) or the email provider's message id that K-12's send returns.",
+          "$ref": "../common/formats.v1.schema.json#/$defs/id"
+        },
+        "at": {
+          "description": "When it was delivered, sent or failed, as the provider reports it (K-04 outbox_parts.delivered_at and failed_at; messages.delivered_at; arch 02 line 127: the clock arms at the first delivery receipt).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+        },
+        "failure": {
+          "description": "For failed, how it failed; null for delivered and sent.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/failure"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["messageId", "at", "failure"],
+      "additionalProperties": false
+    },
+    "failure": {
+      "title": "Failure",
+      "description": "How a part failed, as the provider reports it: a failed part, a failed poll (poll.failed: arch 12 line 610) or a bounced email (02-contracts K-12). The codes are the ports' (K-11 'poll.failed codes', K-12; README open gaps); K-04 outbox_parts.error_code stores the code.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "The provider's code, or null when it gives none (K-04 outbox_parts.error_code; K-11, K-12 list them).",
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "description": "What failed, in the provider's words or the adapter's, such as 'poll failed' or 'bounced' (arch 12 line 610; 02-contracts K-12 'failed or bounced'), for the team console's failed rows (C-194).",
+          "type": "string",
+          "pattern": "\\S"
+        }
+      },
+      "required": ["code", "reason"],
+      "additionalProperties": false
+    },
+    "emailReply": {
+      "title": "EmailReply",
+      "description": "An email reply's own fields (02-contracts K-12 'Inbound replies': from, to, subject, text, attachments, and the sender-check result; RULES 4.1, 6.1). The from address is the handle; the text is the body; the attachments are the event's.",
+      "type": "object",
+      "properties": {
+        "replyAddress": {
+          "description": "The address it was sent to: the booking's own reply address, which picks the booking and thread (RULES 4.1: 'Each booking has its own reply address, and Rosie answers replies in that thread'; K-04 threads.reply_address).",
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+$"
+        },
+        "subject": {
+          "description": "The subject line, after the same scrub as the body (arch 02 line 109).",
+          "type": "string"
+        },
+        "senderCheck": {
+          "description": "The mail system's sender check: passed or failed. An email counts only when it passes; one failing it proves nothing (RULES 6.1; arch 02 line 109). A check that did not run is failed (README default 4).",
+          "type": "string",
+          "enum": ["passed", "failed"]
+        }
+      },
+      "required": ["replyAddress", "subject", "senderCheck"],
+      "additionalProperties": false
+    }
+  }
+}

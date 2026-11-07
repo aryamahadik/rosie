@@ -1,0 +1,33 @@
+{
+  "eventId": "evt-sam-0004",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550100"
+  },
+  "service": "imessage",
+  "kind": "photo",
+  "messageId": "linq-msg-demo-in-sam-0004",
+  "chatId": "linq-chat-demo-sam",
+  "sentAt": "2026-10-19T14:20:00Z",
+  "receivedAt": "2026-10-19T14:20:02Z",
+  "body": "Here's my price list",
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [
+    {
+      "attachmentId": "att-sam-price-list",
+      "mediaType": "image/jpeg"
+    }
+  ],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-sam-0004"
+}

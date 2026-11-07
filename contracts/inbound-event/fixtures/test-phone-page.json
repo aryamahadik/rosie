@@ -1,0 +1,28 @@
+{
+  "eventId": "evt-double-0104-0001",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550104"
+  },
+  "service": "imessage",
+  "kind": "text",
+  "messageId": "linq-msg-double-in-0104-0001",
+  "chatId": "linq-chat-double-0104",
+  "sentAt": "2026-10-20T13:00:00Z",
+  "receivedAt": "2026-10-20T13:00:01Z",
+  "body": "Is there a spot in Saturday's class?",
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": "linq-msg-double-0104-0000",
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-double-0104-0001"
+}

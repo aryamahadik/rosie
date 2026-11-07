@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-linq-delivered-0001",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550101"
+  },
+  "service": "imessage",
+  "kind": "delivered",
+  "messageId": null,
+  "chatId": "linq-chat-demo-alex",
+  "sentAt": null,
+  "receivedAt": "2026-10-23T14:05:04Z",
+  "body": null,
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": {
+    "messageId": "linq-msg-demo-0001",
+    "at": "2026-10-23T14:05:04Z",
+    "failure": null
+  },
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-alex-delivered-0001"
+}
