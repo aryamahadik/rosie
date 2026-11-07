@@ -1,0 +1,46 @@
+{
+  "after": ["seed-staff-joined.json"],
+  "rows": [
+    {
+      "table": "proof_codes",
+      "values": {
+        "id": "code-jordan-email-change-oct31",
+        "purpose": "contact_change",
+        "person_id": "person-jordan",
+        "business_id": null,
+        "sent_to_handle_id": "handle-jordan",
+        "channel": "text",
+        "code_hash": "cc08bab0a84a3a70e29c7d23e8abbbf096556f74adfe84e7f3bd5137cfdcac95",
+        "hash_key_name": "PROOF_CODE_HASH_KEY",
+        "sent_at": "2026-10-31T18:00:00Z",
+        "expires_at": "2026-10-31T18:10:00Z",
+        "wrong_tries": 0,
+        "used_at": "2026-10-31T18:01:00Z",
+        "version": 2
+      }
+    }
+  ],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "personId": "person-jordan"
+    },
+    "action": "insert",
+    "table": "sessions",
+    "values": {
+      "id": "session-jordan-oct31",
+      "person_id": "person-jordan",
+      "token_sha256": "e5e61c24cbc0ea35a9b5da7bf11933314ed5d732c36b7fd664b6b1012ab16683",
+      "device_sha256": "5301a9d93851a89095bbcbadb38c5a2dceb1c3310395560141b3d738c3660bf4",
+      "proven_via": "code",
+      "proof_code_id": "code-jordan-email-change-oct31",
+      "started_at": "2026-10-31T18:01:00Z",
+      "last_seen_at": "2026-10-31T18:01:00Z",
+      "expires_at": "2026-11-30T18:01:00Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

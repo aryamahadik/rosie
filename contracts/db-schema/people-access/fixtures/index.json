@@ -213,8 +213,8 @@
       "version": "v1",
       "table": "sessions",
       "expect": "refuse",
-      "shows": "A call that acts for no person (a sign-in call before its code is right) starting a session for Sam is refused by the insert policy (SQLSTATE 42501), even naming a used sign-in code of Sam's: the person is set only once the code is right, in the same transaction; the same insert in Sam's own call (rosie.person_id Sam) passes, and so does the runtime side",
-      "source": "README rules 4 and 5; S11-52 ('Sam types his mobile, and a code comes by text'); RULES 6.1, 6.2; S13-45 row 8"
+      "shows": "A call that acts for no person starting a session for Sam is refused by the insert policy (SQLSTATE 42501), even naming a used sign-in code of Sam's: a sign-in call acts for no one before its code is right, nor does the call that takes a new device's ID re-check before it sets its person. The person is set in the transaction where check_proof_code answers right for the code the call made (the sign-in code, or a new device's code to the owner's email) or, for the ID re-check, by the call that takes the upload, to the person K-05 kept on the server with the used sign-in code (never an id the page sends); then the same insert passes in Sam's own call (rosie.person_id Sam), as proven_via code here or code_and_id_re_check after a new device's ID re-check, each session naming its sign-in code once, and so does the runtime side",
+      "source": "README rules 4 and 5 and 'Every path that binds a person'; S11-52 ('Sam types his mobile, and a code comes by text'; 'A new device ... follows the business side of S13-45'); S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); RULES 6.1, 6.2; FS line 688; MC C10"
     },
     {
       "file": "invalid/refuse-session-unused-code.json",
@@ -247,6 +247,22 @@
       "expect": "refuse",
       "shows": "Sam's own call setting ended_at and ended_why back to null on his session of Oct 20, which he signed out of, changes no row (the update policy admits only a session not yet ended): an ended session stays ended, so no call reopens one its person or the runtime ended (left, handed_over); the same update on the runtime side passes",
       "source": "README rule 5; RULES 8.7 ('Sign-in ... end'), 9.1; S11-100; S11-52"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-under-business.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Riley writing an own-chat change for Alex under the barbershop's business id (Alex's updates moved from his email to Riley's mobile, with a code Riley's mobile got and typed back) is refused by the insert policy (SQLSTATE 42501): a business scope writes only its own desk and team-edit rows (in_person, owner_team_edit), so a person's own change (own_chat, own_code, email_on_file, signed_in_id_re_check) is written only with no business and only for the call's own person; the same row with no business passes in Alex's own call, and the same row passes on the runtime side",
+      "source": "README rule 4; D75 (RULES 9.1; S13-45 row 3: 'the request counts only from the customer's own chat'); D77; S11-20; RULES 9.3; D102; FS line 756"
+    },
+    {
+      "file": "invalid/refuse-session-contact-change-code.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Jordan's own call (rosie.person_id Jordan) starting a session that names his used contact-change code (a code to his phone on file, typed back to change his email) is refused by the insert policy (SQLSTATE 42501): a session needs a used sign-in code of its own person (purpose sign_in or new_device), never a code that proved something else; the same insert naming a used sign-in code of Jordan's passes in his own call, and the same row passes on the runtime side",
+      "source": "README rule 5; S11-52 ('Sam types his mobile, and a code comes by text'); S13-45 row 8; FS section 8 ('Staff changing their own phone or email'); RULES 6.2"
     }
   ]
 }
