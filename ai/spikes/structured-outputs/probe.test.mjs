@@ -19,6 +19,19 @@ import {
   loadFormats,
 } from "./lib.mjs";
 import { main } from "./probe.mjs";
+import {
+  FROZEN_CALLS,
+  FROZEN_MODEL,
+  FROZEN_TARGETS,
+  buildFrozenCalls,
+  compileFrozen,
+  frozenSamples,
+} from "./frozen.mjs";
+import {
+  MODEL_FACING,
+  bundleSchema,
+  lintSchema,
+} from "../../../contracts/scripts/structured-subset-lint.mjs";
 
 const FAKE_KEY = "test-key-not-real-0123456789";
 const formats = loadFormats();
@@ -303,5 +316,285 @@ test("live retries an outside failure once, and skips a model whose control call
     assert.ok(results.length <= MAX_CALLS);
   } finally {
     rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ---------------------------------------------------------------------------------------------------------
+// T-1066: --frozen sends the frozen contracts' own model-facing schemas, bundled the way the gateway will.
+
+const FROZEN_DEFS = ["decideRead", "safetyRead", "plannerOutput", "plan"];
+const frozenValidators = compileFrozen();
+const frozenSampleOutputs = frozenSamples();
+const contractJson = (file) =>
+  JSON.parse(readFileSync(new URL(`../../../contracts/${file}`, import.meta.url), "utf8"));
+
+/** A temp output folder whose results.jsonl already logs `logged` calls (T-360 logged 16). */
+function tempOutWithLog(logged) {
+  const out = tempOut();
+  writeFileSync(path.join(out.dir, "results.jsonl"), '{"earlier":true}\n'.repeat(logged));
+  return out;
+}
+
+const frozenOutputs = () => FROZEN_DEFS.map((def) => JSON.stringify(frozenSampleOutputs[def]));
+
+test("frozen plan: exactly 4 calls on Haiku, one per frozen schema, each as bundleSchema() builds it", () => {
+  assert.deepEqual(
+    FROZEN_TARGETS.map((target) => target.def),
+    FROZEN_DEFS,
+  );
+  assert.deepEqual(FROZEN_TARGETS.slice(0, 3), MODEL_FACING.slice(0, 3));
+  assert.equal(FROZEN_CALLS, 4);
+  assert.equal(FROZEN_MODEL, "claude-haiku-5-5");
+  const calls = buildFrozenCalls({ firstN: 17 });
+  assert.equal(calls.length, FROZEN_CALLS);
+  assert.deepEqual(
+    calls.map((call) => call.n),
+    [17, 18, 19, 20],
+  );
+  assert.deepEqual(
+    calls.map((call) => call.id),
+    [
+      "frozen-decide-read-haiku-5-5",
+      "frozen-safety-read-haiku-5-5",
+      "frozen-planner-output-haiku-5-5",
+      "frozen-plan-haiku-5-5",
+    ],
+  );
+  calls.forEach((call, k) => {
+    const target = FROZEN_TARGETS[k];
+    const schema = call.body.output_config.format.schema;
+    assert.equal(call.model, FROZEN_MODEL);
+    assert.equal(call.body.model, FROZEN_MODEL);
+    assert.equal(call.schemaName, target.def);
+    assert.deepEqual(schema, bundleSchema({ schema: target.schema, def: target.def }));
+    assert.equal(call.body.output_config.format.type, "json_schema");
+    assert.equal(schema.$schema, undefined);
+    assert.equal(schema.$id, undefined);
+    assert.deepEqual(checkSubset(schema).problems, [], call.id);
+    assert.deepEqual(lintSchema(schema).errors, [], call.id);
+    const wire = JSON.stringify(call.body);
+    for (const banned of ["temperature", "top_p", "top_k", "x-api-key", "headers", "undefined", "[object"]) {
+      assert.ok(!wire.includes(banned), `${call.id} body carries ${banned}`);
+    }
+    assert.ok(!wire.includes('"$ref":"../'), `${call.id} keeps a relative $ref`);
+  });
+});
+
+test("frozen prompts are built from the frozen fixtures", () => {
+  const [decide, safety, planner, plan] = buildFrozenCalls().map((call) => call.body.messages[0].content);
+  assert.ok(decide.includes("Barbershop, plumbing, electrical"));
+  assert.ok(decide.includes("c-01") && decide.includes("oq-s1-02"));
+  assert.ok(safety.includes("the gas leak was fixed in March"));
+  assert.ok(planner.includes("pay.noshow"));
+  assert.ok(plan.includes("S1-02") && plan.includes("<allowed_formats>text</allowed_formats>"));
+});
+
+test("frozen validators accept the contracts' fixture outputs and refuse what the contracts forbid", () => {
+  for (const def of FROZEN_DEFS) {
+    assert.equal(frozenValidators[def](frozenSampleOutputs[def]), true, `${def} refused its fixture output`);
+  }
+  assert.equal(
+    frozenValidators.decideRead(contractJson("model/fixtures/invalid/refuse-unknown-verb.json")),
+    false,
+  );
+  assert.equal(
+    frozenValidators.plannerOutput(contractJson("model/fixtures/invalid/refuse-planner-books.json")),
+    false,
+  );
+  const hold = structuredClone(frozenSampleOutputs.plan);
+  hold.lines[0].text = "Your {{hold}} is ready.";
+  assert.equal(frozenValidators.plan(hold), false);
+});
+
+test("frozen dry run passes offline, with 16 calls logged, with the folder as it is, and with the limit spent", async () => {
+  for (const logged of [16, 20]) {
+    const { dir, url } = tempOutWithLog(logged);
+    try {
+      const lines = [];
+      const code = await main(["--frozen", "--dry-run"], {
+        env: {},
+        fetchImpl: noFetch,
+        write: (line) => lines.push(line),
+        outDir: url,
+      });
+      assert.equal(code, 0, lines.join("\n"));
+      assert.ok(lines.at(-1).includes("passed"));
+      assert.equal(lines.filter((line) => line.startsWith("ok  ")).length, FROZEN_CALLS);
+      assert.equal(
+        lines.some((line) => line.includes("would refuse")),
+        logged === 20,
+      );
+      assert.deepEqual(readdirSync(dir), ["results.jsonl"], "a dry run writes nothing");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+  const lines = [];
+  assert.equal(
+    await main(["--frozen", "--dry-run"], { env: {}, fetchImpl: noFetch, write: (l) => lines.push(l) }),
+    0,
+  );
+});
+
+test("frozen live: 4 calls on Haiku, logged from 17, outputs checked against the frozen defs, no key written", async () => {
+  const { dir, url } = tempOutWithLog(16);
+  try {
+    const outputs = frozenOutputs();
+    const seen = [];
+    const fetchImpl = async (target, init) => {
+      const body = JSON.parse(init.body);
+      seen.push({ target, model: body.model, version: init.headers["anthropic-version"] });
+      return fakeResponse(200, okBody(outputs[seen.length - 1]));
+    };
+    const lines = [];
+    const options = {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: (l) => lines.push(l),
+      outDir: url,
+    };
+    assert.equal(await main(["--frozen", "--live"], { ...options, sleep: noWait }), 0, lines.join("\n"));
+    assert.equal(seen.length, FROZEN_CALLS);
+    assert.ok(seen.every((call) => call.target === API_URL && call.model === FROZEN_MODEL));
+    assert.ok(seen.every((call) => call.version === "2026-10-21"));
+    const results = readFileSync(path.join(dir, "results.jsonl"), "utf8").trim().split("\n");
+    assert.equal(results.length, MAX_CALLS);
+    const logged = results.slice(16).map((line) => JSON.parse(line));
+    assert.deepEqual(
+      logged.map((line) => [line.call_number, line.n, line.schema, line.accepted, line.output_valid]),
+      [
+        [17, 17, "decideRead", true, true],
+        [18, 18, "safetyRead", true, true],
+        [19, 19, "plannerOutput", true, true],
+        [20, 20, "plan", true, true],
+      ],
+    );
+    assert.ok(logged.every((line) => line.variant === "frozen" && line.input_tokens === 100));
+    const files = readdirSync(path.join(dir, "samples")).sort();
+    assert.deepEqual(
+      files,
+      FROZEN_DEFS.flatMap((def, k) => {
+        const id = ["decide-read", "safety-read", "planner-output", "plan"][k];
+        return [
+          `${17 + k}-frozen-${id}-haiku-5-5.request.json`,
+          `${17 + k}-frozen-${id}-haiku-5-5.response.json`,
+        ];
+      }),
+    );
+    const written = [
+      lines.join("\n"),
+      ...results,
+      ...files.map((f) => readFileSync(path.join(dir, "samples", f), "utf8")),
+    ];
+    for (const text of written) {
+      assert.ok(!text.includes(FAKE_KEY), "the key was written");
+      assert.ok(!text.includes("x-api-key"), "a header was written");
+    }
+    // The limit is spent: a second run refuses and calls nothing.
+    assert.equal(await main(["--frozen", "--live"], { ...options, fetchImpl: noFetch }), 2);
+    assert.equal(readFileSync(path.join(dir, "results.jsonl"), "utf8").trim().split("\n").length, MAX_CALLS);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("frozen live records a refusal with its text and an output that does not validate", async () => {
+  const { dir, url } = tempOutWithLog(16);
+  try {
+    const outputs = frozenOutputs();
+    outputs[1] = '{"labels":[{"outcome":"Maybe"}]}';
+    let count = 0;
+    const fetchImpl = async () => {
+      count += 1;
+      if (count === 1) {
+        return fakeResponse(400, {
+          type: "error",
+          error: { type: "invalid_request_error", message: "Schema is too complex." },
+        });
+      }
+      return fakeResponse(200, okBody(outputs[count - 1]));
+    };
+    const code = await main(["--frozen", "--live"], {
+      env: { ANTHROPIC_API_KEY: FAKE_KEY },
+      fetchImpl,
+      write: ignore,
+      outDir: url,
+      sleep: noWait,
+    });
+    assert.equal(code, 0);
+    assert.equal(count, FROZEN_CALLS, "a 400 is a finding, not an outside failure: no retry");
+    const logged = readFileSync(path.join(dir, "results.jsonl"), "utf8")
+      .trim()
+      .split("\n")
+      .slice(16)
+      .map((line) => JSON.parse(line));
+    assert.deepEqual(
+      logged.map((line) => [line.schema, line.accepted, line.refusal_or_error, line.output_valid]),
+      [
+        ["decideRead", false, "Schema is too complex.", null],
+        ["safetyRead", true, null, false],
+        ["plannerOutput", true, null, true],
+        ["plan", true, null, true],
+      ],
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("frozen live refuses with fewer than 4 calls left, in CI and without a key, and calls nothing", async () => {
+  const lines = [];
+  const write = (line) => lines.push(line);
+  const { dir, url } = tempOutWithLog(17);
+  try {
+    assert.equal(
+      await main(["--frozen", "--live"], {
+        env: { ANTHROPIC_API_KEY: FAKE_KEY },
+        fetchImpl: noFetch,
+        write,
+        outDir: url,
+      }),
+      2,
+    );
+    assert.ok(lines.some((line) => line.includes("only 3 of the 20 are left")));
+    assert.deepEqual(readdirSync(dir), ["results.jsonl"]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+  const sixteen = tempOutWithLog(16);
+  try {
+    assert.equal(
+      await main(["--frozen", "--live"], {
+        env: { CI: "true", ANTHROPIC_API_KEY: FAKE_KEY },
+        fetchImpl: noFetch,
+        write,
+        outDir: sixteen.url,
+      }),
+      2,
+    );
+    assert.equal(
+      await main(["--frozen", "--live"], { env: {}, fetchImpl: noFetch, write, outDir: sixteen.url }),
+      2,
+    );
+    assert.ok(lines.some((line) => line.includes("ANTHROPIC_API_KEY is not set")));
+    assert.ok(!lines.join("\n").includes(FAKE_KEY));
+    assert.deepEqual(readdirSync(sixteen.dir), ["results.jsonl"]);
+  } finally {
+    rmSync(sixteen.dir, { recursive: true, force: true });
+  }
+});
+
+test("the flags: --frozen needs exactly one of --dry-run and --live, and nothing else is taken", async () => {
+  for (const argv of [
+    ["--frozen"],
+    ["--dry-run", "--live"],
+    ["--frozen", "--frozen", "--live"],
+    ["--frozen", "--dry-run", "--x"],
+    [],
+  ]) {
+    const lines = [];
+    const code = await main(argv, { env: {}, fetchImpl: noFetch, write: (l) => lines.push(l) });
+    assert.equal(code, 2, argv.join(" "));
+    assert.ok(lines[0].startsWith("Usage:"));
   }
 });
