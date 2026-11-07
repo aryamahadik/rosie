@@ -4,4 +4,7 @@ package-lock.json
 # Generated or checksummed files are never reformatted.
 bundles/
 fixtures/
+
+# Saved copy of the old /test page, pinned by SHA256SUMS (T-1052).
+infra/rosfield-test-backup/
 contracts/generated/
