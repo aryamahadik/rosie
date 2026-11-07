@@ -1,0 +1,23 @@
+// Routing tables (T-146; C-058): hubs, doors, the 21 any-time rows with their handler steps, the 50 rule nodes, the homes.
+export {
+  ANYTIME_ROW_NAMES,
+  DOORS,
+  DOOR_NAMES,
+  HUBS,
+  HUB_NAMES,
+  RULE_NODE_COUNT,
+  RoutingError,
+  compileRouting,
+  compileTradeRouting,
+  namedSteps,
+  unresolvedAnytime,
+  type AlwaysOn,
+  type AnytimeFlag,
+  type AnytimeRow,
+  type AnytimeRowName,
+  type CompiledRouting,
+  type DoorName,
+  type HubName,
+  type RuleNode,
+  type UnresolvedRow,
+} from "./tables";
