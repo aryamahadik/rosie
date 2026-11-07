@@ -7,8 +7,9 @@
 //                        with the earlier id: every published bundle stays readable for replay (tour line 658).
 //
 // Every call answers with the contract's outcome (contracts/data-access fixtures): a response, or an error shape such as
-// `notPublished`. A serialization failure (40001) or a deadlock (40P01) answers `transient`: nothing was written and the
-// same request may be sent again. Times are UTC text ending in Z. Every value reaches the database as a bound parameter.
+// `notPublished`. A serialization failure (40001), a deadlock (40P01) or a lost connection (postgres.js's
+// CONNECTION_CLOSED, CONNECTION_DESTROYED and CONNECTION_ENDED as 08006; SQLSTATE class 08; 57P01 to 57P03) answers
+// `transient`: nothing was written and the same request may be sent again. Times are UTC text ending in Z. Every value reaches the database as a bound parameter.
 //
 // Publishing never changes the active id. Switching serializes on one transaction-level advisory lock, then locks the
 // active row and the target row, so parallel switches run one after the other and exactly one id is active at any time
@@ -39,6 +40,10 @@ export type ReadActiveBundleResult =
   | { result: "active"; bundleId: BundleId; manifestKey: string; activatedAt: string }
   | { error: "noActiveBundle" }
   | TransientError;
+
+export interface ReadBundleValueRequest {
+  key: string;
+}
 
 export type ReadBundleValueResult =
   | { result: "value"; value: StoredText }
@@ -99,7 +104,14 @@ interface ValueRow {
   value: Uint8Array;
 }
 
-const TRANSIENT_SQLSTATES = new Set(["40001", "40P01"]);
+/** A serialization failure, a deadlock, and a server that shut down or dropped this backend (57P01 to 57P03). */
+const TRANSIENT_SQLSTATES = new Set(["40001", "40P01", "57P01", "57P02", "57P03"]);
+/**
+ * postgres.js's own codes for a connection that is gone. They carry no SQLSTATE, so they answer 08006
+ * (connection_failure), a default listed in the handoff.
+ */
+const LOST_CONNECTION_CODES = new Set(["CONNECTION_CLOSED", "CONNECTION_DESTROYED", "CONNECTION_ENDED"]);
+const LOST_CONNECTION_SQLSTATE = "08006";
 /** Held for the length of a switch of the active bundle. */
 const ACTIVE_SWITCH_LOCK = "rosie.bundles.active";
 
@@ -116,10 +128,48 @@ function sameId(a: BundleId, b: BundleId): boolean {
   return a.hash === b.hash && a.build === b.build;
 }
 
+function isLostConnection(error: unknown): boolean {
+  const code = (error as { code?: unknown }).code;
+  return (
+    typeof code === "string" && (LOST_CONNECTION_CODES.has(code) || /^(08[0-9A-Z]{3}|57P0[123])$/.test(code))
+  );
+}
+
+/**
+ * One transaction on one reserved connection (read committed, like sql.begin). postgres.js's own `begin` answers a
+ * failure with a `rollback` written to the connection even when that connection is gone, and that write throws from a
+ * timer, outside any promise, which would end the process. Here a lost connection is rethrown without a rollback (the
+ * server rolled the transaction back when the backend went), and the connection is always released.
+ */
+async function inTransaction<T>(sql: Sql, fn: (tx: Sql) => Promise<T>): Promise<T> {
+  const reserved = await sql.reserve();
+  try {
+    await reserved`begin`;
+    let result: T;
+    try {
+      result = await fn(reserved);
+    } catch (error) {
+      if (!isLostConnection(error)) {
+        await reserved`rollback`;
+      }
+      throw error;
+    }
+    await reserved`commit`;
+    return result;
+  } finally {
+    reserved.release();
+  }
+}
+
 function transientOrThrow(error: unknown): TransientError {
   const code = (error as { code?: unknown }).code;
-  if (typeof code === "string" && TRANSIENT_SQLSTATES.has(code)) {
-    return { error: "transient", sqlstate: code };
+  if (typeof code === "string") {
+    if (TRANSIENT_SQLSTATES.has(code) || /^08[0-9A-Z]{3}$/.test(code)) {
+      return { error: "transient", sqlstate: code };
+    }
+    if (LOST_CONNECTION_CODES.has(code)) {
+      return { error: "transient", sqlstate: LOST_CONNECTION_SQLSTATE };
+    }
   }
   throw error;
 }
@@ -162,7 +212,11 @@ export async function readActiveBundle(sql: Sql | Tx): Promise<ReadActiveBundleR
 }
 
 /** One value by its KV key, with its stored size and sha256, which the reader checks against the text. */
-export async function readBundleValue(sql: Sql | Tx, key: string): Promise<ReadBundleValueResult> {
+export async function readBundleValue(
+  sql: Sql | Tx,
+  request: ReadBundleValueRequest,
+): Promise<ReadBundleValueResult> {
+  const { key } = request;
   try {
     const [row] = await sql<ValueRow[]>`
       select key, kind, bytes, sha256, value from bundle_values where key = ${key}
@@ -208,10 +262,15 @@ export async function publishBundleCopy(
   if (bad !== null) {
     return { error: "valueMismatch", key: bad };
   }
+  // K-05's schema: values has at least one entry, the manifest among them (K-05 gives no answer to a refused request;
+  // default: valueMismatch naming the manifest key, the value that is missing).
+  if (!request.values.some((value) => value.kind === "manifest" && value.key === request.manifestKey)) {
+    return { error: "valueMismatch", key: request.manifestKey };
+  }
   const { hash, build } = request.bundleId;
   const at = options.now ?? null;
   try {
-    return await sql.begin<PublishBundleCopyResult>(async (tx) => {
+    return await inTransaction<PublishBundleCopyResult>(sql, async (tx) => {
       // A parallel publish of the same id waits on the unique indexes here, then sees the winner's row and does nothing
       // (no conflict target: the manifest key, which the id determines, is a second unique rule).
       const [inserted] = await tx<BundleRow[]>`
@@ -282,7 +341,7 @@ export async function setActiveBundle(
 ): Promise<SetActiveBundleResult> {
   const target = request.bundleId;
   try {
-    return await sql.begin<SetActiveBundleResult>(async (tx) => {
+    return await inTransaction<SetActiveBundleResult>(sql, async (tx) => {
       await tx`select pg_advisory_xact_lock(hashtext(${ACTIVE_SWITCH_LOCK}))`;
       const [current] = await tx<BundleRow[]>`select * from bundles where active for update`;
       const [wanted] = await tx<BundleRow[]>`

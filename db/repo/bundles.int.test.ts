@@ -3,7 +3,9 @@
 // and contracts/data-access (the calls' requests and outcomes); hashes made up here are sha256 of a label, never data.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createClient, resolvePrimaryUrl } from "./client";
 import {
   type BundleId,
   type PublishBundleCopyRequest,
@@ -365,7 +367,7 @@ describe("fixtures: seed-bundle-registry and the read calls", () => {
     await emptyTables(db.sql);
     await loadSeed(db.sql, "seed-bundle-registry.json");
     const fixture = exchange("bundle-value-on-miss.json");
-    const answer = await readBundleValue(db.sql, fixture.request.key as string);
+    const answer = await readBundleValue(db.sql, fixture.request as { key: string });
     expect(answer).toEqual(fixture.outcome);
     if ("value" in answer) {
       expect(byteLength(answer.value.text)).toBe(answer.value.bytes);
@@ -377,7 +379,7 @@ describe("fixtures: seed-bundle-registry and the read calls", () => {
     await emptyTables(db.sql);
     expect(await readActiveBundle(db.sql)).toEqual({ error: "noActiveBundle" });
     const key = `bundle/${sha("none")}/1/manifest`;
-    expect(await readBundleValue(db.sql, key)).toEqual({
+    expect(await readBundleValue(db.sql, { key })).toEqual({
       error: "notFound",
       table: "bundle_values",
       rowId: key,
@@ -408,7 +410,7 @@ describe("publishBundleCopy and setActiveBundle: the deploy's steps (fixtures)",
     const seeded = seed("seed-bundle-registry.json").rows.find(
       (row) => row.table === "bundle_values",
     )?.values;
-    const stored = await readBundleValue(db.sql, publish.request.manifestKey as string);
+    const stored = await readBundleValue(db.sql, { key: publish.request.manifestKey as string });
     expect(stored).toMatchObject({
       result: "value",
       value: { bytes: seeded?.bytes, sha256: seeded?.sha256 },
@@ -495,7 +497,7 @@ describe("publishBundleCopy and setActiveBundle: the deploy's steps (fixtures)",
       key: flow.key,
     });
     // The stored manifest is untouched.
-    expect(await readBundleValue(db.sql, value.key)).toMatchObject({ value: { text: value.text } });
+    expect(await readBundleValue(db.sql, { key: value.key })).toMatchObject({ value: { text: value.text } });
   });
 
   it("stores flow and trade values beside the manifest and reads each back by its key, multi-byte text included", async () => {
@@ -513,7 +515,7 @@ describe("publishBundleCopy and setActiveBundle: the deploy's steps (fixtures)",
     const result = await publishBundleCopy(db.sql, { ...request, values: [...request.values, flow, trade] });
     expect(result).toMatchObject({ result: "published", values: 3 });
     for (const value of [flow, trade]) {
-      expect(await readBundleValue(db.sql, value.key)).toEqual({ result: "value", value });
+      expect(await readBundleValue(db.sql, { key: value.key })).toEqual({ result: "value", value });
     }
   });
 
@@ -529,7 +531,7 @@ describe("publishBundleCopy and setActiveBundle: the deploy's steps (fixtures)",
     expect(await activeIds(db.sql)).toEqual([idOf(a)]);
     expect(await readActiveBundle(db.sql)).toMatchObject({ bundleId: idOf(a) });
     await setActiveBundle(db.sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" });
-    expect(await readBundleValue(db.sql, a.manifestKey)).toMatchObject({ result: "value" });
+    expect(await readBundleValue(db.sql, { key: a.manifestKey })).toMatchObject({ result: "value" });
   });
 
   it("setActiveBundle refuses an unpublished id and leaves the active id alone", async () => {
@@ -718,6 +720,28 @@ describe("20 parallel switches", () => {
     expect(await activeIds(db.sql)).toHaveLength(1);
   });
 
+  it("a request K-05's schema refuses (no values, or no manifest among them) answers valueMismatch naming the manifest key and writes nothing", async () => {
+    await emptyTables(db.sql);
+    const request = bundleOf("refused", 1);
+    const [manifest] = request.values as [StoredText];
+    const flowText = JSON.stringify({ flow: "A" });
+    const flow: StoredText = {
+      key: `bundle/${request.bundleId.hash}/1/flow/A`,
+      kind: "flow",
+      bytes: byteLength(flowText),
+      sha256: sha(flowText),
+      text: flowText,
+    };
+    for (const values of [[], [flow]]) {
+      expect(await publishBundleCopy(db.sql, { ...request, values })).toEqual({
+        error: "valueMismatch",
+        key: manifest.key,
+      });
+    }
+    const [counts] = await db.sql<{ n: number }[]>`select count(*)::int as n from bundles`;
+    expect(counts?.n).toBe(0);
+  });
+
   it("20 parallel publishes of one bundle write it once: one published, the rest repeated", async () => {
     await emptyTables(db.sql);
     const request = bundleOf("parallel publish", 1);
@@ -731,4 +755,114 @@ describe("20 parallel switches", () => {
     `;
     expect(counts).toEqual({ bundles: 1, values: 1 });
   });
+});
+
+describe("a lost connection answers transient (K-05 README: every call)", () => {
+  const LOCK_NAME = "rosie.bundles.active";
+  const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+  /**
+   * Runs `call` on its own one-connection client while a second connection holds a lock the call waits on, then
+   * terminates the call's backend (pg_terminate_backend) from a third connection, and returns the call's answer.
+   */
+  async function answerAfterKill<T>(
+    take: (tx: postgres.TransactionSql) => Promise<unknown>,
+    call: (sql: Sql) => Promise<T>,
+  ): Promise<T> {
+    const url = resolvePrimaryUrl();
+    const holder = postgres(url, { max: 1, onnotice: () => undefined });
+    const killer = postgres(url, { max: 1, onnotice: () => undefined });
+    const victim = createClient({ primaryUrl: url, schema: db.schema, max: 1 });
+    try {
+      // The holder keeps its lock until told to let go.
+      let letGo: () => void = () => undefined;
+      const hold = new Promise<void>((resolve) => {
+        letGo = resolve;
+      });
+      let locked: () => void = () => undefined;
+      const isLocked = new Promise<void>((resolve) => {
+        locked = resolve;
+      });
+      const holding = holder.begin(async (tx) => {
+        await take(tx);
+        locked();
+        await hold;
+      });
+      await isLocked;
+
+      const [backend] = await victim.primary<{ pid: number }[]>`select pg_backend_pid() as pid`;
+      const pid = backend?.pid ?? 0;
+      const answering = call(victim.primary);
+      // Wait until the victim's backend is waiting on the lock, then terminate it.
+      let waiting = false;
+      for (let attempt = 0; attempt < 100 && !waiting; attempt += 1) {
+        const [state] = await killer<{ waiting: boolean }[]>`
+          select (wait_event_type = 'Lock') as waiting from pg_stat_activity where pid = ${pid}
+        `;
+        waiting = state?.waiting === true;
+        if (!waiting) {
+          await sleep(50);
+        }
+      }
+      expect(waiting).toBe(true);
+      await killer`select pg_terminate_backend(${pid})`;
+
+      const answer = await answering;
+      letGo();
+      await holding;
+      return answer;
+    } finally {
+      await victim.close();
+      await killer.end({ timeout: 5 });
+      await holder.end({ timeout: 5 });
+    }
+  }
+
+  const lostConnection = /^(08[0-9A-Z]{3}|57P0[123])$/;
+  const lockTables = (tx: postgres.TransactionSql): Promise<unknown> =>
+    tx`lock table ${tx(db.schema)}.bundles, ${tx(db.schema)}.bundle_values in access exclusive mode`;
+
+  it("setActiveBundle waiting on the switch lock, its backend terminated from another connection, answers transient and writes nothing", async () => {
+    await emptyTables(db.sql);
+    const [a, b] = [bundleOf("kill a", 1), bundleOf("kill b", 2)] as [
+      PublishBundleCopyRequest,
+      PublishBundleCopyRequest,
+    ];
+    await publishBundleCopy(db.sql, a);
+    await publishBundleCopy(db.sql, b);
+    await setActiveBundle(db.sql, { bundleId: idOf(a), expectActive: null, at: "2026-11-08T10:00:00Z" });
+    const answer = await answerAfterKill(
+      (tx) => tx`select pg_advisory_xact_lock(hashtext(${LOCK_NAME}))`,
+      (sql) => setActiveBundle(sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
+    );
+    expect(answer).toMatchObject({ error: "transient" });
+    expect((answer as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    // Nothing was written: a is still the one active bundle, and a switch still works.
+    expect(await activeIds(db.sql)).toEqual([idOf(a)]);
+    expect(
+      await setActiveBundle(db.sql, { bundleId: idOf(b), expectActive: idOf(a), at: "2026-11-08T11:00:00Z" }),
+    ).toMatchObject({ result: "activated", repeated: false });
+  }, 30_000);
+
+  it("publishBundleCopy, readActiveBundle and readBundleValue waiting on a table lock, their backends terminated, answer transient", async () => {
+    await emptyTables(db.sql);
+    const published = bundleOf("kill published", 1);
+    await publishBundleCopy(db.sql, bundleOf("kill read", 2));
+    const publish = await answerAfterKill(lockTables, (sql) => publishBundleCopy(sql, published));
+    expect(publish).toMatchObject({ error: "transient" });
+    expect((publish as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    const active = await answerAfterKill(lockTables, (sql) => readActiveBundle(sql));
+    expect(active).toMatchObject({ error: "transient" });
+    expect((active as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    const value = await answerAfterKill(lockTables, (sql) =>
+      readBundleValue(sql, { key: bundleOf("kill read", 2).manifestKey }),
+    );
+    expect(value).toMatchObject({ error: "transient" });
+    expect((value as { sqlstate: string }).sqlstate).toMatch(lostConnection);
+    // The killed publish wrote nothing, and the same request can be sent again.
+    expect(await publishBundleCopy(db.sql, published)).toMatchObject({
+      result: "published",
+      repeated: false,
+    });
+  }, 60_000);
 });

@@ -5,7 +5,8 @@
 -- release's), so no policy is needed here.
 --
 -- No foreign key waits for a later migration: bundle_values points at bundles, made here. Later tables (turns,
--- open_questions, outbox_rows, event_log) point at bundles; those keys are added by the migrations that make them.
+-- open_questions, outbox_rows) point at bundles (event_log has no key to bundles in K-04); those keys are added by the
+-- migrations that make them: turns_bundle_fk, open_questions_bundle_fk and outbox_rows_bundle_fk.
 
 -- The bundle registry: every published bundle, keyed on K-01's bundle id {hash, build}, with at most one active.
 create table bundles (
