@@ -11,8 +11,9 @@
 //     read refreshes it at no cost. A 1-hour lifetime exists at twice the input price for a write; this layout does not
 //     use it, because the gateway's price table prices only the 5-minute write (NQ-AI-2).
 //   - Caches are per model, and the structured-output format is part of the prompt ("Changing the output_config.format
-//     parameter will invalidate any prompt cache"), so each model and each stage's schema keeps its own entries; a
-//     changed `effort` also misses. A stage keeps one schema and one effort, so its entries are read turn after turn.
+//     parameter will invalidate any prompt cache"), so each model and each stage's schema keeps its own entries. A
+//     changed `effort` always misses message blocks and, depending on the model, system blocks too. A stage keeps one
+//     schema and one effort, so its entries are read turn after turn.
 //   - An entry can be read only once the response that writes it has started: calls sent side by side each write.
 //   - The usage of a response gives `cache_read_input_tokens` (read), `cache_creation_input_tokens` (written) and
 //     `input_tokens` (the rest, after the last marker); the gateway's K-08 span holds them as `cached_tokens`,
