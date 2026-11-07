@@ -18,7 +18,8 @@
       "turn_id": null,
       "event_id": "evt-alex-0008",
       "handle_ref": "handle-alex",
-      "got": { "provider": "linq", "kind": "pollVote", "service": "imessage" },
+      "provider": "linq",
+      "got": { "kind": "pollVote", "service": "imessage" },
       "decided": { "signatureValid": true, "knownEventId": true, "firstTrace": "trace-alex-0008", "answered": 200 },
       "outcome": "dropped",
       "error_code": null

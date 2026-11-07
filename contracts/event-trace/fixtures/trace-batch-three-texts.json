@@ -20,7 +20,8 @@
           "turn_id": null,
           "event_id": "evt-alex-0003",
           "handle_ref": "handle-alex",
-          "got": { "provider": "linq", "kind": "text", "service": "imessage" },
+          "provider": "linq",
+          "got": { "kind": "text", "service": "imessage" },
           "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
           "outcome": "ok",
           "error_code": null
@@ -274,6 +275,9 @@
           "turn_id": "turn-alex-three-1",
           "handle_ref": "handle-alex",
           "business_id": "biz-lees-barbershop",
+          "provider": "linq",
+          "call": "sendPart",
+          "attempt": 1,
           "got": { "row": "out-a7-03-alex-first", "sendClass": "quick_reply" },
           "decided": { "channel": "imessage", "parts": 2, "idempotencyKey": "out-a7-03-alex-first/1/1" },
           "limits": [{ "limit": 8, "result": "pass", "outcome": null }],
@@ -291,7 +295,8 @@
           "turn_id": "turn-alex-three-1",
           "handle_ref": "handle-alex",
           "business_id": "biz-lees-barbershop",
-          "got": { "provider": "linq", "messageId": "linq-msg-demo-0031", "part": 1 },
+          "provider": "linq",
+          "got": { "messageId": "linq-msg-demo-0031", "part": 1 },
           "outcome": "ok",
           "error_code": null
         }
@@ -317,7 +322,8 @@
           "turn_id": null,
           "event_id": "evt-alex-0004",
           "handle_ref": "handle-alex",
-          "got": { "provider": "linq", "kind": "text", "service": "imessage" },
+          "provider": "linq",
+          "got": { "kind": "text", "service": "imessage" },
           "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
           "outcome": "ok",
           "error_code": null
@@ -403,7 +409,8 @@
           "turn_id": null,
           "event_id": "evt-alex-0005",
           "handle_ref": "handle-alex",
-          "got": { "provider": "linq", "kind": "text", "service": "imessage" },
+          "provider": "linq",
+          "got": { "kind": "text", "service": "imessage" },
           "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
           "outcome": "ok",
           "error_code": null

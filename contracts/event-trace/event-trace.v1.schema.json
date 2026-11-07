@@ -894,7 +894,7 @@
     },
     "hop": {
       "title": "Hop",
-      "description": "A hop a trace passes through (02-contracts K-08 'Hops'; arch 02 steps 1 to 9, S and Q, lines 109 to 129; BP section 10 D-017): receive, scrub, safetyRead, batch, lease, guard, frontier, search, decideReads, reread, planner, gate, commit, compose, fillAndChecks, rewriteOrFallback, dispatch, providerAccepted, delivered, clockArmed, clockFired, effectRun, providerWebhook, pageRequest, agentApiRequest. The README's hop table gives each one's source.",
+      "description": "A hop a trace passes through (02-contracts K-08 'Hops'; arch 02 steps 1 to 9, S and Q, lines 109 to 129; BP section 10 D-017): receive, scrub, safetyRead, batch, lease, guard, frontier, search, decideReads, reread, planner, gate, commit, compose, fillAndChecks, rewriteOrFallback, dispatch, providerAccepted, delivered, clockArmed, clockFired, effectRun, providerWebhook, pageRequest, agentApiRequest; and portCall, any other outside call through a port: a Google Places search or details (K-15; C-218), a geocode (K-17; C-220), an R2 upload link, read link, server-side write or delete (K-13; C-219), an email sent outside the outbox such as a sign-in code (K-12; C-095), a fresh calendar free/busy read or a watch renewal (K-16; arch 05 lines 259, 271), Linq's capability check (K-11; arch 07 line 365), and Stripe's onboarding, account-status and reconciliation-listing calls (K-14; arch 10 line 550) (arch 02 diagram line 105, 'THIRD-PARTY SERVICES'; 02-contracts section 5). The README's hop table gives each one's source.",
       "type": "string",
       "enum": [
         "receive",
@@ -921,7 +921,8 @@
         "effectRun",
         "providerWebhook",
         "pageRequest",
-        "agentApiRequest"
+        "agentApiRequest",
+        "portCall"
       ]
     },
     "label": {
@@ -962,8 +963,12 @@
       "description": "What a hop got, or what it decided, as named values (tour line 656: 'Each step adds what it got, what it decided and how long it took').",
       "type": "object",
       "propertyNames": {
-        "description": "A camelCase name (tour line 656).",
-        "pattern": "^[a-z][A-Za-z0-9]*$"
+        "description": "A camelCase name (tour line 656), never provider: the vendor has its own span field, from the closed list (arch 02 diagram line 105; README default 13).",
+        "pattern": "^[a-z][A-Za-z0-9]*$",
+        "not": {
+          "description": "The span's provider field holds the vendor (README default 13).",
+          "const": "provider"
+        }
       },
       "additionalProperties": {
         "$ref": "#/$defs/spanValue"
@@ -1040,7 +1045,7 @@
     },
     "span": {
       "title": "Span",
-      "description": "One step of a trace, written as one log line (ADR-009: one JSON object per event with level, msg, trace_id, environment and version beside these fields). It carries the bundle id, the turn id and a handle reference, never the raw number or words; timings; for model calls the model id, tokens, cached tokens and cost; its outcome or error code (02-contracts K-08 'Trace spans'; tour line 656; arch 10 line 548).",
+      "description": "One step of a trace, written as one log line (ADR-009: one JSON object per event with level, msg, trace_id, environment and version beside these fields). It carries the bundle id, the turn id and a handle reference, never the raw number or words; timings; for model calls the model id, tokens, cached tokens and cost; for an outside call its provider, call and attempt (arch 02 diagram line 105; arch 10 lines 540, 542); its outcome or error code (02-contracts K-08 'Trace spans'; tour line 656; arch 10 line 548).",
       "type": "object",
       "properties": {
         "trace_id": {
@@ -1128,6 +1133,19 @@
             }
           ]
         },
+        "provider": {
+          "description": "The outside service the hop called or heard from, from the closed list (arch 02 diagram line 105, 'THIRD-PARTY SERVICES'; 02-contracts K-08 hops 'dispatch', 'provider accepted', 'delivered', 'effect run', 'provider webhook'). Required on the outside-call hops (dispatch when it sends, effectRun, portCall) and on the hops a provider's message opens (receive, providerAccepted, delivered, providerWebhook); never in got or decided (README default 13).",
+          "$ref": "#/$defs/provider"
+        },
+        "call": {
+          "description": "The port call the hop made, as the port contract names it, such as sendPart (K-11 'Send one part'), a K-07 effect kind such as charge or calendarWrite, search or details (K-15), geocode (K-17), serverWrite or readLink (K-13) (02-contracts section 5: each port defines its calls; README default 14). Required with provider on the outside-call hops.",
+          "$ref": "#/$defs/label"
+        },
+        "attempt": {
+          "description": "Which try of this call the span is, from 1: a send's try, the last part of K-07's idempotency key (row, part, try), each try after any Retry-After (arch 10 line 540); an effect's try on its one idempotency key, at most 5 in 10 minutes before that service's outage row (arch 10 line 542); another job's try, at most 5 before the dead-letter queue (arch 10 line 540). Required with provider on the outside-call hops (README default 14).",
+          "type": "integer",
+          "minimum": 1
+        },
         "got": {
           "description": "What the hop got (tour line 656).",
           "$ref": "#/$defs/spanFacts"
@@ -1189,8 +1207,58 @@
       "additionalProperties": false,
       "dependentSchemas": {
         "hop": {
-          "description": "A hop that calls a model lists its calls, and the gate lists its limits (02-contracts K-08; arch 06 lines 279 to 291; arch 02 line 121).",
+          "description": "A hop that calls a model lists its calls, and the gate lists its limits (02-contracts K-08; arch 06 lines 279 to 291; arch 02 line 121). An outside call names its provider, call and attempt; a hop a provider's message opens names its provider (arch 02 diagram line 105; arch 10 lines 540, 542; README defaults 13, 14).",
           "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "hop": {
+                    "description": "The effects runner's and the other ports' outside calls (arch 10 lines 508, 542; 02-contracts section 5).",
+                    "enum": ["effectRun", "portCall"]
+                  }
+                }
+              },
+              "then": {
+                "description": "The vendor, the call and its try (arch 10 line 542; README defaults 13, 14).",
+                "required": ["provider", "call", "attempt"]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "hop": {
+                    "description": "The dispatcher's send (arch 02 line 125).",
+                    "const": "dispatch"
+                  },
+                  "outcome": {
+                    "description": "Every outcome but one that sends nothing: dropped (a stopped phone), held (text hours) or refused (limit 8) (arch 02 line 125).",
+                    "not": {
+                      "description": "No send call is made (arch 02 line 125; README default 14).",
+                      "enum": ["dropped", "held", "refused"]
+                    }
+                  }
+                },
+                "required": ["hop", "outcome"]
+              },
+              "then": {
+                "description": "The vendor (linq or resend), the send call and its try (arch 10 line 540; K-07 idempotency key (row, part, try); README defaults 13, 14).",
+                "required": ["provider", "call", "attempt"]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "hop": {
+                    "description": "A provider's webhook, acceptance or delivery receipt (arch 02 lines 109, 127; CQ-06).",
+                    "enum": ["receive", "providerAccepted", "delivered", "providerWebhook"]
+                  }
+                }
+              },
+              "then": {
+                "description": "The vendor whose message it is (arch 02 diagram line 105; README default 13).",
+                "required": ["provider"]
+              }
+            },
             {
               "if": {
                 "properties": {

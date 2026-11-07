@@ -129,6 +129,9 @@
       "job_id": "fire-clock-oq-a7-03-alex-yoga",
       "handle_ref": "handle-sam",
       "business_id": "biz-yoga-studio",
+      "provider": "linq",
+      "call": "sendPart",
+      "attempt": 1,
       "got": { "row": "out-a7-03-yoga-owner-told", "sendClass": "routine" },
       "decided": { "channel": "imessage", "parts": 1, "idempotencyKey": "out-a7-03-yoga-owner-told/1/1" },
       "limits": [{ "limit": 8, "result": "pass", "outcome": null }],
@@ -147,7 +150,8 @@
       "job_id": "fire-clock-oq-a7-03-alex-yoga",
       "handle_ref": "handle-sam",
       "business_id": "biz-yoga-studio",
-      "got": { "provider": "linq", "messageId": "linq-msg-demo-0207", "part": 1 },
+      "provider": "linq",
+      "got": { "messageId": "linq-msg-demo-0207", "part": 1 },
       "outcome": "ok",
       "error_code": null
     },
@@ -163,7 +167,8 @@
       "job_id": "fire-clock-oq-a7-03-alex-yoga",
       "handle_ref": "handle-sam",
       "business_id": "biz-yoga-studio",
-      "got": { "provider": "linq", "receipt": "message.delivered", "messageId": "linq-msg-demo-0207" },
+      "provider": "linq",
+      "got": { "receipt": "message.delivered", "messageId": "linq-msg-demo-0207" },
       "outcome": "ok",
       "error_code": null
     }

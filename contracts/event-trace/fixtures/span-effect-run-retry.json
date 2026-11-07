@@ -1,0 +1,25 @@
+{
+  "trace_id": "trace-alex-0008",
+  "span_id": "span-alex-0008-18",
+  "seq": 18,
+  "hop": "effectRun",
+  "at": "2026-10-23T14:06:45.200Z",
+  "ms": 420,
+  "bundle_id": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+  "turn_id": "turn-alex-move-2",
+  "job_id": null,
+  "handle_ref": "handle-alex",
+  "business_id": "biz-lees-barbershop",
+  "provider": "google_calendar",
+  "call": "calendarUpdate",
+  "attempt": 2,
+  "got": {
+    "effect": "eff-cal-booking-alex-haircut",
+    "booking": "booking-alex-haircut",
+    "idempotencyKey": "eff-cal-booking-alex-haircut",
+    "previousTry": "networkError"
+  },
+  "decided": { "eventUpdated": true, "outageRow": false },
+  "outcome": "ok",
+  "error_code": null
+}

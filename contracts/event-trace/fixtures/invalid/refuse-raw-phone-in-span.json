@@ -9,7 +9,8 @@
   "turn_id": null,
   "event_id": "evt-sam-0000",
   "handle_ref": "+15555550100",
-  "got": { "provider": "linq", "kind": "text", "service": "imessage" },
+  "provider": "linq",
+  "got": { "kind": "text", "service": "imessage" },
   "decided": { "signatureValid": true, "knownEventId": false, "sealedToActor": true },
   "outcome": "ok",
   "error_code": null

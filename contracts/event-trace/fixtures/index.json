@@ -89,6 +89,22 @@
       "source": "02-contracts K-08 'the hard-invariant checks of the hourly monitor'; arch 08 lines 427, 445; BP 5.4"
     },
     {
+      "file": "span-effect-run-retry.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "The effects runner's second try at moving Alex's haircut on the business's Google calendar after his A7-03 vote (booking-alex-haircut), on the effect's one idempotency key after a network error on the first: provider google_calendar, call calendarUpdate, attempt 2, ok, no outage row",
+      "source": "02-contracts K-08 hop 'effect run'; arch 10 lines 508, 542 (5 tries in 10 minutes on one idempotency key, then the outage row); arch 05 line 267; 02-contracts K-07 effect rows (calendar update, tries); K-04 v1 seed-booking-head.json; event-commit.json"
+    },
+    {
+      "file": "span-places-call.json",
+      "version": "v1",
+      "def": "span",
+      "expect": "accept",
+      "shows": "At sign-up's S1-09, a Google Places search for Sam's business by name and town, the words left out of the span: provider google_places, call search, attempt 1, one candidate, the double's fixed listing for Lee's Barbershop",
+      "source": "02-contracts K-15 (search by a business name and town; the double's fixed listings for the demo shops; C-218); S1-09 in master-A.json; arch 02 diagram line 105 ('Google Places', 'business lookup'); 02-contracts K-08 ('never the raw number or words')"
+    },
+    {
       "file": "invalid/refuse-raw-phone-in-span.json",
       "version": "v1",
       "def": "span",
