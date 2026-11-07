@@ -44,14 +44,10 @@ const EARLIER_TABLES = [
   "phones",
   "pauses",
 ];
-const LOADABLE_TABLES: readonly string[] = [...EARLIER_TABLES, ...OWN_TABLES];
+// bookings (0007) comes in through the fixtures' `after` chain: seed-booking-head.json loads before the threads.
+const LOADABLE_TABLES: readonly string[] = [...EARLIER_TABLES, "bookings", ...OWN_TABLES];
 // Foreign keys of the table list whose target table a later migration makes. The key is added there.
-const WAITING_FOREIGN_KEYS = [
-  "threads_booking_fk",
-  "messages_booking_fk",
-  "openers_sent_outbox_fk",
-  "messages_outbox_fk",
-];
+const WAITING_FOREIGN_KEYS = ["openers_sent_outbox_fk", "messages_outbox_fk"];
 
 interface FixtureFile {
   after: string[];
@@ -109,7 +105,15 @@ async function loadFixture(
 // Later migrations add tables that reference these, so the truncate cascades to them. Each test file runs in its
 // own schema (createTestDatabase), so nothing else is touched.
 async function emptyTables(sql: Sql): Promise<void> {
-  await sql`truncate messages, openers_sent, threads, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
+  await sql`truncate messages, openers_sent, threads, bookings, pauses, phones, person_handles, handles, person_roles, sealing_keys, persons, businesses cascade`;
+}
+
+/** A booking head row for a thread or message to name (threads_booking_fk, messages_booking_fk). */
+async function makeBooking(sql: Sql, id: string): Promise<void> {
+  await sql`
+    insert into bookings (id, business_id, flow, booker_person_id)
+    values (${id}, 'biz-lees-barbershop', 'A', 'person-alex')
+  `;
 }
 
 /** What the database says about a failed statement: its SQLSTATE and the constraint it names. */
@@ -371,6 +375,7 @@ describe("threads per handle and channel", () => {
     expect(
       await refusal(createThread(db.sql, { id: "t-nohandle", handleId: "handle-none", kind: "chat" })),
     ).toEqual({ code: "23503", constraint: "threads_handle_fk" });
+    await makeBooking(db.sql, "booking-x");
     expect(
       await refusal(
         createThread(db.sql, {
@@ -421,6 +426,7 @@ describe("threads per handle and channel", () => {
   it("several email threads for one handle are fine; a handle's chat stays one", async () => {
     await createHandle(db.sql, { id: "h-mail-2", kind: "email", address: "second@example.com" });
     for (const n of [1, 2]) {
+      await makeBooking(db.sql, `b-mail-${String(n)}`);
       await createThread(db.sql, {
         id: `t-mail-${String(n)}`,
         handleId: "h-mail-2",
@@ -680,6 +686,7 @@ describe("the message log: words sealed, last 6 with one business up to 30 days 
   it("after erasePerson() the words are unreadable: the read gives null, and the stored text cannot be opened", async () => {
     await createPerson(db.sql, { id: "person-erase", name: "Demo Erase" });
     await createHandle(db.sql, { id: "h-erase", kind: "email", address: "erase@example.com" });
+    await makeBooking(db.sql, "b-erase");
     const thread = await createThread(db.sql, {
       id: "t-erase",
       handleId: "h-erase",
