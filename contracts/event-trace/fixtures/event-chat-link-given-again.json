@@ -1,0 +1,17 @@
+{
+  "id": "evlog-confirmation-ben-haircut-1",
+  "at": "2026-10-05T17:00:00Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "job-confirmation-email-ben-haircut",
+  "trace_id": "trace-page-ben-0001",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "rosie",
+  "kind": "chat_link.given_again",
+  "table_name": "chat_links",
+  "row_id": "chatlink-ben-haircut",
+  "old_values": { "given_via": ["booking_page"] },
+  "new_values": { "given_via": ["booking_page", "confirmation_email"] }
+}

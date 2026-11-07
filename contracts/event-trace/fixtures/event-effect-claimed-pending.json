@@ -1,0 +1,27 @@
+{
+  "id": "log-eff-cal-riley-alex-nov14-write-run-1-claim-1",
+  "at": "2026-11-07T15:06:33Z",
+  "zone": "America/New_York",
+  "turn_id": "turn-alex-book-1",
+  "job_id": null,
+  "trace_id": "trace-alex-0012",
+  "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+  "bundle_build": 1,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "job",
+  "kind": "effect.claimed",
+  "table_name": "effects",
+  "row_id": "eff-cal-riley-alex-nov14-write",
+  "old_values": {
+    "state": "pending",
+    "first_try_at": null,
+    "claimed_by": null,
+    "claim_lapses_at": null
+  },
+  "new_values": {
+    "state": "running",
+    "first_try_at": "2026-11-07T15:06:33Z",
+    "claimed_by": "effects-runner-1",
+    "claim_lapses_at": "2026-11-07T15:07:33Z"
+  }
+}

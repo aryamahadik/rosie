@@ -1,0 +1,25 @@
+{
+  "id": "evlog-page-sam-signin-0030-1",
+  "at": "2026-10-30T13:00:00Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "page-req-sam-signin-0030",
+  "trace_id": "trace-page-sam-signin-0030",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": null,
+  "actor_kind": "rosie",
+  "kind": "proof_code.sent",
+  "table_name": "proof_codes",
+  "row_id": "proofcode-sam-signin-0030",
+  "old_values": null,
+  "new_values": {
+    "person_id": "person-sam",
+    "purpose": "signIn",
+    "route": "textFromMobile",
+    "contact_handle_id": "handle-sam",
+    "expires_at": "2026-10-30T13:10:00Z",
+    "wrong_tries": 0
+  },
+  "why": { "step": "S13-45" }
+}

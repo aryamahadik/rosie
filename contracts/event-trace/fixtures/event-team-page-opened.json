@@ -1,0 +1,56 @@
+{
+  "rows": [
+    {
+      "id": "evlog-clock-handoff-alex-0204-1",
+      "at": "2026-10-26T21:45:03Z",
+      "zone": "America/New_York",
+      "turn_id": null,
+      "job_id": "job-fire-clock-handoff-alex-0204",
+      "trace_id": "trace-clock-handoff-alex-0204",
+      "bundle_hash": null,
+      "bundle_build": null,
+      "business_id": "biz-lees-barbershop",
+      "actor_kind": "job",
+      "kind": "hand_off.escalated",
+      "table_name": "hand_offs",
+      "row_id": "handoff-alex-0204",
+      "old_values": { "escalated_at": null },
+      "new_values": { "escalated_at": "2026-10-26T21:45:03Z" },
+      "why": { "step": "A3-48" }
+    },
+    {
+      "id": "evlog-clock-handoff-alex-0204-2",
+      "at": "2026-10-26T21:45:03Z",
+      "zone": "America/New_York",
+      "turn_id": null,
+      "job_id": "job-fire-clock-handoff-alex-0204",
+      "trace_id": "trace-clock-handoff-alex-0204",
+      "bundle_hash": null,
+      "bundle_build": null,
+      "business_id": null,
+      "actor_kind": "job",
+      "kind": "team_page.opened",
+      "table_name": "team_pages",
+      "row_id": "page-alex-0204",
+      "old_values": null,
+      "new_values": {
+        "reason": "hand_off",
+        "business_id": "biz-lees-barbershop",
+        "hand_off_id": "handoff-alex-0204",
+        "harm_report_id": null,
+        "review_item_id": null,
+        "safety_timer_id": null,
+        "turn_id": null,
+        "named_person_id": "person-pat",
+        "summary": "Hand-off handoff-alex-0204 at Lee's Barbershop (biz-lees-barbershop): a threat to staff or others, read from safety-alex-0204; no reply or console tap from the owner in 5 minutes.",
+        "opened_at": "2026-10-26T21:45:03Z",
+        "last_paged_at": "2026-10-26T21:45:03Z",
+        "times_paged": 1,
+        "repeat_minutes": 5,
+        "next_page_clock_row_id": "clock-page-alex-0204-2",
+        "state": "open"
+      },
+      "why": { "step": "A3-48" }
+    }
+  ]
+}

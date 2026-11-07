@@ -135,6 +135,158 @@
       "expect": "refuse",
       "shows": "A row that records an edit of an earlier event-log row (adding approved_by to evlog-alex-0008-1): the event log is never edited, so no row's table is event_log",
       "source": "arch 09 lines 457, 492 ('never edited'); K-04 v1 README rule 5 and refuse-event-log-update.json"
+    },
+    {
+      "file": "event-safety-outcome-hold.json",
+      "version": "v1.1",
+      "def": "eventLogBatch",
+      "expect": "accept",
+      "shows": "Alex's threat to Riley at Lee's Barbershop, in one commit: the safety outcome recorded (labels plain, his words sealed under his key), its hold set with the rule never, and the hand-off to Sam, the owner, with the words the owner may hear; each row carries the business, as K-34's and K-36's row-level security lets the business read them",
+      "source": "K-09 draft recordSafetyOutcome, handOff (T-009; open gap 4); arch 06 lines 315 to 329; A3-22, A3-48; K-34 v1 seed-threat-pause.json; K-36 v1 seed-page-open.json (handoff-alex-0204)"
+    },
+    {
+      "file": "event-safety-hold-released.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Alex's emergency hold released after his clear 'we're safe' read no danger: released_why safe_readback, with the turn and the safety read that released it",
+      "source": "K-09 draft releaseSafetyHold; arch 06 line 323; A3-24; K-34 v1 seed-hold-released.json (hold-alex-0202, safety-alex-0220)"
+    },
+    {
+      "file": "event-harm-report.json",
+      "version": "v1.1",
+      "def": "eventLogBatch",
+      "expect": "accept",
+      "shows": "Alex tells of harm to an older adult: the outcome and its at-once hold carry the business; the harm report (details sealed under Alex's key) and the page to Rosie's team carry no business, so no business scope reads them, the business named in their new values",
+      "source": "K-09 draft recordSafetyOutcome (Rosie's team that day); A3-49; arch 06 line 329; K-34 v1 README rule 4 and seed-harm-report.json (harm-alex-0205); K-36 v1 README rule 2 (team_pages reason harm_report)"
+    },
+    {
+      "file": "event-team-page-opened.json",
+      "version": "v1.1",
+      "def": "eventLogBatch",
+      "expect": "accept",
+      "shows": "No reply or console tap from Sam in 5 minutes: the hand-off's escalation clock fires (a job, no turn, no bundle), the hand-off is marked escalated (business row) and the page to Rosie's team and Pat, the person Sam named, is opened, repeating every 5 minutes (no business)",
+      "source": "K-09 draft pageTeam (reason hand_off); arch 06 line 329; K-36 v1 README 'Who is told' and seed-page-open.json (page-alex-0204)"
+    },
+    {
+      "file": "event-team-page-paged-again.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "The page's clock row fires at 5:50pm: paged a second time, the next page's clock row armed for 5:55pm",
+      "source": "K-09 draft pageTeam (repeatOfPageId); arch 06 line 329 ('paged every 5 minutes until acknowledged'); K-36 v1 seed-page-open.json"
+    },
+    {
+      "file": "event-team-page-acknowledged.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Pat acknowledges the page for Alex's emergency by a reply, as a core action of Pat's turn (CQ-32's default): the paging stops; the row carries no business",
+      "source": "K-09 draft acknowledgePage; arch 06 line 329; CQ-32; K-36 v1 seed-page-acknowledged.json (page-alex-0202)"
+    },
+    {
+      "file": "event-hand-off-answered.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam answers the emergency hand-off by a tap on the owner console, a request with no turn",
+      "source": "K-09 draft answerHandOff; arch 06 line 329 ('no reply or console tap'); K-36 v1 hand_offs.answered_at, answered_via; seed-page-acknowledged.json (handoff-alex-0202)"
+    },
+    {
+      "file": "event-review-item-opened.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "The new kind of work Sam drafted at sign-up goes to Rosie's team's review queue, due in 1 business day; the row carries no business, the business named in its new values",
+      "source": "K-09 draft openReviewItem; S1-03; K-37 v1 README rule 2 and seed-review-item.json (review-new-work-barbershop)"
+    },
+    {
+      "file": "event-gap-case-logged.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Alex's gift-card question fit nothing: the planner logs a gap case for the turn, its state plain, the planner's summary sealed under Alex's key, no business on the row",
+      "source": "K-09 draft gateAndCommit and plannerVerbs (log_gap); arch 01 line 95; arch 03 line 189; K-37 v1 README rule 2 and seed-gap-case.json (turn-alex-gift-card)"
+    },
+    {
+      "file": "event-chat-link-issued.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Ben's chat link for his haircut, issued on the booking page: its short code, purpose, booking, person and where it was given plain; the mobile it is for sealed under Ben's key, never a raw number",
+      "source": "K-09 draft issueChatLink; MC C9; RULES 4.1b; K-29 v1 chat_links and seed-chat-link.json (chatlink-ben-haircut)"
+    },
+    {
+      "file": "event-chat-link-given-again.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "The same unused link given again in the confirmation email: only where it was given grows",
+      "source": "K-09 draft issueChatLink (repeat: given_via extended); K-29 v1 chat_links.given_via and seed-chat-link.json"
+    },
+    {
+      "file": "event-proof-code-sent.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam signs in to the owner console: a code that he texts from his mobile, alive 10 minutes; the row names K-22's proof_codes, carries no business and no sealed value, and never the code, its hash or the ready text",
+      "source": "K-09 draft sendProofCode (purpose signIn, route textFromMobile); RULES 6.2; S13-45; MC C9; K-22 proof_codes (T-031, not yet frozen: named only)"
+    },
+    {
+      "file": "event-proof-code-checked.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Sam texts the code from his mobile within the 10 minutes: proven, the check the person's own act; never the code as typed",
+      "source": "K-09 draft proveCode; RULES 6.2; S13-45; K-22 proof_codes (T-031, not yet frozen: named only)"
+    },
+    {
+      "file": "event-effect-claimed-pending.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "claimEffects takes the pending calendar write for Alex's haircut with Riley: old state pending, the run starts (first try time) under effects-runner-1's claim, lapsing in 60 s",
+      "source": "K-05 v1.1 item 20, open gap 15 and claim-effects.json; QUESTIONS.md CQ-43; K-07 v1 effects (claimed_by, claim_lapses_at)"
+    },
+    {
+      "file": "event-effect-claimed-lapsed.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "effects-runner-1 died; its claim lapsed at 15:08:04, and claimEffects hands the running row to effects-runner-2, tries and runs kept",
+      "source": "K-05 v1.1 item 20 and claim-effects-lapsed.json; CQ-43; K-07 v1 README 'How a claim lapses'"
+    },
+    {
+      "file": "event-effect-claimed-outage.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "accept",
+      "shows": "Google Calendar is back: serviceBack takes the effect from the calendar service's outage row, a second run with tries from 0, claimed by effects-runner-1",
+      "source": "K-05 v1.1 item 22 and service-back.json; CQ-43; arch 11 line 582"
+    },
+    {
+      "file": "invalid/refuse-proof-code-hash-in-clear.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "event-proof-code-sent.json with the code's keyed hash in its new values (code_hash): a proof code's hash never appears in the log",
+      "source": "BP rule 7; RULES 6.2; K-22 proof_codes.code_hash (T-031 draft); README 'v1.1'"
+    },
+    {
+      "file": "invalid/refuse-proof-code-typed-in-clear.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "event-proof-code-checked.json with the code as Sam typed it in its new values (typed): a proof code never appears in the log",
+      "source": "BP rule 7; RULES 6.2; K-09 draft proveCode.request.typed; README 'v1.1'"
+    },
+    {
+      "file": "invalid/refuse-harm-report-business-scope.json",
+      "version": "v1.1",
+      "def": "eventLogRow",
+      "expect": "refuse",
+      "shows": "event-harm-report.json's harm report row with the business on the row: Lee's Barbershop's own scope would read a report that may name its owner or staff",
+      "source": "K-34 v1 README rule 4 ('no business reads them, its owner included'); arch 06 line 329; S13-10; K-04 v1 rule 4; README 'v1.1'"
     }
   ]
 }

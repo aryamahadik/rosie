@@ -1,0 +1,28 @@
+{
+  "id": "evlog-console-sam-0202-1",
+  "at": "2026-10-24T15:20:00Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "console-req-sam-0202",
+  "trace_id": "trace-console-sam-0202",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": "biz-lees-barbershop",
+  "actor_kind": "person",
+  "actor_person_id": "person-sam",
+  "actor_role": "owner",
+  "kind": "hand_off.answered",
+  "table_name": "hand_offs",
+  "row_id": "handoff-alex-0202",
+  "old_values": {
+    "answered_at": null,
+    "answered_via": null,
+    "answered_by_person_id": null
+  },
+  "new_values": {
+    "answered_at": "2026-10-24T15:20:00Z",
+    "answered_via": "console_tap",
+    "answered_by_person_id": "person-sam"
+  },
+  "why": { "step": "A3-24" }
+}

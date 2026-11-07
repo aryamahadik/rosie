@@ -1,0 +1,29 @@
+{
+  "id": "evlog-page-sam-s1-03-1",
+  "at": "2026-10-19T18:20:00Z",
+  "zone": "America/New_York",
+  "turn_id": null,
+  "job_id": "page-req-sam-s1-03",
+  "trace_id": "trace-page-sam-s1-03",
+  "bundle_hash": null,
+  "bundle_build": null,
+  "business_id": null,
+  "actor_kind": "rosie",
+  "kind": "review_item.opened",
+  "table_name": "review_items",
+  "row_id": "review-new-work-barbershop",
+  "old_values": null,
+  "new_values": {
+    "kind": "new_work",
+    "business_id": "biz-lees-barbershop",
+    "subject_table": null,
+    "subject_row_id": null,
+    "turn_id": null,
+    "raised_by_person_id": "person-sam",
+    "summary": "A new kind of work drafted from Sam's own words and price list: review the plug-in and check every service against the official rules for that work. It stays a draft, offline, until reviewed.",
+    "opened_at": "2026-10-19T18:20:00Z",
+    "due_at": "2026-10-20T18:20:00Z",
+    "state": "open"
+  },
+  "why": { "step": "S1-03" }
+}
