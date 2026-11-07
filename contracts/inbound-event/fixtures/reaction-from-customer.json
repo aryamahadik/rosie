@@ -1,0 +1,31 @@
+{
+  "eventId": "evt-alex-0011",
+  "provider": "linq",
+  "handle": {
+    "kind": "phone",
+    "address": "+15555550101"
+  },
+  "service": "imessage",
+  "kind": "reaction",
+  "messageId": null,
+  "chatId": "linq-chat-demo-alex",
+  "sentAt": "2026-10-23T14:05:30Z",
+  "receivedAt": "2026-10-23T14:05:31Z",
+  "body": null,
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": {
+    "reaction": "like",
+    "onMessageId": "linq-msg-demo-0001"
+  },
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": null,
+  "traceId": "trace-alex-0011"
+}

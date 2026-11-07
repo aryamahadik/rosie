@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-email-alex-0001",
+  "provider": "email",
+  "handle": {
+    "kind": "email",
+    "address": "alex@example.com"
+  },
+  "service": "email",
+  "kind": "text",
+  "messageId": "email-msg-demo-alex-0001",
+  "chatId": null,
+  "sentAt": "2026-10-23T18:30:00Z",
+  "receivedAt": "2026-10-23T18:30:04Z",
+  "body": "Can we make it 2pm instead?",
+  "scrubbed": {
+    "cards": 0,
+    "ssns": 0
+  },
+  "attachments": [],
+  "threadedReplyTo": null,
+  "poll": null,
+  "reaction": null,
+  "edit": null,
+  "status": null,
+  "fromRosie": false,
+  "email": {
+    "replyAddress": "booking-alex-haircut@reply.example.com",
+    "subject": "Re: Your haircut at Lee's Barbershop",
+    "senderCheck": "passed"
+  },
+  "traceId": "trace-email-alex-0001"
+}
