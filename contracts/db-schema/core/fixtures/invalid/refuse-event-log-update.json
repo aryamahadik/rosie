@@ -1,0 +1,24 @@
+{
+  "after": [
+    "seed-event-log.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "event_log",
+    "set": {
+      "new_values": {
+        "step": "A7-03",
+        "status": "answered"
+      }
+    },
+    "where": {
+      "id": "evlog-0001"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "after": [
+    "seed-resources.json",
+    "seed-booking-head.json"
+  ],
+  "rows": [
+    {
+      "table": "class_seats",
+      "values": {
+        "resource_id": "res-handstand-workshop",
+        "resource_kind": "class_session",
+        "business_id": "biz-yoga-studio",
+        "capacity": 10,
+        "taken": 2,
+        "version": 3
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-alex-workshop",
+        "business_id": "biz-yoga-studio",
+        "resource_id": "res-handstand-workshop",
+        "resource_kind": "class_session",
+        "worker_person_id": null,
+        "during": "[2026-11-14T16:00:00Z,2026-11-14T18:00:00Z)",
+        "state": "booked",
+        "seats": 1,
+        "booking_id": "booking-alex-workshop",
+        "version": 2
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-agent-workshop",
+        "business_id": "biz-yoga-studio",
+        "resource_id": "res-handstand-workshop",
+        "resource_kind": "class_session",
+        "worker_person_id": null,
+        "during": "[2026-11-14T16:00:00Z,2026-11-14T18:00:00Z)",
+        "state": "held",
+        "seats": 1,
+        "held_until": "2026-11-07T15:10:00Z",
+        "for_agent_token": "agent-token-demo-1",
+        "version": 1
+      }
+    }
+  ]
+}

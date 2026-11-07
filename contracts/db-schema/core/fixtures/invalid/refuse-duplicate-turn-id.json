@@ -1,0 +1,33 @@
+{
+  "after": [
+    "seed-turn.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "insert",
+    "table": "turns",
+    "values": {
+      "id": "turn-alex-move-1",
+      "handle_id": "handle-alex",
+      "event_ids": [
+        "evt-alex-0007"
+      ],
+      "state": "committed",
+      "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+      "bundle_build": 1,
+      "trace_id": "trace-alex-0007-retry",
+      "joined_trace_ids": [],
+      "tries": 1,
+      "committed_at": "2026-10-23T14:05:09Z",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23505",
+      "constraintOneOf": [
+        "turns_pkey"
+      ]
+    }
+  }
+}

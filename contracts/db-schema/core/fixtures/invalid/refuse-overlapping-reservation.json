@@ -1,0 +1,34 @@
+{
+  "after": [
+    "seed-reservation.json"
+  ],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "reservations",
+    "values": {
+      "id": "rsv-overlap-riley",
+      "business_id": "biz-lees-barbershop",
+      "resource_id": "res-riley",
+      "resource_kind": "worker",
+      "worker_person_id": "person-riley",
+      "during": "[2026-10-24T15:15:00Z,2026-10-24T15:45:00Z)",
+      "state": "held",
+      "seats": 1,
+      "held_until": "2026-10-23T14:20:00Z",
+      "for_agent_token": "agent-token-demo-2",
+      "version": 1
+    },
+    "expect": {
+      "sqlstate": "23P01",
+      "constraintOneOf": [
+        "reservations_no_overlap_per_resource",
+        "reservations_no_overlap_per_worker"
+      ]
+    }
+  }
+}

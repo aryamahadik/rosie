@@ -1,0 +1,33 @@
+{
+  "after": [
+    "seed-phone-stopped.json",
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "pauses",
+      "values": {
+        "id": "pause-ben-phone",
+        "business_id": "biz-lees-barbershop",
+        "target": "phone",
+        "phone_number": "+15555550106",
+        "set_at": "2026-10-21T18:00:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "pauses",
+      "values": {
+        "id": "pause-alex-address",
+        "business_id": "biz-movers",
+        "target": "address",
+        "address": "\\x6b30342d736565642d7365616c65642d616464726573732d6e6f742d7265616c",
+        "sealed_for_person_id": "person-alex",
+        "set_at": "2026-10-22T18:00:00Z",
+        "cleared_at": "2026-10-22T19:30:00Z",
+        "cleared_by_person_id": "person-sam",
+        "version": 2
+      }
+    }
+  ]
+}

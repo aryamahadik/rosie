@@ -1,0 +1,37 @@
+{
+  "after": [],
+  "rows": [
+    {
+      "table": "release_flags",
+      "values": {
+        "name": "journey.1",
+        "scope": "global",
+        "enabled": false,
+        "value": null,
+        "version": 1
+      }
+    },
+    {
+      "table": "release_flags",
+      "values": {
+        "name": "skeleton.d-017",
+        "scope": "global",
+        "enabled": true,
+        "value": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "release_flags",
+      "values": {
+        "name": "staging.text-hours-override",
+        "scope": "phone:+15555550101",
+        "enabled": true,
+        "value": {
+          "anyHour": true
+        },
+        "version": 1
+      }
+    }
+  ]
+}

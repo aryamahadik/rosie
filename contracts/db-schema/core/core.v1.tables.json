@@ -1,0 +1,3740 @@
+{
+  "part": "core",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "businesses",
+      "description": "The business head row (CQ-03): only what M2 tasks read. Row-level security per business keys on it (arch 10 line 546), the frontier labels choices by business (arch 03 line 159), and limit 8 reads the owner's text hours (RULES 4.3). The other fields of FS line 721 (company, listing phone, website, about, photos, Stripe, terms, cutoff, arrival, pf facts and switches, extras) are K-23's.",
+      "source": "CQ-03 (business head row); FS line 721; arch 10 line 546; 02-contracts K-04 'Also in core'",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business's id: an opaque string code makes and never parses (CQ-09). Every per-business row names it, and row-level security scopes by it.",
+          "source": "FS line 721 (business.id); CQ-09; arch 10 line 546"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The business name as listed (B01). Choices for other bookings are labelled by business (arch 03 line 159).",
+          "source": "FS line 721 (name, B01); arch 03 line 159"
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The name texts show (B02); with the sensitive switch on, texts show only it (RULES 4.6). The opener names the business (arch 07 line 361).",
+          "source": "FS line 721 (display_name, B02); RULES 4.6; arch 07 line 361"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": false,
+          "default": "'offline'",
+          "audience": ["owner"],
+          "description": "offline, saved or live; S1-35 makes it live.",
+          "source": "FS line 721 (status); S1-35"
+        },
+        {
+          "name": "time_zone",
+          "type": "text",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The business's IANA zone. Owner and staff text hours are read in it, and a customer's when no visit gives a zone (CQ-05's default).",
+          "source": "FS line 721 (time_zone); S13-03; CQ-05; CQ-09"
+        },
+        {
+          "name": "text_hours_start",
+          "type": "time",
+          "null": false,
+          "default": "'08:00'",
+          "audience": ["owner"],
+          "description": "When the owner's text hours start (H04, default 8am). Texts that can wait go to owner and staff from then (RULES 4.3).",
+          "source": "FS line 721 (text_hours, H04); FS row H04; RULES 4.3"
+        },
+        {
+          "name": "text_hours_end",
+          "type": "time",
+          "null": false,
+          "default": "'20:00'",
+          "audience": ["owner"],
+          "description": "When the owner's text hours end (H04, default 8pm).",
+          "source": "FS line 721 (text_hours, H04); FS row H04; RULES 4.3"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "checks": [
+        {
+          "name": "businesses_status_known",
+          "expression": "status in ('offline', 'saved', 'live')",
+          "source": "FS line 721 (status: offline, saved, live)"
+        },
+        {
+          "name": "businesses_time_zone_form",
+          "expression": "time_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name)"
+        },
+        {
+          "name": "businesses_text_hours_order",
+          "expression": "text_hours_start < text_hours_end",
+          "source": "FS row H04 (8am to 8pm)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "persons",
+      "description": "One person row per human, across every business (FS line 743: 'A person is one row'), with the language Rosie stored for them. Their roles per business are person_roles; the handles they write from are person_handles. Staff details are K-22's, customer details K-28's.",
+      "source": "FS line 743; arch 09 line 457 ('Person & role'); 02-contracts K-04 'People and roles'",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The person's name as they gave it or as a business saved it; null until known.",
+          "source": "FS line 743 (person: name)"
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The language Rosie stored for this person, after two texts in it (arch 06); null: the business's language. A BCP 47 tag such as en or es.",
+          "source": "arch 06 'What the AI never does'; CQ-07"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "checks": [
+        {
+          "name": "persons_language_form",
+          "expression": "language is null or language ~ '^[a-z]{2,3}(-[A-Za-z0-9]+)*$'",
+          "source": "arch 06 'What the AI never does' (a stored language)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "One row per human across every business (FS line 743); the business link is person_roles, which row-level security scopes."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "person_roles",
+      "description": "A person's role at one business: owner, admin, staff, own business or customer (FS line 723; arch 09 line 457, 'Person & role'). The guard lists a handle's roles (arch 02 line 115). A role that ends keeps its row with ended_at, so the event log's who stays readable.",
+      "source": "FS lines 723, 743; arch 09 line 457; arch 02 line 115",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The role row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person (persons.id).",
+          "source": "FS line 743"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "FS line 723; arch 10 line 546"
+        },
+        {
+          "name": "role",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "owner, admin, staff, own_business or customer.",
+          "source": "FS line 723 (role: owner, admin, staff, own business); arch 09 line 457 (owner · staff · customer)"
+        },
+        {
+          "name": "ended_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the role ended (staff stopped or removed, FS line 723); null while it holds.",
+          "source": "FS line 723 (status stopped, removed)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "person_roles_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "person_roles_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "person_roles_one_live_role",
+          "columns": ["person_id", "business_id", "role"],
+          "where": "ended_at is null",
+          "source": "FS line 743 (staff links that person to each business they work in)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "person_roles_role_known",
+          "expression": "role in ('owner', 'admin', 'staff', 'own_business', 'customer')",
+          "source": "FS line 723; arch 09 line 457"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "person_roles_person_idx",
+          "columns": ["person_id"],
+          "why": "The guard lists a handle's roles across every business (arch 02 line 115)."
+        },
+        {
+          "name": "person_roles_business_role_idx",
+          "columns": ["business_id", "role"],
+          "why": "A business's owners and staff (limit 8; RULES 4.3)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "handles",
+      "description": "One handle per phone number or email address that writes to Rosie; one handle can be several people (arch 01 line 55). Each handle has one actor (arch 10 line 502). Written once.",
+      "source": "arch 01 line 55; arch 10 line 502; MC C1",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "phone or email.",
+          "source": "arch 01 line 55 ('A phone number or email address')"
+        },
+        {
+          "name": "address",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "The phone number in E.164 form (+ then digits) or the email address in lower case. Traces never carry it (K-08).",
+          "source": "arch 01 line 55; arch 02 diagram line 105 (sealed traces)"
+        }
+      ],
+      "primaryKey": ["id"],
+      "unique": [
+        {
+          "name": "handles_address_key",
+          "columns": ["address"],
+          "source": "arch 01 line 55 (one handle per number or address)"
+        },
+        {
+          "name": "handles_id_address_key",
+          "columns": ["id", "address"],
+          "source": "FS line 728 (phones refer to their handle by id and number)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "handles_kind_known",
+          "expression": "kind in ('phone', 'email')",
+          "source": "arch 01 line 55"
+        },
+        {
+          "name": "handles_address_form",
+          "expression": "(kind = 'phone' and address ~ '^\\+[1-9][0-9]{6,14}$') or (kind = 'email' and address ~ '^[^@[:space:]]+@[^@[:space:]]+$' and address = lower(address))",
+          "source": "arch 01 line 55; CQ-09"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A handle writes to Rosie's one number across every business (arch 01 line 55; arch 10 line 502; MC C1)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "person_handles",
+      "description": "Which people write from which handle: one handle can be several people (arch 01 line 55; S13-27 rule 28), and a person can write from a mobile and an email. Rows are added or removed, never updated.",
+      "source": "arch 01 line 55; S13-27 rule 28; FS line 743",
+      "columns": [
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person (persons.id).",
+          "source": "FS line 743"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle (handles.id).",
+          "source": "arch 01 line 55"
+        }
+      ],
+      "primaryKey": ["person_id", "handle_id"],
+      "foreignKeys": [
+        {
+          "name": "person_handles_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "person_handles_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "person_handles_handle_idx",
+          "columns": ["handle_id"],
+          "why": "The guard lists a handle's people (arch 02 line 115)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A handle and a person each span every business (arch 01 line 55; FS line 743)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "phones",
+      "description": "One phone row per mobile across every business, since there is one number (FS line 728; MC C1): chat open, the service Linq reports, the stopped flag with its stop and start times, whether it was added as a Linq contact, whether it has voted in a poll, and whether the opt-out line has been delivered to it. The paused flag is a pauses row.",
+      "source": "FS line 728; RULES 4.1b, 4.3, 7.5; arch 03 line 175; arch 07 line 379; MC C1, C9; Q-33; Q-03; Q-30",
+      "columns": [
+        {
+          "name": "number",
+          "type": "text",
+          "null": false,
+          "audience": ["staff", "owner"],
+          "description": "The mobile number in E.164 form; the same as its handle's address.",
+          "source": "FS line 728 (phone.number); D102"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Its handle (handles.id), whose address is this number.",
+          "source": "arch 01 line 55"
+        },
+        {
+          "name": "chat_open",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "RULES 4.1b's flag: set by the mobile's first text to Rosie's number, cleared by STOP, set again by START.",
+          "source": "RULES 4.1b; RULES 7.5"
+        },
+        {
+          "name": "chat_open_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the mobile first texted Rosie's number; null: never.",
+          "source": "FS line 728 (chat_open_at); RULES 4.1b"
+        },
+        {
+          "name": "chat_way",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The service Linq reports for this chat: imessage, rcs or sms (sms is Linq's SMS service on an Android phone in the same chat, never an SMS provider). Null until the first text.",
+          "source": "Q-33 default (chat_way holds the service Linq reports); FS line 728; MC C9; DL-012"
+        },
+        {
+          "name": "stopped",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": ["staff", "owner"],
+          "description": "The stopped flag: after STOP, only stop replies, safety lines and a new booking's texts after its fresh yes from this phone; START clears it. Every business with an open booking hears only that texts are off.",
+          "source": "arch 03 line 175; RULES 7.2, 7.5; MC C1"
+        },
+        {
+          "name": "stop_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the last STOP came; null: never stopped.",
+          "source": "FS line 728 (stop_at); arch 03 line 175"
+        },
+        {
+          "name": "start_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the last START came; null: never.",
+          "source": "FS line 728 (start_at); RULES 7.5"
+        },
+        {
+          "name": "linq_contact_added_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When this mobile was added as a Linq contact; null: not added. The chat link is shown only if the add worked.",
+          "source": "MC C9 ('Each mobile is added as a Linq contact when it is saved'); Q-03"
+        },
+        {
+          "name": "poll_voted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When this phone first voted in a poll; until then a poll's options also go in the words in their text form.",
+          "source": "arch 07 line 379"
+        },
+        {
+          "name": "optout_line_delivered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the STOP, HELP and rates line was first delivered to this number; the line rides on its texts until one is delivered.",
+          "source": "RULES 4.3; arch 07 line 361; Q-30"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["number"],
+      "foreignKeys": [
+        {
+          "name": "phones_handle_fk",
+          "columns": ["handle_id", "number"],
+          "references": {
+            "table": "handles",
+            "columns": ["id", "address"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "phones_handle_key",
+          "columns": ["handle_id"],
+          "source": "FS line 728 (one row per mobile)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "phones_number_form",
+          "expression": "number ~ '^\\+[1-9][0-9]{6,14}$'",
+          "source": "FS line 728; CQ-09"
+        },
+        {
+          "name": "phones_chat_way_known",
+          "expression": "chat_way is null or chat_way in ('imessage', 'rcs', 'sms')",
+          "source": "Q-33; K-03 v1 channel (imessage, rcs, sms through Linq)"
+        },
+        {
+          "name": "phones_stop_closes_chat",
+          "expression": "not (stopped and chat_open)",
+          "source": "RULES 4.1b (STOP clears it)"
+        },
+        {
+          "name": "phones_stopped_has_time",
+          "expression": "not stopped or stop_at is not null",
+          "source": "FS line 728 (stop_at)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "One row per mobile across every business, since there is one number (FS line 728; MC C1)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "threads",
+      "description": "A thread: the chat with Rosie's number, one per handle (S1-01 gives thread), or a booking's email reply thread (RULES 4.1). Its messages are messages rows.",
+      "source": "S1-01 (gives thread); RULES 4.1; MC C1; 02-contracts K-04 'Threads'",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The thread's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle on the other side (handles.id).",
+          "source": "S1-01; arch 01 line 55"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "chat: the chat with Rosie's number; email: one booking's email thread.",
+          "source": "S1-01; RULES 4.1"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For an email thread, its booking (bookings.id); null for the chat.",
+          "source": "RULES 4.1 (each booking has its own reply address)"
+        },
+        {
+          "name": "linq_chat_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Linq's id for the chat; K-11 names its form. Null until Linq reports it.",
+          "source": "S1-01; K-11 (to come)"
+        },
+        {
+          "name": "reply_address",
+          "type": "text",
+          "null": true,
+          "audience": ["customer"],
+          "description": "For an email thread, the booking's own reply address; Rosie answers replies in that thread.",
+          "source": "RULES 4.1"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "threads_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "threads_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "threads_one_chat_per_handle",
+          "columns": ["handle_id"],
+          "where": "kind = 'chat'",
+          "source": "MC C1 (one Rosie number: one chat per handle)"
+        },
+        {
+          "name": "threads_reply_address_key",
+          "columns": ["reply_address"],
+          "source": "RULES 4.1"
+        },
+        {
+          "name": "threads_linq_chat_key",
+          "columns": ["linq_chat_id"],
+          "source": "S1-01"
+        }
+      ],
+      "checks": [
+        {
+          "name": "threads_kind_known",
+          "expression": "kind in ('chat', 'email')",
+          "source": "S1-01; RULES 4.1"
+        },
+        {
+          "name": "threads_chat_or_email",
+          "expression": "(kind = 'chat' and booking_id is null and reply_address is null) or (kind = 'email' and booking_id is not null and reply_address is not null)",
+          "source": "RULES 4.1"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The chat is one per handle across every business (MC C1); its messages carry their business, which row-level security scopes."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "openers_sent",
+      "description": "Whether Rosie's opener for a business has gone to a handle: on Rosie's first text to a handle about one business, code adds \"This is Rosie, the automated booking assistant for <business>.\" (arch 07 line 361). Written once.",
+      "source": "arch 07 line 361; 02-contracts K-04 'Threads'",
+      "columns": [
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle (handles.id).",
+          "source": "arch 07 line 361"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the opener named (businesses.id).",
+          "source": "arch 07 line 361"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the outbox row carrying the opener was committed.",
+          "source": "arch 07 line 361"
+        },
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The outbox row that carried it (outbox_rows.id).",
+          "source": "arch 07 line 361"
+        }
+      ],
+      "primaryKey": ["handle_id", "business_id"],
+      "foreignKeys": [
+        {
+          "name": "openers_sent_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "openers_sent_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "openers_sent_outbox_fk",
+          "columns": ["outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "messages",
+      "description": "The message log the context bundle and the composer read (the last 6 messages with this business, up to 30 days old, for tone only): every message in and out, text without private details. Partitioned by month at 10,000 businesses (arch 10 line 534), not now.",
+      "source": "FS line 734 (message); arch 03 line 181; arch 07 line 397; arch 10 line 534",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The message's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "thread_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Its thread (threads.id).",
+          "source": "FS line 734; S1-01"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is with (businesses.id); null before there is one, such as sign-up's first texts.",
+          "source": "FS line 734 (business_id); arch 03 line 181 ('messages with this business')"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it is about (bookings.id), or null.",
+          "source": "FS line 734 (booking_id)"
+        },
+        {
+          "name": "direction",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "in: to Rosie; out: from Rosie.",
+          "source": "FS line 734 (direction)"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "text, email, page or ai (a customer's own AI through the Agent API). FS line 734's call is left out: nothing goes by voice (Q-05).",
+          "source": "FS line 734 (channel); Q-05"
+        },
+        {
+          "name": "service",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a text, the service Linq reports: imessage, rcs or sms; null otherwise.",
+          "source": "Q-33 (chat_way); K-03 v1 channel; MC C9"
+        },
+        {
+          "name": "from_role",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who wrote it: rosie, customer, owner, admin, staff, own_business, team or ai.",
+          "source": "FS line 734 (to and from role); FS line 723"
+        },
+        {
+          "name": "to_role",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who it was for, from the same list.",
+          "source": "FS line 734 (to and from role)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on the other side (persons.id), when known.",
+          "source": "FS line 743"
+        },
+        {
+          "name": "words",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The text without private details (scrubbed and redacted). Read for tone only; never quoted into another person's message.",
+          "source": "FS line 734 (text without private details); arch 03 line 181; RULES 4.5"
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a message in, its inbound event id (K-06); null for a message out.",
+          "source": "arch 02 line 109; arch 11 line 584"
+        },
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a text or email out, the outbox row it came from (outbox_rows.id).",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was sent (the sender's send time for a message in).",
+          "source": "FS line 734 (sent_at); arch 06 line 309"
+        },
+        {
+          "name": "delivered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When its delivery receipt came; null: not yet or never.",
+          "source": "FS line 734 (delivered); arch 02 line 127"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "messages_thread_fk",
+          "columns": ["thread_id"],
+          "references": {
+            "table": "threads",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "messages_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "messages_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "messages_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "messages_outbox_fk",
+          "columns": ["outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "messages_event_id_key",
+          "columns": ["event_id"],
+          "source": "arch 02 line 109 (a known event id is dropped)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "messages_direction_known",
+          "expression": "direction in ('in', 'out')",
+          "source": "FS line 734"
+        },
+        {
+          "name": "messages_channel_known",
+          "expression": "channel in ('text', 'email', 'page', 'ai')",
+          "source": "FS line 734; Q-05"
+        },
+        {
+          "name": "messages_service_known",
+          "expression": "service is null or service in ('imessage', 'rcs', 'sms')",
+          "source": "Q-33; K-03 v1 channel"
+        },
+        {
+          "name": "messages_service_only_for_text",
+          "expression": "service is null or channel = 'text'",
+          "source": "Q-33"
+        },
+        {
+          "name": "messages_from_role_known",
+          "expression": "from_role in ('rosie', 'customer', 'owner', 'admin', 'staff', 'own_business', 'team', 'ai')",
+          "source": "FS lines 723, 734"
+        },
+        {
+          "name": "messages_to_role_known",
+          "expression": "to_role in ('rosie', 'customer', 'owner', 'admin', 'staff', 'own_business', 'team', 'ai')",
+          "source": "FS lines 723, 734"
+        },
+        {
+          "name": "messages_in_has_event",
+          "expression": "direction = 'out' or event_id is not null",
+          "source": "arch 02 line 109"
+        },
+        {
+          "name": "messages_out_has_row",
+          "expression": "direction = 'in' or channel not in ('text', 'email') or outbox_row_id is not null",
+          "source": "arch 01 line 65"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "messages_thread_sent_idx",
+          "columns": ["thread_id", "sent_at"],
+          "why": "The context bundle's last 6 messages (arch 03 line 181)."
+        },
+        {
+          "name": "messages_business_sent_idx",
+          "columns": ["business_id", "sent_at"],
+          "why": "Messages with one business (arch 03 line 181; arch 07 line 397)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "bookings",
+      "description": "The booking head row (CQ-03): id, business, flow, stage, version, booker, person served, payer, and the private and deceased flags. The guard lists a handle's bookings (arch 02 line 115), hubs follow the booking's stage (arch 03 line 163), and the flags are checked by the gate, the dispatcher and the charge job (arch 03 line 175). The rest of the booking is K-30's.",
+      "source": "CQ-03 (booking head row); FS line 729; arch 02 line 115; arch 03 lines 163, 175; arch 09 line 457 ('Booking: state · version'); arch 10 line 506",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The booking's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business it belongs to (businesses.id); each booking belongs to exactly one (FS line 743).",
+          "source": "FS line 729 (business_id); FS line 743"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "writtenOnceAtBooking": true,
+          "description": "A: the customer comes to the business; B: the business goes to the customer.",
+          "source": "FS line 729 (flow); FS line 752; master-A.json, master-B.json"
+        },
+        {
+          "name": "stage",
+          "type": "text",
+          "null": false,
+          "default": "'entry'",
+          "audience": ["customer", "staff", "owner"],
+          "description": "entry, booked, checked_in, done or cancelled. The hub reads it: entry A3-51 (B3-40), booked A7-02 (B7-05), checked in A8-32 (B8-22), done A10-06 (B10-07).",
+          "source": "arch 03 line 163; arch 09 line 457 (Booking: state)"
+        },
+        {
+          "name": "booker_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who booked (persons.id).",
+          "source": "FS line 729 (booker_id); key who_for (A3-30)"
+        },
+        {
+          "name": "served_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person served (persons.id); null until known.",
+          "source": "FS line 729 (served_id); key who_for"
+        },
+        {
+          "name": "payer_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The payer (persons.id); null until known.",
+          "source": "FS line 729 (payer_id); key who_for"
+        },
+        {
+          "name": "private",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Private: only the person served, those they added and the business are reached (A3-50); cleared by the person served.",
+          "source": "arch 03 lines 175, 177; A3-50; RULES 4.8"
+        },
+        {
+          "name": "deceased",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Deceased: reminders and sales texts stop, nothing new is charged, bills wait for the owner (A7-81); cleared by the owner.",
+          "source": "arch 03 lines 175, 177; A7-81"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "bookings_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "bookings_booker_fk",
+          "columns": ["booker_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "bookings_served_fk",
+          "columns": ["served_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "bookings_payer_fk",
+          "columns": ["payer_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "bookings_flow_known",
+          "expression": "flow in ('A', 'B')",
+          "source": "FS line 729 (flow)"
+        },
+        {
+          "name": "bookings_stage_known",
+          "expression": "stage in ('entry', 'booked', 'checked_in', 'done', 'cancelled')",
+          "source": "arch 03 line 163"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "bookings_business_stage_idx",
+          "columns": ["business_id", "stage"],
+          "why": "A business's bookings by stage."
+        },
+        {
+          "name": "bookings_booker_idx",
+          "columns": ["booker_person_id"],
+          "why": "The guard lists a handle's bookings (arch 02 line 115)."
+        },
+        {
+          "name": "bookings_served_idx",
+          "columns": ["served_person_id"],
+          "why": "The guard lists a handle's bookings (arch 02 line 115)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "pauses",
+      "description": "The paused flag for a person, phone or address: visits and requests wait for the owner (A3-48), and the owner clears it; still paused at 7pm the day before, or 2 hours before a same-day visit, the visit is called off (S11-62). One row per pause; a cleared pause keeps its row.",
+      "source": "arch 03 lines 175, 177; A3-48; S11-62; CQ-03",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pause's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose owner clears it (businesses.id).",
+          "source": "arch 03 line 177 (cleared by the owner)"
+        },
+        {
+          "name": "target",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "person, phone or address.",
+          "source": "arch 03 line 175 ('Paused (person, phone or address)')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a person: who (persons.id).",
+          "source": "arch 03 line 175"
+        },
+        {
+          "name": "phone_number",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a phone: the number (phones.number).",
+          "source": "arch 03 line 175"
+        },
+        {
+          "name": "address",
+          "type": "bytea",
+          "null": true,
+          "audience": "secure-page-only",
+          "sealedBy": "sealed_for_person_id",
+          "description": "For an address: the address, sealed under the key of the person in sealed_for_person_id.",
+          "source": "arch 03 line 175; arch 01 line 93; RULES 4.5"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For an address: the person whose key seals it (persons.id).",
+          "source": "arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "set_by_turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that set it (turns.id), or null when a page set it.",
+          "source": "A3-48"
+        },
+        {
+          "name": "set_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was set.",
+          "source": "A3-48"
+        },
+        {
+          "name": "cleared_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the owner cleared it; null while paused.",
+          "source": "arch 03 line 177"
+        },
+        {
+          "name": "cleared_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who cleared it (persons.id).",
+          "source": "arch 03 line 177"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "pauses_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pauses_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pauses_phone_fk",
+          "columns": ["phone_number"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pauses_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pauses_turn_fk",
+          "columns": ["set_by_turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "pauses_cleared_by_fk",
+          "columns": ["cleared_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "pauses_target_known",
+          "expression": "target in ('person', 'phone', 'address')",
+          "source": "arch 03 line 175"
+        },
+        {
+          "name": "pauses_one_target",
+          "expression": "(target = 'person' and person_id is not null and phone_number is null and address is null) or (target = 'phone' and phone_number is not null and person_id is null and address is null) or (target = 'address' and address is not null and sealed_for_person_id is not null and person_id is null and phone_number is null)",
+          "source": "arch 03 line 175"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "pauses_open_person_idx",
+          "columns": ["person_id"],
+          "where": "cleared_at is null",
+          "why": "The gate and the dispatcher check a person's pause (arch 03 line 175)."
+        },
+        {
+          "name": "pauses_open_phone_idx",
+          "columns": ["phone_number"],
+          "where": "cleared_at is null",
+          "why": "The gate and the dispatcher check a phone's pause (arch 03 line 175)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "resources",
+      "description": "Bookable resources: a worker, a room, a vehicle, or a class session whose seats are a class_seats counter row (CQ-03). Reservations refer to them; the reservation table refuses overlapping time per worker, room or vehicle (arch 05 line 255; arch 10 line 510). A worker is a person, so a booking in any of their businesses blocks that time in all of them (FS line 743). Schedules, hours and the rest of availability are K-27's.",
+      "source": "CQ-03 (bookable resources); arch 05 line 255; arch 10 line 510; BP section 10 card T-041; FS line 743",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The resource's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business it belongs to (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "worker, room, vehicle or class_session.",
+          "source": "arch 05 line 255 ('per worker, room or vehicle. Class seats ...'); arch 10 line 510"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "Its name as the business gives it, such as a worker's first name or a truck.",
+          "source": "arch 05 line 255; FS line 726 (schedule owner)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a worker, the person (persons.id); null otherwise.",
+          "source": "FS line 743 ('A booking in any of their businesses blocks that time in all of them')"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "null": false,
+          "default": "true",
+          "audience": ["owner"],
+          "description": "Whether it can be booked now.",
+          "source": "FS line 741 (bookable); arch 05 line 255"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "resources_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "resources_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "resources_id_kind_key",
+          "columns": ["id", "kind"],
+          "source": "arch 10 line 510 (reservations and seat counters carry their resource's kind)"
+        },
+        {
+          "name": "resources_id_person_key",
+          "columns": ["id", "person_id"],
+          "source": "FS line 743 (a worker's reservations carry the person)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "resources_kind_known",
+          "expression": "kind in ('worker', 'room', 'vehicle', 'class_session')",
+          "source": "arch 05 line 255; arch 10 line 510"
+        },
+        {
+          "name": "resources_worker_is_person",
+          "expression": "(kind = 'worker') = (person_id is not null)",
+          "source": "FS line 743"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "class_seats",
+      "description": "Class seats as a counter row with CHECK (taken <= capacity): one row per class session. A reservation of a class session raises taken by its seats in the same commit, so the database refuses a seat past capacity (arch 05 line 255; arch 10 line 510; BP section 10 card T-041).",
+      "source": "arch 05 line 255; arch 10 line 510; BP section 10 card T-041",
+      "columns": [
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The class session (resources.id, kind class_session).",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "resource_kind",
+          "type": "text",
+          "null": false,
+          "default": "'class_session'",
+          "audience": "never",
+          "description": "Always class_session; it ties the row to a class session resource.",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "How many seats the session holds (the spots, such as the workshop's 10).",
+          "source": "arch 10 line 510; FS line 726 (seats)"
+        },
+        {
+          "name": "taken",
+          "type": "integer",
+          "null": false,
+          "default": "0",
+          "audience": ["staff", "owner"],
+          "description": "Seats taken by held and booked reservations.",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["resource_id"],
+      "foreignKeys": [
+        {
+          "name": "class_seats_resource_fk",
+          "columns": ["resource_id", "resource_kind"],
+          "references": {
+            "table": "resources",
+            "columns": ["id", "kind"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "class_seats_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "class_seats_kind",
+          "expression": "resource_kind = 'class_session'",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "class_seats_capacity_positive",
+          "expression": "capacity > 0",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "class_seats_taken_not_negative",
+          "expression": "taken >= 0",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "class_seats_taken_within_capacity",
+          "expression": "taken <= capacity",
+          "source": "arch 10 line 510 ('class seats as a counter with CHECK (taken ≤ capacity)'); arch 05 line 255; BP section 10 card T-041"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "reservations",
+      "description": "One reservation table: a resource, a time range and a state (arch 09 line 457). EXCLUDE refuses overlapping held or booked time per worker, room or vehicle, and per worker person across businesses; class seats are counted in class_seats (arch 05 line 255; arch 10 line 510; BP section 10 card T-041). A saved time is a held row with held_until (arch 05 line 247); someone waiting next in line is a waiting row (A4-18).",
+      "source": "arch 09 line 457 ('Reservation: resource · range · state'); arch 05 lines 247, 255; arch 10 line 510; BP section 10 card T-041; FS line 743; key time_saved (A4-21, B4-23)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The reservation's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "resource_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The resource reserved (resources.id).",
+          "source": "arch 09 line 457"
+        },
+        {
+          "name": "resource_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The resource's kind, copied from resources and held to it by a foreign key, so EXCLUDE can tell workers, rooms and vehicles from class sessions.",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "worker_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a worker, the person (persons.id), held to the resource by a foreign key; null otherwise.",
+          "source": "FS line 743"
+        },
+        {
+          "name": "during",
+          "type": "tstzrange",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The time reserved, [start, end).",
+          "source": "arch 09 line 457 (range); arch 10 line 510"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "held (a saved time), waiting (next in line), booked or released.",
+          "source": "arch 09 line 457 (state); arch 05 line 247; A4-18; 02-contracts K-05 item 6"
+        },
+        {
+          "name": "seats",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": ["staff", "owner"],
+          "description": "Seats it takes: 1, or more for a class session.",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "held_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["customer"],
+          "description": "For a saved time, when it ends: 10 minutes; 15 for a customer's own AI's booking (C3); up to 1 hour for a plan check; 24 hours while a document is signed.",
+          "source": "arch 05 line 247; MC C3; Q-12"
+        },
+        {
+          "name": "extended",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Whether the one 10-minute extension was given (never for C3's door).",
+          "source": "arch 05 line 247; Q-12"
+        },
+        {
+          "name": "for_phone_number",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Saved for this mobile (phones.number): at most 2 saved times per mobile.",
+          "source": "arch 05 line 247; 02-contracts K-05 item 6"
+        },
+        {
+          "name": "for_agent_token",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Saved for this agent token's id (K-20 names tokens): at most 2 per agent token per business.",
+          "source": "arch 05 line 247; 02-contracts K-05 item 6"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it holds (bookings.id), once there is one.",
+          "source": "arch 09 line 457 ('booked as'); 02-contracts K-05 item 6"
+        },
+        {
+          "name": "released_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was released; null while held, waiting or booked.",
+          "source": "02-contracts K-05 item 6 (release)"
+        },
+        {
+          "name": "released_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "expired, let_go or cancelled.",
+          "source": "02-contracts K-05 item 6 ('Release: expired, let go, booked or cancelled': booked is the booked state)"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "reservations_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "reservations_resource_kind_fk",
+          "columns": ["resource_id", "resource_kind"],
+          "references": {
+            "table": "resources",
+            "columns": ["id", "kind"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "reservations_worker_person_fk",
+          "columns": ["resource_id", "worker_person_id"],
+          "references": {
+            "table": "resources",
+            "columns": ["id", "person_id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "reservations_phone_fk",
+          "columns": ["for_phone_number"],
+          "references": {
+            "table": "phones",
+            "columns": ["number"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "reservations_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "reservations_no_overlap_per_resource",
+          "using": "gist",
+          "elements": [
+            {
+              "column": "resource_id",
+              "operator": "="
+            },
+            {
+              "column": "during",
+              "operator": "&&"
+            }
+          ],
+          "where": "resource_kind in ('worker', 'room', 'vehicle') and state in ('held', 'booked')",
+          "source": "arch 10 line 510 ('EXCLUDE overlaps per worker, room or vehicle'); arch 05 line 255; BP section 10 card T-041 (two overlapping reservations for one worker are refused by the database)"
+        },
+        {
+          "name": "reservations_no_overlap_per_worker",
+          "using": "gist",
+          "elements": [
+            {
+              "column": "worker_person_id",
+              "operator": "="
+            },
+            {
+              "column": "during",
+              "operator": "&&"
+            }
+          ],
+          "where": "worker_person_id is not null and state in ('held', 'booked')",
+          "source": "FS line 743 ('A booking in any of their businesses blocks that time in all of them, so nobody is double-booked'); arch 10 line 510"
+        }
+      ],
+      "checks": [
+        {
+          "name": "reservations_kind_known",
+          "expression": "resource_kind in ('worker', 'room', 'vehicle', 'class_session')",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "reservations_state_known",
+          "expression": "state in ('held', 'waiting', 'booked', 'released')",
+          "source": "arch 09 line 457; arch 05 line 247; A4-18"
+        },
+        {
+          "name": "reservations_released_why_known",
+          "expression": "released_why is null or released_why in ('expired', 'let_go', 'cancelled')",
+          "source": "02-contracts K-05 item 6"
+        },
+        {
+          "name": "reservations_worker_person",
+          "expression": "(resource_kind = 'worker') = (worker_person_id is not null)",
+          "source": "FS line 743"
+        },
+        {
+          "name": "reservations_seats",
+          "expression": "seats >= 1 and (resource_kind = 'class_session' or seats = 1)",
+          "source": "arch 10 line 510"
+        },
+        {
+          "name": "reservations_during_bounded",
+          "expression": "not isempty(during) and not lower_inf(during) and not upper_inf(during)",
+          "source": "arch 09 line 457 (range)"
+        },
+        {
+          "name": "reservations_held_has_end",
+          "expression": "state <> 'held' or held_until is not null",
+          "source": "arch 05 line 247"
+        },
+        {
+          "name": "reservations_released_has_why",
+          "expression": "(state = 'released') = (released_at is not null and released_why is not null)",
+          "source": "02-contracts K-05 item 6"
+        },
+        {
+          "name": "reservations_for_someone",
+          "expression": "for_phone_number is not null or for_agent_token is not null or booking_id is not null",
+          "source": "02-contracts K-05 item 6 ('for a mobile, an agent token or a booking')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "reservations_held_until_idx",
+          "columns": ["held_until"],
+          "where": "state = 'held'",
+          "why": "Saved times that end are released (arch 05 line 247)."
+        },
+        {
+          "name": "reservations_phone_held_idx",
+          "columns": ["for_phone_number"],
+          "where": "state = 'held'",
+          "why": "At most 2 saved times per mobile (arch 05 line 247)."
+        },
+        {
+          "name": "reservations_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking's reservations."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "turns",
+      "description": "One turn: a batch of a handle's texts, decided and committed once under its turn id, a hash of their event ids; the primary key makes a turn commit once (arch 01 line 59; arch 10 line 508). Its state, the 60 s lease, the bundle it ran on and its trace ids.",
+      "source": "arch 01 lines 59, 61; arch 10 lines 508, 548; arch 11 line 576; 02-contracts K-04 'Turns'",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The turn id: a hash of its texts' event ids. Unique, so a crash or retry never commits a turn twice.",
+          "source": "arch 01 line 59; arch 10 line 508; CQ-09; tour line 418"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle whose texts it batches (handles.id).",
+          "source": "arch 01 line 59"
+        },
+        {
+          "name": "event_ids",
+          "type": "text[]",
+          "null": false,
+          "audience": "never",
+          "description": "The event ids of the texts it joins, in order (K-06).",
+          "source": "arch 01 line 59; arch 02 line 113"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "leased, committed or parked.",
+          "source": "02-contracts K-04 'Turns'; arch 01 line 61; arch 11 line 576"
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "While leased, when the 60 s lease lapses; a lapsed lease reruns the turn from its sealed texts.",
+          "source": "arch 01 line 61; arch 02 line 113"
+        },
+        {
+          "name": "bundle_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle the turn ran on (pinned at turn start). The hash half of K-01's bundleId: 64 lowercase hex characters.",
+          "source": "K-01 v1 bundleId (bundle.v1.schema.json manifest.bundleId); CQ-09; arch 10 line 548"
+        },
+        {
+          "name": "bundle_build",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The build half of K-01's bundleId, counting publishes from 1.",
+          "source": "K-01 v1 bundleId; CQ-09; C-072"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The turn's trace id: the first text's (CQ-06).",
+          "source": "arch 10 line 548; CQ-06; BP 5.5"
+        },
+        {
+          "name": "joined_trace_ids",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The other texts' trace ids, each ending at 'joined turn T' (CQ-06).",
+          "source": "CQ-06"
+        },
+        {
+          "name": "tries",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "How many times the turn has started; parked after a third crash before its commit.",
+          "source": "arch 11 line 576"
+        },
+        {
+          "name": "committed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it committed.",
+          "source": "arch 01 line 59"
+        },
+        {
+          "name": "parked_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was parked.",
+          "source": "arch 11 line 576"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "turns_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "turns_bundle_fk",
+          "columns": ["bundle_hash", "bundle_build"],
+          "references": {
+            "table": "bundles",
+            "columns": ["hash", "build"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "turns_state_known",
+          "expression": "state in ('leased', 'committed', 'parked')",
+          "source": "02-contracts K-04 'Turns'"
+        },
+        {
+          "name": "turns_has_events",
+          "expression": "cardinality(event_ids) >= 1",
+          "source": "arch 01 line 59"
+        },
+        {
+          "name": "turns_leased_has_lease",
+          "expression": "state <> 'leased' or lease_until is not null",
+          "source": "arch 01 line 61"
+        },
+        {
+          "name": "turns_committed_has_time",
+          "expression": "(state = 'committed') = (committed_at is not null)",
+          "source": "arch 01 line 59"
+        },
+        {
+          "name": "turns_parked_has_time",
+          "expression": "(state = 'parked') = (parked_at is not null)",
+          "source": "arch 11 line 576"
+        },
+        {
+          "name": "turns_tries_range",
+          "expression": "tries between 1 and 3",
+          "source": "arch 11 line 576 (parked after a third crash)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "turns_handle_idx",
+          "columns": ["handle_id"],
+          "why": "A handle's turns."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A turn belongs to a handle and may touch several businesses' bookings (arch 03 line 159; arch 02 line 119); its writes carry their own business."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "open_questions",
+      "description": "A row per question sent: the step, the options as sent, the read-back an exact yes binds to, the versions read, the bundle id, the clock, the ask count and the status (arch 01 line 63; arch 09 line 490). Open questions are the memory of every conversation (arch 09 line 455). The question's clock row is in clock_rows.",
+      "source": "arch 01 lines 63, 89; arch 09 lines 455, 490; tour lines 423 to 427; arch 10 line 506",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The open question's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The turn that opened it (turns.id).",
+          "source": "arch 02 line 121"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle it was sent to (handles.id).",
+          "source": "arch 03 line 159 (every one sent to this handle)"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person asked (persons.id), when known.",
+          "source": "arch 01 line 89 (the decider's own answer)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is about (businesses.id); null before there is one.",
+          "source": "arch 03 line 159 (labelled by business)"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it is about (bookings.id), or null.",
+          "source": "arch 03 line 159"
+        },
+        {
+          "name": "step",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The step that asks, as K-01 writes step ids.",
+          "source": "arch 01 line 63; K-01 v1 stepId"
+        },
+        {
+          "name": "options",
+          "type": "jsonb",
+          "null": false,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The options as sent, in order: a JSON array of K-03's option, {\"id\", \"label\"}; the ids are those K-02's choices and K-03's optionIds carry, the labels word for word what the person saw.",
+          "source": "arch 01 line 63; arch 09 line 490; tour line 423; K-02 v1; K-03 v1 option"
+        },
+        {
+          "name": "readback",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The read-back text an exact yes binds to; null when the question has none.",
+          "source": "arch 01 line 89; S12-05"
+        },
+        {
+          "name": "versions_read",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The versions this was decided on: a JSON array of {\"table\", \"rowId\", \"version\"}, the row references of K-02's facts, which the commit compares and sets (limit 4).",
+          "source": "arch 01 line 63; arch 09 line 490; tour line 425 (booking v7); K-02 v1 fact"
+        },
+        {
+          "name": "bundle_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle it was asked under. The hash half of K-01's bundleId: 64 lowercase hex characters.",
+          "source": "K-01 v1 bundleId (bundle.v1.schema.json manifest.bundleId); CQ-09; arch 10 line 548"
+        },
+        {
+          "name": "bundle_build",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The build half of K-01's bundleId, counting publishes from 1.",
+          "source": "K-01 v1 bundleId; CQ-09; C-072"
+        },
+        {
+          "name": "clock",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The step's Clock line as it applies here, such as 24 h; null: step 9's default. The armed clock is a clock_rows row.",
+          "source": "arch 01 line 63; tour line 425; arch 02 line 127"
+        },
+        {
+          "name": "ask_count",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "How many times it was asked: Rosie asks once; once more only after a language or access problem, or after answering a question back.",
+          "source": "arch 09 line 490; S13-25 rules 16, 22"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": false,
+          "default": "'waiting'",
+          "audience": "never",
+          "description": "waiting, open, answered, defaulted or withdrawn.",
+          "source": "arch 09 line 490; arch 02 line 123 (withdrawn)"
+        },
+        {
+          "name": "answered_option_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The option chosen, when answered.",
+          "source": "arch 01 line 89"
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was answered, defaulted or withdrawn.",
+          "source": "arch 09 line 490"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "open_questions_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "open_questions_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "open_questions_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "open_questions_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "open_questions_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "open_questions_bundle_fk",
+          "columns": ["bundle_hash", "bundle_build"],
+          "references": {
+            "table": "bundles",
+            "columns": ["hash", "build"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "open_questions_step_form",
+          "expression": "step ~ '^[SAB](1[0-3]|[1-9])-x?[0-9]{2,3}$'",
+          "source": "K-01 v1 stepId"
+        },
+        {
+          "name": "open_questions_status_known",
+          "expression": "status in ('waiting', 'open', 'answered', 'defaulted', 'withdrawn')",
+          "source": "arch 09 line 490"
+        },
+        {
+          "name": "open_questions_options_list",
+          "expression": "jsonb_typeof(options) = 'array'",
+          "source": "arch 01 line 63"
+        },
+        {
+          "name": "open_questions_versions_list",
+          "expression": "jsonb_typeof(versions_read) = 'array'",
+          "source": "arch 01 line 63"
+        },
+        {
+          "name": "open_questions_ask_count",
+          "expression": "ask_count >= 1",
+          "source": "arch 09 line 490"
+        },
+        {
+          "name": "open_questions_closed_has_time",
+          "expression": "(status in ('answered', 'defaulted', 'withdrawn')) = (closed_at is not null)",
+          "source": "arch 09 line 490"
+        },
+        {
+          "name": "open_questions_answer_only_when_answered",
+          "expression": "answered_option_id is null or status = 'answered'",
+          "source": "arch 01 line 89"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "open_questions_handle_live_idx",
+          "columns": ["handle_id"],
+          "where": "status in ('waiting', 'open')",
+          "why": "The guard and the frontier list every open question sent to this handle (arch 03 line 159; arch 02 line 115)."
+        },
+        {
+          "name": "open_questions_booking_idx",
+          "columns": ["booking_id"],
+          "why": "A booking's questions."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "clock_rows",
+      "description": "Every clock is a PostgreSQL row with a due time and zone; the actor's alarm only triggers it, and a cron sweep each minute fires missed rows and rows no handle owns, such as monthly billing (arch 01 line 83; arch 10 line 540). A question's clock arms at its first delivery receipt (arch 02 line 127).",
+      "source": "arch 01 line 83; arch 02 line 127; arch 10 line 540; 02-contracts K-04 'Clock rows'",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The clock row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "question: an open question's deadline; never_delivered: step 9's never-delivered deadline; saved_time: a saved time's end; step: a timed step such as a reminder; job: a job no handle owns, such as monthly billing.",
+          "source": "arch 02 line 127; arch 05 line 247; arch 10 line 540"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For question and never_delivered, its question (open_questions.id).",
+          "source": "arch 01 line 63; arch 02 line 127"
+        },
+        {
+          "name": "reservation_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For saved_time, the reservation (reservations.id).",
+          "source": "arch 05 line 247"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The owning handle, whose actor's alarm triggers it (handles.id); null for rows the minute sweep owns.",
+          "source": "arch 10 line 540"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business (businesses.id), or null.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking (bookings.id), or null.",
+          "source": "arch 02 line 127 (the visit's start)"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it is due; null until it arms.",
+          "source": "arch 01 line 83; arch 02 line 127"
+        },
+        {
+          "name": "due_zone",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The IANA zone its due time was set in; null until it arms.",
+          "source": "arch 01 line 83; CQ-09; S13-03"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'waiting'",
+          "audience": "never",
+          "description": "waiting (not yet armed), armed, fired or cancelled.",
+          "source": "arch 02 line 127; 02-contracts K-05 items 4, 5"
+        },
+        {
+          "name": "armed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it armed: for a question, at its first delivery receipt.",
+          "source": "arch 02 line 127"
+        },
+        {
+          "name": "fires",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "What it fires: a JSON object naming the step and branch, the safe default, or the job.",
+          "source": "arch 01 line 83; arch 02 line 127; arch 10 line 540"
+        },
+        {
+          "name": "fired_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it fired, once.",
+          "source": "02-contracts K-05 item 5"
+        },
+        {
+          "name": "cancelled_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it was cancelled (its question answered or withdrawn).",
+          "source": "02-contracts K-05 item 4"
+        },
+        {
+          "name": "created_by_turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that made it (turns.id), or null for a job.",
+          "source": "arch 02 line 121"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "clock_rows_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "clock_rows_reservation_fk",
+          "columns": ["reservation_id"],
+          "references": {
+            "table": "reservations",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "clock_rows_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "clock_rows_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "clock_rows_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "clock_rows_turn_fk",
+          "columns": ["created_by_turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "clock_rows_kind_known",
+          "expression": "kind in ('question', 'never_delivered', 'saved_time', 'step', 'job')",
+          "source": "arch 02 line 127; arch 05 line 247; arch 10 line 540"
+        },
+        {
+          "name": "clock_rows_state_known",
+          "expression": "state in ('waiting', 'armed', 'fired', 'cancelled')",
+          "source": "arch 02 line 127"
+        },
+        {
+          "name": "clock_rows_armed_has_due",
+          "expression": "state not in ('armed', 'fired') or (due_at is not null and due_zone is not null and armed_at is not null)",
+          "source": "arch 01 line 83; arch 02 line 127"
+        },
+        {
+          "name": "clock_rows_due_zone_form",
+          "expression": "due_zone is null or due_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09"
+        },
+        {
+          "name": "clock_rows_fired_has_time",
+          "expression": "(state = 'fired') = (fired_at is not null)",
+          "source": "02-contracts K-05 item 5 (fired once)"
+        },
+        {
+          "name": "clock_rows_cancelled_has_time",
+          "expression": "(state = 'cancelled') = (cancelled_at is not null)",
+          "source": "02-contracts K-05 item 4"
+        },
+        {
+          "name": "clock_rows_question_has_question",
+          "expression": "kind not in ('question', 'never_delivered') or open_question_id is not null",
+          "source": "arch 02 line 127"
+        },
+        {
+          "name": "clock_rows_saved_time_has_reservation",
+          "expression": "kind <> 'saved_time' or reservation_id is not null",
+          "source": "arch 05 line 247"
+        },
+        {
+          "name": "clock_rows_job_has_no_handle",
+          "expression": "kind <> 'job' or handle_id is null",
+          "source": "arch 10 line 540 (rows no handle owns)"
+        },
+        {
+          "name": "clock_rows_fires_object",
+          "expression": "jsonb_typeof(fires) = 'object'",
+          "source": "arch 01 line 83"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "clock_rows_handle_due_idx",
+          "columns": ["handle_id", "due_at"],
+          "where": "state = 'armed'",
+          "why": "Each actor keeps one alarm at its earliest row (arch 10 line 540)."
+        },
+        {
+          "name": "clock_rows_due_idx",
+          "columns": ["due_at"],
+          "where": "state = 'armed'",
+          "why": "The minute sweep fires missed rows and rows no handle owns (arch 10 line 540)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "outbox_rows",
+      "description": "One message to one recipient on one channel (arch 01 line 65): written at the commit with no plan, then the composer's plan and the final parts are written into it (arch 01 lines 39 to 41; arch 11 line 576). It stores K-03's plan and final parts as one JSON value each. K-07 gives the row's states and moves, and the parts' kinds; this table holds them as text.",
+      "source": "arch 01 lines 39 to 41, 65; arch 02 lines 121 to 127; arch 07 lines 347, 371, 397; RULES 4.3; 02-contracts K-04 'Outbox rows'; K-03 v1 rowPlan, finalParts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The outbox row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The turn whose commit wrote it (turns.id).",
+          "source": "arch 02 line 121"
+        },
+        {
+          "name": "commit_seq",
+          "type": "bigint",
+          "null": false,
+          "default": "generated always as identity",
+          "audience": "never",
+          "description": "Commit order: the dispatcher sends each recipient's rows in this order. An identity column.",
+          "source": "arch 02 line 125; 02-contracts K-04 ('commit order per recipient')"
+        },
+        {
+          "name": "recipient_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The recipient's handle (handles.id): a mobile, or an email address for an email row.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "recipient_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The recipient (persons.id), when known.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business it is from or about (businesses.id); null for Rosie's own lines before there is one.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it is about (bookings.id), or null.",
+          "source": "RULES 4.2"
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "imessage, rcs or sms through Linq, or email (K-03 v1's channel).",
+          "source": "arch 01 line 65; K-03 v1 channel; MC C9; DL-012"
+        },
+        {
+          "name": "send_class",
+          "type": "text",
+          "null": false,
+          "default": "'routine'",
+          "audience": "never",
+          "description": "routine; quick_reply (a reply in the same turn: Q-15); visit_now (a visit happening now); safety. Only routine waits for text hours.",
+          "source": "RULES 4.3; arch 01 line 65; Q-15"
+        },
+        {
+          "name": "versions_read",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "The versions this was decided on: a JSON array of {\"table\", \"rowId\", \"version\"}, the row references of K-02's facts, which the commit compares and sets (limit 4).",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "open_question_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The open question it asks (open_questions.id), or null.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "plan",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "K-03 v1's rowPlan, as one JSON value; null until the composer's plan is written (only rows without a plan are composed after a crash).",
+          "source": "K-03 v1 rowPlan; arch 07 line 347; arch 11 line 576"
+        },
+        {
+          "name": "final_parts",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "K-03 v1's finalParts, as one JSON value: the sends after code inserted options and fixed lines and filled slots; null until then.",
+          "source": "K-03 v1 finalParts; arch 02 line 123; arch 07 line 367"
+        },
+        {
+          "name": "copy_of_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For an email copy, the text row whose plan it reuses (outbox_rows.id).",
+          "source": "arch 07 lines 371, 397; RULES 4.1"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'planned'",
+          "audience": "never",
+          "description": "Where the row stands; K-07 gives the values and moves.",
+          "source": "02-contracts K-07 'The outbox row's life'"
+        },
+        {
+          "name": "held_until",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "Held for text hours until this time; later rows for the recipient may pass.",
+          "source": "arch 02 line 125; RULES 4.3"
+        },
+        {
+          "name": "bundle_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle of the turn that wrote it. The hash half of K-01's bundleId: 64 lowercase hex characters.",
+          "source": "K-01 v1 bundleId (bundle.v1.schema.json manifest.bundleId); CQ-09; arch 10 line 548"
+        },
+        {
+          "name": "bundle_build",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The build half of K-01's bundleId, counting publishes from 1.",
+          "source": "K-01 v1 bundleId; CQ-09; C-072"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The trace id it rides under, from webhook to delivery receipt.",
+          "source": "arch 10 line 548; BP 5.5"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "outbox_rows_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_handle_fk",
+          "columns": ["recipient_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_person_fk",
+          "columns": ["recipient_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_question_fk",
+          "columns": ["open_question_id"],
+          "references": {
+            "table": "open_questions",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_copy_of_fk",
+          "columns": ["copy_of_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "outbox_rows_bundle_fk",
+          "columns": ["bundle_hash", "bundle_build"],
+          "references": {
+            "table": "bundles",
+            "columns": ["hash", "build"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "outbox_rows_commit_seq_key",
+          "columns": ["commit_seq"],
+          "source": "arch 02 line 125 (commit order)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "outbox_rows_channel_known",
+          "expression": "channel in ('imessage', 'rcs', 'sms', 'email')",
+          "source": "K-03 v1 channel; DL-012"
+        },
+        {
+          "name": "outbox_rows_send_class_known",
+          "expression": "send_class in ('routine', 'quick_reply', 'visit_now', 'safety')",
+          "source": "RULES 4.3; Q-15"
+        },
+        {
+          "name": "outbox_rows_plan_object",
+          "expression": "plan is null or jsonb_typeof(plan) = 'object'",
+          "source": "K-03 v1 rowPlan"
+        },
+        {
+          "name": "outbox_rows_final_parts_object",
+          "expression": "final_parts is null or jsonb_typeof(final_parts) = 'object'",
+          "source": "K-03 v1 finalParts"
+        },
+        {
+          "name": "outbox_rows_versions_list",
+          "expression": "jsonb_typeof(versions_read) = 'array'",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "outbox_rows_copy_is_email",
+          "expression": "copy_of_row_id is null or channel = 'email'",
+          "source": "arch 07 line 371"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "outbox_rows_recipient_order_idx",
+          "columns": ["recipient_handle_id", "commit_seq"],
+          "why": "The dispatcher sends each recipient's rows in commit order (arch 02 line 125)."
+        },
+        {
+          "name": "outbox_rows_unplanned_idx",
+          "columns": ["turn_id"],
+          "where": "plan is null",
+          "why": "After a crash only rows without a plan are composed (arch 11 line 576)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "outbox_parts",
+      "description": "One part of an outbox row under one idempotency key (row, part, try): Linq's message and option ids and what happened to it (arch 01 line 65). A retry after a timeout or crash reuses the key (attempts rises); one after a reported failure gets a new key, the next try. K-07 gives the kinds, states and retry rules.",
+      "source": "arch 01 line 65; arch 07 line 367; 02-contracts K-04 'Outbox rows'; 02-contracts K-07",
+      "columns": [
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The row (outbox_rows.id).",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "part_no",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "1 or 2: at most two sends, the words and then one poll or card.",
+          "source": "arch 07 line 367"
+        },
+        {
+          "name": "try_no",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The key's try number, from 1; a new key only after a reported failure.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The idempotency key, '<row>/<part>/<try>'.",
+          "source": "arch 01 line 65 ('an idempotency key (row, part, try)')"
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "Sends made under this key (a retry after a timeout or crash reuses it).",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The part's kind; K-07 gives the values.",
+          "source": "02-contracts K-07 (parts: kind)"
+        },
+        {
+          "name": "linq_message_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Linq's message id, once Linq accepts it.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "linq_option_ids",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "For a poll, Linq's option ids, as a JSON array.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where the part stands; K-07 gives the values.",
+          "source": "02-contracts K-07"
+        },
+        {
+          "name": "sent_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When Linq accepted it.",
+          "source": "arch 02 line 127"
+        },
+        {
+          "name": "delivered_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When its delivery receipt came.",
+          "source": "arch 02 line 127"
+        },
+        {
+          "name": "failed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When a failure was reported.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "error_code",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The provider's error code, such as 4001 or 4006.",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["outbox_row_id", "part_no", "try_no"],
+      "foreignKeys": [
+        {
+          "name": "outbox_parts_row_fk",
+          "columns": ["outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "outbox_parts_idempotency_key_key",
+          "columns": ["idempotency_key"],
+          "source": "arch 01 line 65"
+        }
+      ],
+      "checks": [
+        {
+          "name": "outbox_parts_part_no",
+          "expression": "part_no in (1, 2)",
+          "source": "arch 07 line 367 (at most two sends)"
+        },
+        {
+          "name": "outbox_parts_try_no",
+          "expression": "try_no >= 1",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "outbox_parts_attempts",
+          "expression": "attempts >= 1",
+          "source": "arch 01 line 65"
+        },
+        {
+          "name": "outbox_parts_key_form",
+          "expression": "idempotency_key = outbox_row_id || '/' || part_no || '/' || try_no",
+          "source": "arch 01 line 65"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "outbox_parts_linq_message_idx",
+          "columns": ["linq_message_id"],
+          "why": "Delivery receipts find their part by Linq's message id (arch 02 line 127)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Written and read only by the dispatcher, never by a Tool API call; its outbox row carries the business."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "event_log",
+      "description": "Every write appends: who, what, old and new, when, why, approved by; never edited (the application role may insert and read, never update or delete). Private values are sealed per person, so deleting one key erases them while consent proofs survive as hashes and the words shown (arch 09 lines 457, 492). K-08 gives its kinds and the shape of why, approved by and proofs.",
+      "source": "arch 09 lines 457, 492; arch 10 line 516; 02-contracts K-04 'The event log'; 02-contracts K-08",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The event id (K-08).",
+          "source": "02-contracts K-08; CQ-09"
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When.",
+          "source": "arch 09 line 457 (when)"
+        },
+        {
+          "name": "zone",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The IANA zone the event is read in (S13-03); null: UTC.",
+          "source": "02-contracts K-08 ('UTC with its zone: S13-03'); CQ-09"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that wrote it (turns.id), or null for a job.",
+          "source": "02-contracts K-08"
+        },
+        {
+          "name": "job_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a clock firing, a webhook, a page or Agent API request, a sweep or reconciliation: the job's id.",
+          "source": "02-contracts K-08"
+        },
+        {
+          "name": "trace_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The trace id.",
+          "source": "arch 10 line 548"
+        },
+        {
+          "name": "bundle_hash",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The bundle in force, as K-01's bundleId hash; null for a write outside a turn.",
+          "source": "arch 10 line 548; K-01 v1 bundleId"
+        },
+        {
+          "name": "bundle_build",
+          "type": "integer",
+          "null": true,
+          "audience": "never",
+          "description": "The bundle's build number; null with bundle_hash.",
+          "source": "K-01 v1 bundleId"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the write belongs to (businesses.id), or null.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "actor_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who: person, rosie, job or provider.",
+          "source": "arch 09 line 457 (who); 02-contracts K-08"
+        },
+        {
+          "name": "actor_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For a person, who (persons.id).",
+          "source": "arch 09 line 457"
+        },
+        {
+          "name": "actor_role",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person's role at the business, as person_roles names it.",
+          "source": "02-contracts K-08 ('a person and role')"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What happened; K-08 gives the closed list.",
+          "source": "arch 09 line 457 (what); 02-contracts K-08"
+        },
+        {
+          "name": "table_name",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The table of the row it touched.",
+          "source": "02-contracts K-08 ('the row it touched')"
+        },
+        {
+          "name": "row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The row it touched.",
+          "source": "02-contracts K-08"
+        },
+        {
+          "name": "old_values",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "Old values field by field, private ones left out (they are in sealed_values).",
+          "source": "arch 09 line 457 (old → new)"
+        },
+        {
+          "name": "new_values",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "New values field by field, private ones left out.",
+          "source": "arch 09 line 457 (old → new)"
+        },
+        {
+          "name": "sealed_values",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "sealed_for_person_id",
+          "description": "The private old and new values, sealed under the key of sealed_for_person_id; unreadable once that key is deleted.",
+          "source": "arch 09 lines 457, 492 (PII sealed per person); arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person whose key seals sealed_values (persons.id). One person per row: a write touching two people's private values writes two rows.",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "why",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "Why: the step, choice, limit outcome, safe default or outage path (K-08 gives its shape).",
+          "source": "arch 09 line 457 (why); 02-contracts K-08"
+        },
+        {
+          "name": "approved_by",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "Approved by: the exact yes, as an answer, a consent row or the owner's yes (K-08 gives its shape).",
+          "source": "arch 09 line 457 (approved by); arch 01 line 89"
+        },
+        {
+          "name": "proofs",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "Consent proofs that survive a deleted key: hashes and the words shown.",
+          "source": "arch 09 line 492; arch 10 line 516"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "event_log_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "event_log_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "event_log_actor_fk",
+          "columns": ["actor_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "event_log_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "event_log_actor_kind_known",
+          "expression": "actor_kind in ('person', 'rosie', 'job', 'provider')",
+          "source": "02-contracts K-08 (who)"
+        },
+        {
+          "name": "event_log_turn_or_job",
+          "expression": "turn_id is not null or job_id is not null",
+          "source": "02-contracts K-08 ('the turn id, or a job id')"
+        },
+        {
+          "name": "event_log_person_actor",
+          "expression": "actor_kind <> 'person' or actor_person_id is not null",
+          "source": "arch 09 line 457 (who)"
+        },
+        {
+          "name": "event_log_sealed_has_person",
+          "expression": "sealed_values is null or sealed_for_person_id is not null",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "event_log_bundle_pair",
+          "expression": "(bundle_hash is null) = (bundle_build is null)",
+          "source": "K-01 v1 bundleId"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "event_log_business_at_idx",
+          "columns": ["business_id", "at"],
+          "why": "A business's history."
+        },
+        {
+          "name": "event_log_turn_idx",
+          "columns": ["turn_id"],
+          "why": "Everything one turn wrote (tour line 416)."
+        },
+        {
+          "name": "event_log_row_idx",
+          "columns": ["table_name", "row_id"],
+          "why": "One row's history."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "bundles",
+      "description": "The bundle registry (CQ-03): every published bundle, keyed on K-01's bundleId {hash, build}, with the active one marked. At turn start the actor reads the active bundle id from PostgreSQL, then that bundle's values from KV, or from bundle_values on a miss (arch 10 line 536). The deploy publishes a bundle before it switches the active id (BP 5.4). Every published bundle stays readable for replay (tour line 658).",
+      "source": "CQ-03 (the bundle registry); arch 10 line 536; arch 01 line 87; BP 5.4; tour line 658; K-01 v1 manifest.bundleId and storage",
+      "columns": [
+        {
+          "name": "hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle id's content hash: 64 lowercase hex characters, as K-01 spells it.",
+          "source": "K-01 v1 bundleId; CQ-09"
+        },
+        {
+          "name": "build",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle id's build number, counting publishes from 1.",
+          "source": "K-01 v1 bundleId; CQ-09; C-072"
+        },
+        {
+          "name": "manifest_key",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The manifest's KV key, bundle/<hash>/<build>/manifest.",
+          "source": "K-01 v1 kvKey and storage.manifestKey"
+        },
+        {
+          "name": "built_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When it was built (the manifest's builtAt).",
+          "source": "K-01 v1 manifest.builtAt"
+        },
+        {
+          "name": "published_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When its values were written to KV and to bundle_values.",
+          "source": "BP 5.4; arch 10 line 536"
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Whether it is the active bundle: at most one is.",
+          "source": "arch 10 line 536 ('the active bundle id')"
+        },
+        {
+          "name": "activated_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When it last became active.",
+          "source": "BP 5.4"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["hash", "build"],
+      "unique": [
+        {
+          "name": "bundles_manifest_key_key",
+          "columns": ["manifest_key"],
+          "source": "K-01 v1 storage.manifestKey"
+        },
+        {
+          "name": "bundles_one_active",
+          "columns": ["active"],
+          "where": "active",
+          "source": "arch 10 line 536 (one active bundle id)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "bundles_hash_form",
+          "expression": "hash ~ '^[0-9a-f]{64}$'",
+          "source": "K-01 v1 sha256"
+        },
+        {
+          "name": "bundles_build_positive",
+          "expression": "build >= 1",
+          "source": "K-01 v1 bundleId (build from 1)"
+        },
+        {
+          "name": "bundles_manifest_key_form",
+          "expression": "manifest_key = 'bundle/' || hash || '/' || build || '/manifest'",
+          "source": "K-01 v1 kvKey"
+        },
+        {
+          "name": "bundles_active_has_time",
+          "expression": "not active or activated_at is not null",
+          "source": "BP 5.4"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Bundles are the playbook for every business (arch 10 line 518)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "bundle_values",
+      "description": "PostgreSQL's copy of each bundle value, read on a KV miss (arch 10 line 536): keyed by K-01's KV key, with the same bytes and their sha256 (K-01 storedValue). Written once at publish.",
+      "source": "arch 10 line 536; K-01 v1 storedValue and kvKey; 02-contracts K-01 'Storage'",
+      "columns": [
+        {
+          "name": "key",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The KV key: bundle/<hash>/<build>/manifest, .../flow/<A or B> or .../trade/<trade id>.",
+          "source": "K-01 v1 kvKey"
+        },
+        {
+          "name": "bundle_hash",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle's hash (bundles.hash).",
+          "source": "K-01 v1 bundleId"
+        },
+        {
+          "name": "bundle_build",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The bundle's build (bundles.build).",
+          "source": "K-01 v1 bundleId"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "manifest, flow or trade: the fourth part of the key.",
+          "source": "K-01 v1 storedValue.kind; kvKey"
+        },
+        {
+          "name": "bytes",
+          "type": "integer",
+          "null": false,
+          "audience": "never",
+          "description": "The value's size in bytes, at most 25 MiB (Cloudflare KV's limit).",
+          "source": "K-01 v1 storedValue.bytes"
+        },
+        {
+          "name": "sha256",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The sha256 of the stored bytes, in lowercase hex.",
+          "source": "K-01 v1 storedValue.sha256; Q-36"
+        },
+        {
+          "name": "value",
+          "type": "bytea",
+          "null": false,
+          "audience": "never",
+          "description": "The same bytes as the KV value (UTF-8 JSON).",
+          "source": "arch 10 line 536; K-01 v1 storedValue"
+        }
+      ],
+      "primaryKey": ["key"],
+      "foreignKeys": [
+        {
+          "name": "bundle_values_bundle_fk",
+          "columns": ["bundle_hash", "bundle_build"],
+          "references": {
+            "table": "bundles",
+            "columns": ["hash", "build"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "bundle_values_kind_known",
+          "expression": "kind in ('manifest', 'flow', 'trade')",
+          "source": "K-01 v1 kvKey"
+        },
+        {
+          "name": "bundle_values_key_form",
+          "expression": "key ~ '^bundle/[0-9a-f]{64}/[1-9][0-9]*/(manifest|flow/[AB]|trade/[a-z0-9][a-z0-9-]*)$'",
+          "source": "K-01 v1 kvKey"
+        },
+        {
+          "name": "bundle_values_key_of_bundle",
+          "expression": "split_part(key, '/', 2) = bundle_hash and split_part(key, '/', 3) = bundle_build::text and split_part(key, '/', 4) = kind",
+          "source": "K-01 v1 kvKey"
+        },
+        {
+          "name": "bundle_values_bytes_range",
+          "expression": "bytes between 1 and 26214400",
+          "source": "K-01 v1 storedValue.bytes"
+        },
+        {
+          "name": "bundle_values_bytes_match",
+          "expression": "octet_length(value) = bytes",
+          "source": "K-01 v1 storedValue.bytes"
+        },
+        {
+          "name": "bundle_values_sha256_match",
+          "expression": "sha256 = encode(sha256(value), 'hex')",
+          "source": "K-01 v1 storedValue.sha256"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "bundle_values_bundle_idx",
+          "columns": ["bundle_hash", "bundle_build"],
+          "why": "A bundle's values."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Bundles are the playbook for every business (arch 10 line 518)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "release_flags",
+      "description": "Release flags in a PostgreSQL table (the D-000 spec's ADR-010 draft): code ships with flags off, then flags turn on (BP 5.4). A flag is set globally or for one business or one phone.",
+      "source": "BP 5.4; d000-factory-spec ADR-010 draft; CQ-03",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The flag's name, in lower case with dots, dashes or underscores.",
+          "source": "BP 5.4"
+        },
+        {
+          "name": "scope",
+          "type": "text",
+          "null": false,
+          "default": "'global'",
+          "audience": "never",
+          "description": "global, business:<business id> or phone:<E.164 number>.",
+          "source": "BP 5.4; BP 9.4 (test phones)"
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "Whether it is on.",
+          "source": "BP 5.4 (flags off, then on)"
+        },
+        {
+          "name": "value",
+          "type": "jsonb",
+          "null": true,
+          "audience": "never",
+          "description": "A setting the flag carries, or null.",
+          "source": "BP 5.4"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["name", "scope"],
+      "checks": [
+        {
+          "name": "release_flags_name_form",
+          "expression": "name ~ '^[a-z][a-z0-9_.-]*$'",
+          "source": "BP 5.4"
+        },
+        {
+          "name": "release_flags_scope_form",
+          "expression": "scope = 'global' or scope ~ '^business:.+$' or scope ~ '^phone:\\+[1-9][0-9]{6,14}$'",
+          "source": "BP 5.4"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Flags are the release's, read by every request (BP 5.4)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "sealing_keys",
+      "description": "Per-person sealing keys: private values are encrypted under the person's key, so deleting the key erases them (arch 01 line 93; arch 09 line 492; RULES 4.10). The key is stored wrapped under a key kept in Workers secrets, which this table names and never holds (rule 7). Erasing keeps the row with the wrapped key gone.",
+      "source": "arch 01 line 93; arch 09 line 492; arch 10 line 516; RULES 4.10; CQ-03",
+      "columns": [
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person (persons.id).",
+          "source": "arch 01 line 93"
+        },
+        {
+          "name": "wrapped_key",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "description": "The person's data key, encrypted under the wrapping key; null once erased.",
+          "source": "arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "wrapping_key_name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The name of the Workers secret that wraps it: a name, never a value.",
+          "source": "arch 10 line 546 (secrets in Workers secrets); BP rule 7"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the key was made.",
+          "source": "arch 01 line 93"
+        },
+        {
+          "name": "erased_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the key was deleted, erasing the person's sealed values.",
+          "source": "arch 09 line 492; RULES 4.10"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; 02-contracts K-04 'Versions'"
+        }
+      ],
+      "primaryKey": ["person_id"],
+      "foreignKeys": [
+        {
+          "name": "sealing_keys_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "sealing_keys_erased_or_held",
+          "expression": "(erased_at is null) = (wrapped_key is not null)",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "sealing_keys_name_form",
+          "expression": "wrapping_key_name ~ '^[A-Z][A-Z0-9_]*$'",
+          "source": "BP rule 7"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "A person's key covers them at every business (FS line 743)."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

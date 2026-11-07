@@ -1,0 +1,91 @@
+{
+  "after": [
+    "seed-person-roles.json"
+  ],
+  "rows": [
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-riley",
+        "business_id": "biz-lees-barbershop",
+        "kind": "worker",
+        "name": "Riley",
+        "person_id": "person-riley",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-avery",
+        "business_id": "biz-lees-barbershop",
+        "kind": "worker",
+        "name": "Avery",
+        "person_id": "person-avery",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-maya",
+        "business_id": "biz-yoga-studio",
+        "kind": "worker",
+        "name": "Maya",
+        "person_id": "person-maya",
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-studio-room",
+        "business_id": "biz-yoga-studio",
+        "kind": "room",
+        "name": "Studio room",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-truck-26",
+        "business_id": "biz-movers",
+        "kind": "vehicle",
+        "name": "26-ft truck",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-truck-20",
+        "business_id": "biz-movers",
+        "kind": "vehicle",
+        "name": "20-ft truck",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    },
+    {
+      "table": "resources",
+      "values": {
+        "id": "res-handstand-workshop",
+        "business_id": "biz-yoga-studio",
+        "kind": "class_session",
+        "name": "Handstand workshop, Sat 11:00am",
+        "person_id": null,
+        "active": true,
+        "version": 1
+      }
+    }
+  ]
+}

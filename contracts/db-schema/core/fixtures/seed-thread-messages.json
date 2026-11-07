@@ -1,0 +1,178 @@
+{
+  "after": [
+    "seed-outbox-row.json",
+    "seed-booking-head.json"
+  ],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-first",
+        "handle_id": "handle-alex",
+        "event_ids": [
+          "evt-alex-0001"
+        ],
+        "state": "committed",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0001",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-12T16:20:03Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "outbox_rows",
+      "values": {
+        "id": "out-alex-first",
+        "turn_id": "turn-alex-first",
+        "recipient_handle_id": "handle-alex",
+        "recipient_person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "channel": "imessage",
+        "send_class": "quick_reply",
+        "versions_read": [],
+        "open_question_id": null,
+        "plan": null,
+        "final_parts": null,
+        "state": "delivered",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0001",
+        "version": 6
+      }
+    },
+    {
+      "table": "openers_sent",
+      "values": {
+        "handle_id": "handle-alex",
+        "business_id": "biz-lees-barbershop",
+        "sent_at": "2026-10-12T16:20:03Z",
+        "outbox_row_id": "out-alex-first"
+      }
+    },
+    {
+      "table": "threads",
+      "values": {
+        "id": "thread-alex-chat",
+        "handle_id": "handle-alex",
+        "kind": "chat",
+        "booking_id": null,
+        "linq_chat_id": "linq-chat-demo-alex",
+        "reply_address": null,
+        "version": 2
+      }
+    },
+    {
+      "table": "threads",
+      "values": {
+        "id": "thread-alex-haircut-email",
+        "handle_id": "handle-alex-email",
+        "kind": "email",
+        "booking_id": "booking-alex-haircut",
+        "linq_chat_id": null,
+        "reply_address": "booking-alex-haircut@reply.example.com",
+        "version": 1
+      }
+    },
+    {
+      "table": "messages",
+      "values": {
+        "id": "msg-alex-0001",
+        "thread_id": "thread-alex-chat",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "direction": "in",
+        "channel": "text",
+        "service": "imessage",
+        "from_role": "customer",
+        "to_role": "rosie",
+        "person_id": "person-alex",
+        "words": "Haircut at Lee's Barbershop this Saturday?",
+        "event_id": "evt-alex-0001",
+        "sent_at": "2026-10-12T16:20:00Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "messages",
+      "values": {
+        "id": "msg-alex-0002",
+        "thread_id": "thread-alex-chat",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": null,
+        "direction": "out",
+        "channel": "text",
+        "service": "imessage",
+        "from_role": "rosie",
+        "to_role": "customer",
+        "person_id": "person-alex",
+        "words": "This is Rosie, the automated booking assistant for Lee's Barbershop.",
+        "outbox_row_id": "out-alex-first",
+        "sent_at": "2026-10-12T16:20:04Z",
+        "delivered_at": "2026-10-12T16:20:05Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "messages",
+      "values": {
+        "id": "msg-alex-0007",
+        "thread_id": "thread-alex-chat",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "direction": "in",
+        "channel": "text",
+        "service": "imessage",
+        "from_role": "customer",
+        "to_role": "rosie",
+        "person_id": "person-alex",
+        "words": "1",
+        "event_id": "evt-alex-0007",
+        "sent_at": "2026-10-23T14:04:58Z",
+        "version": 1
+      }
+    },
+    {
+      "table": "messages",
+      "values": {
+        "id": "msg-alex-0008",
+        "thread_id": "thread-alex-chat",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "direction": "out",
+        "channel": "text",
+        "service": "imessage",
+        "from_role": "rosie",
+        "to_role": "customer",
+        "person_id": "person-alex",
+        "words": "Sure. Pick a new time for your haircut at Lee's Barbershop with Riley.\nWhich time works?",
+        "outbox_row_id": "out-a7-03-alex",
+        "sent_at": "2026-10-23T14:05:03Z",
+        "delivered_at": "2026-10-23T14:05:04Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "messages",
+      "values": {
+        "id": "msg-alex-0009",
+        "thread_id": "thread-alex-chat",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "direction": "in",
+        "channel": "text",
+        "service": "imessage",
+        "from_role": "customer",
+        "to_role": "rosie",
+        "person_id": "person-alex",
+        "words": "A",
+        "event_id": "evt-alex-0008",
+        "sent_at": "2026-10-23T14:06:10Z",
+        "version": 1
+      }
+    }
+  ]
+}
