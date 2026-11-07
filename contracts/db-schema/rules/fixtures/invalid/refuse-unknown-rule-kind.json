@@ -1,0 +1,26 @@
+{
+  "after": ["seed-rule-registry.json", "../../core/fixtures/seed-person-roles.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "rules",
+    "values": {
+      "id": "rule-lees-barbershop-phone-line",
+      "business_id": "biz-lees-barbershop",
+      "rule_kind": "phone_line",
+      "value_type": "on",
+      "value_on": true,
+      "words": "Missed and after-hours calls to (555) 010-0177 go to Rosie",
+      "set_by_person_id": "person-sam",
+      "effective_from": "2026-10-19T18:12:00Z"
+    },
+    "expect": {
+      "sqlstate": "23503",
+      "constraintOneOf": ["rules_kind_fk"]
+    }
+  }
+}

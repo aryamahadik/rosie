@@ -1,0 +1,636 @@
+{
+  "part": "rules",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "trade_facts",
+      "description": "The closed registry of plug-in facts (pf.facts): the kinds of work a profession has, which gate branches and steps (SPEC-master 5d). One row per known fact; a profession's facts list (K-23's company_kinds.pf_facts) names only these, which code checks at each write, since an array carries no foreign key. A new fact is a registry entry written by a migration's seed (C-157), never a column. The same for every business.",
+      "source": "arch 09 line 480 ('Typed values for rule values and trade facts, checked against a closed registry'); C-157; SPEC-master 5d (FACTS); master-A.json live.facts and header facts; MC C5; K-23 v1 README (company_kinds: 'Which names are known facts and switches is K-26's closed registry')",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The fact's name, lowercase letters and digits, such as children, documents or waitlist.",
+          "source": "SPEC-master 5b ('lowercase letters and digits'), 5d; master-A.json live.facts"
+        },
+        {
+          "name": "means",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "What the fact means, where the master gives it (its header facts); null where the master's FACTS list gives the name only.",
+          "source": "master-A.json header facts (label and means); SPEC-master 5d"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where the fact is defined: SPEC-master 5d's FACTS list or the master's header facts.",
+          "source": "02-contracts section 2 item 4 (every value names its source)"
+        }
+      ],
+      "primaryKey": ["name"],
+      "checks": [
+        {
+          "name": "trade_facts_name_form",
+          "expression": "name ~ '^[a-z0-9]+$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits'); K-23 v1 company_kinds_names_form"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The registry is the same for every business: every role reads it, and only a migration's seed writes it (C-157)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "plugin_switches",
+      "description": "The closed registry of plug-in switches (pf.switches): words that depend on the kind of work, each off unless a profession turns it on, per flow (SPEC-master 5b). One row per known switch; K-23's company_kinds.pf_switches_a and pf_switches_b name only these, which code checks at each write. A new switch is a registry entry written by a migration's seed (C-157). The same for every business.",
+      "source": "SPEC-master 5b ('A key naming an unknown switch is an error'); master-A.json live.switches, live.merged.switches and header switches; K-23 v1 README (company_kinds); C-157",
+      "columns": [
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The switch's name, lowercase letters and digits, such as sensitive or cancelright.",
+          "source": "SPEC-master 5b ('lowercase letters and digits')"
+        },
+        {
+          "name": "means",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What turning it on means, from SPEC-master 5b's table (its 'On for' column) or the master's header switches.",
+          "source": "SPEC-master 5b; master-A.json header switches (verify)"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Where the switch is defined.",
+          "source": "02-contracts section 2 item 4"
+        }
+      ],
+      "primaryKey": ["name"],
+      "checks": [
+        {
+          "name": "plugin_switches_name_form",
+          "expression": "name ~ '^[a-z0-9]+$'",
+          "source": "SPEC-master 5b ('lowercase letters and digits')"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The registry is the same for every business: every role reads it, and only a migration's seed writes it (C-157)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "rule_kinds",
+      "description": "The closed registry of rule kinds: each kind of owner rule, the one type its value takes, and the plug-in fact a business's kinds of work must list before the rule is offered. An owner rule names a kind here and carries a value of that type (rules_kind_fk); a kind not here is refused. A new kind of rule is a registry entry written by a migration's seed (C-157), never a column. The kind note holds the owner's own words, which the AI reads and code never enforces.",
+      "source": "arch 09 lines 480, 482; C-157; S1-21; FS rows H05, H08, V11, V12, V14, V17, K10; arch 06 line 301 (limit 2)",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind's name, lowercase words joined by underscores, such as ok_same_day or note.",
+          "source": "arch 09 line 480 ('A new kind of rule is a registry entry')"
+        },
+        {
+          "name": "value_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The one type its value takes: on (on or off), money (whole cents with a currency), span (a length of time), count (a whole number from 1), dates (a range of days in the business's zone) or note (the owner's words only). A dates or note kind may have several rows in effect in one scope; every other kind one at a time.",
+          "source": "arch 09 line 480 ('Typed values for rule values'); FS rows H05 (rules), H08 (dates), V11 (on or off), V12 (on or off + amount), V21 (amount); CQ-09 (money in whole cents)"
+        },
+        {
+          "name": "needs_fact",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The plug-in fact a business's kinds of work must list for the rule to be offered, such as waitlist for the waitlist rule; null: any work.",
+          "source": "master-A.json header facts (waitlist: 'the owner's booking rules turn it on, S1-21'; tips; banktransfer; monthlybill); FS rows V11, V12, V14, V17"
+        },
+        {
+          "name": "unset_means",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What holds when the business has no rule of this kind in effect: the safe default the tap list keeps (S1-21 'Not shown, kept at a safe default').",
+          "source": "S1-21 ('Safe default: every suggestion kept as shown'; 'Also the waitlist, one bill for many visits and the no-show count, all off'); FS section 2 (Need column defaults)"
+        },
+        {
+          "name": "means",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "What the rule does, in plain words.",
+          "source": "02-contracts section 2 item 4"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The step, FS row or architecture line the kind comes from.",
+          "source": "02-contracts section 2 item 4"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "rule_kinds_needs_fact_fk",
+          "columns": ["needs_fact"],
+          "references": {
+            "table": "trade_facts",
+            "columns": ["name"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "rule_kinds_id_type_key",
+          "columns": ["id", "value_type"],
+          "source": "arch 09 line 480 (a rule's value is of its kind's one type: rules_kind_fk)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "rule_kinds_id_form",
+          "expression": "id ~ '^[a-z]+(_[a-z]+)*$'",
+          "source": "arch 09 line 480"
+        },
+        {
+          "name": "rule_kinds_value_type_known",
+          "expression": "value_type in ('on', 'money', 'span', 'count', 'dates', 'note')",
+          "source": "arch 09 lines 480, 482; FS rows H05, H08, V11, V12, V21"
+        },
+        {
+          "name": "rule_kinds_note_is_note",
+          "expression": "(id = 'note') = (value_type = 'note')",
+          "source": "arch 09 line 482 (notes in the owner's own words, which code never enforces: one kind, note)"
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "The registry is the same for every business: every role reads it, and only a migration's seed writes it (C-157)."
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "rules",
+      "description": "The owner's own rules (S1-21 gives booking_rules): each a kind from rule_kinds, a scope (the business, or one flow, one kind of work, or both) and a typed value of the kind's one type, or a note in the owner's own words that the AI reads and code never enforces. Rows carry effective dates: a change closes one row (effective_to) and opens the next, so a booking keeps the rules it was made with (K-30's terms snapshot copies them). A suggestion from the tap list becomes a row only when the owner keeps it.",
+      "source": "arch 09 lines 457 ('Rule type · scope · value'), 478 to 482, 488; S1-21 (gives booking_rules); S11-57; FS rows H05, H08, V11, V12, V14, V17, K10; A4-98; arch 06 line 301",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The rule row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose rule it is (businesses.id).",
+          "source": "arch 10 line 546; S1-21 ('Each kept one becomes Sam's own rule')"
+        },
+        {
+          "name": "rule_kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind of rule (rule_kinds.id); a kind not in the registry is refused (rules_kind_fk).",
+          "source": "arch 09 lines 457 (type), 480 ('checked against a closed registry')"
+        },
+        {
+          "name": "value_type",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The kind's value type, copied from rule_kinds and held to it by rules_kind_fk, so the row's value is checked against the registry: exactly the value column of this type is set (rules_value_matches_type).",
+          "source": "arch 09 line 480 ('Typed values ... checked against a closed registry')"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The flow it applies to, A or B as K-04's bookings.flow; null: both.",
+          "source": "arch 09 line 457 (scope); S1-21 ('Each row shows only where it applies'); FS line 729 (flow)"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The kind of work it applies to, by its profession file's id as K-23's company_kinds.kind_id (such as barber); null: all the business's kinds. K-24 names the kinds; that the business has the kind spans rows, so code checks it.",
+          "source": "arch 09 line 457 (scope); S1-21 ('ranked by the plug-in'); K-23 v1 company_kinds.kind_id; 02-contracts row K-24"
+        },
+        {
+          "name": "value_on",
+          "type": "boolean",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The value of an on kind: true on, false off. Null for any other type.",
+          "source": "FS rows V11, V12, V14, V17, K10 ('on or off'); S1-21"
+        },
+        {
+          "name": "value_cents",
+          "type": "integer",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The value of a money kind, in whole cents, such as a minimum job or a bank-transfer threshold. Null for any other type.",
+          "source": "FS row V12 ('on or off + amount'); arch 06 line 301 (the minimum); CQ-09 (integer cents)"
+        },
+        {
+          "name": "value_currency",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The currency code of value_cents, such as USD; set exactly when value_cents is.",
+          "source": "CQ-09 ('money in integer cents with a currency code'); contracts/common/formats.v1.schema.json (currency)"
+        },
+        {
+          "name": "value_span",
+          "type": "interval",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The value of a span kind, such as the notice a booking needs. Null for any other type.",
+          "source": "FS row H05 ('notice'); S11-57 ('hours, notice')"
+        },
+        {
+          "name": "value_count",
+          "type": "integer",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The value of a count kind, from 1, such as the no-show count. Null for any other type.",
+          "source": "S1-21 ('the no-show count'); S11-57"
+        },
+        {
+          "name": "value_dates",
+          "type": "daterange",
+          "null": true,
+          "audience": ["owner"],
+          "description": "The value of a dates kind: a range of days in the business's zone (core businesses.time_zone), such as the dates that wait for the owner's OK. Null for any other type.",
+          "source": "FS row H08 ('dates'); A4-98 ('date ranges'); S1-21 ('some services or dates')"
+        },
+        {
+          "name": "words",
+          "type": "text",
+          "null": true,
+          "audience": ["customer", "staff", "owner"],
+          "description": "The owner's own words. For a note, the whole rule: the AI reads it and may say it, and code never enforces it; the read-back tells the owner it was saved only as a note. For any other kind, how the owner put it, if kept; null: none.",
+          "source": "arch 09 line 482 ('Notes in the owner's own words, which the AI reads and code never enforces. The read-back tells the owner when a rule was saved only as a note')"
+        },
+        {
+          "name": "set_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who kept or set it (persons.id): the owner, or an admin the owner lets change settings; never a helper or Rosie.",
+          "source": "S1-21 ('a suggestion runs only once the owner keeps it'); S13-45 row 8 (admins only what the owner lets them); FS line 630"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When it took effect: bookings made from then on follow it.",
+          "source": "arch 09 line 488 ('Effective dates on every price and rule'); S11-57 ('for new bookings only')"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When it stopped: the change that closed it opened the next row at the same instant, or the owner turned it off. Null: in effect.",
+          "source": "arch 09 line 488 ('A change closes one row and opens the next')"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "rules_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "rules_kind_fk",
+          "columns": ["rule_kind", "value_type"],
+          "references": {
+            "table": "rule_kinds",
+            "columns": ["id", "value_type"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "rules_set_by_fk",
+          "columns": ["set_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "rules_one_in_effect",
+          "using": "gist",
+          "elements": [
+            {
+              "column": "business_id",
+              "operator": "="
+            },
+            {
+              "column": "rule_kind",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(flow, '')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(kind_id, '')",
+              "operator": "="
+            },
+            {
+              "expression": "tstzrange(effective_from, effective_to, '[)')",
+              "operator": "&&"
+            }
+          ],
+          "where": "value_type not in ('dates', 'note')",
+          "source": "arch 09 line 488 ('A change closes one row and opens the next'): one rule of a kind in effect per scope at a time"
+        }
+      ],
+      "checks": [
+        {
+          "name": "rules_flow_known",
+          "expression": "flow is null or flow in ('A', 'B')",
+          "source": "FS line 729 (flow); K-04 v1 bookings_flow_known"
+        },
+        {
+          "name": "rules_kind_id_form",
+          "expression": "kind_id is null or kind_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "K-23 v1 company_kinds_kind_id_form"
+        },
+        {
+          "name": "rules_value_matches_type",
+          "expression": "(value_on is not null) = (value_type = 'on') and (value_cents is not null) = (value_type = 'money') and (value_currency is not null) = (value_type = 'money') and (value_span is not null) = (value_type = 'span') and (value_count is not null) = (value_type = 'count') and (value_dates is not null) = (value_type = 'dates')",
+          "source": "arch 09 line 480 ('Typed values for rule values ... checked against a closed registry')"
+        },
+        {
+          "name": "rules_value_in_range",
+          "expression": "(value_cents is null or value_cents >= 0) and (value_currency is null or value_currency ~ '^[A-Z]{3}$') and (value_span is null or value_span > interval '0') and (value_count is null or value_count >= 1) and (value_dates is null or not isempty(value_dates))",
+          "source": "CQ-09 (money); FS rows H05, H08, V12"
+        },
+        {
+          "name": "rules_note_has_words",
+          "expression": "value_type <> 'note' or (words is not null and length(btrim(words)) > 0)",
+          "source": "arch 09 line 482"
+        },
+        {
+          "name": "rules_dates_in_order",
+          "expression": "effective_to is null or effective_to > effective_from",
+          "source": "arch 09 line 488"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "rules_business_idx",
+          "columns": ["business_id", "rule_kind", "effective_from"],
+          "why": "A business's rules in effect at a time: limit 2's rule evaluator and search (arch 06 line 301, arch 05 line 237), the request decision (A4-98), the read-back and summary (S1-21, S1-79) and the Settings page (S11-57)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": true,
+      "effectiveColumns": ["effective_from", "effective_to"]
+    },
+    {
+      "name": "price_ok_limits",
+      "description": "The owner's price OK limit (S1-21 gives price_oks; FS row V21): a quote, a bill or both over an amount comes to the owner first, before the customer sees it (A4-09). List prices never need an OK. Scoped like a rule (the business, one flow, one kind of work, or both), with effective dates: a change closes one row and opens the next.",
+      "source": "S1-21 ('Price OKs: quotes and bills over an amount come to the owner first. List prices never need an OK'); FS row V21; A4-09; SPEC-master 6 ('Sam's price OK limit: $500'; 'Price OK limit: none needed for list prices'); arch 09 line 488",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business (businesses.id).",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "flow",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The flow it applies to, A or B; null: both.",
+          "source": "S1-21 ('Each row shows only where it applies'); FS line 729 (flow)"
+        },
+        {
+          "name": "kind_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The kind of work it applies to, by its profession file's id as K-23's company_kinds.kind_id; null: all the business's kinds.",
+          "source": "S1-21; K-23 v1 company_kinds.kind_id"
+        },
+        {
+          "name": "quotes",
+          "type": "boolean",
+          "null": false,
+          "audience": ["owner"],
+          "description": "A quote over the amount (priced from photos or at the visit) comes to the owner before it is sent (A4-05, A4-09).",
+          "source": "S1-21 ('quotes and bills over an amount'); FS row V21 ('a quote or bill over an amount'); A4-09"
+        },
+        {
+          "name": "bills",
+          "type": "boolean",
+          "null": false,
+          "audience": ["owner"],
+          "description": "A bill over the amount comes to the owner before it is sent.",
+          "source": "S1-21 ('quotes and bills over an amount'); FS row V21"
+        },
+        {
+          "name": "over_cents",
+          "type": "integer",
+          "null": false,
+          "audience": ["owner"],
+          "description": "The amount in whole cents: a quote or bill over it comes to the owner first. 0: every priced quote or bill it covers, as 'Color quotes come to you first'.",
+          "source": "FS row V21 ('amount'); SPEC-master 6 ('Sam's price OK limit: $500'); S1-21; CQ-09"
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The currency code of over_cents, such as USD.",
+          "source": "CQ-09; contracts/common/formats.v1.schema.json (currency)"
+        },
+        {
+          "name": "set_by_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "Who kept or set it (persons.id): the owner, or an admin the owner lets change settings.",
+          "source": "S1-21; S13-45 row 8"
+        },
+        {
+          "name": "effective_from",
+          "type": "timestamptz",
+          "null": false,
+          "audience": ["owner"],
+          "description": "When it took effect: quotes and bills priced from then on follow it.",
+          "source": "arch 09 line 488; S11-57 ('for new bookings only')"
+        },
+        {
+          "name": "effective_to",
+          "type": "timestamptz",
+          "null": true,
+          "audience": ["owner"],
+          "description": "When it stopped; null: in effect.",
+          "source": "arch 09 line 488"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "price_ok_limits_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "price_ok_limits_set_by_fk",
+          "columns": ["set_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "exclude": [
+        {
+          "name": "price_ok_limits_one_in_effect",
+          "using": "gist",
+          "elements": [
+            {
+              "column": "business_id",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(flow, '')",
+              "operator": "="
+            },
+            {
+              "expression": "coalesce(kind_id, '')",
+              "operator": "="
+            },
+            {
+              "expression": "tstzrange(effective_from, effective_to, '[)')",
+              "operator": "&&"
+            }
+          ],
+          "source": "arch 09 line 488: one price OK limit in effect per scope at a time"
+        }
+      ],
+      "checks": [
+        {
+          "name": "price_ok_limits_flow_known",
+          "expression": "flow is null or flow in ('A', 'B')",
+          "source": "FS line 729 (flow)"
+        },
+        {
+          "name": "price_ok_limits_kind_id_form",
+          "expression": "kind_id is null or kind_id ~ '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "source": "K-23 v1 company_kinds_kind_id_form"
+        },
+        {
+          "name": "price_ok_limits_covers_something",
+          "expression": "quotes or bills",
+          "source": "S1-21 ('quotes and bills over an amount')"
+        },
+        {
+          "name": "price_ok_limits_money",
+          "expression": "over_cents >= 0 and currency ~ '^[A-Z]{3}$'",
+          "source": "CQ-09; FS row V21"
+        },
+        {
+          "name": "price_ok_limits_dates_in_order",
+          "expression": "effective_to is null or effective_to > effective_from",
+          "source": "arch 09 line 488"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "price_ok_limits_business_idx",
+          "columns": ["business_id", "effective_from"],
+          "why": "A business's price OK limits in effect when a quote or bill is priced (A4-05, A4-09)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": true,
+      "effectiveColumns": ["effective_from", "effective_to"]
+    }
+  ]
+}

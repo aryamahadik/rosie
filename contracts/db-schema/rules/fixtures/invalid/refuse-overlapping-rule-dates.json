@@ -1,0 +1,25 @@
+{
+  "after": ["seed-rules-tap-list.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "rules",
+    "values": {
+      "id": "rule-lees-barbershop-ok-new-customer-2",
+      "business_id": "biz-lees-barbershop",
+      "rule_kind": "ok_new_customer",
+      "value_type": "on",
+      "value_on": false,
+      "set_by_person_id": "person-sam",
+      "effective_from": "2026-11-02T05:00:00Z"
+    },
+    "expect": {
+      "sqlstate": "23P01",
+      "constraintOneOf": ["rules_one_in_effect"]
+    }
+  }
+}

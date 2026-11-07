@@ -1,0 +1,52 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-rule-registry.json",
+      "version": "v1",
+      "table": "rule_kinds",
+      "expect": "accept",
+      "shows": "The closed registries v1 holds: the 28 live plug-in facts, the 6 plug-in switch names (the 5 live ones and nomoney, set with its fact), and the 16 rule kinds, each with its one value type, the fact the work must list before it is offered, and what holds when it is unset",
+      "source": "arch 09 lines 480, 482; C-157; SPEC-master 5b, 5d; master-A.json header facts and switches, live.facts, live.switches, live.merged; MC C5; S1-21; FS rows H05, H08, V11, V12, V14, V17, K10; arch 06 line 301"
+    },
+    {
+      "file": "seed-rules-tap-list.json",
+      "version": "v1",
+      "table": "rules",
+      "expect": "accept",
+      "shows": "Lee's Barbershop's S1-21 tap list kept as shown (Sam answers 1, Keep them): same-day and new customers ask Sam first, as two on rules for the whole business; and the price OK row, color quotes come to Sam first and board prices never need one, as flow A quotes over $0. The tap list's hours (K-27), cancel time (K-23) and fee (K-25) rows live in their own parts, and the phone-line row is out (C-236)",
+      "source": "S1-21 (gives booking_rules and price_oks; its list: 'Same-day and new customers: Ask you first', 'Price OKs: Color quotes come to you first. Board prices never need one'); SPEC-master 6 (flow A's photos example: color and cut priced from photos; 'Price OK limit: none needed for list prices'); FS rows H05, V21; A4-98"
+    },
+    {
+      "file": "seed-price-ok-limit.json",
+      "version": "v1",
+      "table": "price_ok_limits",
+      "expect": "accept",
+      "shows": "Sam's price OK limit for Lee Home Services: a quote or bill over $500 comes to Sam first, in both flows; and Lee's Barbershop's barbers in flow B, where any wedding party quote over $500 comes to Sam first, a scope more specific than the tap list's flow A row",
+      "source": "SPEC-master 6 ('Sam's price OK limit: $500'; the water heater quoted at $640, 'over $500, so Sam OKs it'); S1-21 ('quotes and bills over an amount'); FS row V21; A4-09; fixtures/v1/forms/barber.json (who_oks: 'any wedding party quote over $500'); fixtures/v1/test-kit/shops/barber.json (flow B: wedding party grooming quoted from photos)"
+    },
+    {
+      "file": "seed-note-only-rule.json",
+      "version": "v1",
+      "table": "rules",
+      "expect": "accept",
+      "shows": "A rule that only adds a note, stored as a rule of kind note for the barbershop's barber work: who may book a kids cut, in Sam's words, which the AI reads and code never enforces; the read-back tells Sam it was saved only as a note",
+      "source": "arch 09 line 482; S1-21 ('Also ... who may book', kept at default); S11-57; fixtures/v1/forms/barber.json (who_may_book: 'an adult; a parent or guardian for anyone under 18, and a parent stays for a kids cut')"
+    },
+    {
+      "file": "invalid/refuse-unknown-rule-kind.json",
+      "version": "v1",
+      "table": "rules",
+      "expect": "refuse",
+      "shows": "A rule of a kind not in the registry is refused (foreign key rules_kind_fk, SQLSTATE 23503): S1-21's phone-line row as a rule of kind phone_line, which has no registry entry since the phone line is out (C-236); the same row with the registry kind ok_same_day passes",
+      "source": "arch 09 line 480 ('checked against a closed registry. A new kind of rule is a registry entry, never a column'); S1-21 (the phone-line row); C-236; 02-contracts section 8 (voice: none)"
+    },
+    {
+      "file": "invalid/refuse-overlapping-rule-dates.json",
+      "version": "v1",
+      "table": "rules",
+      "expect": "refuse",
+      "shows": "A second new-customer rule for the barbershop from Nov 2 while the kept one is still in effect is refused (EXCLUDE rules_one_in_effect, SQLSTATE 23P01); once the first is closed at that instant, the same row passes: a change closes one row and opens the next",
+      "source": "arch 09 line 488 ('Effective dates on every price and rule. A change closes one row and opens the next'); S11-57 ('Sam changes a booking rule, for new bookings only'); SPEC-master 6 (Nov 2, the price board's change date)"
+    }
+  ]
+}
