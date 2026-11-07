@@ -1,0 +1,28 @@
+{
+  "call": "reserve",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": ["reserve-10-min.json"],
+    "now": "2026-11-07T15:07:00Z",
+    "note": "Alex's mobile holds two saved times at Lee's Barbershop and asks for a third at the yoga studio: the cap counts a mobile across businesses."
+  },
+  "request": {
+    "reservationId": "rsv-alex-maya-nov15",
+    "businessId": "biz-yoga-studio",
+    "resourceId": "res-maya",
+    "during": { "start": "2026-11-15T15:00:00Z", "end": "2026-11-15T16:00:00Z" },
+    "seats": 1,
+    "for": { "phoneNumber": "+15555550101" },
+    "door": "standard",
+    "holdMinutes": null,
+    "waitIfSaved": true,
+    "at": "2026-11-07T15:07:00Z"
+  },
+  "outcome": {
+    "error": "savedTimeCap",
+    "saved": [
+      { "reservationId": "rsv-alex-saved-avery", "heldUntil": "2026-11-07T15:10:00Z" },
+      { "reservationId": "rsv-alex-riley-nov14", "heldUntil": "2026-11-07T15:15:00Z" }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["commit-sam-quick-reply.json"],
+    "now": "2026-11-08T01:31:07Z"
+  },
+  "request": {
+    "outboxRowId": "out-sam-reply-evening",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-sam-reply-evening",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text"],
+        "lines": [{ "role": "first", "text": "Got it, {{owner.name:Sam}}." }],
+        "question": null,
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-sam-reply-evening",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "Got it, Sam.",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [{ "slot": "owner.name", "value": "Sam" }],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRowId": "out-sam-reply-evening",
+    "version": 2
+  }
+}

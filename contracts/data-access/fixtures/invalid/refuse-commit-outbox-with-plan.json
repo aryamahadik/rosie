@@ -1,0 +1,45 @@
+{
+  "turn": {
+    "id": "turn-alex-book-1",
+    "handleId": "handle-alex",
+    "eventIds": ["evt-alex-0012"],
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "traceId": "trace-alex-0012",
+    "joinedTraceIds": [],
+    "tries": 1
+  },
+  "versionsRead": [],
+  "writes": {
+    "state": [],
+    "openQuestions": { "open": [], "close": [] },
+    "clockRows": { "make": [], "cancel": [] },
+    "outboxRows": [
+      {
+        "id": "out-alex-booked-riley",
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "openQuestionId": null,
+        "copyOfRowId": null,
+        "versionsRead": [],
+        "plan": {
+          "row": "out-alex-booked-riley",
+          "channel": "imessage",
+          "copyOf": null,
+          "plan": {
+            "formats": ["text"],
+            "lines": [{ "role": "first", "text": "You're booked with {{pro.name:Riley}}." }],
+            "question": null,
+            "pageType": null,
+            "threadReplyTo": null
+          }
+        }
+      }
+    ],
+    "reservations": { "confirm": [], "release": [] },
+    "events": []
+  }
+}

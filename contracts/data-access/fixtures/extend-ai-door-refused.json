@@ -1,0 +1,21 @@
+{
+  "call": "extend",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": ["reserve-ai-door-15-min.json"],
+    "now": "2026-11-07T15:12:00Z",
+    "note": "More time asked for the truck saved through the customer's own AI: its 15 minutes are never extended."
+  },
+  "request": {
+    "reservationId": "rsv-agent-truck-20-nov20",
+    "businessId": "biz-movers",
+    "expectVersion": 1,
+    "door": "ownAi",
+    "at": "2026-11-07T15:12:00Z"
+  },
+  "outcome": {
+    "error": "neverExtended",
+    "reservationId": "rsv-agent-truck-20-nov20",
+    "door": "ownAi"
+  }
+}

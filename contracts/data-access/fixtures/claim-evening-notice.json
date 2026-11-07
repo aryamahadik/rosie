@@ -1,0 +1,60 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["write-plan-evening-notice.json"],
+    "now": "2026-11-08T01:30:04Z",
+    "note": "The actor asks the dispatcher to send Sam's rows after the commit."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-sam",
+    "now": "2026-11-08T01:30:04Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-sam-passon-evening",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "routine",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+        "finalParts": {
+          "row": "out-sam-passon-evening",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "Alex M. has a question about the haircut.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [{ "slot": "name", "value": "Alex M." }],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-passon-evening/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0020"
+      }
+    ],
+    "passedHeld": []
+  }
+}

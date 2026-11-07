@@ -1,0 +1,12 @@
+{
+  "reservationId": "rsv-agent-truck-26-nov21",
+  "businessId": "biz-movers",
+  "resourceId": "res-truck-26",
+  "during": { "start": "2026-11-21T13:00:00Z", "end": "2026-11-21T21:00:00Z" },
+  "seats": 1,
+  "for": { "phoneNumber": "+15555550101" },
+  "door": "document",
+  "holdMinutes": 1500,
+  "waitIfSaved": false,
+  "at": "2026-11-07T15:05:00Z"
+}

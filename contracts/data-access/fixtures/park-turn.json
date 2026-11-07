@@ -1,0 +1,61 @@
+{
+  "call": "parkTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": [],
+    "now": "2026-11-07T15:20:00Z",
+    "note": "Maya's turn crashed a third time before its commit: it is parked for Rosie's team, and Maya hears once that nothing changed (arch 11 line 576)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-maya-0004",
+      "handleId": "handle-maya",
+      "eventIds": ["evt-maya-0004"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-maya-0004",
+      "joinedTraceIds": [],
+      "tries": 3
+    },
+    "parkedAt": "2026-11-07T15:20:00Z",
+    "outboxRows": [
+      {
+        "id": "out-maya-parked",
+        "recipientHandleId": "handle-maya",
+        "recipientPersonId": "person-maya",
+        "businessId": "biz-yoga-studio",
+        "bookingId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "openQuestionId": null,
+        "copyOfRowId": null,
+        "versionsRead": []
+      }
+    ],
+    "events": [
+      {
+        "id": "log-turn-maya-0004-parked",
+        "kind": "turn.parked",
+        "zone": null,
+        "businessId": "biz-yoga-studio",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "turns",
+        "rowId": "turn-maya-0004",
+        "oldValues": null,
+        "newValues": { "state": "parked", "tries": 3 },
+        "sealed": null,
+        "why": { "outage": "third crash before the commit" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "parked",
+    "turnId": "turn-maya-0004",
+    "parkedAt": "2026-11-07T15:20:00Z",
+    "outboxRows": [{ "id": "out-maya-parked", "commitSeq": 1 }],
+    "repeated": false
+  }
+}

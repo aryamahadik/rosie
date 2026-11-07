@@ -1,0 +1,22 @@
+{
+  "call": "markRow",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["claim-evening-notice.json"],
+    "now": "2026-11-08T01:30:04Z",
+    "note": "Limit 8: a routine row to the owner at 8:30pm is outside text hours, so it is held to 8am in New York (arch 06 line 313)."
+  },
+  "request": {
+    "outboxRowId": "out-sam-passon-evening",
+    "expectVersion": 3,
+    "outcome": "held",
+    "heldUntil": "2026-11-08T13:00:00Z",
+    "at": "2026-11-08T01:30:04Z"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-sam-passon-evening",
+    "version": 4,
+    "outcome": "held"
+  }
+}

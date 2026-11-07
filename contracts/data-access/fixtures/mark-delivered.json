@@ -1,0 +1,25 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["mark-sent.json"],
+    "now": "2026-11-07T15:06:36Z",
+    "note": "Linq's message.delivered for the part, found by its message id."
+  },
+  "request": {
+    "outcome": "delivered",
+    "providerMessageId": "linq-msg-demo-0101",
+    "at": "2026-11-07T15:06:36Z"
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-alex-booked-riley",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": true,
+    "openQuestionId": null,
+    "nextKey": null
+  }
+}

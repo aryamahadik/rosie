@@ -1,0 +1,59 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": [],
+    "now": "2026-11-07T15:07:00Z",
+    "note": "The turn read Alex's haircut booking at version 6; another chat's commit has since moved it to 7 (the seed)."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-cancel-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0013"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0013",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 6 }],
+    "writes": {
+      "state": [
+        {
+          "op": "update",
+          "table": "bookings",
+          "key": { "id": "booking-alex-haircut" },
+          "expectVersion": 6,
+          "set": { "stage": "cancelled" }
+        }
+      ],
+      "openQuestions": { "open": [], "close": [] },
+      "clockRows": { "make": [], "cancel": [] },
+      "outboxRows": [],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-booking-alex-haircut-cancel",
+          "kind": "booking.cancelled",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "person",
+          "actorPersonId": "person-alex",
+          "actorRole": "customer",
+          "tableName": "bookings",
+          "rowId": "booking-alex-haircut",
+          "oldValues": { "stage": "booked" },
+          "newValues": { "stage": "cancelled" },
+          "sealed": null,
+          "why": { "step": "A7-02" },
+          "approvedBy": { "exactYes": "evt-alex-0013" },
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "error": "versionChanged",
+    "changed": [{ "table": "bookings", "rowId": "booking-alex-haircut", "readVersion": 6, "currentVersion": 7 }]
+  }
+}

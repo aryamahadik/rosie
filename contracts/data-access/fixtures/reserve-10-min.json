@@ -1,0 +1,31 @@
+{
+  "call": "reserve",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": [],
+    "now": "2026-11-07T15:05:00Z",
+    "note": "Alex's mobile already holds one saved time (rsv-alex-saved-avery, ends 15:10), so this is its second."
+  },
+  "request": {
+    "reservationId": "rsv-alex-riley-nov14",
+    "businessId": "biz-lees-barbershop",
+    "resourceId": "res-riley",
+    "during": { "start": "2026-11-14T16:00:00Z", "end": "2026-11-14T16:30:00Z" },
+    "seats": 1,
+    "for": { "phoneNumber": "+15555550101" },
+    "door": "standard",
+    "holdMinutes": null,
+    "waitIfSaved": true,
+    "at": "2026-11-07T15:05:00Z"
+  },
+  "outcome": {
+    "result": "held",
+    "reservationId": "rsv-alex-riley-nov14",
+    "version": 1,
+    "resourceId": "res-riley",
+    "during": { "start": "2026-11-14T16:00:00Z", "end": "2026-11-14T16:30:00Z" },
+    "heldUntil": "2026-11-07T15:15:00Z",
+    "savedTimeClockId": "rsv-alex-riley-nov14/saved-time",
+    "repeated": false
+  }
+}

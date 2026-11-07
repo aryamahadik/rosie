@@ -1,0 +1,28 @@
+{
+  "turn": {
+    "id": "turn-alex-book-1",
+    "handleId": "handle-alex",
+    "eventIds": ["evt-alex-0012"],
+    "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+    "traceId": "trace-alex-0012",
+    "joinedTraceIds": [],
+    "tries": 1
+  },
+  "versionsRead": [],
+  "writes": {
+    "state": [
+      {
+        "op": "update",
+        "table": "reservations",
+        "key": { "id": "rsv-alex-riley-nov14" },
+        "expectVersion": 1,
+        "set": { "state": "booked", "booking_id": "booking-alex-riley-nov14" }
+      }
+    ],
+    "openQuestions": { "open": [], "close": [] },
+    "clockRows": { "make": [], "cancel": [] },
+    "outboxRows": [],
+    "reservations": { "confirm": [], "release": [] },
+    "events": []
+  }
+}

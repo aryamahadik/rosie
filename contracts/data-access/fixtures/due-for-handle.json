@@ -1,0 +1,34 @@
+{
+  "call": "dueClocks",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": ["arm-clock.json"],
+    "now": "2026-10-24T14:05:30Z",
+    "note": "Alex's actor's alarm rings: A7-03's clock is due and Alex never picked a time."
+  },
+  "request": {
+    "for": "handle",
+    "handleId": "handle-alex",
+    "now": "2026-10-24T14:05:30Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "due",
+    "rows": [
+      {
+        "clockRowId": "clock-oq-a7-03-alex",
+        "version": 2,
+        "kind": "question",
+        "handleId": "handle-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-haircut",
+        "openQuestionId": "oq-a7-03-alex",
+        "reservationId": null,
+        "dueAt": "2026-10-24T14:05:04Z",
+        "dueZone": "America/New_York",
+        "fires": { "step": "A7-03", "safeDefault": "the time stays as booked" }
+      }
+    ],
+    "nextDueAt": null
+  }
+}

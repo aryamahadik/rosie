@@ -1,0 +1,31 @@
+{
+  "call": "reserve",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": [],
+    "now": "2026-11-07T15:05:00Z",
+    "note": "A customer's own AI books the movers' 20-ft truck, a service that books at once with a deposit due: D104's door."
+  },
+  "request": {
+    "reservationId": "rsv-agent-truck-20-nov20",
+    "businessId": "biz-movers",
+    "resourceId": "res-truck-20",
+    "during": { "start": "2026-11-20T13:00:00Z", "end": "2026-11-20T21:00:00Z" },
+    "seats": 1,
+    "for": { "agentToken": "agent-token-demo-1" },
+    "door": "ownAi",
+    "holdMinutes": null,
+    "waitIfSaved": false,
+    "at": "2026-11-07T15:05:00Z"
+  },
+  "outcome": {
+    "result": "held",
+    "reservationId": "rsv-agent-truck-20-nov20",
+    "version": 1,
+    "resourceId": "res-truck-20",
+    "during": { "start": "2026-11-20T13:00:00Z", "end": "2026-11-20T21:00:00Z" },
+    "heldUntil": "2026-11-07T15:20:00Z",
+    "savedTimeClockId": "rsv-agent-truck-20-nov20/saved-time",
+    "repeated": false
+  }
+}

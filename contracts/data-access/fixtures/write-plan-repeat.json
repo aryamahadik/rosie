@@ -1,0 +1,53 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["write-plan.json"],
+    "now": "2026-11-07T15:06:34Z",
+    "note": "write-plan.json's request sent again (a retry after a lost reply): the row already holds a plan, which stays."
+  },
+  "request": {
+    "outboxRowId": "out-alex-booked-riley",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-alex-booked-riley",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text"],
+        "lines": [
+          { "role": "first", "text": "You're booked with {{pro.name:Riley}} at {{biz.name:Lee's Barbershop}}." },
+          { "role": "fact", "text": "{{visit.time:Sat Nov 14, 11:00am}}" }
+        ],
+        "question": null,
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-alex-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+          "calendarFile": "new",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "biz.name", "value": "Lee's Barbershop" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "error": "alreadyPlanned",
+    "outboxRowId": "out-alex-booked-riley",
+    "version": 2
+  }
+}

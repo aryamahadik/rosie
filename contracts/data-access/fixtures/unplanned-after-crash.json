@@ -1,0 +1,23 @@
+{
+  "call": "unplannedRows",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["write-plan.json"],
+    "now": "2026-11-07T15:06:40Z",
+    "note": "The actor crashed after the commit and after Alex's row was planned: only Sam's row is composed again."
+  },
+  "request": { "turnId": "turn-alex-book-1" },
+  "outcome": {
+    "result": "rows",
+    "rows": [
+      {
+        "outboxRowId": "out-sam-booked-riley",
+        "version": 1,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-sam",
+        "channel": "imessage",
+        "copyOfRowId": null
+      }
+    ]
+  }
+}

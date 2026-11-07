@@ -1,0 +1,106 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["write-plan-owner.json"],
+    "now": "2026-11-07T15:06:35Z",
+    "note": "Both rows of turn-alex-book-1 hold their final parts; the dispatcher's sweep claims any recipients."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "now": "2026-11-07T15:06:35Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-booked-riley",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "quick_reply",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-alex-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "You're booked with Riley at Lee's Barbershop.\nSat Nov 14, 11:00am",
+              "calendarFile": "new",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "biz.name", "value": "Lee's Barbershop" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-alex-booked-riley/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0012"
+      },
+      {
+        "outboxRowId": "out-sam-booked-riley",
+        "version": 3,
+        "commitSeq": 2,
+        "recipientHandleId": "handle-sam",
+        "recipientPersonId": "person-sam",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": "booking-alex-riley-nov14",
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "routine",
+        "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }],
+        "finalParts": {
+          "row": "out-sam-booked-riley",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "New booking: Alex M. with Riley.\nSat Nov 14, 11:00am",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": [],
+          "slotValues": [
+            { "slot": "name", "value": "Alex M." },
+            { "slot": "pro.name", "value": "Riley" },
+            { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+          ],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-sam-booked-riley/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0012"
+      }
+    ],
+    "passedHeld": []
+  }
+}

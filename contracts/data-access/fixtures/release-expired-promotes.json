@@ -1,0 +1,34 @@
+{
+  "call": "release",
+  "given": {
+    "k04Seeds": ["seed-reservation.json"],
+    "after": [],
+    "now": "2026-11-07T15:10:00Z",
+    "note": "Alex's saved time with Avery ends at 15:10 with no yes. Two agent tokens wait for it, queued at 15:02 and 15:04 though inserted in the other order: the 15:02 one is promoted."
+  },
+  "request": {
+    "reservationId": "rsv-alex-saved-avery",
+    "businessId": "biz-lees-barbershop",
+    "expectVersion": null,
+    "why": "expired",
+    "at": "2026-11-07T15:10:00Z"
+  },
+  "outcome": {
+    "result": "released",
+    "reservationId": "rsv-alex-saved-avery",
+    "version": 2,
+    "releasedAt": "2026-11-07T15:10:00Z",
+    "why": "expired",
+    "promoted": {
+      "reservationId": "rsv-agent-waiting-avery",
+      "version": 2,
+      "heldUntil": "2026-11-07T15:20:00Z",
+      "forPhoneNumber": null,
+      "forAgentToken": "agent-token-demo-2",
+      "bookingId": null,
+      "savedTimeClockId": "rsv-agent-waiting-avery/saved-time"
+    },
+    "skipped": [],
+    "repeated": false
+  }
+}

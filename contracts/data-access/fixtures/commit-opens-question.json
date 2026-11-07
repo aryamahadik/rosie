@@ -1,0 +1,108 @@
+{
+  "call": "commitTurn",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-booking-head.json"],
+    "after": [],
+    "now": "2026-10-23T14:05:02Z",
+    "note": "The tour's example (tour lines 423 to 427): Alex asks to move the haircut; A7-03 asks which time, with booking v7 read and a 24-hour clock that waits for the first delivery receipt."
+  },
+  "request": {
+    "turn": {
+      "id": "turn-alex-move-1",
+      "handleId": "handle-alex",
+      "eventIds": ["evt-alex-0007"],
+      "bundleId": { "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037", "build": 1 },
+      "traceId": "trace-alex-0007",
+      "joinedTraceIds": [],
+      "tries": 1
+    },
+    "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+    "writes": {
+      "state": [],
+      "openQuestions": {
+        "open": [
+          {
+            "id": "oq-a7-03-alex",
+            "handleId": "handle-alex",
+            "personId": "person-alex",
+            "businessId": "biz-lees-barbershop",
+            "bookingId": "booking-alex-haircut",
+            "step": "A7-03",
+            "options": [
+              { "id": "A7-03/1", "label": "Sat 12:00pm" },
+              { "id": "A7-03/2", "label": "Sat 2:00pm" },
+              { "id": "A7-03/3", "label": "Sat 3:30pm" }
+            ],
+            "readback": null,
+            "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }],
+            "clock": "24 h"
+          }
+        ],
+        "close": []
+      },
+      "clockRows": {
+        "make": [
+          {
+            "id": "clock-oq-a7-03-alex",
+            "kind": "question",
+            "openQuestionId": "oq-a7-03-alex",
+            "reservationId": null,
+            "handleId": "handle-alex",
+            "businessId": "biz-lees-barbershop",
+            "bookingId": "booking-alex-haircut",
+            "fires": { "step": "A7-03", "safeDefault": "the time stays as booked" }
+          }
+        ],
+        "cancel": []
+      },
+      "outboxRows": [
+        {
+          "id": "out-a7-03-alex",
+          "recipientHandleId": "handle-alex",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-haircut",
+          "channel": "imessage",
+          "sendClass": "quick_reply",
+          "openQuestionId": "oq-a7-03-alex",
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-haircut", "version": 7 }]
+        }
+      ],
+      "reservations": { "confirm": [], "release": [] },
+      "events": [
+        {
+          "id": "log-oq-a7-03-alex-opened",
+          "kind": "question.opened",
+          "zone": "America/New_York",
+          "businessId": "biz-lees-barbershop",
+          "actorKind": "rosie",
+          "actorPersonId": null,
+          "actorRole": null,
+          "tableName": "open_questions",
+          "rowId": "oq-a7-03-alex",
+          "oldValues": null,
+          "newValues": { "step": "A7-03", "status": "waiting" },
+          "sealed": null,
+          "why": { "step": "A7-03" },
+          "approvedBy": null,
+          "proofs": null
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "result": "committed",
+    "turnId": "turn-alex-move-1",
+    "committedAt": "2026-10-23T14:05:02Z",
+    "repeated": false,
+    "committed": {
+      "written": [
+        { "table": "open_questions", "rowId": "oq-a7-03-alex", "version": 1 },
+        { "table": "clock_rows", "rowId": "clock-oq-a7-03-alex", "version": 1 }
+      ],
+      "outboxRows": [{ "id": "out-a7-03-alex", "commitSeq": 1 }],
+      "promoted": []
+    }
+  }
+}

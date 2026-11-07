@@ -1,0 +1,53 @@
+{
+  "call": "writePlan",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["write-plan.json"],
+    "now": "2026-11-07T15:06:34Z",
+    "note": "The owner's notice to Sam gets its plan too."
+  },
+  "request": {
+    "outboxRowId": "out-sam-booked-riley",
+    "expectVersion": 1,
+    "plan": {
+      "row": "out-sam-booked-riley",
+      "channel": "imessage",
+      "copyOf": null,
+      "plan": {
+        "formats": ["text"],
+        "lines": [
+          { "role": "first", "text": "New booking: {{name:Alex M.}} with {{pro.name:Riley}}." },
+          { "role": "fact", "text": "{{visit.time:Sat Nov 14, 11:00am}}" }
+        ],
+        "question": null,
+        "pageType": null,
+        "threadReplyTo": null
+      }
+    },
+    "finalParts": {
+      "row": "out-sam-booked-riley",
+      "channel": "imessage",
+      "sends": [
+        {
+          "kind": "words",
+          "text": "New booking: Alex M. with Riley.\nSat Nov 14, 11:00am",
+          "calendarFile": "none",
+          "options": [],
+          "link": null
+        }
+      ],
+      "fixedLines": [],
+      "slotValues": [
+        { "slot": "name", "value": "Alex M." },
+        { "slot": "pro.name", "value": "Riley" },
+        { "slot": "visit.time", "value": "Sat Nov 14, 11:00am" }
+      ],
+      "threadReplyTo": null
+    }
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRowId": "out-sam-booked-riley",
+    "version": 2
+  }
+}

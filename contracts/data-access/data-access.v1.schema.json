@@ -1,0 +1,2337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.schema.json",
+  "title": "DataAccessV1",
+  "description": "K-05 v1, the data-access calls the runtime and the Tool API make on PostgreSQL (02-contracts K-05; BP 3.3: 'commit a turn, claim outbox rows, arm and fire clock rows, reserve and release'). Each call's request, response and errors are definitions under $defs named <call>.request, <call>.response and <call>.errors (02-contracts section 2 item 2), and <call>.exchange pairs one request with its outcome, which is what every fixture is. The root is any one exchange, so the type generator writes a type for every call (ADR-005). The rows these calls read and write are K-04 v1's core tables (contracts/db-schema/core/core.v1.tables.json); the README states for each call whether it reads the primary uncached or the replica, the business scope it runs under, whether repeating it is safe, and its time budget. Not model-facing, so number and length limits are schema rules here.",
+  "anyOf": [
+    { "$ref": "#/$defs/commitTurn.exchange" },
+    { "$ref": "#/$defs/writePlan.exchange" },
+    { "$ref": "#/$defs/unplannedRows.exchange" },
+    { "$ref": "#/$defs/claimOutbox.exchange" },
+    { "$ref": "#/$defs/markPart.exchange" },
+    { "$ref": "#/$defs/markRow.exchange" },
+    { "$ref": "#/$defs/armClock.exchange" },
+    { "$ref": "#/$defs/cancelClock.exchange" },
+    { "$ref": "#/$defs/dueClocks.exchange" },
+    { "$ref": "#/$defs/fireClock.exchange" },
+    { "$ref": "#/$defs/reserve.exchange" },
+    { "$ref": "#/$defs/release.exchange" },
+    { "$ref": "#/$defs/extend.exchange" },
+    { "$ref": "#/$defs/readActiveBundle.exchange" },
+    { "$ref": "#/$defs/readBundleValue.exchange" },
+    { "$ref": "#/$defs/publishBundleCopy.exchange" },
+    { "$ref": "#/$defs/setActiveBundle.exchange" },
+    { "$ref": "#/$defs/parkTurn.exchange" }
+  ],
+  "$defs": {
+    "id": {
+      "title": "Id",
+      "description": "An opaque id code makes and never parses (CQ-09; K-04 v1 rule 3: ids are text).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/id"
+    },
+    "nullableId": {
+      "title": "NullableId",
+      "description": "An opaque id, or null where the K-04 column is nullable (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/id" }, { "type": "null" }]
+    },
+    "utc": {
+      "title": "Utc",
+      "description": "An instant in UTC ending in Z (CQ-09); K-04's timestamptz columns.",
+      "$ref": "../common/formats.v1.schema.json#/$defs/utc"
+    },
+    "nullableUtc": {
+      "title": "NullableUtc",
+      "description": "An instant in UTC, or null (CQ-09).",
+      "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/utc" }, { "type": "null" }]
+    },
+    "zone": {
+      "title": "Zone",
+      "description": "An IANA zone name (CQ-09; S13-03; K-04 clock_rows.due_zone).",
+      "$ref": "../common/formats.v1.schema.json#/$defs/zone"
+    },
+    "bundleId": {
+      "title": "BundleIdRef",
+      "description": "A bundle id {hash, build} (K-01 v1 bundleId; CQ-09; K-04 bundles primary key). The hash is 64 lowercase hex characters and the build counts publishes from 1 (K-04 checks bundles_hash_form, bundles_build_positive).",
+      "type": "object",
+      "properties": {
+        "hash": {
+          "description": "The content hash (K-01 v1 sha256; K-04 bundles.hash).",
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "build": {
+          "description": "The build number, from 1 (K-01 v1 bundleId; K-04 bundles.build).",
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["hash", "build"],
+      "additionalProperties": false
+    },
+    "phoneNumber": {
+      "title": "PhoneNumber",
+      "description": "A mobile number in E.164 form (K-04 phones_number_form; FS line 728).",
+      "type": "string",
+      "pattern": "^\\+[1-9][0-9]{6,14}$"
+    },
+    "tableName": {
+      "title": "TableName",
+      "description": "A table name as K-04 (or a later domain part) spells it (02-contracts section 2 item 3).",
+      "type": "string",
+      "pattern": "^[a-z_][a-z0-9_]*$"
+    },
+    "version": {
+      "title": "RowVersion",
+      "description": "A row's version: every update raises it by one and a commit compares and sets it (arch 01 line 85; arch 10 line 506; K-04 v1 rule 2).",
+      "type": "integer",
+      "minimum": 1
+    },
+    "sqlstate": {
+      "title": "Sqlstate",
+      "description": "A PostgreSQL SQLSTATE code, five characters, such as 23P01 (EXCLUDE), 23514 (CHECK), 23505 (unique), 40001 (serialization failure) or 40P01 (deadlock) (K-04 README, refused fixtures).",
+      "type": "string",
+      "pattern": "^[0-9A-Z]{5}$"
+    },
+    "rowRef": {
+      "title": "RowRef",
+      "description": "A row and the version it was read at: the row references of K-02's facts, which K-04 stores in open_questions.versions_read and outbox_rows.versions_read and which a commit compares and sets (limit 4: arch 06 line 305; tour line 425: booking v7).",
+      "type": "object",
+      "properties": {
+        "table": { "$ref": "#/$defs/tableName" },
+        "rowId": {
+          "description": "The row's primary key as text (K-02 v1 fact rowId; K-04 versions_read).",
+          "$ref": "#/$defs/id"
+        },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["table", "rowId", "version"],
+      "additionalProperties": false
+    },
+    "changedRow": {
+      "title": "ChangedRow",
+      "description": "A row whose version moved since it was read: limit 4's 'rows that changed' (02-contracts K-05 item 1; arch 06 line 305: reload once, then say what changed).",
+      "type": "object",
+      "properties": {
+        "table": { "$ref": "#/$defs/tableName" },
+        "rowId": { "$ref": "#/$defs/id" },
+        "readVersion": {
+          "description": "The version the turn read.",
+          "$ref": "#/$defs/version"
+        },
+        "currentVersion": {
+          "description": "The version now on the primary.",
+          "$ref": "#/$defs/version"
+        }
+      },
+      "required": ["table", "rowId", "readVersion", "currentVersion"],
+      "additionalProperties": false
+    },
+    "during": {
+      "title": "During",
+      "description": "A time range [start, end), K-04 reservations.during (arch 09 line 457: 'Reservation: resource · range · state'). Both ends bounded (K-04 reservations_during_bounded); that start is before end is a code check.",
+      "type": "object",
+      "properties": {
+        "start": { "$ref": "#/$defs/utc" },
+        "end": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["start", "end"],
+      "additionalProperties": false
+    },
+    "given": {
+      "title": "Given",
+      "description": "What an exchange assumes before its request runs, so QA's contract test (T-084) can set it up against local PostgreSQL with K-04 migrated (02-contracts K-05 'Contract test'): the K-04 seed fixtures loaded, the data-access fixtures run first, and the clock.",
+      "type": "object",
+      "properties": {
+        "k04Seeds": {
+          "description": "K-04 v1 seed fixtures (contracts/db-schema/core/fixtures/), each loaded with its own 'after' chain.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^seed-[a-z0-9-]+[.]json$" }
+        },
+        "after": {
+          "description": "Fixtures of this folder whose requests run first, in order.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9-]+[.]json$" }
+        },
+        "now": {
+          "description": "The database's now() when the request runs (the test's fake clock).",
+          "$ref": "#/$defs/utc"
+        },
+        "note": {
+          "description": "Anything else the exchange assumes, in plain words.",
+          "type": "string"
+        }
+      },
+      "required": ["k04Seeds", "after", "now"],
+      "additionalProperties": false
+    },
+    "transientError": {
+      "title": "TransientError",
+      "description": "The database could not run the call now (a serialization failure 40001, a deadlock 40P01 or a lost connection). Nothing was written; the same request may be sent again (arch 10 line 540: queues carry retries).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "transient" },
+        "sqlstate": { "$ref": "#/$defs/sqlstate" }
+      },
+      "required": ["error", "sqlstate"],
+      "additionalProperties": false
+    },
+    "notFoundError": {
+      "title": "NotFoundError",
+      "description": "The row does not exist, or the call's business scope hides it (K-04 v1 rule 4: a row-level security read returns no row). Nothing was written.",
+      "type": "object",
+      "properties": {
+        "error": { "const": "notFound" },
+        "table": { "$ref": "#/$defs/tableName" },
+        "rowId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["error", "table", "rowId"],
+      "additionalProperties": false
+    },
+    "versionChangedError": {
+      "title": "VersionChangedError",
+      "description": "Limit 4: a row read or written by this call has a newer version than the one given. Nothing was written; the rows that changed are listed (02-contracts K-05 item 1; arch 06 line 305; arch 10 line 506).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "versionChanged" },
+        "changed": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/changedRow" },
+          "minItems": 1
+        }
+      },
+      "required": ["error", "changed"],
+      "additionalProperties": false
+    },
+    "constraintError": {
+      "title": "ConstraintError",
+      "description": "A database rule refused a write (an EXCLUDE 23P01, a CHECK 23514, a unique key 23505 or a foreign key 23503 of K-04 v1). Nothing was written (one transaction: arch 01 lines 39 to 41).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "constraint" },
+        "sqlstate": { "$ref": "#/$defs/sqlstate" },
+        "constraint": {
+          "description": "The K-04 constraint's name, such as reservations_no_overlap_per_resource.",
+          "type": "string",
+          "pattern": "^[a-z_][a-z0-9_]*$"
+        }
+      },
+      "required": ["error", "sqlstate", "constraint"],
+      "additionalProperties": false
+    },
+    "turn": {
+      "title": "Turn",
+      "description": "The turn a commit or park writes: K-04 turns, written once, as committed or parked (QUESTIONS.md NQ-RT-3's default: the 60 s lease lives in the handle actor). Its id is a hash of its texts' event ids, unique, so a turn commits once (arch 01 line 59; arch 10 line 508; CQ-09).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The turn id (K-04 turns.id).",
+          "$ref": "../common/formats.v1.schema.json#/$defs/turnId"
+        },
+        "handleId": {
+          "description": "The handle whose texts it batches (K-04 turns.handle_id; arch 01 line 59).",
+          "$ref": "#/$defs/id"
+        },
+        "eventIds": {
+          "description": "The event ids of the texts it joins, in order (K-04 turns.event_ids; K-06). For a clock's turn, see fireClock.request.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "minItems": 1
+        },
+        "bundleId": {
+          "description": "The bundle pinned at turn start (K-04 turns.bundle_hash and bundle_build; arch 10 line 548).",
+          "$ref": "#/$defs/bundleId"
+        },
+        "traceId": {
+          "description": "The first text's trace id (K-04 turns.trace_id; CQ-06).",
+          "$ref": "#/$defs/id"
+        },
+        "joinedTraceIds": {
+          "description": "The other texts' trace ids (K-04 turns.joined_trace_ids; CQ-06).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "tries": {
+          "description": "How many times the turn has started, 1 to 3; a third crash before the commit parks it (K-04 turns.tries; arch 11 line 576).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        }
+      },
+      "required": ["id", "handleId", "eventIds", "bundleId", "traceId", "joinedTraceIds", "tries"],
+      "additionalProperties": false
+    },
+    "stateWrite": {
+      "title": "StateWrite",
+      "description": "One write to a versioned state row the turn decided, such as a booking head, a phone, a pause or a person (02-contracts K-05 item 1: 'the state writes'). An update names the version it read and is compared and set (limit 4; arch 10 line 506). The tables that have their own list below (turns, open questions, clock rows, outbox rows, reservations, the event log) are never written here. Column names and values follow K-04 (or a later domain part): JSON for jsonb, PostgreSQL text input for the rest, as K-04's seed fixtures write them.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "op": { "const": "insert" },
+            "table": { "$ref": "#/$defs/stateTable" },
+            "values": {
+              "description": "Column to value; a column left out takes its default (K-04).",
+              "type": "object",
+              "minProperties": 1
+            }
+          },
+          "required": ["op", "table", "values"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": { "const": "update" },
+            "table": { "$ref": "#/$defs/stateTable" },
+            "key": {
+              "description": "The row's primary key, column to value (K-04 primaryKey).",
+              "type": "object",
+              "minProperties": 1
+            },
+            "expectVersion": {
+              "description": "The version the turn read; the update raises it by one or the commit is refused (limit 4).",
+              "$ref": "#/$defs/version"
+            },
+            "set": {
+              "description": "Column to new value; never the version column, which the update raises.",
+              "type": "object",
+              "minProperties": 1,
+              "not": { "required": ["version"] }
+            }
+          },
+          "required": ["op", "table", "key", "expectVersion", "set"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "stateTable": {
+      "title": "StateTable",
+      "description": "A table a state write may name: any K-04 or domain table except those the commit writes through their own lists and the write-once bundle and sealing rows, which have calls of their own.",
+      "type": "string",
+      "pattern": "^[a-z_][a-z0-9_]*$",
+      "not": {
+        "enum": [
+          "turns",
+          "open_questions",
+          "clock_rows",
+          "outbox_rows",
+          "outbox_parts",
+          "reservations",
+          "class_seats",
+          "event_log",
+          "bundles",
+          "bundle_values",
+          "sealing_keys"
+        ]
+      }
+    },
+    "openQuestionNew": {
+      "title": "OpenQuestionNew",
+      "description": "An open question the turn opens: K-04 open_questions, with the turn's id and bundle (arch 01 line 63; arch 09 line 490; tour lines 423 to 427). It starts waiting; the commit writes no clock for it unless the turn lists one.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "handleId": {
+          "description": "The handle it is sent to (K-04 open_questions.handle_id).",
+          "$ref": "#/$defs/id"
+        },
+        "personId": { "description": "The person asked, when known.", "$ref": "#/$defs/nullableId" },
+        "businessId": {
+          "description": "The business it is about; null before there is one.",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": { "description": "The booking it is about, or null.", "$ref": "#/$defs/nullableId" },
+        "step": {
+          "description": "The step that asks (K-01 v1 stepId; K-04 open_questions_step_form).",
+          "$ref": "../bundle/bundle.v1.schema.json#/$defs/stepId"
+        },
+        "options": {
+          "description": "The options as sent, in order, as K-03's option (K-04 open_questions.options); empty for an open-ended question.",
+          "type": "array",
+          "items": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/option" }
+        },
+        "readback": {
+          "description": "The read-back an exact yes binds to, or null (arch 01 line 89; S12-05).",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        },
+        "versionsRead": {
+          "description": "The versions it was decided on (K-04 open_questions.versions_read; limit 4).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "clock": {
+          "description": "The step's Clock line as it applies, such as '24 h'; null: step 9's default (K-04 open_questions.clock; arch 02 line 127).",
+          "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "id",
+        "handleId",
+        "personId",
+        "businessId",
+        "bookingId",
+        "step",
+        "options",
+        "readback",
+        "versionsRead",
+        "clock"
+      ],
+      "additionalProperties": false
+    },
+    "openQuestionClose": {
+      "title": "OpenQuestionClose",
+      "description": "An open question the turn closes: answered (with the option chosen), defaulted or withdrawn (K-04 open_questions.status and closed_at; arch 09 line 490; arch 02 line 123).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "status": { "enum": ["answered", "defaulted", "withdrawn"] },
+        "answeredOptionId": {
+          "description": "For answered with an option, the option's id (K-04 answered_option_id); otherwise null.",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["id", "expectVersion", "status", "answeredOptionId"],
+      "additionalProperties": false
+    },
+    "clockKind": {
+      "title": "ClockKind",
+      "description": "K-04 clock_rows.kind: question, never_delivered, saved_time, step or job (arch 02 line 127; arch 05 line 247; arch 10 line 540).",
+      "enum": ["question", "never_delivered", "saved_time", "step", "job"]
+    },
+    "clockNew": {
+      "title": "ClockNew",
+      "description": "A clock row the turn makes (02-contracts K-05 item 1; K-04 clock_rows; arch 01 line 83). Without 'due' it is written waiting and arms later (a question's clock arms at its first delivery receipt: arch 02 line 127, armClock); with 'due' it is written armed at the commit's time (a timed step whose due time is known now).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "$ref": "#/$defs/clockKind" },
+        "openQuestionId": {
+          "description": "For question and never_delivered, its question (K-04 clock_rows_question_has_question).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "reservationId": {
+          "description": "For saved_time, its reservation (K-04 clock_rows_saved_time_has_reservation).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "handleId": {
+          "description": "The owning handle whose actor's alarm triggers it; null for rows the minute sweep owns (arch 10 line 540; K-04 clock_rows_job_has_no_handle).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "fires": {
+          "description": "What it fires: the step and branch, the safe default, or the job (K-04 clock_rows.fires, a JSON object).",
+          "type": "object"
+        },
+        "due": {
+          "description": "Present: armed at the commit, due then (arch 01 line 83).",
+          "type": "object",
+          "properties": {
+            "dueAt": { "$ref": "#/$defs/utc" },
+            "dueZone": { "$ref": "#/$defs/zone" }
+          },
+          "required": ["dueAt", "dueZone"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "openQuestionId",
+        "reservationId",
+        "handleId",
+        "businessId",
+        "bookingId",
+        "fires"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "enum": ["question", "never_delivered"] } }
+          },
+          "then": {
+            "properties": { "openQuestionId": { "$ref": "#/$defs/id" } }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "saved_time" } } },
+          "then": { "properties": { "reservationId": { "$ref": "#/$defs/id" } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "job" } } },
+          "then": { "properties": { "handleId": { "type": "null" } } }
+        }
+      ]
+    },
+    "clockCancel": {
+      "title": "ClockCancel",
+      "description": "A clock row the turn cancels, because its question was answered or withdrawn (02-contracts K-05 item 4; K-04 clock_rows.cancelled_at).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" }
+      },
+      "required": ["id", "expectVersion"],
+      "additionalProperties": false
+    },
+    "channel": {
+      "title": "Channel",
+      "description": "imessage, rcs or sms through Linq, or email (K-03 v1 channel; K-04 outbox_rows_channel_known; DL-012).",
+      "enum": ["imessage", "rcs", "sms", "email"]
+    },
+    "sendClass": {
+      "title": "SendClass",
+      "description": "routine; quick_reply (a reply in the same turn: Q-15); visit_now; safety. Only routine waits for text hours (RULES 4.3; arch 06 line 313; K-04 outbox_rows.send_class).",
+      "enum": ["routine", "quick_reply", "visit_now", "safety"]
+    },
+    "outboxRowNew": {
+      "title": "OutboxRowNew",
+      "description": "One message to one recipient on one channel, written by the commit with no plan: 'Words are written into those rows after the commit' (arch 01 lines 39 to 41; arch 01 line 65; K-04 outbox_rows). The database gives its commit order (K-04 commit_seq) and its first state (K-04's default; K-07 names the states). A plan or final parts here is refused.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "recipientHandleId": { "$ref": "#/$defs/id" },
+        "recipientPersonId": { "$ref": "#/$defs/nullableId" },
+        "businessId": {
+          "description": "The business it is from or about; null for Rosie's own lines before there is one (K-04 outbox_rows.business_id).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "channel": { "$ref": "#/$defs/channel" },
+        "sendClass": { "$ref": "#/$defs/sendClass" },
+        "openQuestionId": {
+          "description": "The open question it asks, or null (K-04 outbox_rows.open_question_id).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "copyOfRowId": {
+          "description": "For an email copy, the text row whose plan it reuses (arch 07 lines 371, 397; K-04 outbox_rows_copy_is_email).",
+          "$ref": "#/$defs/nullableId"
+        },
+        "versionsRead": {
+          "description": "The versions it was decided on; limit 8 compares them at send (arch 06 line 313; K-04 outbox_rows.versions_read).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        }
+      },
+      "required": [
+        "id",
+        "recipientHandleId",
+        "recipientPersonId",
+        "businessId",
+        "bookingId",
+        "channel",
+        "sendClass",
+        "openQuestionId",
+        "copyOfRowId",
+        "versionsRead"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "channel": { "enum": ["imessage", "rcs", "sms"] } } },
+      "then": { "properties": { "copyOfRowId": { "type": "null" } } }
+    },
+    "reservationConfirm": {
+      "title": "ReservationConfirm",
+      "description": "A saved time the turn books: held to booked, with its booking (02-contracts K-05 item 1: 'reservations confirmed'; K-04 reservations.state, booking_id). Refused with reservationLost when it is no longer held (limit 5: arch 06 line 307).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "bookingId": { "$ref": "#/$defs/id" }
+      },
+      "required": ["id", "expectVersion", "bookingId"],
+      "additionalProperties": false
+    },
+    "reservationLetGo": {
+      "title": "ReservationLetGo",
+      "description": "A reservation the turn releases: let go or cancelled (02-contracts K-05 items 1 and 6). It promotes the next in line in the same transaction, as release does.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "why": { "enum": ["let_go", "cancelled"] }
+      },
+      "required": ["id", "expectVersion", "why"],
+      "additionalProperties": false
+    },
+    "sealedValues": {
+      "title": "SealedValues",
+      "description": "Private old and new values already sealed under one person's key (K-04 event_log.sealed_values and sealed_for_person_id; arch 09 line 492; arch 01 line 93). The caller seals; this layer stores the bytes. One person per entry.",
+      "type": "object",
+      "properties": {
+        "forPersonId": { "$ref": "#/$defs/id" },
+        "base64": {
+          "description": "The sealed bytes in base64.",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        }
+      },
+      "required": ["forPersonId", "base64"],
+      "additionalProperties": false
+    },
+    "eventEntry": {
+      "title": "EventEntry",
+      "description": "One event-log entry the call appends: who, what, old and new, why, approved by; never edited (arch 09 lines 457, 492; K-04 event_log). The turn's id, trace id and bundle, or the job's id, come from the call, not the entry. K-08 (F3) gives the kinds and the shapes of why, approvedBy and proofs; until then they are free text and JSON objects.",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": {
+          "description": "What happened (K-04 event_log.kind; K-08's closed list).",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.]*$"
+        },
+        "zone": {
+          "description": "The IANA zone the event is read in; null: UTC (K-04 event_log.zone; S13-03).",
+          "anyOf": [{ "$ref": "#/$defs/zone" }, { "type": "null" }]
+        },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "actorKind": {
+          "description": "Who: person, rosie, job or provider (K-04 event_log_actor_kind_known).",
+          "enum": ["person", "rosie", "job", "provider"]
+        },
+        "actorPersonId": { "$ref": "#/$defs/nullableId" },
+        "actorRole": {
+          "description": "The person's role at the business, as K-04 person_roles names it, or null.",
+          "anyOf": [{ "enum": ["owner", "admin", "staff", "own_business", "customer"] }, { "type": "null" }]
+        },
+        "tableName": { "anyOf": [{ "$ref": "#/$defs/tableName" }, { "type": "null" }] },
+        "rowId": { "$ref": "#/$defs/nullableId" },
+        "oldValues": { "anyOf": [{ "type": "object" }, { "type": "null" }] },
+        "newValues": { "anyOf": [{ "type": "object" }, { "type": "null" }] },
+        "sealed": { "anyOf": [{ "$ref": "#/$defs/sealedValues" }, { "type": "null" }] },
+        "why": { "anyOf": [{ "type": "object" }, { "type": "null" }] },
+        "approvedBy": { "anyOf": [{ "type": "object" }, { "type": "null" }] },
+        "proofs": { "anyOf": [{ "type": "object" }, { "type": "null" }] }
+      },
+      "required": [
+        "id",
+        "kind",
+        "zone",
+        "businessId",
+        "actorKind",
+        "actorPersonId",
+        "actorRole",
+        "tableName",
+        "rowId",
+        "oldValues",
+        "newValues",
+        "sealed",
+        "why",
+        "approvedBy",
+        "proofs"
+      ],
+      "additionalProperties": false,
+      "if": { "properties": { "actorKind": { "const": "person" } } },
+      "then": { "properties": { "actorPersonId": { "$ref": "#/$defs/id" } } }
+    },
+    "writes": {
+      "title": "Writes",
+      "description": "Everything one turn commits, all or nothing, in one transaction under the turn id (arch 01 lines 39 to 41; arch 02 line 121; 02-contracts K-05 item 1): state writes, open questions opened or closed, clock rows made or cancelled, outbox rows with no plan yet, reservations confirmed or released, and event-log entries. Every list is present, empty when the turn has none.",
+      "type": "object",
+      "properties": {
+        "state": { "type": "array", "items": { "$ref": "#/$defs/stateWrite" } },
+        "openQuestions": {
+          "type": "object",
+          "properties": {
+            "open": { "type": "array", "items": { "$ref": "#/$defs/openQuestionNew" } },
+            "close": { "type": "array", "items": { "$ref": "#/$defs/openQuestionClose" } }
+          },
+          "required": ["open", "close"],
+          "additionalProperties": false
+        },
+        "clockRows": {
+          "type": "object",
+          "properties": {
+            "make": { "type": "array", "items": { "$ref": "#/$defs/clockNew" } },
+            "cancel": { "type": "array", "items": { "$ref": "#/$defs/clockCancel" } }
+          },
+          "required": ["make", "cancel"],
+          "additionalProperties": false
+        },
+        "outboxRows": { "type": "array", "items": { "$ref": "#/$defs/outboxRowNew" } },
+        "reservations": {
+          "type": "object",
+          "properties": {
+            "confirm": { "type": "array", "items": { "$ref": "#/$defs/reservationConfirm" } },
+            "release": { "type": "array", "items": { "$ref": "#/$defs/reservationLetGo" } }
+          },
+          "required": ["confirm", "release"],
+          "additionalProperties": false
+        },
+        "events": { "type": "array", "items": { "$ref": "#/$defs/eventEntry" } }
+      },
+      "required": ["state", "openQuestions", "clockRows", "outboxRows", "reservations", "events"],
+      "additionalProperties": false
+    },
+    "outboxRowWritten": {
+      "title": "OutboxRowWritten",
+      "description": "An outbox row the call wrote, with the commit order the database gave it (K-04 outbox_rows.commit_seq, an identity column: arch 02 line 125).",
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "commitSeq": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["id", "commitSeq"],
+      "additionalProperties": false
+    },
+    "promotion": {
+      "title": "Promotion",
+      "description": "The next in line a release promoted: the waiting row of the same resource whose time overlaps the released one, earliest queued_at first, a tie to the lower id (compared, never parsed: CQ-09), now held with its own saved-time end and saved-time clock row (A4-18; arch 05 line 247; K-04 reservations.queued_at and reservations_waiting_queue_idx; K-04 reservations_held_has_end).",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "heldUntil": { "$ref": "#/$defs/utc" },
+        "forPhoneNumber": { "anyOf": [{ "$ref": "#/$defs/phoneNumber" }, { "type": "null" }] },
+        "forAgentToken": { "$ref": "#/$defs/nullableId" },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "savedTimeClockId": {
+          "description": "The saved_time clock row written for its end (K-04 clock_rows kind saved_time).",
+          "$ref": "#/$defs/id"
+        }
+      },
+      "required": [
+        "reservationId",
+        "version",
+        "heldUntil",
+        "forPhoneNumber",
+        "forAgentToken",
+        "bookingId",
+        "savedTimeClockId"
+      ],
+      "additionalProperties": false
+    },
+    "skippedInLine": {
+      "title": "SkippedInLine",
+      "description": "A waiting row release passed over: the EXCLUDE refused holding it because another held or booked row overlaps it (23P01), or its mobile or agent token already holds 2 saved times (arch 05 line 247). It stays waiting.",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "#/$defs/id" },
+        "reason": { "enum": ["overlap", "savedTimeCap"] }
+      },
+      "required": ["reservationId", "reason"],
+      "additionalProperties": false
+    },
+    "commitResult": {
+      "title": "CommitResult",
+      "description": "What a commit (or a clock's firing) wrote: each row it inserted or updated with its version after the commit (turn, outbox and event-log rows left out), the turn's outbox rows with their commit order, and any next in line its releases promoted. A repeat writes nothing, so its written and promoted are empty, while outboxRows still lists the turn's rows, read back by turn id (K-04 keeps no copy of a commit's result).",
+      "type": "object",
+      "properties": {
+        "written": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "outboxRows": { "type": "array", "items": { "$ref": "#/$defs/outboxRowWritten" } },
+        "promoted": { "type": "array", "items": { "$ref": "#/$defs/promotion" } }
+      },
+      "required": ["written", "outboxRows", "promoted"],
+      "additionalProperties": false
+    },
+    "reservationLostError": {
+      "title": "ReservationLostError",
+      "description": "Limit 5: a reservation the turn confirms is no longer held: released, booked, waiting, or still held but past its end and not yet released by its clock (arch 05 line 249: 'No yes before the saved time ends: nothing booked'). Checked before its version. Nothing was written (02-contracts K-05 item 1; arch 06 line 307: the next open times follow).",
+      "type": "object",
+      "properties": {
+        "error": { "const": "reservationLost" },
+        "reservations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "state": { "enum": ["held", "waiting", "booked", "released"] },
+              "heldUntil": { "$ref": "#/$defs/nullableUtc" },
+              "releasedWhy": { "anyOf": [{ "enum": ["expired", "let_go", "cancelled"] }, { "type": "null" }] }
+            },
+            "required": ["id", "state", "heldUntil", "releasedWhy"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["error", "reservations"],
+      "additionalProperties": false
+    },
+
+    "commitTurn.request": {
+      "title": "CommitTurnRequest",
+      "description": "Commit a turn: the gate has passed limits 1 to 6, and one transaction writes the turn row (committed), the state, open questions, clock rows, outbox rows, reservations and the event log under the turn id, all or nothing, once (arch 01 lines 39 to 41; arch 02 line 121; arch 10 line 508; 02-contracts K-05 item 1).",
+      "type": "object",
+      "properties": {
+        "turn": { "$ref": "#/$defs/turn" },
+        "versionsRead": {
+          "description": "Every row the turn's decisions and read-backs rest on, at the version read; each is compared, written or not (limit 4: 'Compare-and-set on every row the read-back showed', arch 06 line 305).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "writes": { "$ref": "#/$defs/writes" }
+      },
+      "required": ["turn", "versionsRead", "writes"],
+      "additionalProperties": false
+    },
+    "commitTurn.response": {
+      "title": "CommitTurnResponse",
+      "description": "Committed. A repeat of a committed turn id writes nothing and returns the first commit's turn id, time and outbox rows with repeated true, whatever the repeat's body (tour line 418; arch 10 line 508: a crash or retry never doubles an effect).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "committed" },
+        "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+        "committedAt": { "$ref": "#/$defs/utc" },
+        "repeated": { "type": "boolean" },
+        "committed": { "$ref": "#/$defs/commitResult" }
+      },
+      "required": ["result", "turnId", "committedAt", "repeated", "committed"],
+      "additionalProperties": false
+    },
+    "commitTurn.errors": {
+      "title": "CommitTurnErrors",
+      "description": "Refused, nothing written: the rows that changed (limit 4), the reservation no longer held (limit 5), the turn already parked (it never commits: arch 11 line 576), a database rule, or a transient failure.",
+      "oneOf": [
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/reservationLostError" },
+        {
+          "title": "TurnParkedError",
+          "type": "object",
+          "properties": {
+            "error": { "const": "turnParked" },
+            "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+            "parkedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "turnId", "parkedAt"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "commitTurn.exchange": {
+      "title": "CommitTurnExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "commitTurn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/commitTurn.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/commitTurn.response" }, { "$ref": "#/$defs/commitTurn.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "writePlan.request": {
+      "title": "WritePlanRequest",
+      "description": "After the commit, write the composer's plan and the final parts after code into one outbox row ('Words are written into those rows after the commit': arch 01 lines 39 to 41; 02-contracts K-05 item 2). K-03 v1's rowPlan and finalParts, stored as one JSON value each (K-04 outbox_rows.plan, final_parts).",
+      "type": "object",
+      "properties": {
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "plan": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/rowPlan" },
+        "finalParts": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts" }
+      },
+      "required": ["outboxRowId", "expectVersion", "plan", "finalParts"],
+      "additionalProperties": false
+    },
+    "writePlan.response": {
+      "title": "WritePlanResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "written" },
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" }
+      },
+      "required": ["result", "outboxRowId", "version"],
+      "additionalProperties": false
+    },
+    "writePlan.errors": {
+      "title": "WritePlanErrors",
+      "description": "alreadyPlanned: the row holds a plan, which stays (after a crash 'only rows without a plan are composed': arch 11 line 576), so a repeat writes nothing; versionChanged; notFound; transient.",
+      "oneOf": [
+        {
+          "title": "AlreadyPlannedError",
+          "type": "object",
+          "properties": {
+            "error": { "const": "alreadyPlanned" },
+            "outboxRowId": { "$ref": "#/$defs/id" },
+            "version": { "$ref": "#/$defs/version" }
+          },
+          "required": ["error", "outboxRowId", "version"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "writePlan.exchange": {
+      "title": "WritePlanExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "writePlan" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/writePlan.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/writePlan.response" }, { "$ref": "#/$defs/writePlan.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "unplannedRows.request": {
+      "title": "UnplannedRowsRequest",
+      "description": "After a crash past the commit, a turn's outbox rows that have no plan yet, so only they are composed (arch 11 line 576; K-04 index outbox_rows_unplanned_idx).",
+      "type": "object",
+      "properties": {
+        "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" }
+      },
+      "required": ["turnId"],
+      "additionalProperties": false
+    },
+    "unplannedRows.response": {
+      "title": "UnplannedRowsResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "rows" },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "outboxRowId": { "$ref": "#/$defs/id" },
+              "version": { "$ref": "#/$defs/version" },
+              "commitSeq": { "type": "integer", "minimum": 1 },
+              "recipientHandleId": { "$ref": "#/$defs/id" },
+              "channel": { "$ref": "#/$defs/channel" },
+              "copyOfRowId": { "$ref": "#/$defs/nullableId" }
+            },
+            "required": [
+              "outboxRowId",
+              "version",
+              "commitSeq",
+              "recipientHandleId",
+              "channel",
+              "copyOfRowId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "rows"],
+      "additionalProperties": false
+    },
+    "unplannedRows.errors": {
+      "title": "UnplannedRowsErrors",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "unplannedRows.exchange": {
+      "title": "UnplannedRowsExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "unplannedRows" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/unplannedRows.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/unplannedRows.response" }, { "$ref": "#/$defs/unplannedRows.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "claimOutbox.request": {
+      "title": "ClaimOutboxRequest",
+      "description": "Claim each recipient's next sendable outbox rows in commit order, so no row is sent twice; a row held for text hours lets later rows pass (arch 02 line 125, DD; 02-contracts K-05 item 3). One recipient (the actor's own after a commit) or, with no recipient, any recipients with sendable rows (the dispatcher's sweep).",
+      "type": "object",
+      "properties": {
+        "claimer": {
+          "description": "The dispatcher instance making the claim, for traces (BP 5.5).",
+          "$ref": "#/$defs/id"
+        },
+        "recipientHandleId": {
+          "description": "One recipient's handle; left out: any recipients.",
+          "$ref": "#/$defs/id"
+        },
+        "now": {
+          "description": "The time held rows are compared with (K-04 outbox_rows.held_until).",
+          "$ref": "#/$defs/utc"
+        },
+        "limit": {
+          "description": "At most this many rows in all.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      },
+      "required": ["claimer", "now", "limit"],
+      "additionalProperties": false
+    },
+    "claimedPart": {
+      "title": "ClaimedPart",
+      "description": "A part of a claimed row and the key to send it under: a part not yet accepted by the provider goes under its stored key (row, part, try), a new part under try 1 (arch 01 line 65; arch 11 line 576; K-04 outbox_parts).",
+      "type": "object",
+      "properties": {
+        "partNo": { "enum": [1, 2] },
+        "tryNo": { "type": "integer", "minimum": 1 },
+        "idempotencyKey": {
+          "description": "'<row>/<part>/<try>' (K-04 outbox_parts_key_form).",
+          "type": "string",
+          "pattern": "^.+/[12]/[1-9][0-9]*$"
+        },
+        "attempts": {
+          "description": "Sends under this key, counting the one this claim is for (K-04 outbox_parts.attempts, at least 1): a new part's row is written at the claim with attempts 1; a re-claim of a part the provider has not accepted raises it (a retry after a timeout or crash reuses the key: arch 01 line 65).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "sent": {
+          "description": "Whether the provider has accepted it (K-04 outbox_parts.sent_at is set); a sent part is not sent again.",
+          "type": "boolean"
+        }
+      },
+      "required": ["partNo", "tryNo", "idempotencyKey", "attempts", "sent"],
+      "additionalProperties": false
+    },
+    "claimedRow": {
+      "title": "ClaimedRow",
+      "description": "A claimed outbox row: what the dispatcher needs to run limit 8 and send it (arch 06 line 313; arch 02 line 125).",
+      "type": "object",
+      "properties": {
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "version": {
+          "description": "The row's version after the claim; marks compare it.",
+          "$ref": "#/$defs/version"
+        },
+        "commitSeq": { "type": "integer", "minimum": 1 },
+        "recipientHandleId": { "$ref": "#/$defs/id" },
+        "recipientPersonId": { "$ref": "#/$defs/nullableId" },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "openQuestionId": { "$ref": "#/$defs/nullableId" },
+        "channel": { "$ref": "#/$defs/channel" },
+        "sendClass": { "$ref": "#/$defs/sendClass" },
+        "versionsRead": {
+          "description": "Limit 8 checks them unchanged at send (arch 06 line 313).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/rowRef" }
+        },
+        "finalParts": { "$ref": "../message-plan/message-plan.v1.schema.json#/$defs/finalParts" },
+        "parts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/claimedPart" },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "traceId": { "$ref": "#/$defs/id" }
+      },
+      "required": [
+        "outboxRowId",
+        "version",
+        "commitSeq",
+        "recipientHandleId",
+        "recipientPersonId",
+        "businessId",
+        "bookingId",
+        "openQuestionId",
+        "channel",
+        "sendClass",
+        "versionsRead",
+        "finalParts",
+        "parts",
+        "traceId"
+      ],
+      "additionalProperties": false
+    },
+    "claimOutbox.response": {
+      "title": "ClaimOutboxResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "claimed" },
+        "claimed": {
+          "description": "Per recipient in commit order.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/claimedRow" }
+        },
+        "passedHeld": {
+          "description": "Rows held for text hours that later rows passed (arch 02 line 125).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "outboxRowId": { "$ref": "#/$defs/id" },
+              "heldUntil": { "$ref": "#/$defs/utc" }
+            },
+            "required": ["outboxRowId", "heldUntil"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["result", "claimed", "passedHeld"],
+      "additionalProperties": false
+    },
+    "claimOutbox.errors": {
+      "title": "ClaimOutboxErrors",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "claimOutbox.exchange": {
+      "title": "ClaimOutboxExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "claimOutbox" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/claimOutbox.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/claimOutbox.response" }, { "$ref": "#/$defs/claimOutbox.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "markPart.request": {
+      "title": "MarkPartRequest",
+      "description": "What happened to one part (02-contracts K-05 item 3): another send under the same key after a timeout or crash (attempt), accepted by the provider with its ids (sent), its delivery receipt (delivered: arch 02 line 127), or a reported failure (failed: the next try gets a new key, arch 01 line 65). A part is named by its key, or a receipt by the provider's message id (K-04 outbox_parts_linq_message_idx).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "outcome": { "const": "attempt" },
+            "idempotencyKey": { "type": "string", "pattern": "^.+/[12]/[1-9][0-9]*$" },
+            "at": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["outcome", "idempotencyKey", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": { "const": "sent" },
+            "idempotencyKey": { "type": "string", "pattern": "^.+/[12]/[1-9][0-9]*$" },
+            "providerMessageId": {
+              "description": "The provider's message id (K-04 outbox_parts.linq_message_id; K-11 names its form).",
+              "$ref": "#/$defs/id"
+            },
+            "providerOptionIds": {
+              "description": "For a poll, the provider's option ids (K-04 outbox_parts.linq_option_ids), else null.",
+              "anyOf": [{ "type": "array", "items": { "$ref": "#/$defs/id" } }, { "type": "null" }]
+            },
+            "at": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["outcome", "idempotencyKey", "providerMessageId", "providerOptionIds", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": { "const": "delivered" },
+            "providerMessageId": { "$ref": "#/$defs/id" },
+            "at": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["outcome", "providerMessageId", "at"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "outcome": { "const": "failed" },
+            "idempotencyKey": { "type": "string", "pattern": "^.+/[12]/[1-9][0-9]*$" },
+            "errorCode": {
+              "description": "The provider's error code, such as 4001 or 4006 (K-04 outbox_parts.error_code).",
+              "type": "string",
+              "minLength": 1
+            },
+            "retry": {
+              "description": "Whether a next try follows (section 07's rules, K-07): true makes the next key, try + 1.",
+              "type": "boolean"
+            },
+            "at": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["outcome", "idempotencyKey", "errorCode", "retry", "at"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "markPart.response": {
+      "title": "MarkPartResponse",
+      "description": "Marked. A repeat (a second receipt, a second 'sent' for the same key) changes nothing and says repeated. firstDelivery is true on the row's first delivery receipt, so the caller arms the question's clock (arch 02 line 127; armClock).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "marked" },
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "partNo": { "enum": [1, 2] },
+        "tryNo": { "type": "integer", "minimum": 1 },
+        "attempts": { "type": "integer", "minimum": 1 },
+        "repeated": { "type": "boolean" },
+        "firstDelivery": { "type": "boolean" },
+        "openQuestionId": { "$ref": "#/$defs/nullableId" },
+        "nextKey": {
+          "description": "After a failure with retry, the next try's key; else null.",
+          "anyOf": [{ "type": "string", "pattern": "^.+/[12]/[1-9][0-9]*$" }, { "type": "null" }]
+        }
+      },
+      "required": [
+        "result",
+        "outboxRowId",
+        "partNo",
+        "tryNo",
+        "attempts",
+        "repeated",
+        "firstDelivery",
+        "openQuestionId",
+        "nextKey"
+      ],
+      "additionalProperties": false
+    },
+    "markPart.errors": {
+      "title": "MarkPartErrors",
+      "oneOf": [{ "$ref": "#/$defs/notFoundError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "markPart.exchange": {
+      "title": "MarkPartExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "markPart" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/markPart.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/markPart.response" }, { "$ref": "#/$defs/markPart.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "markRow.request": {
+      "title": "MarkRowRequest",
+      "description": "Limit 8's outcome for a claimed row (arch 06 line 313; 02-contracts K-05 item 3): held until a time (outside text hours: 9am, or 8am for owner and team), dropped as stopped (its question takes step 9's never-delivered path), stale (its plan and final parts are cleared so it is composed again from today's record, S13-57), or withdrawn (its booking or question has closed).",
+      "type": "object",
+      "properties": {
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "outcome": { "enum": ["held", "droppedStopped", "stale", "withdrawn"] },
+        "heldUntil": {
+          "description": "For held, until when (K-04 outbox_rows.held_until); null otherwise.",
+          "$ref": "#/$defs/nullableUtc"
+        },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["outboxRowId", "expectVersion", "outcome", "heldUntil", "at"],
+      "additionalProperties": false,
+      "if": { "properties": { "outcome": { "const": "held" } } },
+      "then": { "properties": { "heldUntil": { "$ref": "#/$defs/utc" } } },
+      "else": { "properties": { "heldUntil": { "type": "null" } } }
+    },
+    "markRow.response": {
+      "title": "MarkRowResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "marked" },
+        "outboxRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "outcome": { "enum": ["held", "droppedStopped", "stale", "withdrawn"] }
+      },
+      "required": ["result", "outboxRowId", "version", "outcome"],
+      "additionalProperties": false
+    },
+    "markRow.errors": {
+      "title": "MarkRowErrors",
+      "oneOf": [
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "markRow.exchange": {
+      "title": "MarkRowExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "markRow" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/markRow.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/markRow.response" }, { "$ref": "#/$defs/markRow.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "armClock.request": {
+      "title": "ArmClockRequest",
+      "description": "Arm a waiting clock row at its first delivery receipt, with the due time clock arming worked out (arch 02 line 127: the step's Clock line, or step 9's default; 02-contracts K-05 item 4). Named by the clock row, or by its question (the question's clock row).",
+      "type": "object",
+      "properties": {
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "openQuestionId": { "$ref": "#/$defs/id" },
+        "deliveredAt": {
+          "description": "The first delivery receipt's time (K-04 clock_rows.armed_at).",
+          "$ref": "#/$defs/utc"
+        },
+        "dueAt": { "$ref": "#/$defs/utc" },
+        "dueZone": { "$ref": "#/$defs/zone" }
+      },
+      "required": ["deliveredAt", "dueAt", "dueZone"],
+      "additionalProperties": false,
+      "oneOf": [{ "required": ["clockRowId"] }, { "required": ["openQuestionId"] }]
+    },
+    "armedClock": {
+      "title": "ArmedClock",
+      "type": "object",
+      "properties": {
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "armedAt": { "$ref": "#/$defs/utc" },
+        "dueAt": { "$ref": "#/$defs/utc" },
+        "dueZone": { "$ref": "#/$defs/zone" },
+        "handleId": {
+          "description": "The handle whose actor sets its alarm, or null for the sweep (arch 10 line 540).",
+          "$ref": "#/$defs/nullableId"
+        }
+      },
+      "required": ["clockRowId", "version", "armedAt", "dueAt", "dueZone", "handleId"],
+      "additionalProperties": false
+    },
+    "armClock.response": {
+      "title": "ArmClockResponse",
+      "description": "Armed. A later receipt never moves it: a repeat returns the first arming with repeated true.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "armed" },
+        "repeated": { "type": "boolean" },
+        "clock": { "$ref": "#/$defs/armedClock" }
+      },
+      "required": ["result", "repeated", "clock"],
+      "additionalProperties": false
+    },
+    "armClock.errors": {
+      "title": "ArmClockErrors",
+      "oneOf": [
+        {
+          "title": "ClockClosedError",
+          "description": "The row has fired or been cancelled (a question answered before its receipt), so nothing arms.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "clockClosed" },
+            "clockRowId": { "$ref": "#/$defs/id" },
+            "state": { "enum": ["fired", "cancelled"] }
+          },
+          "required": ["error", "clockRowId", "state"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "armClock.exchange": {
+      "title": "ArmClockExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "armClock" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/armClock.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/armClock.response" }, { "$ref": "#/$defs/armClock.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "cancelClock.request": {
+      "title": "CancelClockRequest",
+      "description": "Cancel a clock row when its question is answered or withdrawn outside a commit, for example a question withdrawn by the passed-on path (02-contracts K-05 item 4; arch 02 line 123). Inside a turn, the commit's clockRows.cancel does the same.",
+      "type": "object",
+      "properties": {
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "withdrawQuestion": {
+          "description": "For the passed-on path, its open question, withdrawn in the same transaction (K-04 open_questions.status withdrawn; arch 02 line 123: 'the question is withdrawn, so no clock arms'); else null.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "openQuestionId": { "$ref": "#/$defs/id" },
+                "expectVersion": { "$ref": "#/$defs/version" }
+              },
+              "required": ["openQuestionId", "expectVersion"],
+              "additionalProperties": false
+            },
+            { "type": "null" }
+          ]
+        },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["clockRowId", "expectVersion", "withdrawQuestion", "at"],
+      "additionalProperties": false
+    },
+    "cancelClock.response": {
+      "title": "CancelClockResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "cancelled" },
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "cancelledAt": { "$ref": "#/$defs/utc" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "clockRowId", "version", "cancelledAt", "repeated"],
+      "additionalProperties": false
+    },
+    "cancelClock.errors": {
+      "title": "CancelClockErrors",
+      "oneOf": [
+        {
+          "title": "AlreadyFiredError",
+          "description": "It fired first; the firing stands (fired once: 02-contracts K-05 item 5).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "alreadyFired" },
+            "clockRowId": { "$ref": "#/$defs/id" },
+            "firedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "clockRowId", "firedAt"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "cancelClock.exchange": {
+      "title": "CancelClockExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "cancelClock" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/cancelClock.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/cancelClock.response" }, { "$ref": "#/$defs/cancelClock.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "dueClocks.request": {
+      "title": "DueClocksRequest",
+      "description": "Armed clock rows that are due: for one handle's alarm, or for the minute sweep, which takes rows no handle owns and rows an actor missed (arch 10 line 540; 02-contracts K-05 item 5).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "for": { "const": "handle" },
+            "handleId": { "$ref": "#/$defs/id" },
+            "now": { "$ref": "#/$defs/utc" },
+            "limit": { "type": "integer", "minimum": 1, "maximum": 100 }
+          },
+          "required": ["for", "handleId", "now", "limit"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "for": { "const": "sweep" },
+            "now": {
+              "description": "Rows no handle owns that are due by now.",
+              "$ref": "#/$defs/utc"
+            },
+            "missedBefore": {
+              "description": "A handle's row due before this time counts as missed by its actor; the margin is the runtime's (C-054), an open gap in the README.",
+              "$ref": "#/$defs/utc"
+            },
+            "limit": { "type": "integer", "minimum": 1, "maximum": 1000 }
+          },
+          "required": ["for", "now", "missedBefore", "limit"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dueClock": {
+      "title": "DueClock",
+      "description": "A due clock row, as fireClock needs it (K-04 clock_rows).",
+      "type": "object",
+      "properties": {
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "kind": { "$ref": "#/$defs/clockKind" },
+        "handleId": { "$ref": "#/$defs/nullableId" },
+        "businessId": { "$ref": "#/$defs/nullableId" },
+        "bookingId": { "$ref": "#/$defs/nullableId" },
+        "openQuestionId": { "$ref": "#/$defs/nullableId" },
+        "reservationId": { "$ref": "#/$defs/nullableId" },
+        "dueAt": { "$ref": "#/$defs/utc" },
+        "dueZone": { "$ref": "#/$defs/zone" },
+        "fires": { "type": "object" }
+      },
+      "required": [
+        "clockRowId",
+        "version",
+        "kind",
+        "handleId",
+        "businessId",
+        "bookingId",
+        "openQuestionId",
+        "reservationId",
+        "dueAt",
+        "dueZone",
+        "fires"
+      ],
+      "additionalProperties": false
+    },
+    "dueClocks.response": {
+      "title": "DueClocksResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "due" },
+        "rows": {
+          "description": "Earliest due first.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/dueClock" }
+        },
+        "nextDueAt": {
+          "description": "For a handle, its earliest armed row due after now, where the actor sets its one alarm (arch 10 line 540); null when none, and always null for the sweep.",
+          "$ref": "#/$defs/nullableUtc"
+        }
+      },
+      "required": ["result", "rows", "nextDueAt"],
+      "additionalProperties": false
+    },
+    "dueClocks.errors": {
+      "title": "DueClocksErrors",
+      "oneOf": [{ "$ref": "#/$defs/transientError" }]
+    },
+    "dueClocks.exchange": {
+      "title": "DueClocksExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "dueClocks" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/dueClocks.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/dueClocks.response" }, { "$ref": "#/$defs/dueClocks.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "fireClock.request": {
+      "title": "FireClockRequest",
+      "description": "Fire a clock row once, together with what its firing commits, in one transaction: the row goes from armed to fired, and the safe default's writes (the step's clock branch, after the gate) commit with it, so a crash never fires twice or loses the default (02-contracts K-05 item 5; arch 02 line 127; arch 10 lines 508, 540). Staging's 'Fire now' calls this same path (BP 9.4). Per QUESTIONS.md NQ-RT-4's default the firing is a turn on the handle's actor (or a sweep job for a row with no handle) whose only input is the clock row: 'turn' is that turn's row, needed when the writes include outbox rows (K-04 outbox_rows.turn_id is not null); the event log carries jobId.",
+      "type": "object",
+      "properties": {
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "firedAt": { "$ref": "#/$defs/utc" },
+        "by": {
+          "description": "alarm: the handle actor's alarm; sweep: the minute sweep; fireNow: staging's test console, which may fire before the due time (BP 9.4).",
+          "enum": ["alarm", "sweep", "fireNow"]
+        },
+        "jobId": {
+          "description": "The firing's job id for the event log (K-04 event_log.job_id: 'For a clock firing ...').",
+          "$ref": "#/$defs/id"
+        },
+        "turn": {
+          "description": "The firing's turn row, or null when its writes hold no outbox row. Its handle is the clock row's.",
+          "anyOf": [{ "$ref": "#/$defs/turn" }, { "type": "null" }]
+        },
+        "versionsRead": { "type": "array", "items": { "$ref": "#/$defs/rowRef" } },
+        "writes": { "$ref": "#/$defs/writes" }
+      },
+      "required": ["clockRowId", "expectVersion", "firedAt", "by", "jobId", "turn", "versionsRead", "writes"],
+      "additionalProperties": false,
+      "if": { "properties": { "turn": { "type": "null" } } },
+      "then": {
+        "properties": {
+          "writes": { "type": "object", "properties": { "outboxRows": { "type": "array", "maxItems": 0 } } }
+        }
+      }
+    },
+    "fireClock.response": {
+      "title": "FireClockResponse",
+      "description": "Fired, once. A repeat writes nothing and returns the first firing's time, turn and outbox rows with repeated true.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "fired" },
+        "clockRowId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "firedAt": { "$ref": "#/$defs/utc" },
+        "turnId": {
+          "anyOf": [{ "$ref": "../common/formats.v1.schema.json#/$defs/turnId" }, { "type": "null" }]
+        },
+        "repeated": { "type": "boolean" },
+        "committed": { "$ref": "#/$defs/commitResult" }
+      },
+      "required": ["result", "clockRowId", "version", "firedAt", "turnId", "repeated", "committed"],
+      "additionalProperties": false
+    },
+    "fireClock.errors": {
+      "title": "FireClockErrors",
+      "oneOf": [
+        {
+          "title": "NotArmedError",
+          "description": "Still waiting (never armed) or cancelled: nothing fires.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notArmed" },
+            "clockRowId": { "$ref": "#/$defs/id" },
+            "state": { "enum": ["waiting", "cancelled"] }
+          },
+          "required": ["error", "clockRowId", "state"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotDueError",
+          "description": "firedAt is before the due time and the caller is not 'fireNow'.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notDue" },
+            "clockRowId": { "$ref": "#/$defs/id" },
+            "dueAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "clockRowId", "dueAt"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/reservationLostError" },
+        { "$ref": "#/$defs/constraintError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "fireClock.exchange": {
+      "title": "FireClockExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "fireClock" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/fireClock.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/fireClock.response" }, { "$ref": "#/$defs/fireClock.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "door": {
+      "title": "Door",
+      "description": "How the time is saved, which sets how long (arch 05 line 247; MC C3; Q-12): standard, 10 minutes (S12-01; A4-21); ownAi, the customer's own AI booking a service that books at once with money due or a card to save, 15 minutes, never extended (D104; MC C3); planCheck, up to 1 hour; document, up to 24 hours while a document is signed (A4-21); ownerOk, up to 30 minutes for the owner's OK (A5-08, B5-06; MC C3).",
+      "enum": ["standard", "ownAi", "planCheck", "document", "ownerOk"]
+    },
+    "savedFor": {
+      "title": "SavedFor",
+      "description": "Who the time is saved for: a mobile, an agent token, or a booking (02-contracts K-05 item 6; K-04 reservations.for_phone_number, for_agent_token, booking_id; reservations_for_someone).",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": { "phoneNumber": { "$ref": "#/$defs/phoneNumber" } },
+          "required": ["phoneNumber"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "agentToken": {
+              "description": "The agent token's id (K-20 names tokens).",
+              "$ref": "#/$defs/id"
+            }
+          },
+          "required": ["agentToken"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": { "bookingId": { "$ref": "#/$defs/id" } },
+          "required": ["bookingId"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "reserve.request": {
+      "title": "ReserveRequest",
+      "description": "Save a resource's time for a mobile, an agent token or a booking (02-contracts K-05 item 6; arch 05 lines 247, 255; limit 5, arch 06 line 307). The id is the caller's, so a repeat finds the first outcome. A worker, room or vehicle is refused on an overlap by the database (EXCLUDE); a class session raises its seat counter (CHECK taken <= capacity).",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "#/$defs/id" },
+        "businessId": {
+          "description": "The business whose scope the call runs under (arch 10 line 546).",
+          "$ref": "#/$defs/id"
+        },
+        "resourceId": { "$ref": "#/$defs/id" },
+        "during": { "$ref": "#/$defs/during" },
+        "seats": {
+          "description": "1, or more for a class session (K-04 reservations_seats).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "for": { "$ref": "#/$defs/savedFor" },
+        "door": { "$ref": "#/$defs/door" },
+        "holdMinutes": {
+          "description": "For planCheck (at most 60), document (at most 1440) and ownerOk (at most 30), how long; null for standard (10) and ownAi (15).",
+          "anyOf": [{ "type": "integer", "minimum": 1, "maximum": 1440 }, { "type": "null" }]
+        },
+        "waitIfSaved": {
+          "description": "When someone else has saved the time: true writes a waiting row, next in line (A4-18: 'they wait next in line while saving another'); false refuses it as an overlap.",
+          "type": "boolean"
+        },
+        "at": {
+          "description": "Now: held_until is at plus the door's minutes.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": [
+        "reservationId",
+        "businessId",
+        "resourceId",
+        "during",
+        "seats",
+        "for",
+        "door",
+        "holdMinutes",
+        "waitIfSaved",
+        "at"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "door": { "enum": ["standard", "ownAi"] } } },
+          "then": { "properties": { "holdMinutes": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "door": { "const": "planCheck" } } },
+          "then": { "properties": { "holdMinutes": { "type": "integer", "maximum": 60 } } }
+        },
+        {
+          "if": { "properties": { "door": { "const": "ownerOk" } } },
+          "then": { "properties": { "holdMinutes": { "type": "integer", "maximum": 30 } } }
+        },
+        {
+          "if": { "properties": { "door": { "const": "document" } } },
+          "then": { "properties": { "holdMinutes": { "type": "integer", "maximum": 1440 } } }
+        }
+      ]
+    },
+    "reserve.response": {
+      "title": "ReserveResponse",
+      "description": "held: the time is saved until heldUntil, with a saved_time clock row for its end; waiting: next in line behind a time someone else saved (A4-18). A repeat of the same request returns the first outcome with repeated true.",
+      "oneOf": [
+        {
+          "title": "ReserveHeld",
+          "type": "object",
+          "properties": {
+            "result": { "const": "held" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "version": { "$ref": "#/$defs/version" },
+            "resourceId": { "$ref": "#/$defs/id" },
+            "during": { "$ref": "#/$defs/during" },
+            "heldUntil": { "$ref": "#/$defs/utc" },
+            "savedTimeClockId": { "$ref": "#/$defs/id" },
+            "repeated": { "type": "boolean" }
+          },
+          "required": [
+            "result",
+            "reservationId",
+            "version",
+            "resourceId",
+            "during",
+            "heldUntil",
+            "savedTimeClockId",
+            "repeated"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "title": "ReserveWaiting",
+          "type": "object",
+          "properties": {
+            "result": { "const": "waiting" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "version": { "$ref": "#/$defs/version" },
+            "resourceId": { "$ref": "#/$defs/id" },
+            "during": { "$ref": "#/$defs/during" },
+            "queuedAt": {
+              "description": "Its place in line (K-04 reservations.queued_at).",
+              "$ref": "#/$defs/utc"
+            },
+            "repeated": { "type": "boolean" }
+          },
+          "required": ["result", "reservationId", "version", "resourceId", "during", "queuedAt", "repeated"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "reserve.errors": {
+      "title": "ReserveErrors",
+      "description": "Refused, nothing written (02-contracts K-05 item 6: 'or refused (an overlap; seats full; a third saved time for one mobile, or for one agent token at one business, with each one's end time)').",
+      "oneOf": [
+        {
+          "title": "OverlapError",
+          "description": "The time overlaps a booked time, or a saved one when waitIfSaved is false (EXCLUDE, 23P01). Whose it is is never said.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "overlap" },
+            "resourceId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "resourceId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SeatsFullError",
+          "description": "A class session's seats would pass its capacity (CHECK taken <= capacity, 23514).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "seatsFull" },
+            "resourceId": { "$ref": "#/$defs/id" },
+            "capacity": { "type": "integer", "minimum": 1 },
+            "taken": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["error", "resourceId", "capacity", "taken"],
+          "additionalProperties": false
+        },
+        {
+          "title": "SavedTimeCapError",
+          "description": "A third saved time for one mobile (across businesses) or one agent token at one business: refused with the time each saved one ends (arch 05 line 247).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "savedTimeCap" },
+            "saved": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "reservationId": { "$ref": "#/$defs/id" },
+                  "heldUntil": { "$ref": "#/$defs/utc" }
+                },
+                "required": ["reservationId", "heldUntil"],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": ["error", "saved"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotBookableError",
+          "description": "The resource is not active, or not this business's (K-04 resources.active; arch 10 line 546).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notBookable" },
+            "resourceId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "resourceId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "IdConflictError",
+          "description": "The reservation id is already used by a different request.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "idConflict" },
+            "reservationId": { "$ref": "#/$defs/id" }
+          },
+          "required": ["error", "reservationId"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "reserve.exchange": {
+      "title": "ReserveExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "reserve" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/reserve.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/reserve.response" }, { "$ref": "#/$defs/reserve.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "release.request": {
+      "title": "ReleaseRequest",
+      "description": "Release a reservation: expired (its saved time ended), let go, or cancelled; booked is a state, set by the commit's confirm (02-contracts K-05 item 6: 'Release: expired, let go, booked or cancelled, promoting the next in line'). A held or booked release promotes the next in line in the same transaction.",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "#/$defs/id" },
+        "businessId": { "$ref": "#/$defs/id" },
+        "expectVersion": {
+          "description": "The version read; null for the saved-time clock's expiry, which checks held_until instead.",
+          "anyOf": [{ "$ref": "#/$defs/version" }, { "type": "null" }]
+        },
+        "why": { "enum": ["expired", "let_go", "cancelled"] },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["reservationId", "businessId", "expectVersion", "why", "at"],
+      "additionalProperties": false
+    },
+    "release.response": {
+      "title": "ReleaseResponse",
+      "description": "Released, with the next in line promoted (or null) and the waiting rows passed over. A repeat returns the first release's time and why with repeated true; only the releasing call reports a promotion.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "released" },
+        "reservationId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "releasedAt": { "$ref": "#/$defs/utc" },
+        "why": { "enum": ["expired", "let_go", "cancelled"] },
+        "promoted": { "anyOf": [{ "$ref": "#/$defs/promotion" }, { "type": "null" }] },
+        "skipped": { "type": "array", "items": { "$ref": "#/$defs/skippedInLine" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": [
+        "result",
+        "reservationId",
+        "version",
+        "releasedAt",
+        "why",
+        "promoted",
+        "skipped",
+        "repeated"
+      ],
+      "additionalProperties": false
+    },
+    "release.errors": {
+      "title": "ReleaseErrors",
+      "oneOf": [
+        {
+          "title": "NotExpiredError",
+          "description": "why expired, but the saved time has not ended (it was extended).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notExpired" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "heldUntil": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "reservationId", "heldUntil"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "release.exchange": {
+      "title": "ReleaseExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "release" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/release.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/release.response" }, { "$ref": "#/$defs/release.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "extend.request": {
+      "title": "ExtendRequest",
+      "description": "Give a saved time its one extension, 10 more minutes, offered before it ends; never for the customer's own AI's door (02-contracts K-05 item 6; arch 05 line 247; Q-12; MC C3). The caller names the door, since K-04 v1 keeps none on the row (README, open gaps).",
+      "type": "object",
+      "properties": {
+        "reservationId": { "$ref": "#/$defs/id" },
+        "businessId": { "$ref": "#/$defs/id" },
+        "expectVersion": { "$ref": "#/$defs/version" },
+        "door": { "$ref": "#/$defs/door" },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["reservationId", "businessId", "expectVersion", "door", "at"],
+      "additionalProperties": false
+    },
+    "extend.response": {
+      "title": "ExtendResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "extended" },
+        "reservationId": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/version" },
+        "heldUntil": {
+          "description": "The old end plus 10 minutes; the saved-time clock row moves with it.",
+          "$ref": "#/$defs/utc"
+        }
+      },
+      "required": ["result", "reservationId", "version", "heldUntil"],
+      "additionalProperties": false
+    },
+    "extend.errors": {
+      "title": "ExtendErrors",
+      "oneOf": [
+        {
+          "title": "AlreadyExtendedError",
+          "description": "The one extension was given (K-04 reservations.extended); a repeat lands here and changes nothing.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "alreadyExtended" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "heldUntil": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "reservationId", "heldUntil"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NeverExtendedError",
+          "description": "The customer's own AI's 15 minutes are never extended (MC C3; D104).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "neverExtended" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "door": { "const": "ownAi" }
+          },
+          "required": ["error", "reservationId", "door"],
+          "additionalProperties": false
+        },
+        {
+          "title": "NotHeldError",
+          "description": "Not a saved time now: waiting, booked, released, or its end has passed.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notHeld" },
+            "reservationId": { "$ref": "#/$defs/id" },
+            "state": { "enum": ["held", "waiting", "booked", "released"] }
+          },
+          "required": ["error", "reservationId", "state"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/versionChangedError" },
+        { "$ref": "#/$defs/notFoundError" },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "extend.exchange": {
+      "title": "ExtendExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "extend" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/extend.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/extend.response" }, { "$ref": "#/$defs/extend.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "readActiveBundle.request": {
+      "title": "ReadActiveBundleRequest",
+      "description": "At turn start, the active bundle id from PostgreSQL (arch 10 line 536; 02-contracts K-05 item 7; K-04 bundles.active).",
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "readActiveBundle.response": {
+      "title": "ReadActiveBundleResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "active" },
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "manifestKey": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/kvKey" },
+        "activatedAt": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["result", "bundleId", "manifestKey", "activatedAt"],
+      "additionalProperties": false
+    },
+    "readActiveBundle.errors": {
+      "title": "ReadActiveBundleErrors",
+      "oneOf": [
+        {
+          "title": "NoActiveBundleError",
+          "description": "No bundle is active yet (before the first deploy's step 3: BP 5.4).",
+          "type": "object",
+          "properties": { "error": { "const": "noActiveBundle" } },
+          "required": ["error"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "readActiveBundle.exchange": {
+      "title": "ReadActiveBundleExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readActiveBundle" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readActiveBundle.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readActiveBundle.response" },
+            { "$ref": "#/$defs/readActiveBundle.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "storedText": {
+      "title": "StoredText",
+      "description": "One bundle value as PostgreSQL's copy holds it: its K-01 key and kind, its size and sha256, and the UTF-8 JSON text itself (K-04 bundle_values; K-01 v1 storedValue). The reader checks bytes and sha256 against the text.",
+      "type": "object",
+      "properties": {
+        "key": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/kvKey" },
+        "kind": { "enum": ["manifest", "flow", "trade"] },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 26214400 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "text": { "type": "string", "minLength": 1 }
+      },
+      "required": ["key", "kind", "bytes", "sha256", "text"],
+      "additionalProperties": false
+    },
+    "readBundleValue.request": {
+      "title": "ReadBundleValueRequest",
+      "description": "A bundle value from PostgreSQL's copy on a KV miss (arch 10 line 536: 'then that bundle's step graph from KV, or from PostgreSQL on a miss'; 02-contracts K-05 item 7).",
+      "type": "object",
+      "properties": {
+        "key": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/kvKey" }
+      },
+      "required": ["key"],
+      "additionalProperties": false
+    },
+    "readBundleValue.response": {
+      "title": "ReadBundleValueResponse",
+      "type": "object",
+      "properties": {
+        "result": { "const": "value" },
+        "value": { "$ref": "#/$defs/storedText" }
+      },
+      "required": ["result", "value"],
+      "additionalProperties": false
+    },
+    "readBundleValue.errors": {
+      "title": "ReadBundleValueErrors",
+      "oneOf": [{ "$ref": "#/$defs/notFoundError" }, { "$ref": "#/$defs/transientError" }]
+    },
+    "readBundleValue.exchange": {
+      "title": "ReadBundleValueExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "readBundleValue" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/readBundleValue.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/readBundleValue.response" },
+            { "$ref": "#/$defs/readBundleValue.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "publishBundleCopy.request": {
+      "title": "PublishBundleCopyRequest",
+      "description": "Write a published bundle's registry row and PostgreSQL's copy of its values, once, before the active id switches (BP 5.4; QUESTIONS.md NQ-PB-5's default: K-05 v1 item 7 also carries publishBundleCopy(); K-04 bundles, bundle_values).",
+      "type": "object",
+      "properties": {
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "builtAt": { "$ref": "#/$defs/utc" },
+        "manifestKey": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/kvKey" },
+        "values": {
+          "description": "Every value of the bundle, the manifest among them, each under its own key (K-01 v1 storage).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/storedText" },
+          "minItems": 1
+        }
+      },
+      "required": ["bundleId", "builtAt", "manifestKey", "values"],
+      "additionalProperties": false
+    },
+    "publishBundleCopy.response": {
+      "title": "PublishBundleCopyResponse",
+      "description": "Published. A repeat with the same values writes nothing and says repeated (a bundle is written once: K-04 bundle_values).",
+      "type": "object",
+      "properties": {
+        "result": { "const": "published" },
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "publishedAt": { "$ref": "#/$defs/utc" },
+        "values": { "type": "integer", "minimum": 1 },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "bundleId", "publishedAt", "values", "repeated"],
+      "additionalProperties": false
+    },
+    "publishBundleCopy.errors": {
+      "title": "PublishBundleCopyErrors",
+      "oneOf": [
+        {
+          "title": "ValueMismatchError",
+          "description": "A value's bytes or sha256 do not match its text, or the key already holds other bytes (K-04 bundle_values_bytes_match, bundle_values_sha256_match). Nothing was written.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "valueMismatch" },
+            "key": { "$ref": "../bundle/bundle.v1.schema.json#/$defs/kvKey" }
+          },
+          "required": ["error", "key"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "publishBundleCopy.exchange": {
+      "title": "PublishBundleCopyExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "publishBundleCopy" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/publishBundleCopy.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/publishBundleCopy.response" },
+            { "$ref": "#/$defs/publishBundleCopy.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "setActiveBundle.request": {
+      "title": "SetActiveBundleRequest",
+      "description": "Switch the active bundle id, compared and set against the one the deploy script read; called only by the deploy script's step 3 (BP 5.4; QUESTIONS.md NQ-PB-5's default). Rolling back is the same call with the earlier id (tour line 658: every published bundle stays readable).",
+      "type": "object",
+      "properties": {
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "expectActive": {
+          "description": "The active id the script read, or null when none is active.",
+          "anyOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }]
+        },
+        "at": { "$ref": "#/$defs/utc" }
+      },
+      "required": ["bundleId", "expectActive", "at"],
+      "additionalProperties": false
+    },
+    "setActiveBundle.response": {
+      "title": "SetActiveBundleResponse",
+      "description": "Active. A repeat (already active) changes nothing and says repeated.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "activated" },
+        "bundleId": { "$ref": "#/$defs/bundleId" },
+        "previous": { "anyOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }] },
+        "activatedAt": { "$ref": "#/$defs/utc" },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "bundleId", "previous", "activatedAt", "repeated"],
+      "additionalProperties": false
+    },
+    "setActiveBundle.errors": {
+      "title": "SetActiveBundleErrors",
+      "oneOf": [
+        {
+          "title": "NotPublishedError",
+          "description": "No registry row for that id: publish first (BP 5.4).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "notPublished" },
+            "bundleId": { "$ref": "#/$defs/bundleId" }
+          },
+          "required": ["error", "bundleId"],
+          "additionalProperties": false
+        },
+        {
+          "title": "ActiveChangedError",
+          "description": "The active id is no longer the one the script read.",
+          "type": "object",
+          "properties": {
+            "error": { "const": "activeChanged" },
+            "active": { "anyOf": [{ "$ref": "#/$defs/bundleId" }, { "type": "null" }] }
+          },
+          "required": ["error", "active"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "setActiveBundle.exchange": {
+      "title": "SetActiveBundleExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "setActiveBundle" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/setActiveBundle.request" },
+        "outcome": {
+          "anyOf": [
+            { "$ref": "#/$defs/setActiveBundle.response" },
+            { "$ref": "#/$defs/setActiveBundle.errors" }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+
+    "parkTurn.request": {
+      "title": "ParkTurnRequest",
+      "description": "Park a turn after a third crash before its commit, freeing the inbox for later texts; the person hears once that nothing changed and that Rosie's team will reply within 1 business day, which is the one outbox row this call may write, with its event-log entries (arch 11 line 576; 02-contracts K-05 item 8; K-04 turns.state parked).",
+      "type": "object",
+      "properties": {
+        "turn": {
+          "description": "The turn row, with tries 3.",
+          "type": "object",
+          "allOf": [{ "$ref": "#/$defs/turn" }],
+          "properties": { "tries": { "const": 3 } }
+        },
+        "parkedAt": { "$ref": "#/$defs/utc" },
+        "outboxRows": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/outboxRowNew" },
+          "maxItems": 1
+        },
+        "events": { "type": "array", "items": { "$ref": "#/$defs/eventEntry" } }
+      },
+      "required": ["turn", "parkedAt", "outboxRows", "events"],
+      "additionalProperties": false
+    },
+    "parkTurn.response": {
+      "title": "ParkTurnResponse",
+      "description": "Parked. A repeat writes nothing and returns the first result with repeated true.",
+      "type": "object",
+      "properties": {
+        "result": { "const": "parked" },
+        "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+        "parkedAt": { "$ref": "#/$defs/utc" },
+        "outboxRows": { "type": "array", "items": { "$ref": "#/$defs/outboxRowWritten" } },
+        "repeated": { "type": "boolean" }
+      },
+      "required": ["result", "turnId", "parkedAt", "outboxRows", "repeated"],
+      "additionalProperties": false
+    },
+    "parkTurn.errors": {
+      "title": "ParkTurnErrors",
+      "oneOf": [
+        {
+          "title": "AlreadyCommittedError",
+          "description": "The turn committed (a crash after the commit): it is never parked (arch 11 line 576: after the commit only rows without a plan are composed).",
+          "type": "object",
+          "properties": {
+            "error": { "const": "alreadyCommitted" },
+            "turnId": { "$ref": "../common/formats.v1.schema.json#/$defs/turnId" },
+            "committedAt": { "$ref": "#/$defs/utc" }
+          },
+          "required": ["error", "turnId", "committedAt"],
+          "additionalProperties": false
+        },
+        { "$ref": "#/$defs/transientError" }
+      ]
+    },
+    "parkTurn.exchange": {
+      "title": "ParkTurnExchange",
+      "type": "object",
+      "properties": {
+        "call": { "const": "parkTurn" },
+        "given": { "$ref": "#/$defs/given" },
+        "request": { "$ref": "#/$defs/parkTurn.request" },
+        "outcome": {
+          "anyOf": [{ "$ref": "#/$defs/parkTurn.response" }, { "$ref": "#/$defs/parkTurn.errors" }]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    }
+  }
+}
