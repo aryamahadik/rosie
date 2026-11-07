@@ -111,7 +111,7 @@ Calls made: 16 of the 20 allowed (results.jsonl has one line per call). Total to
 
 Question: are the frozen K-02 decide read, safety read and planner output, and the K-03 plan, accepted as structured outputs, each sent bundled the way the AI gateway will send it? T-360 measured candidates; this measures the contracts themselves (`contracts/model/model.v1.schema.json`, `contracts/message-plan/message-plan.v1.schema.json`, both frozen). The contracts are not changed here.
 
-**Status: pending the lead's one live run (NQ-R2; DL-027 smoke-size calls; DL-081).** The table below is filled in from `results.jsonl` lines 17 to 20 after that run. Everything above the table is offline and done.
+**Status: done. The lead ran `node --env-file=.dev.vars .claude/worktrees/wf_270839c4-5be-1/ai/spikes/structured-outputs/probe.mjs --frozen --live` once from the code folder, at the user's instruction in an interactive session (NQ-R2, DL-081); it ended at 13:16Z by results.jsonl's time. 4 calls, 20 of 20 used. No key in results.jsonl, samples/ or this file (searched for the key prefix and an api-key header: 0 files).**
 
 How it works:
 
@@ -132,12 +132,14 @@ Offline measurements (`--frozen --dry-run`, 2026-11-07): all 4 bundled schemas p
 
 Live results (call numbers 17 to 20, `claude-haiku-5-5`):
 
-| Call | Schema               | Accepted or refused | Refusal or error text | Output valid against the frozen def | Tokens in/out |
-| ---- | -------------------- | ------------------- | --------------------- | ----------------------------------- | ------------- |
-| 17   | K-02 `decideRead`    | pending             | pending               | pending                             | pending       |
-| 18   | K-02 `safetyRead`    | pending             | pending               | pending                             | pending       |
-| 19   | K-02 `plannerOutput` | pending             | pending               | pending                             | pending       |
-| 20   | K-03 `plan`          | pending             | pending               | pending                             | pending       |
+| Call | Schema               | Accepted or refused      | Refusal or error text                                                                                                                                                        | Output valid against the frozen def | Tokens in/out |
+| ---- | -------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------------- |
+| 17   | K-02 `decideRead`    | refused                  | attempt 1: no answer within the probe's 120 s timeout ("TimeoutError: The operation was aborted due to timeout"); attempt 2, after 40.8 s: HTTP 400 "Schema is too complex." | n/a                                 | none          |
+| 18   | K-02 `safetyRead`    | accepted (200, end_turn) | none                                                                                                                                                                         | yes                                 | 1386/53       |
+| 19   | K-02 `plannerOutput` | accepted (200, end_turn) | none                                                                                                                                                                         | yes                                 | 2542/61       |
+| 20   | K-03 `plan`          | not measured             | the decide read's retry used this call; the 20-call limit is reached                                                                                                         | n/a                                 | none          |
+
+What it shows: the frozen K-02 decide read, sent bundled as the gateway would send it, is refused as too complex on claude-haiku-5-5, as the spike's smaller candidate was on both models. So K-02 v1's decide read cannot go to the model as one structured-output schema. Before C-115 is built, the architect and the AI engineer choose how decide is sent (for example one strict tool per verb, mapped by code into K-02's decide read; or a simpler wire envelope; or a K-02 change under the contract-change skill). The frozen safety read and planner output are accepted and their outputs validate. The K-03 plan stays unmeasured live (its candidate was accepted on both models in T-360); a later smoke-size call settles it.
 
 If `decideRead` is refused, changing K-02 or the gateway's wire format is not this task's: the architect decides under the contract-change skill, with the options listed under "For others".
 
