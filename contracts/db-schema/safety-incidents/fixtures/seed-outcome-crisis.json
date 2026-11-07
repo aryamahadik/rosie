@@ -1,0 +1,60 @@
+{
+  "after": ["../../core/fixtures/seed-turn.json", "../../core/fixtures/seed-booking-head.json"],
+  "rows": [
+    {
+      "table": "turns",
+      "values": {
+        "id": "turn-alex-0203",
+        "handle_id": "handle-alex",
+        "event_ids": ["evt-alex-0203"],
+        "state": "committed",
+        "bundle_hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+        "bundle_build": 1,
+        "trace_id": "trace-alex-0203",
+        "joined_trace_ids": [],
+        "tries": 1,
+        "committed_at": "2026-10-25T23:10:02Z",
+        "version": 2
+      }
+    },
+    {
+      "table": "safety_outcomes",
+      "values": {
+        "id": "safety-alex-0203",
+        "event_id": "evt-alex-0203",
+        "source": "text",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "business_id": "biz-lees-barbershop",
+        "booking_id": "booking-alex-haircut",
+        "turn_id": "turn-alex-0203",
+        "read_at": "2026-10-25T23:10:01Z",
+        "tries": [{ "model": "haiku", "result": "verdict" }],
+        "timed_out": false,
+        "labels": ["Crisis words"],
+        "tenses": ["now"],
+        "danger_word_lists": ["general"],
+        "danger_word_kinds": ["selfHarm"],
+        "sealed_words": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c",
+        "outcomes": ["Crisis words"],
+        "lifted_to_unsure": false
+      }
+    },
+    {
+      "table": "safety_holds",
+      "values": {
+        "id": "hold-alex-0203",
+        "safety_outcome_id": "safety-alex-0203",
+        "business_id": "biz-lees-barbershop",
+        "handle_id": "handle-alex",
+        "person_id": "person-alex",
+        "booking_id": "booking-alex-haircut",
+        "turn_id": "turn-alex-0203",
+        "release_rule": "after_safe",
+        "blocks_booking": false,
+        "held_at": "2026-10-25T23:10:02Z",
+        "version": 1
+      }
+    }
+  ]
+}

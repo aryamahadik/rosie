@@ -1,0 +1,84 @@
+{
+  "fixtures": [
+    {
+      "file": "seed-outcome-crisis.json",
+      "version": "v1",
+      "table": "safety_outcomes",
+      "expect": "accept",
+      "shows": "Alex's crisis-words text after booking (K-02's safety-crisis-words read: label Crisis words, tense now, a general self-harm danger word): the outcome row with the words sealed under Alex's key and only the labels, tense and danger-word kinds plain; its hold waits for a clear 'I'm safe right now' (after_safe)",
+      "source": "A3-25; S13-10 ('Crisis words after booking'); arch 06 lines 283, 323, 329; arch 02 line 111; K-02 v1 fixtures/safety-crisis-words.json; arch 09 line 492; SPEC-master 6 (Alex M., Lee's Barbershop)"
+    },
+    {
+      "file": "seed-hold-released.json",
+      "version": "v1",
+      "table": "safety_holds",
+      "expect": "accept",
+      "shows": "Alex's emergency (K-02's safety-emergency-now read: An emergency, now, a plug-in danger word) held its routine actions; a later text 'we're safe, it's handled', read as No with tense over, released the hold (safe_readback) by its turn and its own safety read; the booking then goes on with its own fresh read-back",
+      "source": "A3-24 ('After a clear we're safe, it's handled, the booking may go on'); arch 06 lines 317, 323; S13-10; K-02 v1 fixtures/safety-emergency-now.json; 02-contracts K-09 ('release them on a clear we're safe with a fresh read-back')"
+    },
+    {
+      "file": "seed-threat-pause.json",
+      "version": "v1",
+      "table": "safety_holds",
+      "expect": "accept",
+      "shows": "Alex's threat to Riley (K-02's safety-threat read: A threat to staff or others, now): the hold that is never released, and the core paused flag set by the same turn on Alex as a person and on Alex's phone at Lee's Barbershop, so visits and new requests wait for Sam",
+      "source": "A3-48 ('Visits with this person are paused until you decide'; 'New requests from that phone or place wait for Sam'); arch 06 line 325; arch 03 lines 175, 177; S13-10; K-02 v1 fixtures/safety-threat.json; K-04 v1 pauses"
+    },
+    {
+      "file": "seed-safety-timer.json",
+      "version": "v1",
+      "table": "safety_timers",
+      "expect": "accept",
+      "shows": "Sam, working alone on an in-home survey for the movers, texts TIMER 2 hours at 9:20am: a running check-out timer due at 11:20am New York time, with Morgan Lee as the emergency contact who said yes by texting Rosie, the job's address sealed under Alex's key, and the core clock row that fires the miss",
+      "source": "B8-86 ('TIMER 2 hours'; 'check out by 11:20am'; 'A solo owner who is the pro: the contact named at sign-up'); S1-78 (Morgan Lee, Sam's emergency contact); S13-10; Q-06; arch 11 line 566; fixtures/v1/test-kit/shops/movers.json ('Surveys: one crew chief'; 'In-home survey')"
+    },
+    {
+      "file": "seed-harm-report.json",
+      "version": "v1",
+      "table": "harm_reports",
+      "expect": "accept",
+      "shows": "Alex tells of harm to an older adult (K-02's safety-child-or-elder read): the at-once hold released after the outcome's message, and a report for Rosie's team that day with the elder-care hotline from Rosie's safety list given first; and a report from Alex that names Riley (staff), which Riley is never told. Both open, the words sealed under Alex's key",
+      "source": "A3-49; S13-10 ('A report that the owner or staff harmed someone goes to Rosie's team that day. Never to the one it names'); arch 06 lines 319, 329; K-02 v1 fixtures/safety-child-or-elder.json; Q-18"
+    },
+    {
+      "file": "seed-privacy-slip.json",
+      "version": "v1",
+      "table": "privacy_incidents",
+      "expect": "accept",
+      "shows": "Two privacy slips: Dee W. texts a photo of a card, which is deleted at once, Dee told once where cards go and the business only that a detail came the wrong way (no detail stored); a text about Ben T.'s booking went to an old number, showing his name and visit time: sends to it stopped, Ben and the business told, Rosie's team looked at why the same day",
+      "source": "S12-29, S12-30 (Dee W.: 'Here's my card for Saturday'), S12-31 (Ben T.: 'It showed the customer's name and visit time'); RULES 4.5, 4.10; SPEC-master 6 (Ben T.)"
+    },
+    {
+      "file": "invalid/refuse-outcome-update.json",
+      "version": "v1",
+      "table": "safety_outcomes",
+      "expect": "refuse",
+      "shows": "Editing a safety outcome (changing Alex's Crisis words to No) is refused: the application roles may insert and read safety_outcomes, never update or delete them (SQLSTATE 42501); a new row for a new text passes",
+      "source": "arch 09 lines 457, 492 (the record of what was read stays); K-04 v1 rule 5 (event_log refuses edits the same way); README rule 5"
+    },
+    {
+      "file": "invalid/refuse-timer-without-contact.json",
+      "version": "v1",
+      "table": "safety_timers",
+      "expect": "refuse",
+      "shows": "A check-out timer with no emergency contact (no contact, no handle, no yes) is refused (NOT NULL, SQLSTATE 23502); the same timer with Morgan Lee, her handle and her yes passes",
+      "source": "S1-78 ('Never: start a safety timer without a contact who said yes'); S13-10 ('With none, or before that yes, no safety timer runs'); B8-86; Q-06"
+    },
+    {
+      "file": "invalid/refuse-owner-reads-harm-report.json",
+      "version": "v1",
+      "table": "harm_reports",
+      "expect": "refuse",
+      "shows": "A Tool API call scoped to Lee's Barbershop cannot read the report that names Riley: the Tool API role may add harm reports and never read them (SQLSTATE 42501); Rosie's team's side reads it",
+      "source": "S13-10 ('Never to the one it names'); arch 06 line 329; README rule 4"
+    },
+    {
+      "file": "invalid/refuse-unknown-outcome-label.json",
+      "version": "v1",
+      "table": "safety_outcomes",
+      "expect": "refuse",
+      "shows": "A safety outcome with a label that is not one of K-02's safetyOutcome values ('Self-harm') is refused (CHECK safety_outcomes_labels_known, SQLSTATE 23514); the same row labelled Crisis words passes",
+      "source": "K-02 v1 safetyOutcome (the 8 outcomes of A3-22 and B3-17 word for word, or Unsure); A3-22; arch 03 line 183"
+    }
+  ]
+}

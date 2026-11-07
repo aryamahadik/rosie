@@ -1,0 +1,1425 @@
+{
+  "part": "safety-incidents",
+  "version": "v1",
+  "tables": [
+    {
+      "name": "safety_outcomes",
+      "description": "The safety read's outcome for each raw text, and for free text from a secure page or an outside AI: the read's labels with their tense, the danger words code matched, the timeout marker, and what holds after code's rules, as K-02 v1's safetyResult gives them. The person's words (each label's evidence words, who is at risk and who wrote it, and the danger words themselves) are sealed under the writer's key. Never edited: the application roles may insert and read, never update or delete (README rule 5).",
+      "source": "arch 02 lines 111, 129; arch 03 line 183; arch 06 lines 283, 315 to 329; A3-22; B3-17; S13-10; K-02 v1 safetyResult, safetyRead, safetyLabel; 02-contracts section 7 row K-34 ('Safety outcomes per text (labels, tense, evidence words, who is at risk, who wrote it; sealed)'); key safe (A3-22, B3-17: 'K-34: the turn's safety outcome')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The outcome row's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "K-02 safetyResult.eventId: the raw text's event id (K-06), or the page or agent call's id. One outcome row per text: the read runs once per raw text, on arrival, before batching.",
+          "source": "K-02 v1 safetyResult.eventId; arch 02 lines 111 ('The actor sends each raw text to the safety read before batching'), 129"
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "K-02 safetyResult.source, the same values: text (a text on arrival), page (free text from a secure page) or agent (free text from an outside AI).",
+          "source": "K-02 v1 safetyResult.source; arch 02 lines 111, 129 ('Free text from them gets the same safety read first (B3-17)')"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The handle the text came from (handles.id); required for a text, null for page or agent free text that came with no handle.",
+          "source": "arch 01 line 55; arch 02 line 111"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person at the handle or on the page (persons.id), when known. Their key seals sealed_words, so deleting it erases the words while the labels stay (arch 09 line 492).",
+          "source": "arch 01 line 93; arch 09 line 492; FS line 743"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business the text is with (businesses.id); null before there is one, since one number serves every business. Row-level security scopes by it; the actor and the guard read unscoped (K-04 v1 rule 4).",
+          "source": "arch 10 line 546; MC C1; arch 03 line 159"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking the text is about (bookings.id), or null: danger is read at any step, before booking and after it (S13-10: 'Crisis words after booking').",
+          "source": "S13-10; arch 06 line 327 ('Not released by the visit')"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn whose one commit wrote the row (turns.id): for a text, the turn its text joined; null for page and agent free text, which no turn carries. While PostgreSQL is down the actor sends the safety line and the row is written on return (arch 11 line 566).",
+          "source": "arch 02 line 121 (one commit per turn); arch 10 line 508; arch 11 line 566; key safe (A3-22: 'the turn's safety outcome')"
+        },
+        {
+          "name": "read_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the read gave its verdict, or when 4 s passed with none.",
+          "source": "arch 02 line 111 ('No verdict in 4 s'); arch 06 line 283 (2 s per model)"
+        },
+        {
+          "name": "tries",
+          "type": "jsonb",
+          "null": false,
+          "audience": "never",
+          "description": "K-02 safetyResult.tries: the model tries in order, Haiku then Sonnet, 2 s each, as a JSON array of {\"model\", \"result\"} (result: verdict, timeout or error).",
+          "source": "K-02 v1 safetyResult.tries; arch 06 line 283; arch 02 line 111 ('One 2 s try per model')"
+        },
+        {
+          "name": "timed_out",
+          "type": "boolean",
+          "null": false,
+          "audience": "never",
+          "description": "K-02 safetyResult.timedOut, the timeout marker: no verdict in 4 s, so there are no labels.",
+          "source": "K-02 v1 safetyResult.timedOut; arch 02 line 111"
+        },
+        {
+          "name": "labels",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "The read's labels in order, each as its K-02 safetyLabel.outcome: one of K-02's safetyOutcome values, the 8 outcomes of A3-22 and B3-17 word for word, or Unsure. Several per text are allowed; empty when timed out.",
+          "source": "K-02 v1 safetyRead.labels, safetyLabel.outcome, safetyOutcome; arch 06 line 279 ('8 · several per text · tense'); arch 03 line 183; A3-22; B3-17"
+        },
+        {
+          "name": "tenses",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "Each label's tense, in the same order as labels: one of K-02's tense values (now, could restart, over, joke, unknown). Over and joke are not danger; unknown reads as danger and adds 'Is anyone in danger right now?'.",
+          "source": "K-02 v1 safetyLabel.tense, tense; arch 06 line 329; S13-24 rule 10"
+        },
+        {
+          "name": "danger_word_lists",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "For each danger word code matched, in order, its K-02 dangerWords.list: general (A3-22's general danger check) or plugin (the trade's own danger words). The words themselves are sealed.",
+          "source": "K-02 v1 safetyResult.dangerWords.list; arch 06 line 283; A3-22"
+        },
+        {
+          "name": "danger_word_kinds",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "For each danger word matched, in the same order, its K-02 dangerWords.kind: selfHarm (988 and 911 on a timeout) or other (911). Plain, so the safety line a timeout gets can be read without the person's key.",
+          "source": "K-02 v1 safetyResult.dangerWords.kind; arch 02 line 111 ('988 and 911 for self-harm words, else 911'); A3-25"
+        },
+        {
+          "name": "sealed_words",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "person_id",
+          "description": "Sealed under the key of person_id: for each label, in order, its evidence words, who is at risk and who wrote it (K-02 safetyLabel evidence, atRisk, writer), and the danger words matched (K-02 dangerWords.words), as one JSON value. Never quoted to anyone: the owner hears 'Urgent: a customer may need help', never the words (A3-25). Null when there are none, or no person is known to seal them.",
+          "source": "02-contracts section 7 row K-34 ('evidence words, who is at risk, who wrote it; sealed'); K-02 v1 safetyLabel, dangerWords.words; arch 01 line 93; arch 09 line 492; A3-25; A3-48 ('never quoted in a text'); RULES 4.5"
+        },
+        {
+          "name": "outcomes",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": "never",
+          "description": "K-02 safetyResult.outcomes: what holds after code's rules, as K-02 safetyOutcome values. A danger word lifts No to Unsure when the tense is now, could restart or unknown; with no verdict in 4 s a danger word counts as Unsure, and with none the list is empty and the outage line goes. Several at once: the strictest holds (safety_holds).",
+          "source": "K-02 v1 safetyResult.outcomes; arch 06 lines 283, 327; arch 02 line 111"
+        },
+        {
+          "name": "lifted_to_unsure",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "K-02 safetyResult.liftedToUnsure: a danger word lifted No to Unsure, or counted as Unsure on a timeout.",
+          "source": "K-02 v1 safetyResult.liftedToUnsure; arch 06 line 283; arch 02 line 111"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "safety_outcomes_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_outcomes_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_outcomes_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_outcomes_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_outcomes_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "safety_outcomes_event_key",
+          "columns": ["event_id"],
+          "source": "arch 02 line 111 (each raw text is read once, before batching); K-02 v1 safetyResult.eventId"
+        }
+      ],
+      "checks": [
+        {
+          "name": "safety_outcomes_source_known",
+          "expression": "source in ('text', 'page', 'agent')",
+          "source": "K-02 v1 safetyResult.source"
+        },
+        {
+          "name": "safety_outcomes_text_has_handle_and_turn",
+          "expression": "source <> 'text' or (handle_id is not null and turn_id is not null)",
+          "source": "arch 02 lines 111, 121"
+        },
+        {
+          "name": "safety_outcomes_labels_known",
+          "expression": "labels <@ array['No', 'Safety steps, then go on', 'An emergency', 'Crisis words', 'A threat to staff or others', 'Harm to a child or older adult', 'Unsafe at home', 'Needs the business''s own line', 'Unsure']::text[]",
+          "source": "K-02 v1 safetyOutcome; A3-22; B3-17; arch 03 line 183"
+        },
+        {
+          "name": "safety_outcomes_tenses_known",
+          "expression": "tenses <@ array['now', 'could restart', 'over', 'joke', 'unknown']::text[]",
+          "source": "K-02 v1 tense; arch 06 line 329"
+        },
+        {
+          "name": "safety_outcomes_one_tense_per_label",
+          "expression": "cardinality(labels) = cardinality(tenses)",
+          "source": "K-02 v1 safetyLabel (each label carries a tense); arch 06 line 329"
+        },
+        {
+          "name": "safety_outcomes_timeout_has_no_labels",
+          "expression": "timed_out = (cardinality(labels) = 0)",
+          "source": "K-02 v1 safetyResult ('A timeout has no read; a verdict has one'); K-02 v1 safetyRead.labels (at least one); arch 02 line 111"
+        },
+        {
+          "name": "safety_outcomes_danger_words_known",
+          "expression": "cardinality(danger_word_lists) = cardinality(danger_word_kinds) and danger_word_lists <@ array['general', 'plugin']::text[] and danger_word_kinds <@ array['selfHarm', 'other']::text[]",
+          "source": "K-02 v1 safetyResult.dangerWords (list, kind)"
+        },
+        {
+          "name": "safety_outcomes_outcomes_known",
+          "expression": "outcomes <@ array['No', 'Safety steps, then go on', 'An emergency', 'Crisis words', 'A threat to staff or others', 'Harm to a child or older adult', 'Unsafe at home', 'Needs the business''s own line', 'Unsure']::text[]",
+          "source": "K-02 v1 safetyResult.outcomes, safetyOutcome"
+        },
+        {
+          "name": "safety_outcomes_verdict_has_outcome",
+          "expression": "timed_out or cardinality(outcomes) >= 1",
+          "source": "K-02 v1 safetyRead.labels ('a text with no danger reads No'); A3-22 ('Means No')"
+        },
+        {
+          "name": "safety_outcomes_timeout_rule",
+          "expression": "not timed_out or outcomes = (case when cardinality(danger_word_kinds) = 0 then '{}'::text[] else array['Unsure']::text[] end)",
+          "source": "arch 02 line 111 ('a danger-word match counts as Unsure ... otherwise the outage line'); K-02 v1 safetyResult.outcomes"
+        },
+        {
+          "name": "safety_outcomes_lift_gives_unsure",
+          "expression": "not lifted_to_unsure or 'Unsure' = any(outcomes)",
+          "source": "arch 06 line 283; K-02 v1 safetyResult.liftedToUnsure"
+        },
+        {
+          "name": "safety_outcomes_sealed_has_person",
+          "expression": "sealed_words is null or person_id is not null",
+          "source": "arch 01 line 93; arch 09 line 492"
+        },
+        {
+          "name": "safety_outcomes_tries_list",
+          "expression": "jsonb_typeof(tries) = 'array' and jsonb_array_length(tries) between 1 and 2",
+          "source": "K-02 v1 safetyResult.tries (1 or 2 tries); arch 06 line 283"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "safety_outcomes_handle_read_idx",
+          "columns": ["handle_id", "read_at"],
+          "where": "handle_id is not null",
+          "why": "A handle's recent outcomes: the actor's danger-first order on return (arch 11 lines 564, 566) and the gate's holds (arch 06 lines 315 to 327)."
+        },
+        {
+          "name": "safety_outcomes_turn_idx",
+          "columns": ["turn_id"],
+          "where": "turn_id is not null",
+          "why": "A turn's safety outcome (key safe, A3-22, B3-17)."
+        },
+        {
+          "name": "safety_outcomes_business_read_idx",
+          "columns": ["business_id", "read_at"],
+          "why": "A business's danger cases, for the gold set and replay (arch 08 line 449; 02-contracts K-10 'for danger cases the outcome labels and tense')."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": false,
+      "effectiveDates": false
+    },
+    {
+      "name": "safety_holds",
+      "description": "What a safety outcome holds and when it is released (arch 06 'Safety outcomes and what they hold'): the routine actions of the text's turn wait, and are released at once after the outcome's message (No, Safety steps then go on, Harm to a child or older adult, Needs the business's own line), once the booking is made private (Unsafe at home), after a clear 'we're safe' with a fresh read-back (An emergency, Crisis words, Unsure), or never (A threat to staff or others). Several outcomes at once: one row with the strictest rule, and the visit does not release it: nothing commits, no fee. The paused flag a threat sets is a core pauses row (K-04).",
+      "source": "arch 06 lines 315 to 327; A3-22 to A3-26, A3-48 to A3-50; B3-17; S13-10; 02-contracts section 7 row K-34 ('holds and their release (arch 06 lines 315 to 327)'); 02-contracts K-09 ('record a safety outcome and its holds; release them on a clear we're safe with a fresh read-back')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The hold's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "safety_outcome_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The outcome that set it (safety_outcomes.id); one hold per outcome row, carrying the strictest rule of its outcomes.",
+          "source": "arch 06 line 327 ('Several at once: The strictest holds')"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The business whose routine actions wait (businesses.id), or null before there is one. Row-level security scopes by it.",
+          "source": "arch 10 line 546"
+        },
+        {
+          "name": "handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The handle whose routine actions wait (handles.id).",
+          "source": "arch 06 line 315; arch 02 line 111 ('Routine actions stay held')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person whose routine actions wait (persons.id), when known.",
+          "source": "arch 06 line 315; FS line 743"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking the held actions are about (bookings.id), or null for a request with no booking yet. Required for Unsafe at home, whose hold is released once this booking is private (A3-50).",
+          "source": "A3-50; A3-24 ('After a clear we're safe, it's handled, the booking may go on')"
+        },
+        {
+          "name": "turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn whose routine actions wait (turns.id); null for page or agent free text. On release they are decided again from today's record, with the booking's own fresh read-back and exact yes (limit 3).",
+          "source": "arch 06 lines 303, 323; arch 02 line 121"
+        },
+        {
+          "name": "release_rule",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "When held routine actions are released, arch 06's table: at_once (after the outcome's message: No, Safety steps then go on, Harm to a child or older adult, Needs the business's own line); when_private (once the booking is made private: Unsafe at home); after_safe (after a clear 'we're safe', with a fresh read-back: An emergency, Crisis words, Unsure); never (A threat to staff or others: nothing books, and new requests wait for the owner). Several at once: the strictest, in that order.",
+          "source": "arch 06 lines 317 to 327; A3-24, A3-25, A3-48, A3-50"
+        },
+        {
+          "name": "blocks_booking",
+          "type": "boolean",
+          "null": false,
+          "default": "false",
+          "audience": "never",
+          "description": "True when the plug-in's stop words matched: they still block booking after an at-once release, nothing is booked, and the owner sees the question.",
+          "source": "arch 06 line 319 ('Plug-in stop words still block booking (A3-26)'); A3-26"
+        },
+        {
+          "name": "held_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the routine actions were held.",
+          "source": "arch 02 line 111 ('Routine actions stay held')"
+        },
+        {
+          "name": "released_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the held actions were released; null while held, and always null for never.",
+          "source": "arch 06 lines 317 to 325"
+        },
+        {
+          "name": "released_why",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Why it was released, matching its rule: outcome_message_sent (at_once), booking_private (when_private), safe_readback (after_safe: a clear 'we're safe, it's handled' or 'I'm safe right now'). Null while held.",
+          "source": "arch 06 lines 319 to 323; A3-24 ('we're safe, it's handled'); A3-25 ('I'm safe right now'); A3-50"
+        },
+        {
+          "name": "released_by_turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn that released it (turns.id): the turn of the clear 'we're safe', or the turn that made the booking private.",
+          "source": "arch 02 line 121; A3-24; A3-50"
+        },
+        {
+          "name": "released_by_outcome_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For after_safe, the safety read of the 'we're safe' text itself (safety_outcomes.id): it releases only when that read holds no danger. A fire, gas or a threat that could start again still gets the message (S13-10).",
+          "source": "S13-10 ('After we're safe, it's handled, the booking may go on. A fire, gas or a threat that could start again still gets the message'); arch 06 line 323"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "safety_holds_outcome_fk",
+          "columns": ["safety_outcome_id"],
+          "references": {
+            "table": "safety_outcomes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_handle_fk",
+          "columns": ["handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_turn_fk",
+          "columns": ["turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_released_turn_fk",
+          "columns": ["released_by_turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_holds_released_outcome_fk",
+          "columns": ["released_by_outcome_id"],
+          "references": {
+            "table": "safety_outcomes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "safety_holds_one_per_outcome",
+          "columns": ["safety_outcome_id"],
+          "source": "arch 06 line 327 ('Several at once: The strictest holds')"
+        }
+      ],
+      "checks": [
+        {
+          "name": "safety_holds_rule_known",
+          "expression": "release_rule in ('at_once', 'when_private', 'after_safe', 'never')",
+          "source": "arch 06 lines 317 to 325"
+        },
+        {
+          "name": "safety_holds_released_pair",
+          "expression": "(released_at is null) = (released_why is null)",
+          "source": "arch 06 lines 317 to 325"
+        },
+        {
+          "name": "safety_holds_why_fits_rule",
+          "expression": "released_why is null or (release_rule = 'at_once' and released_why = 'outcome_message_sent') or (release_rule = 'when_private' and released_why = 'booking_private') or (release_rule = 'after_safe' and released_why = 'safe_readback')",
+          "source": "arch 06 lines 319 to 323"
+        },
+        {
+          "name": "safety_holds_threat_never_released",
+          "expression": "release_rule <> 'never' or released_at is null",
+          "source": "arch 06 line 325 ('Never. Nothing books, and new requests wait for the owner (A3-48)')"
+        },
+        {
+          "name": "safety_holds_safe_release_has_read",
+          "expression": "released_why is distinct from 'safe_readback' or (released_by_turn_id is not null and released_by_outcome_id is not null)",
+          "source": "arch 06 line 323 ('After a clear we're safe, with a fresh read-back'); S13-10"
+        },
+        {
+          "name": "safety_holds_private_has_booking",
+          "expression": "release_rule <> 'when_private' or booking_id is not null",
+          "source": "A3-50; arch 06 line 321 ('Once the booking is made private')"
+        },
+        {
+          "name": "safety_holds_released_after_held",
+          "expression": "released_at is null or released_at >= held_at",
+          "source": "arch 06 lines 317 to 325"
+        },
+        {
+          "name": "safety_holds_not_released_by_itself",
+          "expression": "released_by_outcome_id is null or released_by_outcome_id <> safety_outcome_id",
+          "source": "arch 06 line 323 (a later, clear 'we're safe')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "safety_holds_open_handle_idx",
+          "columns": ["handle_id"],
+          "where": "released_at is null",
+          "why": "The gate checks a handle's open holds before any routine commit (arch 06 lines 315 to 327; arch 02 line 111)."
+        },
+        {
+          "name": "safety_holds_booking_idx",
+          "columns": ["booking_id"],
+          "where": "booking_id is not null",
+          "why": "A booking's holds: Unsafe at home releases when it is private (A3-50); the visit never releases one (arch 06 line 327)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "harm_reports",
+      "description": "Reports Rosie's team follows up that day: harm to a child, an older adult or someone in care, not urgent now (A3-49); a report that the owner or staff harmed someone, never told to the one it names; and a risk at home that only Rosie's team hears of (a child's booking made private by the parent who is its contact, or a report from anyone else). Rosie's team's rows: the Tool API role may add them and never read, change or delete them, so no business sees them, its owner included (README rule 4).",
+      "source": "A3-49; S13-10; arch 06 line 329 ('Harm to a child or older adult, or a report about the owner or staff: Rosie's team that day, never the person named'); RULES 4.12; Q-18; 02-contracts section 7 row K-34 ('harm reports to Rosie's team that day (A3-49)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The report's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business whose chat or booking it came from (businesses.id). Not a row-level security scope: no business reads these rows (README rule 4).",
+          "source": "A3-49; arch 06 line 329"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "harm_to_child_or_elder: harm to a child, an elder or someone in care, not urgent now (A3-49; harm to an animal goes to the owner instead, who decides any report); about_owner_or_staff: a report that the owner or staff harmed someone (S13-10; cancelling is free); unsafe_at_home: a risk at home only Rosie's team hears of (S13-10: a child's booking made private by its parent contact, or a report from anyone else, which only tightens contact preferences).",
+          "source": "A3-49; S13-10; arch 06 line 329; RULES 4.12"
+        },
+        {
+          "name": "safety_outcome_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The safety read that raised it (safety_outcomes.id), or null for a report that came another way.",
+          "source": "A3-22; B3-17; arch 03 line 173 ('The safety read alone sets the first three rows')"
+        },
+        {
+          "name": "reporter_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "Who told Rosie (persons.id), when known. Nothing they said reaches the family or the booker (A3-49).",
+          "source": "A3-49; FS line 743"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it came up in (bookings.id), or null. If they came to book help for it, the booking goes on (A3-49).",
+          "source": "A3-49"
+        },
+        {
+          "name": "named_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For about_owner_or_staff, the owner or staff member the report names (persons.id): never told, by Rosie or its team.",
+          "source": "S13-10 ('Never to the one it names'); arch 06 line 329; RULES 4.12"
+        },
+        {
+          "name": "hotline",
+          "type": "text",
+          "null": true,
+          "audience": ["customer"],
+          "description": "The hotline given first, from Rosie's safety list: child_abuse, youth_crisis, family_violence or elder_care. Required for harm_to_child_or_elder. The list's numbers are not in the sources and are never made up (README open gaps); 911 and 988 are the safety lines.",
+          "source": "S13-10 ('That hotline comes only from Rosie's safety list: 911, 988, and lines for child abuse, youth crisis, family violence and elder care'); A3-49 ('Never make up or guess a hotline number'); A3-50"
+        },
+        {
+          "name": "sealed_details",
+          "type": "bytea",
+          "null": true,
+          "audience": "never",
+          "sealedBy": "sealed_for_person_id",
+          "description": "Sealed under the key of sealed_for_person_id: what was said, for the person on Rosie's team who follows up; never quoted to the family, the booker, the owner or staff.",
+          "source": "A3-49 ('Nothing they said reaches the family or the booker'); arch 01 line 93; arch 09 line 492; RULES 4.5"
+        },
+        {
+          "name": "sealed_for_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person whose key seals sealed_details (persons.id): the one who told Rosie.",
+          "source": "arch 01 line 93; arch 09 line 492"
+        },
+        {
+          "name": "reported_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the report came.",
+          "source": "A3-49"
+        },
+        {
+          "name": "day_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone 'that day' is counted in: the business's time_zone (CQ-05's default for whose day it is; README open gaps).",
+          "source": "A3-49 ('a person on Rosie's team follows up today'); arch 06 line 329 ('that day'); CQ-05; CQ-09"
+        },
+        {
+          "name": "followed_up_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When a person on Rosie's team followed it up; null until then. Due the same calendar day as reported_at in day_zone.",
+          "source": "A3-49; S13-10 ('A person on Rosie's team is told that day'); Q-18"
+        },
+        {
+          "name": "followed_up_by_person_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The person on Rosie's team who followed it up (persons.id). Until launch Rosie's team is Jay and the CTO (Q-18's default).",
+          "source": "Q-18; A3-49"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "harm_reports_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_outcome_fk",
+          "columns": ["safety_outcome_id"],
+          "references": {
+            "table": "safety_outcomes",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_reporter_fk",
+          "columns": ["reporter_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_named_fk",
+          "columns": ["named_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_sealed_for_fk",
+          "columns": ["sealed_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "harm_reports_followed_up_by_fk",
+          "columns": ["followed_up_by_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "harm_reports_kind_known",
+          "expression": "kind in ('harm_to_child_or_elder', 'about_owner_or_staff', 'unsafe_at_home')",
+          "source": "A3-49; S13-10; arch 06 line 329"
+        },
+        {
+          "name": "harm_reports_named_only_about_owner_or_staff",
+          "expression": "(kind = 'about_owner_or_staff') = (named_person_id is not null)",
+          "source": "S13-10; arch 06 line 329"
+        },
+        {
+          "name": "harm_reports_hotline_known",
+          "expression": "hotline is null or hotline in ('child_abuse', 'youth_crisis', 'family_violence', 'elder_care')",
+          "source": "S13-10 (Rosie's safety list)"
+        },
+        {
+          "name": "harm_reports_child_or_elder_has_hotline",
+          "expression": "kind <> 'harm_to_child_or_elder' or hotline is not null",
+          "source": "A3-49 ('They get a hotline from Rosie's safety list'); S13-10 ('a hotline first')"
+        },
+        {
+          "name": "harm_reports_sealed_has_person",
+          "expression": "sealed_details is null or sealed_for_person_id is not null",
+          "source": "arch 09 line 492"
+        },
+        {
+          "name": "harm_reports_followed_up_pair",
+          "expression": "(followed_up_at is null) = (followed_up_by_person_id is null)",
+          "source": "A3-49; Q-18"
+        },
+        {
+          "name": "harm_reports_followed_after_reported",
+          "expression": "followed_up_at is null or followed_up_at >= reported_at",
+          "source": "A3-49"
+        },
+        {
+          "name": "harm_reports_day_zone_form",
+          "expression": "day_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "harm_reports_open_idx",
+          "columns": ["reported_at"],
+          "where": "followed_up_at is null",
+          "why": "Reports Rosie's team has yet to follow up that day (A3-49; S13-10)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "none",
+        "why": "Rosie's team's rows, never a business's: a report may name the owner or staff, who must never hear of it (S13-10; arch 06 line 329). The Tool API role may insert only (README rule 4); the team's side reads and follows up unscoped."
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "safety_timers",
+      "description": "Check-out timers for a pro working alone, where the plug-in sets one: started only with an emergency contact who said yes, due at the check-out time; a missed check-out stays open until the pro replies SAFE, and reaching someone never closes it. The contact is told the job's address only, never the customer's name or the service. The row holds what the actor keeps its own copy of (its due time, address and emergency contact), so a running timer fires while PostgreSQL is down; the core clock row fires the miss.",
+      "source": "S13-10; B8-86; S1-78; RULES 4.9, 4.12, 5.7; arch 11 lines 566, 568; Q-06; 02-contracts section 7 row K-34 ('safety timers with their due time, address and emergency contact (S13-10; B8-86; the actor's copy, arch 11 line 566)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The timer's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business the pro is working for (businesses.id). Row-level security scopes by it.",
+          "source": "B8-86; arch 10 line 546"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The job the pro is at (bookings.id), whose address the contact is told; null when the timer names no booking.",
+          "source": "B8-86 ('who is told only this job's address'); S13-10"
+        },
+        {
+          "name": "worker_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pro working alone (persons.id); a solo owner who is the pro too (B8-86).",
+          "source": "B8-86; S13-10; S1-78"
+        },
+        {
+          "name": "worker_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The pro's handle (handles.id): where the timer was set and its prompts go ('Reply SAFE', never 'stop'), and the reply SAFE comes from.",
+          "source": "B8-86 ('TIMER 2 hours'; 'Reply SAFE when you've stopped working'); S13-10 ('Prompts say Reply SAFE, never stop')"
+        },
+        {
+          "name": "emergency_contact_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The emergency contact the pro named (persons.id), a person row in core; K-22 adds the staff link later. Not null: no timer starts without a contact who said yes.",
+          "source": "S13-10 ('With none, or before that yes, no safety timer runs'); S1-78 ('Never: start a safety timer without a contact who said yes'); B8-86; 02-contracts section 7 row K-34 ('an emergency contact is a person row in core')"
+        },
+        {
+          "name": "emergency_contact_handle_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The contact's handle (handles.id): their mobile, which texted Rosie their yes, or an email. A missed check alerts them by text to their open chat or by email, since nothing goes by voice (Q-06's default).",
+          "source": "Q-06; S1-78 ('Rosie texts the contact once for their own yes'); arch 11 line 566 (the actor's copy of the emergency contact); MC C9"
+        },
+        {
+          "name": "contact_yes_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the contact said yes to safety calls or texts, as K-22 records it once frozen: by texting Rosie (Q-06). The timer starts only after it; a contact's STOP or removal ends the yes, and no timer runs after that.",
+          "source": "S1-78; S13-10 ('An emergency contact's STOP or removal ends their yes'); Q-06"
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When the timer started.",
+          "source": "B8-86"
+        },
+        {
+          "name": "started_by_turn_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The turn of the pro's TIMER text that started it (turns.id); null when it was started another way.",
+          "source": "B8-86 ('TIMER 2 hours'); arch 02 line 121"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "The check-out time: with no SAFE by then the check is missed. The actor keeps its own copy, so the timer fires even while PostgreSQL is down; safety timers never wait for an outage.",
+          "source": "B8-86 ('check out by 11:20am'); arch 11 lines 566, 568; RULES 5.7"
+        },
+        {
+          "name": "due_zone",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The IANA zone the check-out time was given in.",
+          "source": "arch 01 line 83; S13-03; CQ-09"
+        },
+        {
+          "name": "address",
+          "type": "bytea",
+          "null": false,
+          "audience": "secure-page-only",
+          "sealedBy": "address_for_person_id",
+          "description": "The job's address, sealed under the key of address_for_person_id. The one thing the contact is told after a missed check, never the customer's name or the service (RULES 4.9's one exception); otherwise addresses stay on the secure page. The actor keeps a copy.",
+          "source": "S13-10 ('The contact is told the job's address only, never the customer's name or the service'); RULES 4.9; arch 11 line 566; arch 01 line 93; RULES 4.5"
+        },
+        {
+          "name": "address_for_person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person whose key seals the address (persons.id): the customer whose place it is, or the pro where there is none.",
+          "source": "arch 01 line 93; RULES 4.10"
+        },
+        {
+          "name": "clock_row_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The core clock row that fires the miss at due_at (clock_rows.id, kind step): every clock is a PostgreSQL row, which the actor's alarm triggers and the minute sweep backs up.",
+          "source": "arch 01 line 83; arch 10 line 540; K-04 v1 clock_rows"
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "default": "'running'",
+          "audience": "never",
+          "description": "running (not yet due, no SAFE yet); missed (due passed with no SAFE: the pro, then the contact, then the owner are alerted, and Rosie's team keeps trying them all); safe (the pro replied SAFE, before or after a miss). A missed check stays missed until the pro replies SAFE; reaching someone never closes it.",
+          "source": "B8-86; S13-10 ('A missed check stays open until the pro replies SAFE. Reaching someone never closes it')"
+        },
+        {
+          "name": "missed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the check-out was missed; stays set after a later SAFE.",
+          "source": "B8-86; S13-10"
+        },
+        {
+          "name": "safe_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the pro replied SAFE.",
+          "source": "B8-86 ('Reply SAFE when you've stopped working'); S13-10"
+        },
+        {
+          "name": "pro_alerted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "After a miss, when the pro was first alerted (B8-86: 'Rosie calls the pro'; by text or email under Q-06).",
+          "source": "B8-86; Q-06"
+        },
+        {
+          "name": "contact_alerted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "After a miss, when the emergency contact was first alerted with the job's address and asked to call 911 if they can't reach the pro.",
+          "source": "B8-86; S13-10 ('Each person reached is asked to call 911 if they can't reach the pro'); Q-06"
+        },
+        {
+          "name": "owner_alerted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "After a miss, when the owner was first alerted, after the contact.",
+          "source": "B8-86 ('then the owner'); S13-10; Q-06"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "safety_timers_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_worker_fk",
+          "columns": ["worker_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_worker_handle_fk",
+          "columns": ["worker_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_contact_fk",
+          "columns": ["emergency_contact_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_contact_handle_fk",
+          "columns": ["emergency_contact_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_turn_fk",
+          "columns": ["started_by_turn_id"],
+          "references": {
+            "table": "turns",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_address_for_fk",
+          "columns": ["address_for_person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "safety_timers_clock_fk",
+          "columns": ["clock_row_id"],
+          "references": {
+            "table": "clock_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "unique": [
+        {
+          "name": "safety_timers_clock_key",
+          "columns": ["clock_row_id"],
+          "source": "arch 01 line 83 (one clock row per clock)"
+        }
+      ],
+      "checks": [
+        {
+          "name": "safety_timers_state_known",
+          "expression": "state in ('running', 'missed', 'safe')",
+          "source": "B8-86; S13-10"
+        },
+        {
+          "name": "safety_timers_state_times",
+          "expression": "(state = 'running' and missed_at is null and safe_at is null) or (state = 'missed' and missed_at is not null and safe_at is null) or (state = 'safe' and safe_at is not null)",
+          "source": "S13-10 ('A missed check stays open until the pro replies SAFE')"
+        },
+        {
+          "name": "safety_timers_due_after_start",
+          "expression": "due_at > started_at",
+          "source": "B8-86 ('TIMER 2 hours'; 'check out by 11:20am')"
+        },
+        {
+          "name": "safety_timers_yes_before_start",
+          "expression": "contact_yes_at <= started_at",
+          "source": "S1-78 ('Never: start a safety timer without a contact who said yes'); S13-10; Q-06"
+        },
+        {
+          "name": "safety_timers_contact_not_worker",
+          "expression": "emergency_contact_person_id <> worker_person_id",
+          "source": "S13-10; B8-86 (the pro, then the emergency contact)"
+        },
+        {
+          "name": "safety_timers_missed_after_due",
+          "expression": "missed_at is null or missed_at >= due_at",
+          "source": "B8-86"
+        },
+        {
+          "name": "safety_timers_alerts_after_miss",
+          "expression": "missed_at is not null or (pro_alerted_at is null and contact_alerted_at is null and owner_alerted_at is null)",
+          "source": "B8-86 ('Missed: Rosie calls the pro, then the emergency contact the worker named, then the owner'); RULES 4.9 (the address only after a missed check)"
+        },
+        {
+          "name": "safety_timers_due_zone_form",
+          "expression": "due_zone ~ '^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$'",
+          "source": "CQ-09 (an IANA zone name)"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "safety_timers_live_due_idx",
+          "columns": ["due_at"],
+          "where": "state in ('running', 'missed')",
+          "why": "Running and missed timers: the actor reloads its copies, and missed checks keep being tried until SAFE (arch 11 line 566; S13-10)."
+        },
+        {
+          "name": "safety_timers_worker_live_idx",
+          "columns": ["worker_handle_id"],
+          "where": "state in ('running', 'missed')",
+          "why": "The pro's open timer, which a SAFE reply closes (B8-86)."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    },
+    {
+      "name": "privacy_incidents",
+      "description": "Privacy slips (S12-29 to S12-31): a detail Rosie never keeps arrives anyway, and is deleted, never repeated, and the person told once where it goes, the business only that one came; or a private detail reaches the wrong person, and the sends to that number stop and its links close, any code it showed is replaced, the business is told within 1 business day, each person affected is told in plain words, and Rosie's team looks at why within 1 business day. The detail itself is never stored here.",
+      "source": "S12-29, S12-30, S12-31; RULES 4.5, 4.10 ('A private detail that reaches the wrong person: stopped, and the business told within 1 business day; each person affected is told in plain words'); 02-contracts section 7 row K-34 ('privacy-slip incidents (S12-29 to S12-31)')",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The incident's id: an opaque string code makes and never parses (CQ-09).",
+          "source": "CQ-09 (other ids are opaque strings)"
+        },
+        {
+          "name": "business_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The business it happened with (businesses.id), which is told. Row-level security scopes by it.",
+          "source": "S12-30; S12-31; arch 10 line 546"
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "detail_never_kept: a detail Rosie never keeps arrived anyway (S12-30, 'A detail never kept'); wrong_person: a private detail reached the wrong person (S12-31, 'It reached the wrong person').",
+          "source": "S12-29 (branch labels 'A detail never kept', 'It reached the wrong person')"
+        },
+        {
+          "name": "person_id",
+          "type": "text",
+          "null": false,
+          "audience": "never",
+          "description": "The person whose detail it was (persons.id), who is told.",
+          "source": "S12-30 ('Dee is told once where cards go'); S12-31 ('Each person affected is told in plain words')"
+        },
+        {
+          "name": "booking_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "The booking it was about (bookings.id), or null.",
+          "source": "S12-31 ('A text about Ben T.'s booking')"
+        },
+        {
+          "name": "detail_kind",
+          "type": "text",
+          "null": true,
+          "audience": ["owner"],
+          "description": "For detail_never_kept, what kind of detail came, never the detail: card_number, ssn (a full Social Security number), password, door_code, or plugin_list (the plug-in's own never-kept list). The business hears only that a detail came the wrong way.",
+          "source": "S12-30 ('Never kept from a text: card numbers, full Social Security numbers, passwords, door codes, and the plug-in's own list'); RULES 4.5"
+        },
+        {
+          "name": "event_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For detail_never_kept, the inbound text's event id (K-06) that carried it, whose detail was deleted.",
+          "source": "S12-30; arch 02 line 109"
+        },
+        {
+          "name": "outbox_row_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For wrong_person, the outbox row that went to the wrong person (outbox_rows.id), when it was a message Rosie sent.",
+          "source": "S12-31 ('A text about Ben T.'s booking went to an old number'); arch 01 line 65"
+        },
+        {
+          "name": "sent_to_handle_id",
+          "type": "text",
+          "null": true,
+          "audience": "never",
+          "description": "For wrong_person, the handle it reached (handles.id): no more texts go to it, and every link in them is closed. Required for wrong_person.",
+          "source": "S12-31 ('Stop first: no more texts to that number, and every link in them is closed')"
+        },
+        {
+          "name": "fields_shown",
+          "type": "text[]",
+          "null": false,
+          "default": "'{}'",
+          "audience": ["customer", "owner"],
+          "description": "For wrong_person, which fields it showed, by name and never by value (such as name and visit_time), so the owner and each person affected hear what went out.",
+          "source": "S12-31 ('It showed the customer's name and visit time'; 'Each person affected hears what went out and what they can do')"
+        },
+        {
+          "name": "found_at",
+          "type": "timestamptz",
+          "null": false,
+          "audience": "never",
+          "description": "When Rosie found it; the 1-business-day deadlines count from here.",
+          "source": "S12-29 ('Rosie acts at once'); S12-31; RULES 4.10"
+        },
+        {
+          "name": "deleted_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "For detail_never_kept, when the detail was deleted (or moved to the secure page where the plug-in keeps that kind).",
+          "source": "S12-30 ('It isn't repeated, it's deleted'; 'it moves to the secure page instead')"
+        },
+        {
+          "name": "stopped_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "For wrong_person, when sends to that handle stopped and every link in them was closed.",
+          "source": "S12-31 ('Stop first')"
+        },
+        {
+          "name": "codes_replaced_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "For wrong_person, when any code it showed was replaced, the new one sent only the right way and staff told the old one no longer works; null when it showed none.",
+          "source": "S12-31 ('Any code it showed is replaced at once')"
+        },
+        {
+          "name": "person_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the person was told: once where the detail goes (S12-30), or what went out and what they can do, as fast as possible and never past the law's shortest deadline (S12-31).",
+          "source": "S12-30; S12-31; RULES 4.10"
+        },
+        {
+          "name": "business_told_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "When the business was told: only that a detail came the wrong way (S12-30), or within 1 business day (S12-31). A health practice is also told as its agreement says.",
+          "source": "S12-30 ('The business is told only that a detail came the wrong way'); S12-31 ('tells the business within 1 business day'); RULES 4.10"
+        },
+        {
+          "name": "team_reviewed_at",
+          "type": "timestamptz",
+          "null": true,
+          "audience": "never",
+          "description": "For wrong_person, when Rosie's team looked at why, within 1 business day.",
+          "source": "S12-31 ('Rosie's team looks at why within 1 business day'); Q-18"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "null": false,
+          "default": "1",
+          "audience": "never",
+          "description": "The row's version: every update raises it by one, and a commit compares and sets it, so a write made from an old read is refused with the rows that changed (limit 4).",
+          "source": "arch 01 line 85; arch 10 line 506; K-04 v1 rule 2"
+        }
+      ],
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        {
+          "name": "privacy_incidents_business_fk",
+          "columns": ["business_id"],
+          "references": {
+            "table": "businesses",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "privacy_incidents_person_fk",
+          "columns": ["person_id"],
+          "references": {
+            "table": "persons",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "privacy_incidents_booking_fk",
+          "columns": ["booking_id"],
+          "references": {
+            "table": "bookings",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "privacy_incidents_outbox_fk",
+          "columns": ["outbox_row_id"],
+          "references": {
+            "table": "outbox_rows",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "privacy_incidents_sent_to_fk",
+          "columns": ["sent_to_handle_id"],
+          "references": {
+            "table": "handles",
+            "columns": ["id"]
+          },
+          "onDelete": "restrict"
+        }
+      ],
+      "checks": [
+        {
+          "name": "privacy_incidents_kind_known",
+          "expression": "kind in ('detail_never_kept', 'wrong_person')",
+          "source": "S12-29"
+        },
+        {
+          "name": "privacy_incidents_detail_kind_known",
+          "expression": "detail_kind is null or detail_kind in ('card_number', 'ssn', 'password', 'door_code', 'plugin_list')",
+          "source": "S12-30"
+        },
+        {
+          "name": "privacy_incidents_never_kept_fields",
+          "expression": "kind <> 'detail_never_kept' or (detail_kind is not null and sent_to_handle_id is null and outbox_row_id is null and cardinality(fields_shown) = 0)",
+          "source": "S12-30"
+        },
+        {
+          "name": "privacy_incidents_wrong_person_fields",
+          "expression": "kind <> 'wrong_person' or (sent_to_handle_id is not null and detail_kind is null and event_id is null and deleted_at is null)",
+          "source": "S12-31"
+        },
+        {
+          "name": "privacy_incidents_steps_after_found",
+          "expression": "(deleted_at is null or deleted_at >= found_at) and (stopped_at is null or stopped_at >= found_at) and (codes_replaced_at is null or codes_replaced_at >= found_at) and (person_told_at is null or person_told_at >= found_at) and (business_told_at is null or business_told_at >= found_at) and (team_reviewed_at is null or team_reviewed_at >= found_at)",
+          "source": "S12-29 ('Rosie acts at once')"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "privacy_incidents_business_found_idx",
+          "columns": ["business_id", "found_at"],
+          "why": "A business's incidents, and those whose 1-business-day steps are still open (S12-31; RULES 4.10)."
+        },
+        {
+          "name": "privacy_incidents_sent_to_idx",
+          "columns": ["sent_to_handle_id"],
+          "where": "sent_to_handle_id is not null",
+          "why": "Limit 8 and the links check whether a handle was cut off by a privacy slip (S12-31 'no more texts to that number')."
+        }
+      ],
+      "rowLevelSecurity": {
+        "scope": "business",
+        "column": "business_id"
+      },
+      "versioned": true,
+      "versionColumn": "version",
+      "effectiveDates": false
+    }
+  ]
+}

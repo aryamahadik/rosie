@@ -1,0 +1,35 @@
+{
+  "after": ["seed-outcome-crisis.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop"
+    },
+    "action": "insert",
+    "table": "safety_outcomes",
+    "values": {
+      "id": "safety-alex-0230",
+      "event_id": "evt-alex-0230",
+      "source": "text",
+      "handle_id": "handle-alex",
+      "person_id": "person-alex",
+      "business_id": "biz-lees-barbershop",
+      "turn_id": "turn-alex-0203",
+      "read_at": "2026-10-25T23:12:01Z",
+      "tries": [{ "model": "haiku", "result": "verdict" }],
+      "timed_out": false,
+      "labels": ["Self-harm"],
+      "tenses": ["now"],
+      "danger_word_lists": [],
+      "danger_word_kinds": [],
+      "sealed_words": "\\x6b33342d736565642d7365616c65642d776f7264732d6e6f742d7265616c",
+      "outcomes": ["Crisis words"],
+      "lifted_to_unsure": false
+    },
+    "expect": {
+      "sqlstate": "23514",
+      "constraintOneOf": ["safety_outcomes_labels_known"]
+    }
+  }
+}

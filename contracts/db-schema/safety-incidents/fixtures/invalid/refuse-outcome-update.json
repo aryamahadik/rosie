@@ -1,0 +1,19 @@
+{
+  "after": ["seed-outcome-crisis.json"],
+  "rows": [],
+  "refused": {
+    "role": "runtime",
+    "scope": null,
+    "action": "update",
+    "table": "safety_outcomes",
+    "set": {
+      "outcomes": ["No"]
+    },
+    "where": {
+      "id": "safety-alex-0203"
+    },
+    "expect": {
+      "sqlstate": "42501"
+    }
+  }
+}
