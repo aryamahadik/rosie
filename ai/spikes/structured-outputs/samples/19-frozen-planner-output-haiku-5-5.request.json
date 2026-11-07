@@ -1,0 +1,128 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "Nothing on the list fit this turn. Choose exactly one of your five verbs. You never book, charge, refund, cancel, move, or change a setting, contact or consent.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<facts>\npay.noshow: Lee's Barbershop's fee for a missed visit is $20.\n</facts>\n<turn>what is the fee if I miss my visit?</turn>\n<language>en</language>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "PlannerOutput",
+        "description": "What the Sonnet planner returns when nothing fits after meaning search: five verbs only, answer from stored facts, ask one question, pass a question on, hand to a person, log a gap case. It never books, charges, refunds, cancels, moves, or changes a setting, contact or consent (arch 06 line 291; arch 03 line 189), so any other verb is refused (refuse-planner-books). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The language it answers in: the text's (arch 06 line 341; CQ-07).",
+            "$ref": "#/$defs/language"
+          },
+          "action": {
+            "description": "One of the five verbs (arch 06 line 291).",
+            "anyOf": [
+              { "$ref": "#/$defs/plannerAnswer" },
+              { "$ref": "#/$defs/plannerAsk" },
+              { "$ref": "#/$defs/plannerPassOn" },
+              { "$ref": "#/$defs/plannerHandOff" },
+              { "$ref": "#/$defs/plannerLogGap" }
+            ]
+          }
+        },
+        "required": ["language", "action"],
+        "additionalProperties": false,
+        "$defs": {
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "plannerAnswer": {
+            "title": "PlannerAnswer",
+            "description": "Answer from stored facts (arch 06 line 291). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 06 line 291.", "const": "answer" },
+              "text": {
+                "description": "The answer, saying only what the facts hold (arch 06 line 291: 'answer from stored facts').",
+                "type": "string"
+              },
+              "facts": {
+                "description": "The names of the context's facts it uses; code checks each is in the context (arch 06 line 291; arch 02 line 117).",
+                "type": "array",
+                "minItems": 1,
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["verb", "text", "facts"],
+            "additionalProperties": false
+          },
+          "plannerAsk": {
+            "title": "PlannerAsk",
+            "description": "Ask one question (arch 06 line 291). A reply to it that fits nothing goes to a person (arch 03 line 189; S13-29 rule 54). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 06 line 291.", "const": "ask" },
+              "question": {
+                "description": "The one question (arch 06 line 291). One question is a code check (C-092), not a schema rule (02-contracts section 2 item 7).",
+                "type": "string"
+              }
+            },
+            "required": ["verb", "question"],
+            "additionalProperties": false
+          },
+          "plannerPassOn": {
+            "title": "PlannerPassOn",
+            "description": "Pass a question on to the business (arch 06 line 291). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 06 line 291.", "const": "pass_on" },
+              "question": {
+                "description": "The question passed on, in the person's words (arch 06 line 291).",
+                "type": "string"
+              }
+            },
+            "required": ["verb", "question"],
+            "additionalProperties": false
+          },
+          "plannerHandOff": {
+            "title": "PlannerHandOff",
+            "description": "Hand to a person: the owner, then the team (arch 06 lines 279 and 291); a report about the owner or staff goes to Rosie's team that day, never the person named, so about says which (arch 06 line 329; S13-29 rule 58). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 06 line 291.", "const": "hand_off" },
+              "reason": { "description": "Why (arch 06 line 291).", "type": "string" },
+              "about": { "$ref": "#/$defs/handOffAbout" }
+            },
+            "required": ["verb", "reason", "about"],
+            "additionalProperties": false
+          },
+          "plannerLogGap": {
+            "title": "PlannerLogGap",
+            "description": "Log a gap case: a turn no choice fit, logged with its state and frontier for the weekly review (arch 06 line 291; arch 01 line 95; arch 03 line 189). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 06 line 291.", "const": "log_gap" },
+              "summary": {
+                "description": "What the person wanted that nothing fit, in plain words; code adds the state and frontier (arch 01 line 95).",
+                "type": "string"
+              }
+            },
+            "required": ["verb", "summary"],
+            "additionalProperties": false
+          },
+          "handOffAbout": {
+            "title": "HandOffAbout",
+            "description": "Whom a hand-off is about, so the hand-off code (C-104) routes it without reading the reason: ownerOrStaff, a report about the owner or staff, which goes to Rosie's team that day, never the person named (arch 06 line 329: 'a report about the owner or staff: Rosie's team that day, never the person named'; S13-29 rule 58: 'A report that the owner or staff harmed someone goes to Rosie's team that day, never only to the one named'; S13-27 rule 36's note: 'If it's about the owner or staff, or is sent to Rosie itself, only Rosie's team gets it'); other, any other hand-off, which goes to the owner in text hours, then Rosie's team after 2 days unanswered (arch 06 line 329; S11-19). A closed enum of scalars, inside the structured-outputs subset (02-contracts section 2 item 7). Model-facing.",
+            "type": "string",
+            "enum": ["ownerOrStaff", "other"]
+          }
+        }
+      }
+    }
+  }
+}

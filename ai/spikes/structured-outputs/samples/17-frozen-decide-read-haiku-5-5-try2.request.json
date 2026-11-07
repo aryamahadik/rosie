@@ -1,0 +1,274 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "You read one turn of texts to a booking assistant and map each part of it to one verb. Use only the choices listed, by their ids. Quote each part's exact words.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<who>Sam Lee, owner of biz-lees-barbershop, owner of biz-lee-home-services, language en</who>\n<open_questions>\noq-s1-02 (step S1-02, Lee's Barbershop, asked 1 time)\n</open_questions>\n<choices>\nc-01 (option, answers oq-s1-02): All on the list. A plug-in holds what one kind of work needs. Fields: kinds (text).\nc-02 (option, answers oq-s1-02): One isn't on the list yet. a service with a visit that Rosie has no plug-in for. Fields: kinds (text).\nc-03 (option, answers oq-s1-02): Not a service we book. goods with no visit, delivery only, renting a thing alone, or work the law bars. Fields: kinds (text).\nc-04 (door, door unclearOwnerOrHelp): An unclear owner text or HELP. Nothing changes on a text Rosie can't act on for sure.\nc-05 (anytime, any-time row danger-or-crisis): Danger or crisis. Every message and every call is checked before any answer, every time, by meaning.\n</choices>\n<recent_messages>\nrosie: Hi! I'm Rosie, an automated assistant. I'll set up your business so AI assistants like ChatGPT, Claude and Gemini can book you. What kinds of work do you do? Just type them.\n</recent_messages>\n<turn>Barbershop, plumbing, electrical</turn>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "DecideRead",
+        "description": "What one decide read returns: the model's verbs, one per part of the text (arch 03 line 183; arch 02 line 119: 'The output is the model's verbs'). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+        "type": "object",
+        "properties": {
+          "language": {
+            "description": "The text's language, as this read sees it; the two reads must agree (CQ-07 default; arch 06 line 341).",
+            "$ref": "#/$defs/language"
+          },
+          "parts": {
+            "description": "One verb per part of the text, in the text's order (arch 03 line 183).",
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/decidePart" }
+          }
+        },
+        "required": ["language", "parts"],
+        "additionalProperties": false,
+        "$defs": {
+          "language": {
+            "title": "Language",
+            "description": "A language as a two-letter lowercase code, such as en or es (arch 06 line 341: 'It answers in the language of the text'; contracts/bundle fixedLine.lang uses the same form). Which codes are checked languages is a code check against the bundle's fixed lines.",
+            "type": "string",
+            "pattern": "^[a-z]{2}$"
+          },
+          "decidePart": {
+            "title": "DecidePart",
+            "description": "One verb for one part of the text: choose, enter, ask, none_fits, pass_on, hand_off, redact or no_op (arch 03 line 183). Any other verb is refused (refuse-unknown-verb). Model-facing.",
+            "anyOf": [
+              { "$ref": "#/$defs/choose" },
+              { "$ref": "#/$defs/enter" },
+              { "$ref": "#/$defs/ask" },
+              { "$ref": "#/$defs/noneFits" },
+              { "$ref": "#/$defs/passOn" },
+              { "$ref": "#/$defs/handOff" },
+              { "$ref": "#/$defs/redact" },
+              { "$ref": "#/$defs/noOp" }
+            ]
+          },
+          "choose": {
+            "title": "Choose",
+            "description": "choose(question, option, fields with their source words): the part answers an offered question or hub case (arch 03 line 183). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "choose" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "question": {
+                "description": "The question the option answers, exactly as the chosen choice's question gives it (arch 03 line 183).",
+                "type": "string"
+              },
+              "choice": {
+                "description": "The chosen option's choice id, one of the turn's choices of kind option, hub or whichBooking (arch 03 line 183; arch 06 line 333: 'Code hands it the choices'). Checked in code, never an enum (README 'Named rules').",
+                "type": "string"
+              },
+              "fields": {
+                "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+                "type": "array",
+                "items": { "$ref": "#/$defs/field" }
+              }
+            },
+            "required": ["verb", "quote", "question", "choice", "fields"],
+            "additionalProperties": false
+          },
+          "enter": {
+            "title": "Enter",
+            "description": "enter(door or any-time row, fields): the part starts something new or raises an any-time row (arch 03 line 183); also an entry step meaning search added (arch 03 line 189). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "enter" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "choice": {
+                "description": "The door's, any-time row's or entry step's choice id, one of the turn's choices of kind door, anytime or searchEntry (arch 03 lines 183 and 189). Checked in code (README 'Named rules').",
+                "type": "string"
+              },
+              "fields": {
+                "description": "The fields its answer carries, each with its words (arch 03 line 183).",
+                "type": "array",
+                "items": { "$ref": "#/$defs/field" }
+              }
+            },
+            "required": ["verb", "quote", "choice", "fields"],
+            "additionalProperties": false
+          },
+          "ask": {
+            "title": "Ask",
+            "description": "ask(questions, what is unclear): the part could answer more than one question, or a bare reply or reaction is not a choice, so Rosie asks which (arch 03 lines 183 and 187; S13-12; A7-17). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "ask" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "questions": {
+                "description": "The questions it could answer, by the choices' question values (arch 03 line 183).",
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "unclear": {
+                "description": "What is unclear, in plain words (arch 03 line 183).",
+                "type": "string"
+              }
+            },
+            "required": ["verb", "quote", "questions", "unclear"],
+            "additionalProperties": false
+          },
+          "noneFits": {
+            "title": "NoneFits",
+            "description": "none_fits(why): no choice fits the part; meaning search runs (arch 03 lines 183 and 189). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "none_fits" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "why": { "description": "Why nothing fits (arch 03 line 183).", "type": "string" }
+            },
+            "required": ["verb", "quote", "why"],
+            "additionalProperties": false
+          },
+          "passOn": {
+            "title": "PassOn",
+            "description": "pass_on(words): the part is words for the business, passed on as they are (arch 03 line 183). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "pass_on" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "words": {
+                "description": "The words to pass on (arch 03 line 183).",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["verb", "quote", "words"],
+            "additionalProperties": false
+          },
+          "handOff": {
+            "title": "HandOff",
+            "description": "hand_off(reason): the part goes to a person (arch 03 line 183), routed by about: a report about the owner or staff to Rosie's team that day, any other hand-off to the owner in text hours, then Rosie's team (arch 06 line 329). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "hand_off" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "reason": { "description": "Why it goes to a person (arch 03 line 183).", "type": "string" },
+              "about": { "$ref": "#/$defs/handOffAbout" }
+            },
+            "required": ["verb", "quote", "reason", "about"],
+            "additionalProperties": false
+          },
+          "redact": {
+            "title": "Redact",
+            "description": "redact(words): words that must not stay in the message log or reach a message, such as a field kept to the secure page (arch 03 line 183; RULES 4.5). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "redact" },
+              "quote": { "$ref": "#/$defs/quote" },
+              "words": {
+                "description": "The words to redact, found in the text (arch 03 line 183).",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["verb", "quote", "words"],
+            "additionalProperties": false
+          },
+          "noOp": {
+            "title": "NoOp",
+            "description": "no_op: the part needs nothing done, such as a thank-you (arch 03 line 183). Model-facing.",
+            "type": "object",
+            "properties": {
+              "verb": { "description": "arch 03 line 183.", "const": "no_op" },
+              "quote": { "$ref": "#/$defs/quote" }
+            },
+            "required": ["verb", "quote"],
+            "additionalProperties": false
+          },
+          "quote": {
+            "title": "Quote",
+            "description": "The part's exact quote from the turn's texts; code confirms it is found in their words (arch 03 line 185: 'each part is quoted exactly, and code confirms the quote'). Model-facing.",
+            "$ref": "#/$defs/nonEmptyText"
+          },
+          "field": {
+            "title": "Field",
+            "description": "One field of a choose or enter, with its source words (arch 03 line 183: 'fields with their source words'). A value without words is refused (refuse-value-without-words). Model-facing.",
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "The field's name, one the chosen choice lists in its fields (contracts/bundle answerField.name; arch 03 line 183).",
+                "type": "string"
+              },
+              "value": { "$ref": "#/$defs/fieldValue" },
+              "words": {
+                "description": "The exact words of the text the value comes from; code re-parses the value from them (arch 03 line 185; arch 06 line 309, limit 6).",
+                "$ref": "#/$defs/nonEmptyText"
+              }
+            },
+            "required": ["name", "value", "words"],
+            "additionalProperties": false
+          },
+          "nonEmptyText": {
+            "title": "NonEmptyText",
+            "description": "Words with at least one character that is not a space, written as a pattern because the structured-outputs subset has no string-length limits (02-contracts section 2 item 7; arch 03 line 185: each part is quoted exactly and each value has its words).",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "handOffAbout": {
+            "title": "HandOffAbout",
+            "description": "Whom a hand-off is about, so the hand-off code (C-104) routes it without reading the reason: ownerOrStaff, a report about the owner or staff, which goes to Rosie's team that day, never the person named (arch 06 line 329: 'a report about the owner or staff: Rosie's team that day, never the person named'; S13-29 rule 58: 'A report that the owner or staff harmed someone goes to Rosie's team that day, never only to the one named'; S13-27 rule 36's note: 'If it's about the owner or staff, or is sent to Rosie itself, only Rosie's team gets it'); other, any other hand-off, which goes to the owner in text hours, then Rosie's team after 2 days unanswered (arch 06 line 329; S11-19). A closed enum of scalars, inside the structured-outputs subset (02-contracts section 2 item 7). Model-facing.",
+            "type": "string",
+            "enum": ["ownerOrStaff", "other"]
+          },
+          "fieldValue": {
+            "title": "FieldValue",
+            "description": "The value the model read for a field, in the type the choice's field names (contracts/bundle answerField.type): a string for text, zone, id or choice; an integer; a boolean; money or a time as the shared formats write them (CQ-09). Code re-parses it from its words (arch 03 line 185; arch 06 line 309, limit 6). Model-facing.",
+            "anyOf": [
+              { "type": "string" },
+              { "type": "integer" },
+              { "type": "boolean" },
+              { "$ref": "#/$defs/money" },
+              { "$ref": "#/$defs/time" }
+            ]
+          },
+          "money": {
+            "title": "Money",
+            "description": "An amount of money: whole cents with its currency code, never a decimal (CQ-09). Whether an amount may be zero or negative is each field's rule, checked in code.",
+            "type": "object",
+            "properties": {
+              "cents": {
+                "description": "The amount in the currency's cents, as an integer (CQ-09).",
+                "type": "integer"
+              },
+              "currency": { "$ref": "#/$defs/currency" }
+            },
+            "required": ["cents", "currency"],
+            "additionalProperties": false
+          },
+          "time": {
+            "title": "Time",
+            "description": "A time: the instant in UTC together with the IANA zone it is shown and reasoned in (CQ-09: 'every time in UTC with its IANA zone'; S13-03).",
+            "type": "object",
+            "properties": { "utc": { "$ref": "#/$defs/utc" }, "zone": { "$ref": "#/$defs/zone" } },
+            "required": ["utc", "zone"],
+            "additionalProperties": false
+          },
+          "currency": {
+            "title": "Currency",
+            "description": "A currency code: three capital letters, as ISO 4217 writes them, for example USD (CQ-09: 'money in integer cents with a currency code').",
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "utc": {
+            "title": "Utc",
+            "description": "An instant in UTC, written as an RFC 3339 date-time ending in Z, for example 2026-11-07T15:30:00Z (CQ-09: 'every time in UTC'). Whether the date exists is a code check.",
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]+)?Z$"
+          },
+          "zone": {
+            "title": "Zone",
+            "description": "An IANA time zone name, for example America/New_York (CQ-09; S13-03: a visit's time is read in the visit's zone). Whether the zone exists in the IANA database is a code check.",
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_+-]*(/[A-Za-z0-9_+-]+)*$"
+          }
+        }
+      }
+    }
+  }
+}

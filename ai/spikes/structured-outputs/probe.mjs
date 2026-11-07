@@ -6,6 +6,11 @@
 //   node ai/spikes/structured-outputs/probe.mjs --live      the lead's one run, with ANTHROPIC_API_KEY in the
 //                                                           environment (never from a file this script opens)
 //
+// T-1066 adds --frozen (with --dry-run or --live): the last 4 of the 20 calls, one on claude-haiku-5-5 for each
+// frozen model-facing schema (K-02 decide read, safety read, planner output; K-03 plan), each built by
+// bundleSchema() from the contract files (frozen.mjs). It plans exactly 4 and refuses to go live with fewer than 4
+// calls left under the limit.
+//
 // Live rules (DL-027, Q-20, hard rule 7): only https://api.anthropic.com; at most 20 calls in total, counting
 // every line already in results.jsonl, so a second run can never pass 20; refuses to start when CI is set or
 // the key is missing; never prints, logs or writes the key or any request header. Per call it appends one line
@@ -26,8 +31,17 @@ import {
   compileCandidates,
   resultLine,
 } from "./lib.mjs";
+import {
+  FROZEN_CALLS,
+  FROZEN_MODEL,
+  FROZEN_TARGETS,
+  buildFrozenCalls,
+  compileFrozen,
+  frozenSamples,
+} from "./frozen.mjs";
+import { lintSchema } from "../../../contracts/scripts/structured-subset-lint.mjs";
 
-const USAGE = "Usage: node ai/spikes/structured-outputs/probe.mjs --dry-run | --live";
+const USAGE = "Usage: node ai/spikes/structured-outputs/probe.mjs [--frozen] --dry-run | [--frozen] --live";
 const DEFAULT_OUT = new URL("./", import.meta.url);
 const REQUEST_TIMEOUT_MS = 120_000;
 const RETRY_WAIT_MS = 20_000;
@@ -113,7 +127,53 @@ function dryRun(write) {
   return failed === 0 ? 0 : 1;
 }
 
-async function live({ env, fetchImpl, write, outDir, sleep }) {
+/** Builds the 4 frozen requests and checks each offline: the subset, the contracts' own lint, a fixture output. */
+function dryRunFrozen(write, outDir) {
+  const already = existingCalls(fileURLToPath(new URL("results.jsonl", outDir)));
+  const remaining = MAX_CALLS - already;
+  // With fewer than 4 left a live run refuses; the dry run still checks the requests, numbered as slots 17 to 20.
+  const calls = buildFrozenCalls(remaining >= FROZEN_CALLS ? { firstN: already + 1 } : {});
+  const validators = compileFrozen();
+  const samples = frozenSamples();
+  let failed = 0;
+  write(
+    `dry run (frozen): ${calls.length} calls planned on ${FROZEN_MODEL} (limit ${MAX_CALLS}; results.jsonl logs ${already}, ${Math.max(remaining, 0)} left); no network, no key`,
+  );
+  if (calls.length !== FROZEN_CALLS) {
+    failed += 1;
+    write(`FAIL ${FROZEN_CALLS} calls are planned, not ${calls.length}`);
+  }
+  if (remaining < FROZEN_CALLS) {
+    write(
+      `note: --frozen --live would refuse now (fewer than ${FROZEN_CALLS} of the ${MAX_CALLS} calls are left)`,
+    );
+  }
+  write(`frozen schemas compiled with Ajv 2020 strict: ${FROZEN_TARGETS.map((t) => t.def).join(", ")}`);
+  for (const call of calls) {
+    const schema = call.body.output_config.format.schema;
+    const subset = checkSubset(schema);
+    const lint = lintSchema(schema);
+    const problems = [...subset.problems, ...lint.errors];
+    const sampleValid = validators[call.schemaName](samples[call.schemaName]) === true;
+    const ok =
+      call.model === FROZEN_MODEL &&
+      problems.length === 0 &&
+      sampleValid &&
+      schema.$schema === undefined &&
+      schema.$id === undefined;
+    if (!ok) failed += 1;
+    write(
+      `${ok ? "ok  " : "FAIL"} ${String(call.n).padStart(2)} ${call.id.padEnd(32)} ${call.model.padEnd(17)} expect ${call.expect.padEnd(7)} ` +
+        `${JSON.stringify(schema).length} schema bytes; optional ${subset.optionalProperties}, unions ${subset.unionParameters}; ` +
+        `fixture output valid ${sampleValid}` +
+        (problems.length > 0 ? `; outside the subset: ${problems.join("; ")}` : ""),
+    );
+  }
+  write(failed === 0 ? "dry run (frozen): passed" : `dry run (frozen): FAILED (${failed})`);
+  return failed === 0 ? 0 : 1;
+}
+
+async function live({ env, fetchImpl, write, outDir, sleep, frozen = false }) {
   if (env.CI) {
     write("refused: CI is set; this probe never runs in CI (T-360, Q-20).");
     return 2;
@@ -133,10 +193,16 @@ async function live({ env, fetchImpl, write, outDir, sleep }) {
     );
     return 2;
   }
+  if (frozen && remaining < FROZEN_CALLS) {
+    write(
+      `refused: results.jsonl logs ${already} calls, so only ${remaining} of the ${MAX_CALLS} are left; the frozen check needs ${FROZEN_CALLS}.`,
+    );
+    return 2;
+  }
   mkdirSync(samplesDir, { recursive: true });
   const scrub = scrubber(key);
-  const validators = compileCandidates();
-  const calls = buildCalls();
+  const validators = frozen ? compileFrozen() : compileCandidates();
+  const calls = frozen ? buildFrozenCalls({ firstN: already + 1 }) : buildCalls();
   const skippedModels = new Set();
   let made = 0;
   write(`live: ${calls.length} calls planned, ${remaining} of ${MAX_CALLS} left (${already} already logged)`);
@@ -197,12 +263,15 @@ export async function main(
     sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   } = {},
 ) {
-  if (argv.length !== 1 || (argv[0] !== "--dry-run" && argv[0] !== "--live")) {
+  const flags = new Set(argv);
+  const frozen = flags.has("--frozen");
+  const mode = ["--dry-run", "--live"].filter((flag) => flags.has(flag));
+  if (flags.size !== argv.length || mode.length !== 1 || flags.size !== mode.length + (frozen ? 1 : 0)) {
     write(USAGE);
     return 2;
   }
-  if (argv[0] === "--dry-run") return dryRun(write);
-  return live({ env, fetchImpl, write, outDir, sleep });
+  if (mode[0] === "--dry-run") return frozen ? dryRunFrozen(write, outDir) : dryRun(write);
+  return live({ env, fetchImpl, write, outDir, sleep, frozen });
 }
 
 function runAsScript() {

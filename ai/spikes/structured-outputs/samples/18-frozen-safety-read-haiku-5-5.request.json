@@ -1,0 +1,74 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "You read one raw text for safety before anything else happens. Label it with every outcome that applies, each with its tense, the words that support it, who is at risk and who wrote it.",
+  "messages": [{ "role": "user", "content": "<text>the gas leak was fixed in March</text>" }],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "SafetyRead",
+        "description": "What one safety read returns for one raw text: its labels, several at once allowed (arch 06 line 279: '8 · several per text · tense'; arch 03 line 183). Model-facing: written inside the structured-outputs subset and checked by contracts/scripts/structured-subset-lint.mjs (02-contracts section 2 item 7).",
+        "type": "object",
+        "properties": {
+          "labels": {
+            "description": "At least one label; a text with no danger reads No (A3-22 'Means No').",
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/safetyLabel" }
+          }
+        },
+        "required": ["labels"],
+        "additionalProperties": false,
+        "$defs": {
+          "safetyLabel": {
+            "title": "SafetyLabel",
+            "description": "One label of a safety read, with its tense, evidence words, who is at risk and who wrote it (arch 03 line 183; arch 02 line 111). Model-facing.",
+            "type": "object",
+            "properties": {
+              "outcome": { "$ref": "#/$defs/safetyOutcome" },
+              "tense": { "$ref": "#/$defs/tense" },
+              "evidence": {
+                "description": "The words of the text that show it; empty for No when nothing points to danger (arch 02 line 111: 'evidence words').",
+                "type": "string"
+              },
+              "atRisk": {
+                "description": "Who is at risk, in plain words, such as 'the writer' or 'nobody' (arch 03 line 183; arch 02 line 111). A closed list waits for a source (README open gaps).",
+                "type": "string"
+              },
+              "writer": {
+                "description": "Who wrote it, as the text shows: the person at the handle or someone writing for them, in plain words (arch 03 line 183: 'who wrote it').",
+                "type": "string"
+              }
+            },
+            "required": ["outcome", "tense", "evidence", "atRisk", "writer"],
+            "additionalProperties": false
+          },
+          "safetyOutcome": {
+            "title": "SafetyOutcome",
+            "description": "One of the 8 outcomes of A3-22 and B3-17, as their branch labels give them word for word (SPEC-master 5d), or Unsure (arch 03 line 183; arch 06 lines 283 and 315 to 329): No; Safety steps, then go on; An emergency; Crisis words; A threat to staff or others; Harm to a child or older adult; Unsafe at home; Needs the business's own line. Model-facing.",
+            "type": "string",
+            "enum": [
+              "No",
+              "Safety steps, then go on",
+              "An emergency",
+              "Crisis words",
+              "A threat to staff or others",
+              "Harm to a child or older adult",
+              "Unsafe at home",
+              "Needs the business's own line",
+              "Unsure"
+            ]
+          },
+          "tense": {
+            "title": "Tense",
+            "description": "A label's tense: now, could restart, over, joke or unknown. Over and joke are not danger; unknown reads as danger and adds 'Is anyone in danger right now?' (arch 06 line 329; S13-24 rule 10). Model-facing.",
+            "type": "string",
+            "enum": ["now", "could restart", "over", "joke", "unknown"]
+          }
+        }
+      }
+    }
+  }
+}
