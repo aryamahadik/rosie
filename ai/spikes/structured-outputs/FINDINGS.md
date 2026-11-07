@@ -80,29 +80,34 @@ Offline proof, run 2026-11-07:
 
 Calls 17 to 20 are left for retries after outside failures. Expected cost at the listed prices (Haiku 5.5 $0.10/$0.50, Sonnet 5.5 $2/$10 per million input/output tokens) is well under $0.10.
 
-## Live results: pending the lead's run
+## Live results (the lead's run, ended 2026-11-07 13:00Z by results.jsonl's time)
 
-The lead runs this once, on the build Mac, with the key loaded into the environment and `CI` unset:
+The lead ran `node --env-file=.dev.vars .claude/worktrees/wf_18e223d2-05c-1/ai/spikes/structured-outputs/probe.mjs --live` once from the code folder, on the build Mac, with `CI` unset, at the user's instruction in an interactive session (NQ-R2; DL-081). Node loaded the key; nothing printed it.
 
-```sh
-node --env-file=.dev.vars ai/spikes/structured-outputs/probe.mjs --live
-```
+| Schema                      | claude-haiku-5-5         | claude-sonnet-5-5        | Refusal or error text                                                                                                                            | Output valid | Tokens in/out (Haiku; Sonnet) |
+| --------------------------- | ------------------------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | ----------------------------- |
+| control (no schema limits)  | accepted (200, end_turn) | accepted (200, end_turn) | none                                                                                                                                             | n/a          | 224/9; 224/9                  |
+| decide                      | refused (400)            | refused (400)            | "Schema is too complex."                                                                                                                         | n/a          | none                          |
+| safety-read                 | accepted (200, end_turn) | accepted (200, end_turn) | none                                                                                                                                             | yes; yes     | 1091/80; 1091/84              |
+| planner                     | accepted (200, end_turn) | accepted (200, end_turn) | none                                                                                                                                             | yes; yes     | 1345/70; 1345/75              |
+| message-plan                | accepted (200, end_turn) | accepted (200, end_turn) | none                                                                                                                                             | yes; yes     | 1950/150; 1950/153            |
+| decide with `$schema`/`$id` | refused (400)            | refused (400)            | "Schema is too complex." (so this run does not show whether `$schema` and `$id` may stay in)                                                     | n/a          | none                          |
+| 13 neg-string-length        | accepted (200, end_turn) | n/a                      | none: a `maxLength` was accepted, though the documentation lists string-length limits as unsupported                                             | n/a          | 1355/80                       |
+| 14 neg-number-limit         | refused (400)            | n/a                      | "output_config.format.schema: For 'integer' type, properties maximum, minimum are not supported"                                                 | n/a          | none                          |
+| 15 neg-open-object          | refused (400)            | n/a                      | "output_config.format.schema: For 'object' type, 'additionalProperties: true' is not supported. Please set 'additionalProperties' to false"      | n/a          | none                          |
+| 16 neg-external-ref         | refused (400)            | n/a                      | "output_config.format.schema: External schema references are not supported (got: ../../../../contracts/common/formats.v1.schema.json#/$defs/id)" | n/a          | none                          |
 
-Run it from the folder that holds `.dev.vars` and this branch's files. Or, with `ANTHROPIC_API_KEY` already exported, run `node ai/spikes/structured-outputs/probe.mjs --live`. The probe reads only `ANTHROPIC_API_KEY` from what `--env-file` loads.
+Calls made: 16 of the 20 allowed (results.jsonl has one line per call). Total tokens: 10,575 in and 710 out. Key in any file or log: none; after the run the lead searched results.jsonl and samples/ for the key prefix and for an api-key header (0 files).
 
-| Schema                      | claude-haiku-5-5 | claude-sonnet-5-5 | Refusal or error text | Output valid | Tokens in/out |
-| --------------------------- | ---------------- | ----------------- | --------------------- | ------------ | ------------- |
-| decide                      | pending          | pending           | pending               | pending      | pending       |
-| safety-read                 | pending          | pending           | pending               | pending      | pending       |
-| planner                     | pending          | pending           | pending               | pending      | pending       |
-| message-plan                | pending          | pending           | pending               | pending      | pending       |
-| decide with `$schema`/`$id` | pending          | pending           | pending               | pending      | pending       |
-| negatives 13 to 16 (Haiku)  | pending          | n/a               | pending               | n/a          | pending       |
+### What the live run shows
 
-Calls made: pending (at most 20). Total tokens: pending. Key in any file or log: none by construction. The tests prove it against a fake API; the lead confirms with a search of `results.jsonl` and `samples/` after the run.
+1. **The decide schema is refused as too complex on both models.** The candidate is small (about 3.9 KB as sent: 11 objects, 25 properties, no optional property) but holds one `anyOf` of 8 object branches, one per verb. The three other candidates, with no `anyOf` of objects, are accepted and their outputs validate.
+2. **The frozen K-02 decide read is larger still.** Measured offline after T-011 merged: contracts/model/model.v1.schema.json `$defs/decideRead` with the 21 definitions it reaches is about 10.4 KB, 12 objects, 37 properties and 2 `anyOf` groups with 13 branches. It is very likely refused the same way. The frozen safety read (about 2.4 KB, no `anyOf`), planner output (about 4.7 KB, one `anyOf` of 5) and K-03 plan (about 6.5 KB, 3 `anyOf` with 6 branches) are closer to the accepted candidates. A live call on each frozen schema settles it (a follow-up of this spike).
+3. External `$ref`, number limits and open objects are refused with the texts above, as the documentation says. A `maxLength` was accepted in one call; keep length limits as code checks (02-contracts section 2 item 7) either way.
 
 ## For others
 
 - **Architect (T-011, T-012), through the lead:** the model-facing contracts need a bundling step before they are sent, because external `$ref` is refused. They also need to stay within 24 optional properties and 16 union parameters per request, and to keep their schemas static. Call 6/12 answers whether `$schema` and `$id` may stay in.
 - **T-004 (recorded-model double):** `samples/NN-<call>.request.json` and `.response.json` are real request and response bodies, saved once the lead's run is done.
+- **Architect and AI engineer (K-02, C-115):** decide as one structured output is refused as too complex on both models, so the gateway cannot send K-02's decide read as one schema as it stands. Options to weigh before C-115 is built: one strict tool per verb (up to 20 strict tools per request), or a simpler wire envelope that code maps into K-02's shape, or a K-02 change under the contract-change skill. A live check of the frozen schemas comes first.
 - **AI gateway (C-121 onward):** check `stop_reason` (`refusal`, `max_tokens`) before parsing, and validate every output with Ajv anyway, since a refusal's output may not match the schema.

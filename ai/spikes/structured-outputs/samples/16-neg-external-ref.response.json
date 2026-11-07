@@ -1,0 +1,8 @@
+{
+  "type": "error",
+  "error": {
+    "type": "invalid_request_error",
+    "message": "output_config.format.schema: External schema references are not supported (got: ../../../../contracts/common/formats.v1.schema.json#/$defs/id)"
+  },
+  "request_id": "req_011CgocJnW24aGzSYiVCLaHV"
+}

@@ -1,0 +1,126 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 4096,
+  "system": "You plan one text message for a booking assistant. Write values only as {{slot}} tokens from the facts given; never type a number, time, price or name yourself. One question at most.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<conversation></conversation>\n<master_text>Confirm the floor consult: what, when, where and the price; say the missed-consult fee; link to the secure page to manage it.</master_text>\n<facts>svc.intext, name.staff, day, arrive, price, fee, secure_link</facts>\n<audience>customer</audience>\n<language>en</language>\n<channel>imessage</channel>\n<situation>money_or_consent</situation>\n<allowed_formats>text, link_card</allowed_formats>\n<allowed_links>secure_link</allowed_links>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "MessagePlanCandidate",
+        "description": "SPIKE CANDIDATE for T-360, not the contract: the composer's plan for one outbox row, derived from ops/plan/02-contracts.md K-03 ('The plan') and architecture 07 (shape, formats, composer prompt). Limits such as 'up to four fact lines' and 'at most one question' are code checks (C-092), not schema keywords (02-contracts section 2 item 7). K-03 v1 (T-012, the architect) is the contract.",
+        "type": "object",
+        "properties": {
+          "format": {
+            "description": "A format from the allowed list code gives (architecture 07 'How the AI picks the format'; K-03).",
+            "type": "string",
+            "enum": ["text", "poll", "link_card", "calendar_file", "tapback"]
+          },
+          "first_line": {
+            "description": "What happened or what is needed (architecture 07 'Shape'). Values appear only as {{slot}} tokens.",
+            "type": "string"
+          },
+          "fact_lines": {
+            "description": "Up to four fact lines (a code check), facts joined with ' · ' (architecture 07 'Shape').",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "action_line": {
+            "description": "One action line (architecture 07 'Shape'); empty when the message has none.",
+            "type": "string"
+          },
+          "link": {
+            "description": "The one link the action line ends with, or none (architecture 07 'Shape'; K-03 slot vocabulary, links).",
+            "type": "string",
+            "enum": ["none", "secure_link", "pay_link", "chat_link"]
+          },
+          "slots": {
+            "description": "Every slot the lines use, from the fixed vocabulary (K-03 'The slot vocabulary'; record.slots). Compiler-made sample-value slots are not in this candidate's closed list.",
+            "type": "array",
+            "items": { "$ref": "#/$defs/slotName" }
+          },
+          "question": {
+            "description": "At most one question, with the open question's option ids (K-03; S13-28 rule 50). Absent when the message asks nothing.",
+            "$ref": "#/$defs/question"
+          },
+          "page_type": {
+            "description": "One page type the step allows; absent for none (architecture 01 line 97; K-03).",
+            "type": "string"
+          },
+          "thread_reply_to": {
+            "description": "The open question a threaded reply answers, when the reply answers one of several (architecture 07 'Threaded reply').",
+            "$ref": "#/$defs/formats_id"
+          }
+        },
+        "required": ["format", "first_line", "fact_lines", "action_line", "link", "slots"],
+        "additionalProperties": false,
+        "$defs": {
+          "question": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "option_ids": { "type": "array", "items": { "$ref": "#/$defs/formats_id" } }
+            },
+            "required": ["text", "option_ids"],
+            "additionalProperties": false
+          },
+          "slotName": {
+            "description": "The record's 16 named slots, the auto-fill slots, the link slots and today and tomorrow (K-03 'The slot vocabulary'). 'hold' is refused since D66, so it is not listed.",
+            "type": "string",
+            "enum": [
+              "pay.asks",
+              "pay.price",
+              "pay.took",
+              "pay.left",
+              "pay.cancel",
+              "pay.late",
+              "pay.noshow",
+              "pay.back",
+              "pay.after",
+              "pay.staff",
+              "pay.failed",
+              "clock.pay",
+              "two.count",
+              "reach.way",
+              "reach.to",
+              "who.ok",
+              "alex.staff",
+              "name.staff",
+              "svc.intext",
+              "arrive",
+              "window",
+              "cutoff",
+              "day",
+              "keep",
+              "price",
+              "fee",
+              "deposit",
+              "rest",
+              "paid",
+              "due",
+              "paidnow",
+              "back",
+              "secure_link",
+              "pay_link",
+              "chat_link",
+              "today",
+              "tomorrow"
+            ]
+          },
+          "formats_id": {
+            "title": "Id",
+            "description": "An opaque id: a non-empty string that code compares as a whole and never parses (CQ-09: 'other ids opaque strings').",
+            "type": "string",
+            "pattern": "."
+          }
+        }
+      }
+    }
+  }
+}

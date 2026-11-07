@@ -1,0 +1,85 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 4096,
+  "system": "Nothing on the list fit this turn. Choose exactly one of your five verbs. You never book, charge, refund, cancel, move, or change a setting, contact or consent.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "<facts>\nbusiness.address: 123 Demo St, Anytown (demo)\nbusiness.hours: Mon-Fri 9am-5pm, Sat 10am-2pm\n</facts>\n<turn>is there parking at the showroom?</turn>"
+    }
+  ],
+  "output_config": {
+    "effort": "low",
+    "format": {
+      "type": "json_schema",
+      "schema": {
+        "title": "PlannerCandidate",
+        "description": "SPIKE CANDIDATE for T-360, not the contract: what the planner returns when nothing fits, derived from ops/plan/02-contracts.md K-02 ('The planner's output') and architecture 06 ('Five verbs only'). It never books, charges, refunds, cancels, moves or changes a setting, contact or consent, so no such verb exists here. K-02 v1 (T-011, the architect) is the contract.",
+        "type": "object",
+        "properties": {
+          "action": {
+            "description": "Exactly one of the planner's five verbs (architecture 06).",
+            "anyOf": [
+              { "$ref": "#/$defs/answer" },
+              { "$ref": "#/$defs/askOne" },
+              { "$ref": "#/$defs/passOn" },
+              { "$ref": "#/$defs/handToPerson" },
+              { "$ref": "#/$defs/logGap" }
+            ]
+          }
+        },
+        "required": ["action"],
+        "additionalProperties": false,
+        "$defs": {
+          "answer": {
+            "description": "Answer from stored facts: names the facts it used; code fills their values (principle 4).",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "answer_from_facts" },
+              "fact_names": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["verb", "fact_names"],
+            "additionalProperties": false
+          },
+          "askOne": {
+            "description": "Ask one question: what is unclear.",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "ask_one_question" },
+              "unclear": { "type": "string" }
+            },
+            "required": ["verb", "unclear"],
+            "additionalProperties": false
+          },
+          "passOn": {
+            "description": "Pass a question on, with the words to pass.",
+            "type": "object",
+            "properties": { "verb": { "type": "string", "const": "pass_on" }, "words": { "type": "string" } },
+            "required": ["verb", "words"],
+            "additionalProperties": false
+          },
+          "handToPerson": {
+            "description": "Hand to a person, with the reason.",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "hand_to_person" },
+              "reason": { "type": "string" }
+            },
+            "required": ["verb", "reason"],
+            "additionalProperties": false
+          },
+          "logGap": {
+            "description": "Log a gap case, with why nothing fit.",
+            "type": "object",
+            "properties": {
+              "verb": { "type": "string", "const": "log_gap_case" },
+              "why": { "type": "string" }
+            },
+            "required": ["verb", "why"],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}

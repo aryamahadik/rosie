@@ -1,0 +1,5 @@
+{
+  "type": "error",
+  "error": { "type": "invalid_request_error", "message": "Schema is too complex." },
+  "request_id": "req_011CgobwtdHFzATzvJC78ZEC"
+}
