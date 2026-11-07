@@ -1,0 +1,49 @@
+{
+  "call": "writeAllSet",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["dispatcher-gives-up.json"],
+    "now": "2026-11-07T16:30:00Z",
+    "note": "Linq is back, and the dispatcher has found that texts to Alex work again (which signal counts is open: K-07 open gap 12). It writes the one short 'all set' to his mobile (arch 02 line 125; S12-10: 'Once texts work, a short \"all set\" goes out. Nothing already emailed is sent again in full'), planned under the failed row's turn, with its id fixed by rule and its event-log entry naming the failed row it closes."
+  },
+  "request": {
+    "failedRowIds": ["out-alex-booked-riley"],
+    "row": {
+      "id": "out-alex-booked-riley/all-set",
+      "recipientHandleId": "handle-alex",
+      "recipientPersonId": "person-alex",
+      "businessId": "biz-lees-barbershop",
+      "bookingId": "booking-alex-riley-nov14",
+      "channel": "imessage",
+      "sendClass": "routine",
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+    },
+    "at": "2026-11-07T16:30:00Z",
+    "events": [
+      {
+        "id": "log-out-alex-booked-riley-all-set",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley/all-set",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "imessage" },
+        "sealed": null,
+        "why": { "allSetFor": ["out-alex-booked-riley"] },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "written",
+    "outboxRow": { "id": "out-alex-booked-riley/all-set", "commitSeq": 4 },
+    "repeated": false
+  }
+}

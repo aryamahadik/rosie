@@ -15,7 +15,26 @@
     "providerObjectId": null,
     "errorCode": "503",
     "ledgerLineId": null,
-    "nextTryAt": "2026-11-07T15:07:04Z"
+    "nextTryAt": "2026-11-07T15:07:04Z",
+    "events": [
+      {
+        "id": "log-eff-cal-riley-alex-nov14-write-run-1-try-1",
+        "kind": "effect.result",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "job",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "effects",
+        "rowId": "eff-cal-riley-alex-nov14-write",
+        "oldValues": { "state": "running", "tries": 0, "runs": 1 },
+        "newValues": { "state": "running", "tries": 1, "runs": 1, "errorCode": "503" },
+        "sealed": null,
+        "why": { "try": 1, "outcome": "networkError", "nextTryAt": "2026-11-07T15:07:04Z" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
   },
   "outcome": {
     "result": "recorded",

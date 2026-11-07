@@ -1,0 +1,69 @@
+{
+  "call": "claimOutbox",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["write-plan-alex-safety.json"],
+    "now": "2026-11-07T16:00:00Z",
+    "note": "The dispatcher claims the safety line; it goes at any hour (RULES 4.3)."
+  },
+  "request": {
+    "claimer": "dispatcher-1",
+    "recipientHandleId": "handle-alex",
+    "now": "2026-11-07T16:00:00Z",
+    "limit": 10
+  },
+  "outcome": {
+    "result": "claimed",
+    "claimed": [
+      {
+        "outboxRowId": "out-alex-safety-emergency",
+        "version": 3,
+        "commitSeq": 1,
+        "recipientHandleId": "handle-alex",
+        "recipientPersonId": "person-alex",
+        "businessId": "biz-lees-barbershop",
+        "bookingId": null,
+        "openQuestionId": null,
+        "channel": "imessage",
+        "sendClass": "safety",
+        "versionsRead": [],
+        "finalParts": {
+          "row": "out-alex-safety-emergency",
+          "channel": "imessage",
+          "sends": [
+            {
+              "kind": "words",
+              "text": "This sounds like an emergency. If anyone is in danger, get to safety and call 911 now.",
+              "calendarFile": "none",
+              "options": [],
+              "link": null
+            }
+          ],
+          "fixedLines": ["safetyEmergency"],
+          "slotValues": [],
+          "threadReplyTo": null
+        },
+        "parts": [
+          {
+            "partNo": 1,
+            "tryNo": 1,
+            "idempotencyKey": "out-alex-safety-emergency/1/1",
+            "attempts": 1,
+            "sent": false
+          }
+        ],
+        "traceId": "trace-alex-0050",
+        "claim": {
+          "claimer": "dispatcher-1",
+          "claimedAt": "2026-11-07T16:00:00Z",
+          "lapsesAt": "2026-11-07T16:01:00Z",
+          "claimNo": 1,
+          "firstTryAt": null,
+          "nextTryNotBefore": null
+        },
+        "claimedFrom": "checked"
+      }
+    ],
+    "passedHeld": []
+  }
+}

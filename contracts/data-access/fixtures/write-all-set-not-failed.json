@@ -1,0 +1,50 @@
+{
+  "call": "writeAllSet",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
+    "after": ["claim-lapsed-reclaimed.json"],
+    "now": "2026-11-07T15:08:00Z",
+    "note": "An 'all set' for Alex's confirmation while it is still sending, not failed: refused with wrongState and the state it is in, and nothing is written."
+  },
+  "request": {
+    "failedRowIds": ["out-alex-booked-riley"],
+    "row": {
+      "id": "out-alex-booked-riley/all-set",
+      "recipientHandleId": "handle-alex",
+      "recipientPersonId": "person-alex",
+      "businessId": "biz-lees-barbershop",
+      "bookingId": "booking-alex-riley-nov14",
+      "channel": "imessage",
+      "sendClass": "routine",
+      "openQuestionId": null,
+      "copyOfRowId": null,
+      "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+    },
+    "at": "2026-11-07T15:08:00Z",
+    "events": [
+      {
+        "id": "log-out-alex-booked-riley-all-set",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley/all-set",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "imessage" },
+        "sealed": null,
+        "why": { "allSetFor": ["out-alex-booked-riley"] },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "error": "wrongState",
+    "table": "outbox_rows",
+    "rowId": "out-alex-booked-riley",
+    "state": "sending"
+  }
+}

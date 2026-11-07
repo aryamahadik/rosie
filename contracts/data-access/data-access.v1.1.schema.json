@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://rosie.invalid/contracts/data-access/data-access.v1.1.schema.json",
   "title": "DataAccessV1dot1",
-  "description": "K-05 v1.1, a minor version of the data-access calls (T-071; 02-contracts K-05: 'v1.1 at F3 adds the effect calls'; 02-contracts section 9 F3). It only adds to v1 (data-access.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, unchanged ones by reference; the changed ones take new optional fields or more enum values, so every v1 exchange is a v1.1 exchange. Added: the calls that write and run K-07 v1's effect rows (effects in the commit's and a firing's writes; claimEffects, recordEffectResult, serviceBack; reconciliationRefund) and record a provider event once (recordProviderEvent); the outbox claim's write, renewal and re-claim in K-07's outbox_claims (claimOutbox's claim, renewClaim) and the moves K-07 v1 leaves to K-05 v1.1 (markRow waitingChat, the commit's moves of waiting rows, dispatcherGivesUp, markPart failed's Retry-After and message id, markPart's row state and version, a wrong-state error). The tables they read and write are K-04 v1's core tables and K-07 v1's schema addition (outbox-effects.v1.tables.json: effects, provider_events, outbox_claims). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
+  "description": "K-05 v1.1, a minor version of the data-access calls (T-071; 02-contracts K-05: 'v1.1 at F3 adds the effect calls'; 02-contracts section 9 F3). It only adds to v1 (data-access.v1.schema.json, frozen and unchanged, referred to here): every v1 definition is here under its own name, unchanged ones by reference; the changed ones take new optional fields or more enum values, so every v1 exchange is a v1.1 exchange. Added: the calls that write and run K-07 v1's effect rows (effects in the commit's and a firing's writes; claimEffects, recordEffectResult, serviceBack; reconciliationRefund) and record a provider event once (recordProviderEvent); the outbox claim's write, renewal and re-claim in K-07's outbox_claims (claimOutbox's claim, renewClaim) and the moves K-07 v1 leaves to K-05 v1.1 (markRow waitingChat, the commit's moves of waiting rows, dispatcherGivesUp, markPart failed's Retry-After and message id, markPart's row state and version, a wrong-state error); and the rows that follow a failed row (arch 02 line 125; K-07 followUp): the next way or the owner's number with dispatcherGivesUp, a failed safety line's other ways with markPart failed, and the one short 'all set' (writeAllSet), each with its event-log entries in the same transaction; and the event-log entries of each effect result (recordEffectResult events). The tables they read and write are K-04 v1's core tables and K-07 v1's schema addition (outbox-effects.v1.tables.json: effects, provider_events, outbox_claims). Not model-facing, so number and length limits are schema rules here. Owner: the architect.",
   "anyOf": [
     {
       "$ref": "#/$defs/commitTurn.exchange"
@@ -78,6 +78,9 @@
     },
     {
       "$ref": "#/$defs/reconciliationRefund.exchange"
+    },
+    {
+      "$ref": "#/$defs/writeAllSet.exchange"
     }
   ],
   "$defs": {
@@ -621,7 +624,7 @@
     },
     "markPart.request": {
       "title": "MarkPartRequest",
-      "description": "What happened to one part (02-contracts K-05 item 3): another send under the same key after a timeout or crash (attempt), accepted by the provider with its ids (sent), its delivery receipt (delivered: arch 02 line 127), or a reported failure (failed: the next try gets a new key, arch 01 line 65). A part is named by its key, or a receipt by the provider's message id (K-04 outbox_parts_linq_message_idx). v1.1 (T-071): a failure may carry the provider's message id and the provider's Retry-After as nextTryNotBefore.",
+      "description": "What happened to one part (02-contracts K-05 item 3): another send under the same key after a timeout or crash (attempt), accepted by the provider with its ids (sent), its delivery receipt (delivered: arch 02 line 127), or a reported failure (failed: the next try gets a new key, arch 01 line 65). A part is named by its key, or a receipt by the provider's message id (K-04 outbox_parts_linq_message_idx). v1.1 (T-071): a failure may carry the provider's message id and the provider's Retry-After as nextTryNotBefore, and a safety line's first failure the rows that take it every other way at once (followUps, with their events).",
       "oneOf": [
         {
           "type": "object",
@@ -720,10 +723,42 @@
             "nextTryNotBefore": {
               "description": "The provider's Retry-After as a time: the next try waits until then (arch 10 line 540: 'each try after any Retry-After'). Stored in outbox_claims.next_try_not_before, so a dispatcher that claims the row again after a lapse sends no earlier (K-07 rule 6); renewClaim refuses a try before it and clears it when the try goes. Only with retry true. Left out or null: none given. New in v1.1.",
               "$ref": "#/$defs/nullableUtc"
+            },
+            "followUps": {
+              "description": "A failed safety line goes at once every other way the person allows (arch 02 line 125: 'A failed safety line retries every 10 s for 15 minutes and goes at once every other way the person allows'; RULES 4.12; K-07 retry rule 3, followUp safetyOtherWay): the rows for those ways, written planned under the failed row's turn, bundle and trace id in the same transaction as this failure, so the failure is never recorded without them. Given with the safety line's first reported failure only, and only for a row whose send class is safety (code checks: C-126); its retries every 10 s carry none. Left out: none. New in v1.1.",
+              "type": "array",
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/followUpRow"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "why": {
+                        "const": "safetyOtherWay"
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1
+            },
+            "events": {
+              "description": "With followUps: their event-log entries (K-08 outbox_row.created, one per row, whose why names the failed row and the follow-up kind: the link K-07 open gap 3 keeps in the event log), carrying the failed row's turn id, trace id and bundle. Left out with followUps. New in v1.1.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/eventEntry"
+              },
+              "minItems": 1
             }
           },
           "required": ["outcome", "idempotencyKey", "errorCode", "retry", "at"],
           "additionalProperties": false,
+          "dependentRequired": {
+            "followUps": ["events"],
+            "events": ["followUps"]
+          },
           "if": {
             "properties": {
               "retry": {
@@ -797,6 +832,13 @@
           },
           "required": ["state", "version"],
           "additionalProperties": false
+        },
+        "followUpRows": {
+          "description": "The follow-up rows a failure with followUps wrote, with the commit order the database gave them; left out when it wrote none (a repeat writes none). New in v1.1.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outboxRowWritten"
+          }
         }
       },
       "required": [
@@ -823,9 +865,12 @@
         },
         {
           "$ref": "#/$defs/wrongStateError"
+        },
+        {
+          "$ref": "#/$defs/constraintError"
         }
       ],
-      "description": "notFound; transient; and from v1.1 wrongState: the part is not in a state the mark starts from (K-07 partMove), such as sent for a failed part."
+      "description": "notFound; transient; and from v1.1 wrongState: the part is not in a state the mark starts from (K-07 partMove), such as sent for a failed part; and constraint: a follow-up row the database refuses (a row id already taken, 23505; a handle or person that does not exist, 23503), so nothing, the failure included, was written."
     },
     "markPart.exchange": {
       "title": "MarkPartExchange",
@@ -1305,7 +1350,7 @@
     },
     "wrongStateError": {
       "title": "WrongStateError",
-      "description": "The row is not in a state this move starts from (K-07 v1's allowed moves: outbox-effects README 'Allowed moves'): markRow on a row that is no longer sending, markPart sent on a part that is not pending, renewClaim for a part that is not pending, a result for an effect that is not running, or a commit letting go an effect that is not in outage. Nothing was written; state is where the row stands now (the database engineer's review of K-07 v1: markRow and markPart need a wrong-state error). New in v1.1.",
+      "description": "The row is not in a state this move starts from (K-07 v1's allowed moves: outbox-effects README 'Allowed moves'): markRow on a row that is no longer sending, markPart sent on a part that is not pending, renewClaim for a part that is not pending, a result for an effect that is not running, a commit letting go an effect that is not in outage, or an 'all set' for a row that is not failed (writeAllSet). Nothing was written; state is where the row stands now (the database engineer's review of K-07 v1: markRow and markPart need a wrong-state error). New in v1.1.",
       "type": "object",
       "properties": {
         "error": {
@@ -1666,6 +1711,21 @@
       "required": ["supersede", "withdrawForBookings", "withdrawForQuestions"],
       "additionalProperties": false
     },
+    "followUpRow": {
+      "title": "FollowUpRow",
+      "description": "A row written because an earlier row failed (arch 02 line 125; K-07 v1 followUp, retry rules 3 and 5): why is K-07's follow-up kind (nextWay: the next way the person allows after the row failed for 15 minutes, such as an email row with no copyOfRowId, S12-10; ownerGetsNumber: none left, so the owner gets the number to call, S12-10; safetyOtherWay: a failed safety line also goes at once every other way the person allows, RULES 4.12), and row is the new outbox row as a commit writes one, with no plan. The call writes it planned under the failed row's turn id, bundle and trace id (K-04 outbox_rows.turn_id is not null; no turn of its own is needed, since K-04 turns are written by texts), with commit_seq from K-04's identity column, so it comes after every row committed before. Written by dispatcherGivesUp (nextWay, ownerGetsNumber) and markPart failed (safetyOtherWay). New in v1.1.",
+      "type": "object",
+      "properties": {
+        "why": {
+          "enum": ["nextWay", "ownerGetsNumber", "safetyOtherWay"]
+        },
+        "row": {
+          "$ref": "#/$defs/outboxRowNew"
+        }
+      },
+      "required": ["why", "row"],
+      "additionalProperties": false
+    },
     "renewClaim.request": {
       "title": "RenewClaimRequest",
       "description": "The dispatcher is about to send one part under its key (a first send, or a retry): renew the claim and record the try (K-07 README 'How a claim lapses': renewed by 60 s at each part attempt, default 2; outboxClaim firstTryAt: 'Written by the dispatcher at its first send'; nextTryNotBefore: 'cleared when the try goes'). New in v1.1.",
@@ -1778,7 +1838,7 @@
     },
     "dispatcherGivesUp.request": {
       "title": "DispatcherGivesUpRequest",
-      "description": "Sends still failing after 15 minutes of tries: the row ends failed, so the next way the person allows can follow (arch 02 line 125; S12-09, S12-10; K-07 move sending to failed by dispatcherGivesUp). The 15 minutes count from the claim's firstTryAt (K-07 rule 5). The next way's row, or the owner's number, is a later commit's (C-126). New in v1.1.",
+      "description": "Sends still failing after 15 minutes of tries: the row ends failed and, in the same transaction, the rows that follow it are written: the next way the person allows (such as an email row), or with none left one row to the owner with the number to call (arch 02 line 125; S12-09, S12-10; K-07 move sending to failed by dispatcherGivesUp, retry rule 5, followUp nextWay and ownerGetsNumber). The 15 minutes count from the claim's firstTryAt (K-07 rule 5), never from a part's attempts. New in v1.1.",
       "type": "object",
       "properties": {
         "outboxRowId": {
@@ -1796,14 +1856,41 @@
         },
         "at": {
           "$ref": "#/$defs/utc"
+        },
+        "followUps": {
+          "description": "The rows that follow the failed one (K-07 followUp): nextWay, one row for each next way the person allows, or, with none left, one ownerGetsNumber row to the owner (S12-10: 'With no email on file, Sam gets the number to call'). Each is written planned under the failed row's turn, bundle and trace id (K-04 outbox_rows.turn_id is not null), so unplannedRows lists it with that turn's rows and it is composed and checked as any row is (writePlan). Empty only when no follow-up applies: a safety line whose other ways already went at its first failure (markPart failed followUps), or a row to the owner with no other way left, for whom the sources name no one to give the number to (open gap 13). Which ways the person allows is the caller's read (K-05 v1.2's recipient send state): a code check (C-126).",
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/followUpRow"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "why": {
+                    "enum": ["nextWay", "ownerGetsNumber"]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "events": {
+          "description": "The event-log entries of this give-up (arch 09 line 457: every write appends): the row's move to failed (K-08 outbox_row.state_changed, old state sending, new state failed, why: 15 minutes of tries since firstTryAt), and one outbox_row.created per follow-up row whose why names the failed row and the follow-up kind (the link K-07 open gap 3 keeps in the event log). The call writes them with the failed row's turn id, trace id and bundle.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventEntry"
+          },
+          "minItems": 1
         }
       },
-      "required": ["outboxRowId", "expectVersion", "claimer", "claimNo", "at"],
+      "required": ["outboxRowId", "expectVersion", "claimer", "claimNo", "at", "followUps", "events"],
       "additionalProperties": false
     },
     "dispatcherGivesUp.response": {
       "title": "DispatcherGivesUpResponse",
-      "description": "Failed: the row's new version, and the claim's firstTryAt the 15 minutes counted from. The claim row stays as the record of the tries; parts keep their states.",
+      "description": "Failed: the row's new version, the claim's firstTryAt the 15 minutes counted from, and the follow-up rows written with the commit order the database gave them (after every row committed before; K-04 commit_seq). The claim row stays as the record of the tries; parts keep their states.",
       "type": "object",
       "properties": {
         "result": {
@@ -1817,14 +1904,20 @@
         },
         "firstTryAt": {
           "$ref": "#/$defs/utc"
+        },
+        "followUpRows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/outboxRowWritten"
+          }
         }
       },
-      "required": ["result", "outboxRowId", "version", "firstTryAt"],
+      "required": ["result", "outboxRowId", "version", "firstTryAt", "followUpRows"],
       "additionalProperties": false
     },
     "dispatcherGivesUp.errors": {
       "title": "DispatcherGivesUpErrors",
-      "description": "tooSoon: no part has gone yet (firstTryAt null), or fewer than 15 minutes have passed since it; claimLost; wrongState (not sending); versionChanged; notFound; transient. Nothing was written.",
+      "description": "tooSoon: no part has gone yet (firstTryAt null), or fewer than 15 minutes have passed since it; claimLost; wrongState (not sending); versionChanged (a repeat of a give-up already made); constraint: a follow-up row the database refuses (a row id already taken, 23505; a handle or person that does not exist, 23503); notFound; transient. Nothing was written: neither the move to failed nor any follow-up row.",
       "oneOf": [
         {
           "title": "TooSoonError",
@@ -1851,6 +1944,9 @@
         },
         {
           "$ref": "#/$defs/versionChangedError"
+        },
+        {
+          "$ref": "#/$defs/constraintError"
         },
         {
           "$ref": "#/$defs/notFoundError"
@@ -1926,7 +2022,7 @@
     },
     "claimEffects.request": {
       "title": "ClaimEffectsRequest",
-      "description": "Claim effect rows to run (02-contracts K-05 v1.1: 'claim effect rows'; arch 10 line 508): pending rows, and running rows whose claim lapsed (a runner that died: K-07 README 'How a claim lapses'), oldest first. Rows in outage wait for serviceBack. New in v1.1.",
+      "description": "Claim effect rows to run (02-contracts K-05 v1.1: 'claim effect rows'; arch 10 line 508): pending rows, and running rows whose claim lapsed (a runner that died: K-07 README 'How a claim lapses'), oldest first. Rows in outage wait for serviceBack. It takes no event-log entries: it picks its rows itself (SKIP LOCKED), so the caller cannot name them, and K-08 v1 has no kind for a claim; the run it starts is logged by each result (recordEffectResult events, old state running with its tries, runs and first try), and a log entry for the claim itself is open gap 15. New in v1.1.",
       "type": "object",
       "properties": {
         "claimer": {
@@ -2012,7 +2108,7 @@
     },
     "serviceBack.request": {
       "title": "ServiceBackRequest",
-      "description": "A service is back after its outage: claim its effect rows in outage so each runs once more on its same key (arch 11 line 582: 'Charges and refunds wait, then run once'; S12-16, S12-18; K-07 move outage to running by serviceBack). Whether the service is back is the runtime's (C-174 to C-176). New in v1.1.",
+      "description": "A service is back after its outage: claim its effect rows in outage so each runs once more on its same key (arch 11 line 582: 'Charges and refunds wait, then run once'; S12-16, S12-18; K-07 move outage to running by serviceBack). Whether the service is back is the runtime's (C-174 to C-176). Like claimEffects it takes no event-log entries (open gap 15): the new run shows in each result's entry (runs raised, tries from 0). New in v1.1.",
       "type": "object",
       "properties": {
         "port": {
@@ -2090,7 +2186,7 @@
     },
     "recordEffectResult.request": {
       "title": "RecordEffectResultRequest",
-      "description": "Record one try's outcome on a running effect (02-contracts K-05 v1.1: 'record an effect's result'; arch 10 line 542): ok (succeeded: the provider's object id, and the ledger line when there is one); networkError (retried on the same key; nextTryAt is when the runner tries next, null when it plans none); declined (a card decline, never retried: RULES 3.11). New in v1.1.",
+      "description": "Record one try's outcome on a running effect (02-contracts K-05 v1.1: 'record an effect's result'; arch 10 line 542): ok (succeeded: the provider's object id, and the ledger line when there is one); networkError (retried on the same key; nextTryAt is when the runner tries next, null when it plans none); declined (a card decline, never retried: RULES 3.11). Every result is logged in the same transaction (events). New in v1.1.",
       "type": "object",
       "properties": {
         "effectId": {
@@ -2132,6 +2228,14 @@
         "nextTryAt": {
           "description": "For networkError, when the next try goes, within 10 minutes of the run's first try: the claim lapses 60 s after it; null otherwise.",
           "$ref": "#/$defs/nullableUtc"
+        },
+        "events": {
+          "description": "The try's event-log entries, appended in the same transaction as the result (arch 09 lines 457, 492: every write appends who, what, old to new, when and why; K-08 kind effect.result): at least the effect's own entry, actor job (the effects runner), old and new state, tries and error, and why (the try's outcome; on the run's 5th failed try, the service's outage). The call writes them with the effect's turn id, or its job id when it has no turn, and its trace id (K-04 event_log_turn_or_job), and the turn's bundle (null for a job). The runner's span for the call is K-08's effectRun, not an entry here.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventEntry"
+          },
+          "minItems": 1
         }
       },
       "required": [
@@ -2143,7 +2247,8 @@
         "providerObjectId",
         "errorCode",
         "ledgerLineId",
-        "nextTryAt"
+        "nextTryAt",
+        "events"
       ],
       "additionalProperties": false,
       "allOf": [
@@ -2452,6 +2557,114 @@
             },
             {
               "$ref": "#/$defs/reconciliationRefund.errors"
+            }
+          ]
+        }
+      },
+      "required": ["call", "given", "request", "outcome"],
+      "additionalProperties": false
+    },
+    "writeAllSet.request": {
+      "title": "WriteAllSetRequest",
+      "description": "Texts work again for a person whose rows failed and went another way: write the one short 'all set' (arch 02 line 125: 'once texts work, one short \"all set\"'; S12-10: 'Once texts work, a short \"all set\" goes out. Nothing already emailed is sent again in full'). Called by the dispatcher (C-126). When texts count as working, and so when it calls, the sources do not say (K-07 open gap 12; open gap 14 here). The row is an ordinary text row with no plan (K-07: no follow-up kind of its own), written planned under the first failed row's turn id, bundle and trace id, so it is composed and checked as any row is (writePlan); its id is fixed by rule, '<first failed row id>/all-set', so one failure set gets one 'all set'. New in v1.1.",
+      "type": "object",
+      "properties": {
+        "failedRowIds": {
+          "description": "The failed rows to this person it closes, oldest first; each must be failed (wrongState otherwise). That they are this person's and went another way is a code check (C-126).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "row": {
+          "description": "The 'all set' row: a text row (texts work again), never an email.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/outboxRowNew"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "channel": {
+                  "enum": ["imessage", "rcs", "sms"]
+                }
+              }
+            }
+          ]
+        },
+        "at": {
+          "$ref": "#/$defs/utc"
+        },
+        "events": {
+          "description": "Its event-log entries (arch 09 line 457: every write appends): outbox_row.created for the row, whose why names the failed rows it closes (the link K-07 open gap 3 keeps in the event log). The call writes them with the first failed row's turn id, trace id and bundle.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/eventEntry"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["failedRowIds", "row", "at", "events"],
+      "additionalProperties": false
+    },
+    "writeAllSet.response": {
+      "title": "WriteAllSetResponse",
+      "description": "Written, planned, with the commit order the database gave it. The row id is the key: the same id again answers repeated true with the stored row and writes nothing, whatever the repeat's body, so the person gets one 'all set'.",
+      "type": "object",
+      "properties": {
+        "result": {
+          "const": "written"
+        },
+        "outboxRow": {
+          "$ref": "#/$defs/outboxRowWritten"
+        },
+        "repeated": {
+          "type": "boolean"
+        }
+      },
+      "required": ["result", "outboxRow", "repeated"],
+      "additionalProperties": false
+    },
+    "writeAllSet.errors": {
+      "title": "WriteAllSetErrors",
+      "description": "wrongState: a listed row is not failed (its state now); notFound: a listed row does not exist; constraint: a handle or person that does not exist (23503); transient. Nothing was written.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/wrongStateError"
+        },
+        {
+          "$ref": "#/$defs/notFoundError"
+        },
+        {
+          "$ref": "#/$defs/constraintError"
+        },
+        {
+          "$ref": "#/$defs/transientError"
+        }
+      ]
+    },
+    "writeAllSet.exchange": {
+      "title": "WriteAllSetExchange",
+      "type": "object",
+      "properties": {
+        "call": {
+          "const": "writeAllSet"
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "request": {
+          "$ref": "#/$defs/writeAllSet.request"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/writeAllSet.response"
+            },
+            {
+              "$ref": "#/$defs/writeAllSet.errors"
             }
           ]
         }

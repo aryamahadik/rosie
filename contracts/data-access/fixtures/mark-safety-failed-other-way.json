@@ -1,0 +1,67 @@
+{
+  "call": "markPart",
+  "given": {
+    "k04Seeds": ["seed-bundle-registry.json", "seed-person-roles.json"],
+    "after": ["claim-alex-safety.json"],
+    "now": "2026-11-07T16:00:01Z",
+    "note": "Linq refuses the safety line's first try with a 503 (the renewal before the send is left out). A failed safety line retries every 10 s for 15 minutes and goes at once every other way the person allows (arch 02 line 125; RULES 4.12; K-07 outbox-safety-retry): in the same transaction as the failure, the next try's key is written and so is the row that takes the line to Alex's email, which he gave, planned under the safety row's turn. Its retries carry no follow-ups."
+  },
+  "request": {
+    "outcome": "failed",
+    "idempotencyKey": "out-alex-safety-emergency/1/1",
+    "errorCode": "503",
+    "retry": true,
+    "at": "2026-11-07T16:00:01Z",
+    "providerMessageId": null,
+    "nextTryNotBefore": null,
+    "followUps": [
+      {
+        "why": "safetyOtherWay",
+        "row": {
+          "id": "out-alex-safety-emergency-email",
+          "recipientHandleId": "handle-alex-email",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": null,
+          "channel": "email",
+          "sendClass": "safety",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": []
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-out-alex-safety-emergency-email",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-safety-emergency-email",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "email" },
+        "sealed": null,
+        "why": { "followUpOf": "out-alex-safety-emergency", "followUp": "safetyOtherWay" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
+  },
+  "outcome": {
+    "result": "marked",
+    "outboxRowId": "out-alex-safety-emergency",
+    "partNo": 1,
+    "tryNo": 1,
+    "attempts": 1,
+    "repeated": false,
+    "firstDelivery": false,
+    "openQuestionId": null,
+    "nextKey": "out-alex-safety-emergency/1/2",
+    "row": { "state": "sending", "version": 4 },
+    "followUpRows": [{ "id": "out-alex-safety-emergency-email", "commitSeq": 2 }]
+  }
+}

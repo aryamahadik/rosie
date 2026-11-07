@@ -4,19 +4,73 @@
     "k04Seeds": ["seed-bundle-registry.json", "seed-reservation.json"],
     "after": ["claim-lapsed-reclaimed.json"],
     "now": "2026-11-07T15:21:40Z",
-    "note": "Linq stays down (S12-09): sends are still failing 15 minutes and 5 seconds after the first try went at 15:06:35. The tries between are left out of this chain; the call checks only the time since firstTryAt, so it ends the row failed and the next way the person allows follows in a later commit (S12-10)."
+    "note": "Linq stays down (S12-09): sends are still failing 15 minutes and 5 seconds after the first try went at 15:06:35. The tries between are left out of this chain; the call checks only the time since firstTryAt. In the same transaction the row ends failed and the next way Alex allows is written: an email row to his email handle, which he gave (S12-10: 'Rosie retries for 15 minutes, then emails Ben, who gave an email on the page'; K-07 outbox-fallback-email), planned under the failed row's turn, so it is composed and checked as any row is."
   },
   "request": {
     "outboxRowId": "out-alex-booked-riley",
     "expectVersion": 5,
     "claimer": "dispatcher-2",
     "claimNo": 2,
-    "at": "2026-11-07T15:21:40Z"
+    "at": "2026-11-07T15:21:40Z",
+    "followUps": [
+      {
+        "why": "nextWay",
+        "row": {
+          "id": "out-alex-booked-riley-by-email",
+          "recipientHandleId": "handle-alex-email",
+          "recipientPersonId": "person-alex",
+          "businessId": "biz-lees-barbershop",
+          "bookingId": "booking-alex-riley-nov14",
+          "channel": "email",
+          "sendClass": "quick_reply",
+          "openQuestionId": null,
+          "copyOfRowId": null,
+          "versionsRead": [{ "table": "bookings", "rowId": "booking-alex-riley-nov14", "version": 1 }]
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "log-out-alex-booked-riley-failed",
+        "kind": "outbox_row.state_changed",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley",
+        "oldValues": { "state": "sending" },
+        "newValues": { "state": "failed" },
+        "sealed": null,
+        "why": { "sendsFailingSince": "2026-11-07T15:06:35Z", "minutes": 15 },
+        "approvedBy": null,
+        "proofs": null
+      },
+      {
+        "id": "log-out-alex-booked-riley-by-email",
+        "kind": "outbox_row.created",
+        "zone": "America/New_York",
+        "businessId": "biz-lees-barbershop",
+        "actorKind": "rosie",
+        "actorPersonId": null,
+        "actorRole": null,
+        "tableName": "outbox_rows",
+        "rowId": "out-alex-booked-riley-by-email",
+        "oldValues": null,
+        "newValues": { "state": "planned", "channel": "email" },
+        "sealed": null,
+        "why": { "followUpOf": "out-alex-booked-riley", "followUp": "nextWay" },
+        "approvedBy": null,
+        "proofs": null
+      }
+    ]
   },
   "outcome": {
     "result": "failed",
     "outboxRowId": "out-alex-booked-riley",
     "version": 6,
-    "firstTryAt": "2026-11-07T15:06:35Z"
+    "firstTryAt": "2026-11-07T15:06:35Z",
+    "followUpRows": [{ "id": "out-alex-booked-riley-by-email", "commitSeq": 3 }]
   }
 }
