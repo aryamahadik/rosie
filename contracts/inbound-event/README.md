@@ -1,14 +1,18 @@
 # inbound-event (K-06): the inbound event, gateway to handle actor
 
-**Status: v1, frozen** (`frozen.json`: `{"frozen": ["v1"]}`). Written and frozen by T-015. The freeze takes effect when T-015 merges, and the merge waits for every review below (build prompt 6.2, 6.5).
+**Status: v1 and v1.1, frozen** (`frozen.json`: `{"frozen": ["v1", "v1.1"]}`). v1 written and frozen by T-015. v1.1, a minor version that adds the wider card-number and Social Security number rule `scrubbedV1dot1` and its fixtures, written and frozen by T-1069; its freeze takes effect when T-1069 merges, and the merge waits for every review below (build prompt 6.2, 6.4, 6.5).
 
 ## Freeze record
 
 Frozen v1, 2026-11-07, reviews required: runtime engineer, integrations engineer, frontend engineer, action-layer engineer.
 
+Frozen v1.1, 2026-11-07 (T-1069), reviews required: runtime engineer, integrations engineer, frontend engineer, action-layer engineer, and the security reviewer (personal data at the edge, build prompt 6.2). Each checks that v1.1 changes nothing on its side but the rule: the shape is v1's, so every v1 event is a v1.1 event; the runtime engineer that the scrub (C-045, T-1070) can make `scrubbedV1dot1` hold and that the tags and counts are v1's; the integrations and frontend engineers that their producers' bodies and subjects go through that scrub unchanged in shape (C-207, C-213, C-205); the action-layer engineer that nothing it reads changes (C-083); the security reviewer the rule itself (README "Named rule (v1.1)").
+
 Each reviewer checks its own side (02-contracts section 1): the runtime engineer the gateway's output and what the actor, the safety read on arrival, the batch, the lease, clock arming, the two-part send and the duplicate, late or edited text path read (C-044, C-045, C-046 to C-049, C-055, C-127, C-184); the integrations engineer that the Linq webhook events and the email inbound replies and delivery events can be parsed into it (C-207, C-213); the frontend engineer that the test-phone page's signed webhooks through the Linq double come out the same (C-205); the action-layer engineer that a poll vote reaches limit 3 as an exact yes and an edit after its turn committed as a new answer (C-083; S13-25 rules 20, 21). The lead records the freeze in `ops/DECISIONS.md` and on the board (build prompt 5.7).
 
 **Owner:** the architect. **Schema:** `inbound-event.v1.schema.json` (JSON Schema 2020-12, `$id` `https://rosie.invalid/contracts/inbound-event/inbound-event.v1.schema.json`); its root is one event. **Named rule:** `inbound-event.rules.mjs` (`scrubbed`). **Checked by:** `npm run contracts:check`. **Contract test:** `tests/contract/inbound-event.v1.test.ts` (QA, T-085). A change after the freeze is a new minor version file, `inbound-event.v1.1.schema.json`, with new fixtures (build prompt 6.4). The frozen-contract guard fails any edit to v1's schema, its fixtures or their index entries; it does not cover the rules file (a release-engineer task already named by T-011).
+
+**v1.1 (T-1069):** `inbound-event.v1.1.schema.json` (`$id` `https://rosie.invalid/contracts/inbound-event/inbound-event.v1.1.schema.json`) is v1's shape exactly: it refers to `inbound-event.v1.schema.json` and adds no field, so `npm run contracts:check` also checks every accepted v1 fixture against it. **Named rule (v1.1):** `scrubbedV1dot1`, added to `inbound-event.rules.mjs` beside `scrubbed`, which is unchanged (the rule name spells v1.1 in the letters the fixtures index allows: `^[A-Za-z][A-Za-z0-9]*$`). **Contract test:** `tests/contract/inbound-event.v1.1.test.ts` (QA, its own task). The guard now also fails an edit to v1.1's schema, its fixtures or their index entries.
 
 ## What it defines
 
@@ -64,6 +68,23 @@ K-06 keeps K-02's names where the meaning is the same, so the context bundle (C-
 
 Card numbers (13 to 19 digits, Luhn) and Social Security numbers are swapped for a tag before any write (arch 02 line 109), so no event after the gateway holds one. One JSON Schema cannot run the Luhn check, so `inbound-event.rules.mjs` states it by name: the body and an email's subject hold no run of 13 to 19 digits (single spaces or dashes allowed between them) that passes the Luhn check, and no Social Security number in a form default 1 names. Every fixture names the rule in `fixtures/index.json`; the accepted ones pass it, and `refuse-unscrubbed-card.json` and `refuse-unscrubbed-ssn.json` pass the schema and are refused by the rule alone (`contracts/scripts/check-fixtures.mjs`). At runtime the gateway's scrub (C-044, C-045) makes it hold; the rule's problem lines never print the number they found.
 
+## Named rule (v1.1): `scrubbedV1dot1`
+
+**Why:** T-242's security review (`ops/cards/T-242.md`) found three ways a card number passes v1's whole-run rule and so is stored untagged: (1) a card next to other digits in the same run ("4111111111111111 123", a card then its security code with one space, is one 19-digit run that fails the Luhn check); (2) a card typed with two or more spaces or dashes between groups; (3) a card in non-ASCII digits. The same widenings apply to a Social Security number. The tags (`[card number]`, `[SSN]`), the fields and `scrubbed`'s counts are v1's.
+
+**What it states.** The body and an email's subject hold no card number and no Social Security number, read this way (sources: arch 02 line 109 "Before any write it swaps card numbers (13 to 19 digits, Luhn) and Social Security numbers for a tag"; arch 10 line 516 "Cards and SSNs scrubbed at the edge"; master S12-30 "Never kept from a text: card numbers, full Social Security numbers", and S13-05; T-242's security review):
+
+1. **Digits of any script** are first read as the ASCII digit they stand for: every Unicode decimal digit (general category Nd: fullwidth, Arabic-Indic, Devanagari, mathematical and the rest). Superscripts, fractions and other number signs that are not Nd are not digits. (`toAsciiDigits`.)
+2. **A digit run** is digits with any run of separators between two of them; a separator is a space of any kind (Unicode Zs, so the no-break and ideographic spaces too), a tab, or a dash of any kind (Unicode Pd, so the hyphen-minus, the en and em dashes and the fullwidth hyphen too). Anything else (a letter, a dot, a slash, a comma, a line break) ends a run.
+3. **A card number** is any 13 to 19 digit window of a run's digits that passes the Luhn check, wherever it sits in the run, so other digits before or after it in the same run do not hide it. (`holdsCardWindow`, `cardRunsInV1dot1`.)
+4. **A Social Security number** is three, two and four digits with a run of one or more separators between the groups and no digit right before or after it (123-45-6789, 123 45 6789, 123-45 6789, 123 - 45 - 6789, and the same in any script). Nine bare digits are still not one (default 1, kept: see "Defaults used (T-1069, v1.1)"). (`hasSsnV1dot1`.)
+
+**It only widens.** Whatever `scrubbed` refuses, `scrubbedV1dot1` refuses: a v1 run is part of a v1.1 run, and its digits are one window of it; v1's two Social Security forms are two of v1.1's. Every accepted v1 fixture passes `scrubbedV1dot1`, and both v1 fixtures `scrubbed` refuses are refused by it (checked when T-1069 was written; the v1.1 contract test holds it).
+
+**Where the tag goes** (the v1.1 fixtures' convention, for the scrub, T-1070): from the left, the first window that passes, the longest at its start, is swapped for `[card number]` with the separators inside it; digits outside it stay ("[card number] 123"); this repeats until no window passes, then Social Security numbers are swapped. The rule holds for any placement that leaves no window; the convention makes the fixtures' tagged bodies the one right answer.
+
+**What it costs.** A long digit run is more often read as a card: a run of 20 digits has 35 windows of 13 to 19 digits, so most such runs hold one that passes the Luhn check by chance, and the scrub swaps it. Arch 02 line 109 puts the scrub before any write, so a number wrongly tagged is lost words, while a card wrongly kept is kept for good; v1.1 takes the first. The rule's problem lines give a count of digits, never the digits.
+
 ## Producers and consumers (02-contracts K-06)
 
 - **Producers:** integrations engineer: C-207 Linq webhook events, C-213 email (inbound replies and delivery events); runtime engineer: C-044 gateway Worker (verifies through the port, seals, drops known event ids), C-045 card and SSN scrub; frontend engineer: C-205 test-phone page (signed webhooks through the Linq double, C-211).
@@ -76,6 +97,17 @@ Accepted, the 16 02-contracts K-06 lists: `text-imessage.json`, `photo.json`, `r
 
 Names and values come only from the master's sample cast (Sam, Alex, Avery; Lee's Barbershop and its $20 fee, fixture set v1's `barber.json`) and K-04's seed rows, so the ids line up across contracts: `evt-alex-0001` and `linq-chat-demo-alex` (seed-thread-messages), the read-back part `linq-msg-demo-0001` and A7-03's poll `linq-msg-demo-0002` with option `linq-opt-demo-2`, "Sat 2:00pm" (seed-outbox-row), the reply address `booking-alex-haircut@reply.example.com`. Phone numbers are the fictional 555-01xx range (+1 555 555 0100 to 0106); email addresses use `example.com`. The card number in the refused fixture is a public test number (4242 4242 4242 4242), and the Social Security number the commonly printed sample 123-45-6789; no real person's data (rule 9). Provider ids (`linq-msg-demo-*`, `linq-chat-demo-*`, `email-msg-demo-*`) are placeholders: their real forms are K-11's and K-12's.
 
+**v1.1 (T-1069)**, each listed for v1.1 and the rule `scrubbedV1dot1`, one pair per case: the refused one (in `fixtures/invalid/`) passes the schema and v1's `scrubbed` and is refused by `scrubbedV1dot1` alone; the accepted one is the same event with the tag in its place, by the convention above.
+
+| Case                           | Refused raw                                    | Accepted tagged                        | Body (raw)                                                          |
+| ------------------------------ | ---------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------- |
+| 1. A card next to other digits | `refuse-unscrubbed-card-next-to-digits.json`   | `text-with-card-next-to-digits.json`   | `My card is 4111111111111111 123, ...`; tagged, the tag then ` 123` |
+| 2. A run of spaces             | `refuse-unscrubbed-card-wide-spaces.json`      | `text-with-card-wide-spaces.json`      | `My card is 4242  4242  4242  4242, ...`, two spaces between groups |
+| 3. Non-ASCII digits            | `refuse-unscrubbed-card-non-ascii-digits.json` | `text-with-card-non-ascii-digits.json` | the same card in fullwidth digits (U+FF10 to U+FF19)                |
+| 4. A wider SSN form            | `refuse-unscrubbed-ssn-wide-form.json`         | `text-with-ssn-wide-form.json`         | `Do you need my social? It's 123 - 45 - 6789`                       |
+
+And `text-with-nine-bare-digits.json` (accepted): "My booking code is 123456789" is kept as it is, which records the bare nine-digit decision. Test values only (rule 9): the public test cards 4111 1111 1111 1111 (Visa) and 4242 4242 4242 4242 (Stripe), and the printed sample number 123-45-6789; the cast and ids are v1's (Alex, Avery; `evt-alex-0016` to `0018`, `evt-avery-0004`, `0005`).
+
 ## Defaults used (T-015)
 
 1. **The tags and the Social Security number forms.** Arch 02 line 109 says "a tag" but not its words. Default: a card number becomes `[card number]` and a Social Security number `[SSN]`; a Social Security number is three digits, two, then four, separated by the same dash or space each time (123-45-6789, 123 45 6789). Nine bare digits are not matched, since no source says they are one. A source naming the tags or the forms changes the gateway and a new rule name, not this version's fields.
@@ -85,6 +117,21 @@ Names and values come only from the master's sample cast (Sam, Alex, Avery; Lee'
 5. **An email reply is kind `text`**, its files are attachments of any media type, and `photo` is Linq's photo message only. An incoming contact card stays an attachment nothing reads (Q-43).
 6. **A receipt's handle** is the handle Rosie's part went to, so clock arming finds the handle's clock rows.
 7. **`chatId`** is carried, though 02-contracts K-06 does not list it, because K-04's `threads.linq_chat_id` waits for "Linq reports it" and the inbound event is where Linq reports it (S1-01).
+
+## Defaults used (T-1069, v1.1)
+
+1. **Nine bare digits stay unmatched (default 1, kept).** No source names the forms of a Social Security number: arch 02 line 109 says "Social Security numbers", arch 10 line 516 "SSNs", and master S12-30 and S13-05 "full Social Security numbers". Nine bare digits are also a booking or order code, a ZIP+4 typed without its dash, or a phone number short a digit, and no source says to give those up. So v1.1 widens the two forms default 1 names (separators and scripts) and leaves nine bare digits as words; `text-with-nine-bare-digits.json` records it. Open question below; if the answer is yes, it is a new minor version with a new rule name.
+2. **Spaces and dashes are by Unicode category** (Zs, a tab, Pd): the card says "any run of spaces or dashes" and names no list. A line break is not a space here, so numbers on separate lines are separate runs.
+3. **Digits are Unicode's decimal digits (Nd)**, read by their place in their set of ten (Unicode encodes each set as ten consecutive code points, 0 to 9); the card says "non-ASCII digits normalised" and names no list.
+4. **Where the tag goes** is the fixtures' convention in "Named rule (v1.1)" (leftmost window, longest at its start); arch 02 line 109 says only "swaps ... for a tag".
+
+## Open gaps (v1.1)
+
+- **Nine bare digits as a Social Security number** (for `QUESTIONS.md`, default 1 in use): should "123456789" be swapped for `[SSN]`? A yes costs the same lost words as a 20-digit run does for cards.
+- **Other characters between digits** end a run: a dot, a slash, a comma or a zero-width character between groups ("4242.4242.4242.4242") is not read as one card. No source or review names them; a later minor version can add them.
+- **The digits next to a card stay** ("[card number] 123"): a security code or an expiry date is not a card number by arch 02 line 109, and no source asks for it to be swapped. Master S13-05 keeps "full card numbers" out; whether a security code counts is not said.
+- **The rules file is not under the frozen-contract guard** (unchanged since v1): `scrubbedV1dot1` is frozen by this README and the rules file's header ("Rules are only ever added"), not by the guard, until the release-engineer task named by T-011 covers `*.rules.mjs`.
+- **The fixture check runs a fixture's own rule only:** that every accepted v1 fixture also passes `scrubbedV1dot1` is held by the v1.1 contract test (QA), not by `npm run contracts:check`, which checks it against the v1.1 schema.
 
 ## Open gaps
 
@@ -104,3 +151,4 @@ Names and values come only from the master's sample cast (Sam, Alex, Avery; Lee'
 ## Change log
 
 - v1, 2026-11-07 (T-015): first version, frozen: the event and its nine kinds, the named rule `scrubbed`, the fixtures and their index, the freeze record and `frozen.json`.
+- v1.1, 2026-11-07 (T-1069): a minor version, additive, frozen at merge. Why: T-242's security review (a card next to other digits, a run of spaces or dashes, non-ASCII digits pass v1's rule untagged). What: `inbound-event.v1.1.schema.json` (v1's shape by reference, no new field); the named rule `scrubbedV1dot1` in `inbound-event.rules.mjs` beside the unchanged `scrubbed`; nine v1.1 fixtures and their index entries (four refused raw, four accepted tagged, one bare nine-digit record); "v1.1" in `frozen.json`; this README's v1.1 sections. No v1 file, fixture or index entry changed. Consumers: as v1 (runtime, integrations, frontend and action-layer engineers); the scrub adopts it in T-1070.

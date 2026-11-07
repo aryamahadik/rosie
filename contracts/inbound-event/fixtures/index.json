@@ -150,6 +150,78 @@
       "expect": "refuse",
       "shows": "Refused by the schema: no event id, so duplicates could not be dropped and no turn id could be made. Otherwise text-imessage.json.",
       "source": "02-contracts K-06 Fixtures (refuse-no-event-id); arch 02 line 109; arch 01 line 59"
+    },
+    {
+      "file": "text-with-card-next-to-digits.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "accept",
+      "shows": "v1.1 case 1, tagged: Alex typed a card and then three more digits with one space; the card's 16 digits are the tag and the other digits stay, so scrubbed.cards is 1. The scrubbed body of invalid/refuse-unscrubbed-card-next-to-digits.json.",
+      "source": "T-242's security review (cards/T-242.md); arch 02 line 109; arch 10 line 516; README 'Named rule (v1.1)' widening 1"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-card-next-to-digits.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "refuse",
+      "shows": "v1.1 case 1, raw: 'My card is 4111111111111111 123' is one 19-digit run that fails the Luhn check, so v1's whole-run rule scrubbed passes it; scrubbedV1dot1 finds the 16-digit window that passes and refuses it. Otherwise text-with-card-next-to-digits.json.",
+      "source": "T-242's security review (cards/T-242.md: 'card 4111111111111111 123'); arch 02 line 109; public Visa test number"
+    },
+    {
+      "file": "text-with-card-wide-spaces.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "accept",
+      "shows": "v1.1 case 2, tagged: a card typed with two spaces between its groups is the tag, spaces included, and scrubbed.cards is 1. The scrubbed body of invalid/refuse-unscrubbed-card-wide-spaces.json.",
+      "source": "T-242's report and security review (cards/T-242.md); arch 02 line 109; README 'Named rule (v1.1)' widening 2"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-card-wide-spaces.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "refuse",
+      "shows": "v1.1 case 2, raw: '4242  4242  4242  4242' (two spaces between groups) is four short runs to v1's rule scrubbed, which passes it; scrubbedV1dot1 reads one 16-digit run and refuses it. Otherwise text-with-card-wide-spaces.json.",
+      "source": "T-242's report (cards/T-242.md: two spaces between groups); arch 02 line 109; public Stripe test number"
+    },
+    {
+      "file": "text-with-card-non-ascii-digits.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "accept",
+      "shows": "v1.1 case 3, tagged: a card typed in fullwidth digits is the tag and scrubbed.cards is 1. The scrubbed body of invalid/refuse-unscrubbed-card-non-ascii-digits.json.",
+      "source": "T-242's report and security review (cards/T-242.md: non-ASCII digits); arch 02 line 109; README 'Named rule (v1.1)' widening 3"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-card-non-ascii-digits.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "refuse",
+      "shows": "v1.1 case 3, raw: the public test card 4242 4242 4242 4242 in fullwidth digits (U+FF10 to U+FF19), which v1's rule scrubbed does not read as digits; scrubbedV1dot1 reads each as its ASCII digit first and refuses it. Otherwise text-with-card-non-ascii-digits.json.",
+      "source": "T-242's report and security review (cards/T-242.md: non-ASCII digits); arch 02 line 109; Unicode decimal digits (Nd)"
+    },
+    {
+      "file": "text-with-ssn-wide-form.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "accept",
+      "shows": "v1.1 case 4, tagged: a Social Security number typed with a space, a dash and a space between its groups is the tag and scrubbed.ssns is 1. The scrubbed body of invalid/refuse-unscrubbed-ssn-wide-form.json.",
+      "source": "arch 02 line 109; arch 10 line 516; master S12-30, S13-05 ('full Social Security numbers'); README 'Named rule (v1.1)'"
+    },
+    {
+      "file": "invalid/refuse-unscrubbed-ssn-wide-form.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "refuse",
+      "shows": "v1.1 case 4, raw: '123 - 45 - 6789' (the printed sample number, a run of spaces and dashes between groups), which v1's rule scrubbed passes because it allows one separator only; scrubbedV1dot1 refuses it. Otherwise text-with-ssn-wide-form.json.",
+      "source": "arch 02 line 109; master S12-30, S13-05; T-242's report (cards/T-242.md); README default 1 (the forms), widened by v1.1"
+    },
+    {
+      "file": "text-with-nine-bare-digits.json",
+      "version": "v1.1",
+      "rule": "scrubbedV1dot1",
+      "expect": "accept",
+      "shows": "The bare nine-digit decision: 'My booking code is 123456789' is kept as it is under v1.1 too, since nine bare digits are not read as a Social Security number (README default 1, kept by T-1069; open question in the README).",
+      "source": "README default 1 and 'Named rule (v1.1)' (nine bare digits); arch 02 line 109 names no form"
     }
   ]
 }
