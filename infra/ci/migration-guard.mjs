@@ -14,8 +14,9 @@
 //
 // Comments and string literals are never checked. Function bodies (CREATE FUNCTION ... AS $$ ... $$) are not
 // checked either, because they do not run during the migration; DO $$ ... $$ blocks are, because they do.
-// A notice also flags CREATE INDEX CONCURRENTLY in a file without the first line `-- migrate:no-transaction`:
-// infra/scripts/migrate.mjs runs every other file in a transaction, where PostgreSQL refuses CONCURRENTLY.
+// A notice also flags a file migrate.mjs refuses: CREATE INDEX CONCURRENTLY mixed with other statements, or a
+// `-- migrate:no-transaction` file with several statements that are not all CREATE INDEX CONCURRENTLY. A file of
+// only CREATE INDEX CONCURRENTLY statements needs no marker (T-724, DL-061).
 //
 // Usage: node infra/ci/migration-guard.mjs [--base <ref>] [--dir <path>]
 //        (defaults: origin/main, db/migrations)
@@ -198,10 +199,10 @@ const ADVICE = new Map([
   ["delete", "Removing rows is a contracting change: ship it in a _contract_ file."],
   [
     "create-index",
-    "Use CREATE INDEX CONCURRENTLY (it does not block writes), alone in a file whose first line is -- migrate:no-transaction.",
+    "Use CREATE INDEX CONCURRENTLY (it does not block writes): either in a file of only CREATE INDEX CONCURRENTLY statements (no marker needed), or in a file whose first line is -- migrate:no-transaction that holds that one statement or several that are all CREATE INDEX CONCURRENTLY.",
   ],
 ]);
-// migrate.mjs runs a file outside a transaction only when its first line is this marker.
+// migrate.mjs also runs a file outside a transaction when its first line is this marker.
 const NO_TRANSACTION = /^--\s*migrate:no-transaction\s*$/;
 const CONCURRENT_INDEX = /\bCREATE\s+(?:UNIQUE\s+)?INDEX\s+CONCURRENTLY\b/;
 
@@ -316,13 +317,19 @@ export function checkMigrations(base, branch, baseName = DEFAULT_BASE) {
       });
     }
     const content = branch.get(file)?.content ?? "";
-    const concurrent = splitStatements(content).some((statement) =>
+    const statements = splitStatements(content);
+    const concurrentCount = statements.filter((statement) =>
       CONCURRENT_INDEX.test(statement.text.toUpperCase()),
-    );
-    if (concurrent && !NO_TRANSACTION.test((content.split(/\r?\n/, 1)[0] ?? "").trim())) {
+    ).length;
+    const marked = NO_TRANSACTION.test((content.split(/\r?\n/, 1)[0] ?? "").trim());
+    // The runner (migrate.mjs) accepts: only CREATE INDEX CONCURRENTLY statements (marker or not), or a marker
+    // file with exactly one statement. It refuses a mix, and a marker file with several other statements.
+    const onlyConcurrent = statements.length > 0 && concurrentCount === statements.length;
+    const refused = !onlyConcurrent && statements.length > 1 && (concurrentCount > 0 || marked);
+    if (refused) {
       notices.push({
         file,
-        message: `${name}: CREATE INDEX CONCURRENTLY fails inside a transaction; make "-- migrate:no-transaction" the first line and keep that statement alone in the file`,
+        message: `${name}: migrate refuses this file: a file of only CREATE INDEX CONCURRENTLY statements needs no marker; a file whose first line is "-- migrate:no-transaction" holds one statement of any kind, or several that are all CREATE INDEX CONCURRENTLY; CREATE INDEX CONCURRENTLY cannot be mixed with other statements`,
       });
     }
     const contract = name.includes("_contract_");
