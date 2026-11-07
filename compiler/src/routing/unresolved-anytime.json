@@ -1,0 +1,96 @@
+{
+  "about": "Any-time rows with no clear handler step in the master, for Jay (QUESTIONS Q-40: a row with no clear step goes to Jay, never guessed). The candidates are steps that come near; none is used as a handler. Checked against tables.ts by routing.test.ts.",
+  "rows": [
+    {
+      "row": "problem-getting-worse",
+      "order": 4,
+      "flows": ["A", "B"],
+      "why": "before the visit a worse problem has a step (A7-13, B7-17), during the visit another (A8-86, B8-97); no source says which is the row's",
+      "candidates": { "A": ["A7-13", "A8-86"], "B": ["B7-17", "B8-97"] }
+    },
+    {
+      "row": "wrong-party-or-language",
+      "order": 7,
+      "flows": ["A", "B"],
+      "why": "a wrong number has a step (A3-12, B3-13); the master has no step for a wrong language",
+      "candidates": { "A": ["A3-12"], "B": ["B3-13"] }
+    },
+    {
+      "row": "third-party-or-privacy",
+      "order": 8,
+      "flows": ["A", "B"],
+      "why": "one step per stage (new conversation, before the visit, after it) and no source names one",
+      "candidates": { "A": ["A3-41", "A7-80", "A10-40"], "B": ["B3-33", "B7-72", "B10-33"] }
+    },
+    {
+      "row": "payment-problem",
+      "order": 10,
+      "flows": ["A", "B"],
+      "why": "a declined card, a Stripe outage and a fee that cannot be charged are separate steps; no source names one",
+      "candidates": { "A": ["S12-25", "S12-16", "S11-24"], "B": ["S12-25", "S12-16", "S11-24"] }
+    },
+    {
+      "row": "complaint-or-dispute",
+      "order": 11,
+      "flows": ["A", "B"],
+      "why": "a complaint and a bank dispute are separate steps; no source names one",
+      "candidates": { "A": ["A10-14", "A10-16"], "B": ["B10-13", "B10-14"] }
+    },
+    {
+      "row": "damage",
+      "order": 12,
+      "flows": ["A", "B"],
+      "why": "one step covers damage during the visit; no source names it for the row, and damage found after the visit has none",
+      "candidates": { "A": ["A8-39"], "B": ["B8-35"] }
+    },
+    {
+      "row": "cancel",
+      "order": 14,
+      "flows": ["A", "B"],
+      "why": "an in-time cancel and a late cancel (with a fee) are separate steps; which one fits is decided by the clock",
+      "candidates": { "A": ["A7-05", "A7-06"], "B": ["B7-08", "B7-10"] }
+    },
+    {
+      "row": "move",
+      "order": 15,
+      "flows": ["A", "B"],
+      "why": "one step moves a visit before it; no source names it for the row",
+      "candidates": { "A": ["A7-03"], "B": ["B7-07"] }
+    },
+    {
+      "row": "running-late",
+      "order": 16,
+      "flows": ["A", "B"],
+      "why": "the customer running late and the pro running late are separate steps",
+      "candidates": { "A": ["A7-70", "A7-14"], "B": ["B7-27", "B7-18"] }
+    },
+    {
+      "row": "business-cant-make-it",
+      "order": 17,
+      "flows": ["A", "B"],
+      "why": "a split of six cases (pro cannot come, runs late, Sam moves it, business cancels, too few booked); no one step",
+      "candidates": { "A": ["A7-93"], "B": ["B7-90"] }
+    },
+    {
+      "row": "scope-change-or-new-request",
+      "order": 18,
+      "flows": ["A", "B"],
+      "why": "before the visit and during it are separate steps",
+      "candidates": { "A": ["A7-31", "A8-33"], "B": ["B7-31", "B8-23"] }
+    },
+    {
+      "row": "question-or-unclear-reply",
+      "order": 19,
+      "flows": ["A", "B"],
+      "why": "a customer's question and an owner's unclear text (S11-21) are separate steps",
+      "candidates": { "A": ["A7-12", "S11-21"], "B": ["B7-16", "S11-21"] }
+    },
+    {
+      "row": "due-items",
+      "order": 21,
+      "flows": ["A", "B"],
+      "why": "one step covers a plan or count due before the visit; no source names it for the row",
+      "candidates": { "A": ["A7-94"], "B": ["B7-91"] }
+    }
+  ]
+}
