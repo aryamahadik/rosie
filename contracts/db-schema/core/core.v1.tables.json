@@ -1579,7 +1579,7 @@
     },
     {
       "name": "reservations",
-      "description": "One reservation table: a resource, a time range and a state (arch 09 line 457). EXCLUDE refuses overlapping held or booked time per worker, room or vehicle, and per worker person across businesses; class seats are counted in class_seats (arch 05 line 255; arch 10 line 510; BP section 10 card T-041). A saved time is a held row with held_until (arch 05 line 247); someone waiting next in line is a waiting row (A4-18).",
+      "description": "One reservation table: a resource, a time range and a state (arch 09 line 457). EXCLUDE refuses overlapping held or booked time per worker, room or vehicle, and per worker person across businesses; class seats are counted in class_seats (arch 05 line 255; arch 10 line 510; BP section 10 card T-041). A saved time is a held row with held_until (arch 05 line 247); someone waiting next in line is a waiting row, and queued_at orders the line (A4-18).",
       "source": "arch 09 line 457 ('Reservation: resource · range · state'); arch 05 lines 247, 255; arch 10 line 510; BP section 10 card T-041; FS line 743; key time_saved (A4-21, B4-23)",
       "columns": [
         {
@@ -1637,6 +1637,15 @@
           "audience": "never",
           "description": "held (a saved time), waiting (next in line), booked or released.",
           "source": "arch 09 line 457 (state); arch 05 line 247; A4-18; 02-contracts K-05 item 6"
+        },
+        {
+          "name": "queued_at",
+          "type": "timestamptz",
+          "null": false,
+          "default": "now()",
+          "audience": "never",
+          "description": "When the row was written, never changed after; for a waiting row, its place in line. The next in line for a released time is the waiting row of that resource whose time overlaps it with the earliest queued_at, a tie broken by the lower id (ids stay opaque, CQ-09: compared only to break a tie, never parsed), so release promotes exactly one row and the same one every time.",
+          "source": "A4-18 and arch 05 line 247 ('A time someone else has saved: they wait next in line'); 02-contracts K-05 item 6 ('Release: ... promoting the next in line'; 'or next in line (A4-18)'); CQ-09 (ids are opaque, so no id gives the order)"
         },
         {
           "name": "seats",
@@ -1855,6 +1864,12 @@
           "columns": ["for_phone_number"],
           "where": "state = 'held'",
           "why": "At most 2 saved times per mobile (arch 05 line 247)."
+        },
+        {
+          "name": "reservations_waiting_queue_idx",
+          "columns": ["resource_id", "queued_at", "id"],
+          "where": "state = 'waiting'",
+          "why": "Release finds the next in line: a resource's waiting rows in queue order, earliest queued_at first, then the lower id (A4-18; arch 05 line 247; 02-contracts K-05 item 6)."
         },
         {
           "name": "reservations_booking_idx",

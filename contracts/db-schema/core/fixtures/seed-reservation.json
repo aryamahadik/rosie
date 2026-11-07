@@ -31,10 +31,27 @@
         "worker_person_id": "person-avery",
         "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
         "state": "held",
+        "queued_at": "2026-11-07T15:00:00Z",
         "seats": 1,
         "held_until": "2026-11-07T15:10:00Z",
         "extended": false,
         "for_phone_number": "+15555550101",
+        "version": 1
+      }
+    },
+    {
+      "table": "reservations",
+      "values": {
+        "id": "rsv-agent-waiting-avery-second",
+        "business_id": "biz-lees-barbershop",
+        "resource_id": "res-avery",
+        "resource_kind": "worker",
+        "worker_person_id": "person-avery",
+        "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
+        "state": "waiting",
+        "queued_at": "2026-11-07T15:04:00Z",
+        "seats": 1,
+        "for_agent_token": "agent-token-demo-3",
         "version": 1
       }
     },
@@ -48,6 +65,7 @@
         "worker_person_id": "person-avery",
         "during": "[2026-11-14T15:00:00Z,2026-11-14T15:30:00Z)",
         "state": "waiting",
+        "queued_at": "2026-11-07T15:02:00Z",
         "seats": 1,
         "for_agent_token": "agent-token-demo-2",
         "version": 1

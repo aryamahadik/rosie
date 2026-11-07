@@ -77,8 +77,8 @@
       "version": "v1",
       "table": "reservations",
       "expect": "accept",
-      "shows": "Alex's haircut with Riley, booked; a time Alex saved with Avery for 10 minutes and an agent token waiting next in line for the same time (a waiting row is outside EXCLUDE); a truck hold that expired and was released",
-      "source": "arch 09 line 457; arch 05 lines 247, 255; A4-18; key time_saved (A4-21); barber.json (the $35 haircut with Riley); MASTER-FLOW-A A7-03 (Sat Oct 24, 11:00am)"
+      "shows": "Alex's haircut with Riley, booked; a time Alex saved with Avery for 10 minutes (15:00) and two agent tokens waiting next in line for the same time, queued at 15:02 and 15:04 and inserted in the other order, so queued_at, not insert order, makes agent-token-demo-2 the one release promotes (waiting rows are outside EXCLUDE); a truck hold that expired and was released",
+      "source": "arch 09 line 457; arch 05 lines 247, 255; A4-18; 02-contracts K-05 item 6 (release promotes the next in line); CQ-09; key time_saved (A4-21);barber.json (the $35 haircut with Riley); MASTER-FLOW-A A7-03 (Sat Oct 24, 11:00am)"
     },
     {
       "file": "seed-turn.json",
