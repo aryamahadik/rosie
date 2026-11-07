@@ -1,0 +1,24 @@
+{
+  "after": ["seed-session.json"],
+  "rows": [],
+  "refused": {
+    "role": "toolApi",
+    "scope": {
+      "businessId": "biz-lees-barbershop",
+      "personId": "person-riley"
+    },
+    "action": "update",
+    "table": "sessions",
+    "set": {
+      "ended_at": "2026-10-26T09:10:00Z",
+      "ended_why": "signed_out",
+      "version": 3
+    },
+    "where": {
+      "id": "session-sam-oct26"
+    },
+    "expect": {
+      "rows": 0
+    }
+  }
+}

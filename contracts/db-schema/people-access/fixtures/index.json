@@ -125,7 +125,7 @@
       "version": "v1",
       "table": "proof_codes",
       "expect": "refuse",
-      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's sign-in code row with every column is refused (no SELECT on code_hash, SQLSTATE 42501): no Tool API call reads a code hash back; the same read on the runtime side passes, and the Tool API's read of every other column passes",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's sign-in code row with every column is refused (no SELECT on code_hash, SQLSTATE 42501): no Tool API call reads a code hash back; the same read on the runtime side passes, and the Tool API's read of every other column passes, returning the row only in Sam's own call (rosie.person_id Sam: rules 4 and 5)",
       "source": "README rule 5; BP rule 7; RULES 6.2; S11-52"
     },
     {
@@ -141,7 +141,7 @@
       "version": "v1",
       "table": "sessions",
       "expect": "refuse",
-      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's live session with every column is refused (no SELECT on token_sha256, SQLSTATE 42501): a token is found only through session_for_token, which never returns a hash; the same read on the runtime side passes",
+      "shows": "A Tool API call scoped to Lee's Barbershop reading Sam's live session with every column is refused (no SELECT on token_sha256 or device_sha256, SQLSTATE 42501): a token is found only through session_for_token and a device only through device_known, which never return a hash; the same read on the runtime side passes",
       "source": "README rule 5; BP rule 7; S11-52"
     },
     {
@@ -151,6 +151,46 @@
       "expect": "refuse",
       "shows": "A Tool API call scoped to Lee's Barbershop reading Alex's change from his own chat, which has no business, gets no row (row-level security): the Tool API may write a person's own change with no business but no business scope reads one; the same read on the runtime side returns it",
       "source": "README rule 4; K-04 v1 rule 4; D75; D102; FS line 756; RULES 9.3"
+    },
+    {
+      "file": "invalid/refuse-session-device-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "Sam's own call (rosie.person_id Sam) reading his live session with every column but token_sha256 is refused (no SELECT on device_sha256, SQLSTATE 42501): the device hash is a session hash no Tool API call reads, and whether a device was seen before comes only from device_known; the same read without device_sha256 returns Sam's row, and the read on the runtime side passes",
+      "source": "README rule 5; BP rule 7; S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); S11-52"
+    },
+    {
+      "file": "invalid/refuse-other-person-code-read.json",
+      "version": "v1",
+      "table": "proof_codes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee Home Services acting for Sam, its owner, reading Jordan's paused sign-in code with every column but code_hash gets no row (row-level security by rosie.person_id): a code is read only in the call of the person it proves, never across people from a business scope; the same read in Jordan's own call returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; RULES 6.2; S11-52; BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-other-person-session-read.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Riley reading Sam's live session with every column but the two hashes gets no row (row-level security by rosie.person_id): a session is read only in its own person's call, even inside a business that person owns; the same read in Sam's own call returns it, and so does the runtime side",
+      "source": "README rules 4 and 5; S11-52 (a session covers every business of the person); BP rule 7"
+    },
+    {
+      "file": "invalid/refuse-other-person-session-end.json",
+      "version": "v1",
+      "table": "sessions",
+      "expect": "refuse",
+      "shows": "The same call (Lee's Barbershop, acting for Riley) ending Sam's live session changes no row (row-level security by rosie.person_id): the Tool API touches and ends only its own person's sessions, and another person's (left, handed_over) end on the runtime side; the same update in Sam's own call signs him out (version 2 to 3), and so does the runtime side",
+      "source": "README rule 5; S11-52; S13-56 ('Their access ends: sign-in ...'); RULES 8.7, 9.1; S11-100"
+    },
+    {
+      "file": "invalid/refuse-own-chat-change-for-another.json",
+      "version": "v1",
+      "table": "contact_changes",
+      "expect": "refuse",
+      "shows": "A call scoped to Lee's Barbershop acting for Sam writing an own-chat change for Alex with no business (Alex's updates moved from his email to Sam's mobile, with a code Sam's mobile got and typed back) is refused by the insert policy (SQLSTATE 42501): a change with no business is admitted only for the call's own person (rosie.person_id), since D75 counts it only from Alex's own chat and its code proves only the new contact; the same row in Alex's own call passes, and so does the runtime side",
+      "source": "README rule 4; D75 (RULES 9.1; S13-45 row 3: 'the request counts only from the customer's own chat'); D102; FS line 756"
     }
   ]
 }

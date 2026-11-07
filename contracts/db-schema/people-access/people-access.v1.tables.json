@@ -1377,7 +1377,7 @@
       ],
       "rowLevelSecurity": {
         "scope": "none",
-        "why": "Not per business: a sign-in code covers every business of the person (S11-52). README rule 5: the Tool API role sends a code by INSERT (in the one commit with its outbox row: arch 10 line 508) and may SELECT every column but code_hash; it has no UPDATE or DELETE, and checks a typed code only through check_proof_code(code_id, typed_hash, at), a security-definer call that uses the code or counts the wrong try (pausing at the fifth) and returns only the outcome, never a hash (RULES 6.2; BP rule 7). The runtime side keeps full access, unscoped."
+        "why": "Not per business: a sign-in code covers every business of the person (S11-52), so the Tool API's rows are bound to the call's person instead (README rules 4 and 5). Its select policy admits a row whose person_id is the call's rosie.person_id, or a listing's control code (no person) whose business_id is the call's rosie.business_id, and it may SELECT every column but code_hash. It sends a code by INSERT, not bound to the call's person since a code may prove someone the call does not act for (D77; S11-100), in the one commit with its outbox row (arch 10 line 508), with no RETURNING; it has no UPDATE or DELETE. It checks a typed code only through check_proof_code(code_id, typed_hash, at), which uses the code or counts the wrong try (pausing at the fifth) and returns only the outcome, and learns a contact's code count and pause only through proof_code_limits(handle_id, purpose, since, at): security-definer calls that never return a hash or another person's row (RULES 6.2; S13-45; BP rule 7). The runtime side keeps full access, unscoped."
       },
       "versioned": true,
       "versionColumn": "version",
@@ -1417,7 +1417,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The sha256 of the device's own id, in lowercase hex, so a sign-in from a device not seen before asks the extra proof (a code to the owner's email typed back, or the ID re-check). Null: not known.",
+          "description": "The sha256 of the device's own id, in lowercase hex, so a sign-in from a device not seen before asks the extra proof (a code to the owner's email typed back, or the ID re-check). A session hash, like token_sha256: no Tool API call reads or searches it, and whether the call's own person used a device before comes only from device_known (README rule 5). Null: not known.",
           "source": "S13-45 row 8 ('A new device needs a code to the owner's email, typed back, or the ID re-check'); S11-52 ('A new device ... follows the business side of S13-45'); BP rule 7"
         },
         {
@@ -1555,7 +1555,7 @@
       ],
       "rowLevelSecurity": {
         "scope": "none",
-        "why": "Not per business: a session covers every business of the person (S11-52: 'every booking for both businesses'). README rule 5: the Tool API role starts a session by INSERT (after check_proof_code says right), may SELECT every column but token_sha256 and UPDATE only last_seen_at, ended_at, ended_why and version, with no DELETE; it finds a presented token only through session_for_token(token_sha256, at), a security-definer call that returns the live session's id, never a hash (BP rule 7). The runtime side keeps full access, unscoped."
+        "why": "Not per business: a session covers every business of the person (S11-52: 'every booking for both businesses'), so the Tool API's rows are bound to the call's person instead (README rules 4 and 5): its policies admit only rows whose person_id is the call's rosie.person_id. It starts its own person's session by INSERT (after check_proof_code says right), may SELECT every column but token_sha256 and device_sha256 and UPDATE only last_seen_at, ended_at, ended_why and version, with no DELETE. It finds a presented token only through session_for_token(token_sha256, at), which returns the live session's id and person, and whether a device was seen before only through device_known(device_sha256), which answers for the call's own person: security-definer calls that never return a hash (BP rule 7; S13-45 row 8). Another person's sessions (left, handed_over) end on the runtime side, which keeps full access, unscoped."
       },
       "versioned": true,
       "versionColumn": "version",
@@ -1587,7 +1587,7 @@
           "type": "text",
           "null": true,
           "audience": "never",
-          "description": "The business whose desk or team page made it (in person, D77; the owner's team edit, S11-20); null for a change from the person's own chat or sign-in, which covers every business (one number: D102). Row-level security is by this column (README rule 4): a business scope reads and writes only its own rows; a row with null here is the person's own change, which the Tool API may insert whatever its scope (the insert policy admits business_id null with changed_by_person_id = person_id, with no RETURNING) and no business scope reads; the runtime side reads it, unscoped.",
+          "description": "The business whose desk or team page made it (in person, D77; the owner's team edit, S11-20); null for a change from the person's own chat or sign-in, which covers every business (one number: D102). Row-level security is by this column (README rule 4): a business scope reads and writes only its own rows; a row with null here is the person's own change, which the Tool API may insert whatever its business scope only for the call's own person (the insert policy admits business_id null when person_id is the call's rosie.person_id and changed_by_person_id = person_id, with no RETURNING) and which no Tool API call reads; the runtime side reads it, unscoped.",
           "source": "D77 ('Staff updating a customer's details in person'); FS section 8 (the owner's team edit, S11-20); D75; D102; K-04 v1 rule 4; arch 10 line 546"
         },
         {

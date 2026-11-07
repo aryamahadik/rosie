@@ -11,7 +11,8 @@
     "set": {
       "wrong_tries": 0,
       "last_wrong_at": null,
-      "paused_until": null
+      "paused_until": null,
+      "version": 7
     },
     "where": {
       "id": "code-jordan-sign-in-paused"
