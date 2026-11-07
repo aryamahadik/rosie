@@ -1,0 +1,103 @@
+{
+  "version": "v1",
+  "contract": "model.v1",
+  "about": "Recordings for the recorded-model double (T-004, C-123). Each is one model answer keyed by its request. These are seeded from K-02 v1's fixtures (contracts/model/fixtures), not recorded live: no model call is made (J-02a). A request is a K-02 context (decide, planner) or a raw text (safety read); a context is given inline, as {\"fixture\": <K-02 fixture>} or as {\"file\": <path under ai/recordings>}. The safety texts and the planner contexts below are synthetic stand-ins written from the fixtures' own evidence words and the master's sample cast; no real person or customer appears (rule 9).",
+  "recordings": [
+    {
+      "id": "decide-s1-02-first",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-s1-02.json" }, "role": "first" },
+      "seed": { "fixture": "decide-s1-02-choose.json" }
+    },
+    {
+      "id": "decide-s1-02-check",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-s1-02.json" }, "role": "check" },
+      "seed": { "fixture": "decide-s1-02-choose.json" }
+    },
+    {
+      "id": "decide-two-requests-first",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-two-requests.json" }, "role": "first" },
+      "seed": { "fixture": "decide-two-requests.json" }
+    },
+    {
+      "id": "decide-two-requests-check",
+      "kind": "decideRead",
+      "request": { "context": { "fixture": "context-two-requests.json" }, "role": "check" },
+      "seed": { "fixture": "decide-two-requests.json" }
+    },
+    {
+      "id": "safety-no",
+      "kind": "safetyRead",
+      "request": { "text": "Can I book a haircut for Saturday at 2?" },
+      "seed": { "fixture": "safety-no.json" }
+    },
+    {
+      "id": "safety-emergency-now",
+      "kind": "safetyRead",
+      "request": { "text": "my lips are swelling after the beard color and I can't breathe well" },
+      "seed": { "fixture": "safety-emergency-now.json" }
+    },
+    {
+      "id": "safety-crisis-words",
+      "kind": "safetyRead",
+      "request": { "text": "I don't want to be alive anymore" },
+      "seed": { "fixture": "safety-crisis-words.json" }
+    },
+    {
+      "id": "safety-threat",
+      "kind": "safetyRead",
+      "request": { "text": "if Riley messes up my hair again I'll hurt him" },
+      "seed": { "fixture": "safety-threat.json" }
+    },
+    {
+      "id": "safety-child-or-elder",
+      "kind": "safetyRead",
+      "request": { "text": "my mom's carer leaves her alone without food for days" },
+      "seed": { "fixture": "safety-child-or-elder.json" }
+    },
+    {
+      "id": "safety-unsafe-at-home",
+      "kind": "safetyRead",
+      "request": { "text": "my ex lives with me and gets angry if he sees I'm going out" },
+      "seed": { "fixture": "safety-unsafe-at-home.json" }
+    },
+    {
+      "id": "safety-business-own-line",
+      "kind": "safetyRead",
+      "request": { "text": "is the beard color okay if I'm allergic to hair dye?" },
+      "seed": { "fixture": "safety-business-own-line.json" }
+    },
+    {
+      "id": "safety-over-gas-leak",
+      "kind": "safetyRead",
+      "request": { "text": "the gas leak was fixed in March" },
+      "seed": { "fixture": "safety-over-gas-leak.json" }
+    },
+    {
+      "id": "safety-unknown-tense",
+      "kind": "safetyRead",
+      "request": { "text": "there was a fire in the back room" },
+      "seed": { "fixture": "safety-unknown-tense.json" }
+    },
+    {
+      "id": "planner-answer",
+      "kind": "plannerOutput",
+      "request": { "context": { "file": "contexts/planner-answer.json" } },
+      "seed": { "fixture": "planner-answer.json" }
+    },
+    {
+      "id": "planner-log-gap",
+      "kind": "plannerOutput",
+      "request": { "context": { "file": "contexts/planner-log-gap.json" } },
+      "seed": { "fixture": "planner-log-gap.json" }
+    },
+    {
+      "id": "planner-hand-off",
+      "kind": "plannerOutput",
+      "request": { "context": { "file": "contexts/planner-hand-off.json" } },
+      "seed": { "fixture": "planner-hand-off.json" }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "turnId": "turn-planner-log-gap-alex-parking",
+  "bundleId": {
+    "hash": "93c00d14a6100d34e6b78556ba6561d8c327ca269cc48885662a302f20c76037",
+    "build": 1
+  },
+  "flow": "A",
+  "texts": [
+    {
+      "eventId": "evt-alex-0302",
+      "kind": "text",
+      "words": "Does the shop have parking?",
+      "sentAt": {
+        "utc": "2026-10-20T15:12:00Z",
+        "zone": "America/New_York"
+      },
+      "attachments": [],
+      "poll": null,
+      "tapback": null
+    }
+  ],
+  "writer": {
+    "handle": "+15555550101",
+    "people": [
+      {
+        "personId": "person-alex",
+        "name": "Alex",
+        "roles": [
+          {
+            "role": "customer",
+            "businessId": "biz-lees-barbershop"
+          }
+        ],
+        "language": "en"
+      }
+    ]
+  },
+  "businessLanguage": "en",
+  "openQuestions": [],
+  "choices": [
+    {
+      "question": null,
+      "branch": null,
+      "anytimeRow": null,
+      "door": "unclearOwnerOrHelp",
+      "hub": null,
+      "fields": [],
+      "stakes": "low",
+      "stakesFrom": [],
+      "choiceId": "c-01",
+      "kind": "door",
+      "label": "An unclear owner text or HELP",
+      "definition": "Nothing changes on a text Rosie can't act on for sure.",
+      "step": "S11-21",
+      "target": {
+        "businessId": "biz-lees-barbershop",
+        "businessName": "Lee's Barbershop",
+        "bookingId": null,
+        "visitAt": null
+      }
+    }
+  ],
+  "cards": [],
+  "facts": [],
+  "alwaysOn": {
+    "flow": "A",
+    "prefixSha256": "18d7f9c761c1f58436d2e3e9148b64386221b1d0affa33a8c7b0226c06b6ebea"
+  },
+  "recentMessages": [],
+  "meaningSearch": null
+}
